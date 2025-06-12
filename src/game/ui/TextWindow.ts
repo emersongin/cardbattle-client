@@ -31,6 +31,11 @@ export class TextWindow extends TextBox {
         });
         this.layout();
         this.setScale(1, 0);
+        this.addAction(scene, callback);
+        scene.add.existing(this);
+    }
+
+    addAction(scene: Phaser.Scene, callback?: () => void) {
         if (!scene.input.keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
@@ -39,7 +44,6 @@ export class TextWindow extends TextBox {
             if (callback && this.isOpen()) callback();
             this.isClose() ? this.open() : this.close();
         });
-        scene.add.existing(this);
     }
 
     static createCenteredWindow(scene: Phaser.Scene, text: string, callback?: () => void) {

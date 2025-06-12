@@ -21,7 +21,12 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
-        "strictPropertyInitialization": false
+        "strictPropertyInitialization": false,
+        "baseUrl": ".",
+        "paths": {
+            "@/*": ["src/*"],
+            "@ui/*": ["src/game/ui/*"]
+        }
     },
     "include": [
         "src/**/*.ts",
