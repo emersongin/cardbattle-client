@@ -26,9 +26,10 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-          '@': fileURLToPath(new URL('../src', import.meta.url))
+            '@': fileURLToPath(new URL('../src', import.meta.url)),
+            '@ui': fileURLToPath(new URL('../src/game/ui', import.meta.url)),
         }
-      },
+    },
     logLevel: 'warning',
     build: {
         rollupOptions: {

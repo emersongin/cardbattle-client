@@ -2,8 +2,10 @@ import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 
 export class TextWindow extends TextBox {
     #tween: Phaser.Tweens.Tween | null = null;
+    private keyListener?: () => void;
+
     private constructor(
-        scene: Phaser.Scene, 
+        readonly scene: Phaser.Scene, 
         x: number, 
         y: number, 
         width: number, 
@@ -35,15 +37,18 @@ export class TextWindow extends TextBox {
         scene.add.existing(this);
     }
 
-    addAction(scene: Phaser.Scene, callback?: () => void) {
+    private addAction(scene: Phaser.Scene, callback?: () => void) {
         if (!scene.input.keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
-        scene.input.keyboard.on('keydown-SPACE', () => {
+
+        this.keyListener = () => {
             if (this.isBusy()) return;
             if (callback && this.isOpen()) callback();
             this.isClose() ? this.open() : this.close();
-        });
+        };
+
+        scene.input.keyboard.once('keydown-SPACE', this.keyListener, this);
     }
 
     static createCenteredWindow(scene: Phaser.Scene, text: string, callback?: () => void) {
@@ -71,6 +76,7 @@ export class TextWindow extends TextBox {
     }
 
     open() {
+        if (!this.scene?.tweens) return;
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 1,
@@ -80,11 +86,21 @@ export class TextWindow extends TextBox {
     }
 
     close() {
+        if (!this.scene?.tweens) return;
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeOut'
         });
+    }
+
+    override destroy(fromScene?: boolean) {
+        if (this.keyListener) {
+            this.scene.input.keyboard?.removeListener('keydown-SPACE', this.keyListener, this);
+            this.keyListener = undefined;
+        }
+
+        super.destroy(fromScene); // destrói corretamente como TextBox (rexUI)
     }
 }

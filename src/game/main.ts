@@ -1,7 +1,7 @@
 import { AUTO, Game } from 'phaser';
 import { Boot } from './scenes/Boot';
 import { Preloader } from './scenes/Preloader';
-import { CardBattle } from './scenes/CardBattle/CardBattle';
+import { CardBattleScene } from './scenes/CardBattle/CardBattleScene';
 import RexUIPlugin from 'phaser3-rex-plugins/templates/ui/ui-plugin.js';
 
 declare module 'phaser' {
@@ -25,7 +25,7 @@ const config: Phaser.Types.Core.GameConfig = {
     scene: [
         Boot,
         Preloader,
-        CardBattle
+        CardBattleScene
     ],
     plugins: {
         scene: [
