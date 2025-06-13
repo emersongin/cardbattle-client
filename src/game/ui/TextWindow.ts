@@ -33,22 +33,18 @@ export class TextWindow extends TextBox {
         });
         this.layout();
         this.setScale(1, 0);
-        this.addAction(scene, callback);
-        scene.add.existing(this);
-    }
 
-    private addAction(scene: Phaser.Scene, callback?: () => void) {
-        if (!scene.input.keyboard) {
-            throw new Error('Keyboard input is not available in this scene.');
-        }
-
+        // organizar isso
         this.keyListener = () => {
             if (this.isBusy()) return;
-            if (callback && this.isOpen()) callback();
-            this.isClose() ? this.open() : this.close();
+            if (this.isClose()) {
+                this.open();
+                return;
+            }
+            this.close(callback);
         };
 
-        scene.input.keyboard.once('keydown-SPACE', this.keyListener, this);
+        scene.add.existing(this);
     }
 
     static createCenteredWindow(scene: Phaser.Scene, text: string, callback?: () => void) {
@@ -81,26 +77,35 @@ export class TextWindow extends TextBox {
             targets: this,
             scaleY: 1,
             duration: 300,
-            ease: 'Back.easeOut'
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                this.addAction(this.scene);
+            }
         });
     }
 
-    close() {
+    private addAction(scene: Phaser.Scene) {
+        if (!scene.input.keyboard) {
+            throw new Error('Keyboard input is not available in this scene.');
+        }
+        scene.input.keyboard.once('keydown-SPACE', this.keyListener!, this);
+    }
+
+    close(callback?: () => void) {
         if (!this.scene?.tweens) return;
-        this.#tween = this.scene.tweens.add({
+        const config: Phaser.Types.Tweens.TweenBuilderConfig = {
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeOut'
-        });
-    }
-
-    override destroy(fromScene?: boolean) {
-        if (this.keyListener) {
-            this.scene.input.keyboard?.removeListener('keydown-SPACE', this.keyListener, this);
-            this.keyListener = undefined;
+        };
+        if (callback) {
+            config.onComplete = () => {
+                console.log('TextWindow closed');
+                callback();
+                super.destroy(true);
+            };
         }
-
-        super.destroy(fromScene); // destrói corretamente como TextBox (rexUI)
+        this.#tween = this.scene.tweens.add(config);
     }
 }

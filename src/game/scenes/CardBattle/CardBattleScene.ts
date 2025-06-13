@@ -17,9 +17,6 @@ export class CardBattleScene extends Scene {
     }
 
     changePhase(phase: Phase) {
-        if (this.phase) {
-            this.phase.destroy();
-        }
         this.phase = phase;
         this.phase.create();
     }

@@ -10,7 +10,6 @@ export class DrawPhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started! Complete the mini-game to proceed.', () => {
             this.scene.changePhase(new LoadPhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }

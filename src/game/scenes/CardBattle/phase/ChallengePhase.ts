@@ -10,7 +10,6 @@ export class ChallengePhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Challenge Phase started! Complete the challenge to proceed.', () => {
             this.scene.changePhase(new StartPhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }

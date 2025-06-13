@@ -10,7 +10,6 @@ export class LoadPhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Load Phase started! Complete the mini-game to proceed.', () => {
             this.scene.changePhase(new SummonPhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }

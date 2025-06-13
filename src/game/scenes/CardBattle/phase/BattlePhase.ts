@@ -10,7 +10,6 @@ export class BattlePhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Battle Phase started! Complete the mini-game to proceed.', () => {
             this.scene.changePhase(new ChallengePhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }

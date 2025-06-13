@@ -10,7 +10,6 @@ export class CompilePhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Compile Phase started! Complete the mini-game to proceed.', () => {
             this.scene.changePhase(new BattlePhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }

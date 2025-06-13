@@ -10,7 +10,6 @@ export class StartPhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Start Phase completed, transitioning to Start Phase!', () => {
             this.scene.changePhase(new DrawPhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }

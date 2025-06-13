@@ -10,7 +10,6 @@ export class SummonPhase implements Phase {
     create(): void {
         this.window = TextWindow.createCenteredWindow(this.scene, 'Summon Phase started! Complete the mini-game to proceed.', () => {
             this.scene.changePhase(new CompilePhase(this.scene));
-            this.destroy();
         });
         this.window.open();
     }
