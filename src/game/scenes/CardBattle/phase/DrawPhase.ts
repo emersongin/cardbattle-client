@@ -1,24 +1,24 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@ui/TextWindow';
-import { StartPhase } from "./StartPhase";
+import { LoadPhase } from "./LoadPhase";
 
-export class ChallengePhase implements Phase {
+export class DrawPhase implements Phase {
     private window: TextWindow;
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Challenge Phase started! Complete the challenge to proceed.', () => {
-            this.scene.changePhase(new StartPhase(this.scene));
+        this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started! Complete the mini-game to proceed.', () => {
+            this.scene.changePhase(new LoadPhase(this.scene));
             this.destroy();
         });
         this.window.open();
     }
 
     update(): void {
-        console.log("Updating Challenge Phase...");
+        console.log("Updating Draw Phase...");
     }
-
+    
     destroy(): void {
         this.window?.destroy();
     }
