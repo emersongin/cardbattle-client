@@ -1,8 +1,9 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 
 export class TextWindow extends TextBox {
+    // #isOpen: boolean = false;
     #tween: Phaser.Tweens.Tween | null = null;
-    private keyListener?: () => void;
+    #onCloseCallback?: () => void;
 
     private constructor(
         readonly scene: Phaser.Scene, 
@@ -33,17 +34,7 @@ export class TextWindow extends TextBox {
         });
         this.layout();
         this.setScale(1, 0);
-
-        // organizar isso
-        this.keyListener = () => {
-            if (this.isBusy()) return;
-            if (this.isClose()) {
-                this.open();
-                return;
-            }
-            this.close(callback);
-        };
-
+        this.#onCloseCallback = callback;
         scene.add.existing(this);
     }
 
@@ -55,22 +46,6 @@ export class TextWindow extends TextBox {
         return new TextWindow(scene,  x, y, width, height, text, callback);
     }
 
-    isOpen() {
-        return this.scaleY === 1;
-    }
-
-    isClose() {
-        return this.scaleY === 0;
-    }
-
-    isAvailable() {
-        return !this.isBusy();
-    }
-
-    isBusy() {
-        return this.#tween !== null && this.#tween.isPlaying();
-    }
-
     open() {
         if (!this.scene?.tweens) return;
         this.#tween = this.scene.tweens.add({
@@ -79,33 +54,36 @@ export class TextWindow extends TextBox {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.addAction(this.scene);
+                this.addActionOnKeyDown();
             }
         });
     }
 
-    private addAction(scene: Phaser.Scene) {
-        if (!scene.input.keyboard) {
+    private addActionOnKeyDown() {
+        if (!this.scene.input.keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
-        scene.input.keyboard.once('keydown-SPACE', this.keyListener!, this);
+        const onKeyDown = () => {
+            this.scene.input.keyboard!.off('keydown-SPACE', onKeyDown, this);
+            this.close();
+        };
+        this.scene.input.keyboard.once('keydown-SPACE', onKeyDown, this);
     }
 
-    close(callback?: () => void) {
+    close() {
         if (!this.scene?.tweens) return;
-        const config: Phaser.Types.Tweens.TweenBuilderConfig = {
+        this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
-            ease: 'Back.easeOut'
-        };
-        if (callback) {
-            config.onComplete = () => {
-                console.log('TextWindow closed');
-                callback();
-                super.destroy(true);
-            };
-        }
-        this.#tween = this.scene.tweens.add(config);
+            ease: 'Back.easeOut',
+            onComplete: () => {
+                if (this.#onCloseCallback) this.#onCloseCallback();
+            }
+        });
+    }
+
+    isBusy() {
+        return this.#tween !== null && this.#tween.isPlaying();
     }
 }
