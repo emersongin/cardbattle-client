@@ -8,18 +8,16 @@ export class DrawPhase implements Phase {
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started! Complete the mini-game to proceed.', () => {
-            this.scene.changePhase(new LoadPhase(this.scene));
+        this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started! Complete the mini-game to proceed.', {
+            onClose: () => {
+                this.scene.changePhase(new LoadPhase(this.scene));
+            }
         });
         this.window.open();
     }
 
     update(): void {
         console.log("Updating Draw Phase...");
-    }
-    
-    destroy(): void {
-        this.window?.destroy();
     }
     
 }

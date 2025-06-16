@@ -8,18 +8,16 @@ export class LoadPhase implements Phase {
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Load Phase started! Complete the mini-game to proceed.', () => {
-            this.scene.changePhase(new SummonPhase(this.scene));
+        this.window = TextWindow.createCenteredWindow(this.scene, 'Load Phase started! Complete the mini-game to proceed.', {
+            onClose: () => {
+                this.scene.changePhase(new SummonPhase(this.scene));
+            }
         });
         this.window.open();
     }
 
     update(): void {
         console.log("Updating Load Phase...");
-    }
-    
-    destroy(): void {
-        this.window?.destroy();
     }
     
 }

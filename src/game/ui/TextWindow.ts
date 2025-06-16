@@ -1,5 +1,9 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 
+type TextWindowConfig = {
+    onClose?: () => void
+};
+
 export class TextWindow extends TextBox {
     // #isOpen: boolean = false;
     #tween: Phaser.Tweens.Tween | null = null;
@@ -38,12 +42,12 @@ export class TextWindow extends TextBox {
         scene.add.existing(this);
     }
 
-    static createCenteredWindow(scene: Phaser.Scene, text: string, callback?: () => void) {
+    static createCenteredWindow(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
         const x = scene.cameras.main.centerX;
         const y = scene.cameras.main.centerY;
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);
-        return new TextWindow(scene,  x, y, width, height, text, callback);
+        return new TextWindow(scene,  x, y, width, height, text, config.onClose);
     }
 
     open() {

@@ -8,8 +8,10 @@ export class SummonPhase implements Phase {
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Summon Phase started! Complete the mini-game to proceed.', () => {
-            this.scene.changePhase(new CompilePhase(this.scene));
+        this.window = TextWindow.createCenteredWindow(this.scene, 'Summon Phase started! Complete the mini-game to proceed.', {
+            onClose: () => {
+                this.scene.changePhase(new CompilePhase(this.scene));
+            }
         });
         this.window.open();
     }
@@ -17,9 +19,5 @@ export class SummonPhase implements Phase {
     update(): void {
         console.log("Updating Summon Phase...");
     }
-    
-    destroy(): void {
-        this.window?.destroy();
-    }
-    
+
 }

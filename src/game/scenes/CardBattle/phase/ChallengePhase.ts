@@ -8,8 +8,10 @@ export class ChallengePhase implements Phase {
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Challenge Phase started! Complete the challenge to proceed.', () => {
-            this.scene.changePhase(new StartPhase(this.scene));
+        this.window = TextWindow.createCenteredWindow(this.scene, 'Challenge Phase started! Complete the challenge to proceed.', {
+            onClose: () => {
+                this.scene.changePhase(new StartPhase(this.scene));
+            }
         });
         this.window.open();
     }
@@ -18,8 +20,4 @@ export class ChallengePhase implements Phase {
         console.log("Updating Challenge Phase...");
     }
 
-    destroy(): void {
-        this.window?.destroy();
-    }
-    
 }
