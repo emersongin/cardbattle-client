@@ -36,6 +36,12 @@ export class StartPhase implements Phase {
                 onSelect: () => {
                     this.scene.changePhase(new DrawPhase(this.scene));
                 }
+            },
+            {
+                description: 'option 3',
+                onSelect: () => {
+                    this.scene.changePhase(new DrawPhase(this.scene));
+                }
             }
         ]);
     }
@@ -50,6 +56,15 @@ export class StartPhase implements Phase {
 
     update(): void {
         console.log("Updating Start Phase...");
+    }
+
+    destroy(): void {
+        if (this.textWindow) {
+            this.textWindow.destroy();
+        }
+        if (this.commandWindow) {
+            this.commandWindow.destroy();
+        }
     }
     
 }

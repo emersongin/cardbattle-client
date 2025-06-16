@@ -19,5 +19,10 @@ export class CompilePhase implements Phase {
     update(): void {
         console.log("Updating Compile Phase...");
     }
-        
+    
+    destroy(): void {
+        if (this.window) {
+            this.window.destroy();
+        }
+    }
 }

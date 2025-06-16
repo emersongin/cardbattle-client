@@ -20,4 +20,9 @@ export class ChallengePhase implements Phase {
         console.log("Updating Challenge Phase...");
     }
 
+    destroy(): void {
+        if (this.window) {
+            this.window.destroy();
+        }
+    }
 }

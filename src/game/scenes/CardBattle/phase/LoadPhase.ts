@@ -20,4 +20,9 @@ export class LoadPhase implements Phase {
         console.log("Updating Load Phase...");
     }
     
+    destroy(): void {
+        if (this.window) {
+            this.window.destroy();
+        }
+    }
 }

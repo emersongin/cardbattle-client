@@ -20,4 +20,9 @@ export class DrawPhase implements Phase {
         console.log("Updating Draw Phase...");
     }
     
+    destroy(): void {
+        if (this.window) {
+            this.window.destroy();
+        }
+    }
 }

@@ -20,4 +20,9 @@ export class SummonPhase implements Phase {
         console.log("Updating Summon Phase...");
     }
 
+    destroy(): void {
+        if (this.window) {
+            this.window.destroy();
+        }
+    }
 }

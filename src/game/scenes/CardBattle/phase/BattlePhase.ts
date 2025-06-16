@@ -20,4 +20,10 @@ export class BattlePhase implements Phase {
         console.log("Updating Battle Phase...");
     }
 
+    destroy(): void {
+        if (this.window) {
+            this.window.destroy();
+        }
+    }
+
 }

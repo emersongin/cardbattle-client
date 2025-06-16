@@ -64,14 +64,18 @@ export class TextWindow extends TextBox {
     }
 
     private addActionOnKeyDown() {
-        if (!this.scene.input.keyboard) {
+        const keyboard = this.scene.input.keyboard;
+        if (!keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
         const onKeyDown = () => {
-            this.scene.input.keyboard!.off('keydown-SPACE', onKeyDown, this);
+            if (!keyboard) {
+                throw new Error('Keyboard input is not available in this scene.');
+            }
+            keyboard.removeAllListeners();
             this.close();
         };
-        this.scene.input.keyboard.once('keydown-SPACE', onKeyDown, this);
+        keyboard.once('keydown-SPACE', onKeyDown, this);
     }
 
     close() {
