@@ -1,6 +1,6 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@ui/TextWindow';
+import { TextWindow } from '@/game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
 
 export class DrawPhase implements Phase {
@@ -8,7 +8,7 @@ export class DrawPhase implements Phase {
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started! Complete the mini-game to proceed.', {
+        this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started!', {
             onClose: () => {
                 this.scene.changePhase(new LoadPhase(this.scene));
             }

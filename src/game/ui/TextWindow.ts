@@ -75,7 +75,7 @@ export class TextWindow extends TextBox {
             keyboard.removeAllListeners();
             this.close();
         };
-        keyboard.once('keydown-SPACE', onKeyDown, this);
+        keyboard.once('keydown-ENTER', onKeyDown, this);
     }
 
     close() {

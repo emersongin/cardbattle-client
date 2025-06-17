@@ -1,8 +1,8 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@ui/TextWindow';
+import { TextWindow } from '@/game/ui/TextWindow';
 import { DrawPhase } from "./DrawPhase";
-import { CommandWindow } from "@ui/CommandWindow";
+import { CommandWindow } from "@/game/ui/CommandWindow";
 
 export class StartPhase implements Phase {
     private textWindow: TextWindow;
@@ -10,8 +10,8 @@ export class StartPhase implements Phase {
     constructor(readonly scene: CardBattleScene) {}
 
     create(): void {
-        this.createTextWindow('Start Phase completed, transitioning to Start Phase!');
-        this.createCommandWindow('Start Phase Options');
+        this.createTextWindow('Start Phase started!');
+        this.createCommandWindow('Select Card Color');
         this.openTextWindow();
     }
 
@@ -24,25 +24,19 @@ export class StartPhase implements Phase {
     }
 
     private createCommandWindow(title: string): void {
-        this.commandWindow = CommandWindow.createCentered(this.scene, title, [
+        this.commandWindow = CommandWindow.createBottom(this.scene, title, [
             {
-                description: 'option 1',
+                description: 'Black',
                 onSelect: () => {
                     this.scene.changePhase(new DrawPhase(this.scene));
                 }
             },
             {
-                description: 'option 2',
+                description: 'White',
                 onSelect: () => {
                     this.scene.changePhase(new DrawPhase(this.scene));
                 }
             },
-            {
-                description: 'option 3',
-                onSelect: () => {
-                    this.scene.changePhase(new DrawPhase(this.scene));
-                }
-            }
         ]);
     }
 

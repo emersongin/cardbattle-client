@@ -1,4 +1,5 @@
 import { Sizer, Label } from 'phaser3-rex-plugins/templates/ui/ui-components';
+import { DisplayUtil } from '@utils/DisplayUtil';
 
 interface CommandOption {
     description: string;
@@ -8,7 +9,7 @@ interface CommandOption {
 export class CommandWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;
     private selectedIndex: number = 0;
-    private buttons: Label[];
+    private options: Label[];
 
     private constructor(
         readonly scene: Phaser.Scene,
@@ -19,18 +20,31 @@ export class CommandWindow extends Sizer {
         title: string,
         readonly commands: CommandOption[]
     ) {
+        const vertical = 1;
         super(scene, {
             x,
             y,
             width,
             height,
-            orientation: 1, // vertical
-            space: { item: 10 },
+            orientation: vertical,
+            space: { item: 6 },
         });
 
+        this.createBackground(scene);
+        this.createTitle(scene, title);
+        this.createOptions(scene, width, commands);
+
+        this.layout();
+        this.setScale(1, 0);
+        scene.add.existing(this);
+    }
+
+    private createBackground(scene: Phaser.Scene) {
         const background = scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x222222);
         this.addBackground(background);
+    }
 
+    private createTitle(scene: Phaser.Scene, title: string) {
         const titleLabel = scene.rexUI.add.label({
             text: scene.add.text(0, 0, title, {
                 fontSize: '24px',
@@ -39,30 +53,18 @@ export class CommandWindow extends Sizer {
             align: 'center'
         });
 
-        this.add(titleLabel, { align: 'center', expand: false, padding: { top: 10 } });
-
-        this.buttons = commands.map(cmd =>
-            CommandWindow.createButton(scene, cmd.description, width - 20)
-        );
-
-        this.buttons.forEach(btn => {
-            this.add(btn, { align: 'center', expand: true });
+        this.add(titleLabel, { align: 'left', expand: false, padding: { top: 20, bottom: 20 } });
+    }
+    
+    private createOptions(scene: Phaser.Scene, width: number, commands: CommandOption[]) {
+        this.options = commands.map(cmd => {
+            const option = CommandWindow.createOption(scene, cmd.description, width - 20);
+            this.add(option, { align: 'center', expand: true });
+            return option;
         });
-
-        this.layout();
-        this.setScale(1, 0);
-        scene.add.existing(this);
     }
 
-    static createCentered(scene: Phaser.Scene, title: string, commands: CommandOption[]) {
-        const width = (scene.scale.width / 10) * 6;
-        const height = commands.length * 50 + 100;
-        const x = scene.cameras.main.centerX;
-        const y = scene.cameras.main.centerY;
-        return new CommandWindow(scene, x, y, width, height, title, commands);
-    }
-
-    private static createButton(scene: Phaser.Scene, label: string, width: number): Label {
+    private static createOption(scene: Phaser.Scene, label: string, width: number): Label {
         return scene.rexUI.add.label({
             background: scene.rexUI.add.roundRectangle(0, 0, width, 40, 4, 0x444444),
             text: scene.add.text(0, 0, label, {
@@ -76,6 +78,14 @@ export class CommandWindow extends Sizer {
                 bottom: 5
             }
         });
+    }
+
+    static createBottom(scene: Phaser.Scene, title: string, commands: CommandOption[]) {
+        const width = scene.scale.width;
+        const height = DisplayUtil.column3of12(scene.scale.height);
+        const x = width / 2;
+        const y = (scene.scale.height - height);
+        return new CommandWindow(scene, x, y, width, height, title, commands);
     }
 
     open() {
@@ -105,7 +115,7 @@ export class CommandWindow extends Sizer {
             this.select(this.selectedIndex + 1);
         });
 
-        keyboard.on('keydown-SPACE', () => {
+        keyboard.on('keydown-ENTER', () => {
             if (!keyboard) {
                 throw new Error('Keyboard input not available');
             }
@@ -115,21 +125,25 @@ export class CommandWindow extends Sizer {
     }
 
     private select(newIndex: number) {
+        this.setSelectIndex(newIndex);
+        this.updateOptions();
+    }
+
+    private setSelectIndex(newIndex: number) {
         const limit = this.commands.length - 1;
         if (newIndex < 0) newIndex = 0;
         if (newIndex > limit) newIndex = limit;
-
         this.selectedIndex = newIndex;
+    }
 
-        this.buttons.forEach((btn, i) => {
-            const bg = btn.getElement('background');
-            if (bg) {
-                bg.setFillStyle(i === newIndex ? 0x8888ff : 0x444444);
-            }
+    private updateOptions() {
+        this.options.forEach((opt: Label, i: number) => {
+            const bg = opt.getElement('background') as Phaser.GameObjects.Shape;
+            if (bg) bg.setFillStyle(i === this.selectedIndex ? 0x8888ff : 0x444444);
         });
     }
 
-    close(onSelect: Function) {
+    close(onSelect: () => void) {
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,

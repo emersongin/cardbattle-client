@@ -25,7 +25,8 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"],
-            "@ui/*": ["src/game/ui/*"]
+            "@ui/*": ["src/game/ui/*"],
+            "@utils/*": ["src/game/utils/*"],
         }
     },
     "include": [
