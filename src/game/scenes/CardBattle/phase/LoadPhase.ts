@@ -3,13 +3,18 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { SummonPhase } from "./SummonPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
+import { TriggerPhase } from "./TriggerPhase";
 
 export class LoadPhase implements Phase {
     #textWindow: TextWindow;
+    #noTextWindow: boolean = false;
     #commandWindow: CommandWindow;
     #zoneCommandWindow: CommandWindow;
-    // #powerCardSlots: PowerCard[] = [];
-    constructor(readonly scene: CardBattleScene) {}
+    #powerSlots: any[] = [];
+    constructor(readonly scene: CardBattleScene, powerSlots: any[] = [], noTextWindow: boolean = false) {
+        this.#powerSlots = powerSlots;
+        this.#noTextWindow = noTextWindow;
+    }
 
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
@@ -24,7 +29,11 @@ export class LoadPhase implements Phase {
     }
 
     changeToLoadPhase(): void {
-        this.scene.changePhase(new LoadPhase(this.scene));
+        this.scene.changePhase(new LoadPhase(this.scene, this.#powerSlots));
+    }
+
+    changeToTriggerPhase(origin: string): void {
+        this.scene.changePhase(new TriggerPhase(this.scene, this.#powerSlots, origin));
     }
 
     changeToSummonPhase(): void {
@@ -43,6 +52,10 @@ export class LoadPhase implements Phase {
         this.createTextWindow('Load Phase started!');
         this.createCommandWindow('Select power card?');
         this.createZoneCommandWindow('Select your zone');
+        if (this.#noTextWindow) {
+            this.openCommandWindow();
+            return;
+        }
         this.openTextWindow();
     }
 
@@ -65,6 +78,11 @@ export class LoadPhase implements Phase {
             {
                 description: 'No',
                 onSelect: () => {
+                    if (this.#powerSlots.length) {
+                        const origin = 'LOAD';
+                        this.changeToTriggerPhase(origin);
+                        return;
+                    }
                     this.changeToSummonPhase();
                 }
             },
@@ -73,6 +91,25 @@ export class LoadPhase implements Phase {
 
     private createZoneCommandWindow(title: string): void {
         this.#zoneCommandWindow = CommandWindow.createBottom(this.scene, title, [
+            {
+                description: 'Play Power card',
+                onSelect: () => {
+                    this.#powerSlots.push({
+                        action: 'POWER_1',
+                        params: {
+                            cardId: 'card_1',
+                            zone: 'player'
+                        } 
+                    });
+                    console.log(this.#powerSlots.length);
+                    if (this.#powerSlots.length >= 3) {
+                        const origin = 'LOAD';
+                        this.changeToTriggerPhase(origin);
+                        return;
+                    }
+                    this.changeToLoadPhase();
+                }
+            },
             {
                 description: 'Trash',
                 onSelect: () => {
