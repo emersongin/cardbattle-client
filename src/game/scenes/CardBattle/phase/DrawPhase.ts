@@ -23,6 +23,10 @@ export class DrawPhase implements Phase {
         this.scene.changePhase(new LoadPhase(this.scene));
     }
 
+    changeToTriggerPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
     changeToSummonPhase(): void {
         throw new Error("Method not implemented.");
     }

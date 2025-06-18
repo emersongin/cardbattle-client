@@ -23,6 +23,10 @@ export class SummonPhase implements Phase {
         throw new Error("Method not implemented.");
     }
 
+    changeToTriggerPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
     changeToSummonPhase(): void {
         throw new Error("Method not implemented.");
     }

@@ -6,6 +6,7 @@ export interface Phase {
     changeToStartPhase(): void;
     changeToDrawPhase(): void;
     changeToLoadPhase(): void;
+    changeToTriggerPhase(origin: string): void;
     changeToSummonPhase(): void;
     changeToCompilePhase(): void;
     changeToBattlePhase(): void;
