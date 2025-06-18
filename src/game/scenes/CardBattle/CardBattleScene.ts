@@ -20,4 +20,8 @@ export class CardBattleScene extends Scene {
         this.phase = phase;
         this.phase.create();
     }
+
+    update() {
+        if (this.phase) this.phase.update();
+    }
 }
