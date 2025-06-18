@@ -5,10 +5,38 @@ import { BattlePhase } from "./BattlePhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
 
 export class CompilePhase implements Phase {
-    private textWindow: TextWindow;
-    private commandWindow: CommandWindow;
-    private zoneCommandWindow: CommandWindow;
+    #textWindow: TextWindow;
+    #commandWindow: CommandWindow;
+    #zoneCommandWindow: CommandWindow;
     constructor(readonly scene: CardBattleScene) {}
+
+    changeToChallengePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    changeToStartPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToDrawPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToLoadPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToSummonPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToCompilePhase(): void {
+        this.scene.changePhase(new CompilePhase(this.scene));
+    }
+
+    changeToBattlePhase(): void {
+        this.scene.changePhase(new BattlePhase(this.scene));
+    }
 
     create(): void {
         this.createTextWindow('Compile Phase started!');
@@ -18,7 +46,7 @@ export class CompilePhase implements Phase {
     }
 
     private createTextWindow(title: string): void {
-        this.textWindow = TextWindow.createCenteredWindow(this.scene, title, {
+        this.#textWindow = TextWindow.createCenteredWindow(this.scene, title, {
             onClose: () => {
                 this.openCommandWindow();
             }
@@ -26,7 +54,7 @@ export class CompilePhase implements Phase {
     }
 
     private createCommandWindow(title: string): void {
-        this.commandWindow = CommandWindow.createBottom(this.scene, title, [
+        this.#commandWindow = CommandWindow.createBottom(this.scene, title, [
             {
                 description: 'Yes',
                 onSelect: () => {
@@ -36,45 +64,45 @@ export class CompilePhase implements Phase {
             {
                 description: 'No',
                 onSelect: () => {
-                    this.scene.changePhase(new BattlePhase(this.scene));
+                    this.changeToBattlePhase();
                 }
             },
         ]);
     }
 
     private createZoneCommandWindow(title: string): void {
-        this.zoneCommandWindow = CommandWindow.createBottom(this.scene, title, [
+        this.#zoneCommandWindow = CommandWindow.createBottom(this.scene, title, [
             {
                 description: 'Trash',
                 onSelect: () => {
-                    this.scene.changePhase(new CompilePhase(this.scene));
+                    this.changeToCompilePhase();
                 }
             },
             {
                 description: 'Field',
                 onSelect: () => {
-                    this.scene.changePhase(new CompilePhase(this.scene));
+                    this.changeToCompilePhase();
                 }
             },
             {
                 description: 'Hand',
                 onSelect: () => {
-                    this.scene.changePhase(new CompilePhase(this.scene));
+                    this.changeToCompilePhase();
                 }
             },
         ]);
     }
 
     openTextWindow(): void {
-        this.textWindow.open();
+        this.#textWindow.open();
     }
 
     openCommandWindow(): void {
-        this.commandWindow.open();
+        this.#commandWindow.open();
     }
 
     openZoneCommandWindow(): void {
-        this.zoneCommandWindow.open();
+        this.#zoneCommandWindow.open();
     }
 
     update(): void {
@@ -82,8 +110,6 @@ export class CompilePhase implements Phase {
     }
     
     destroy(): void {
-        if (this.textWindow) {
-            this.textWindow.destroy();
-        }
+        if (this.#textWindow) this.#textWindow.destroy();
     }
 }

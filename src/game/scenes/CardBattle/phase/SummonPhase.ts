@@ -4,16 +4,44 @@ import { TextWindow } from '@/game/ui/TextWindow';
 import { CompilePhase } from "./CompilePhase";
 
 export class SummonPhase implements Phase {
-    private window: TextWindow;
+    #window: TextWindow;
     constructor(readonly scene: CardBattleScene) {}
 
+    changeToChallengePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    changeToStartPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToDrawPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToLoadPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToSummonPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToCompilePhase(): void {
+        this.scene.changePhase(new CompilePhase(this.scene));
+    }
+
+    changeToBattlePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Summon Phase started!', {
+        this.#window = TextWindow.createCenteredWindow(this.scene, 'Summon Phase started!', {
             onClose: () => {
-                this.scene.changePhase(new CompilePhase(this.scene));
+                this.changeToCompilePhase();
             }
         });
-        this.window.open();
+        this.#window.open();
     }
 
     update(): void {
@@ -21,8 +49,6 @@ export class SummonPhase implements Phase {
     }
 
     destroy(): void {
-        if (this.window) {
-            this.window.destroy();
-        }
+        if (this.#window) this.#window.destroy();
     }
 }

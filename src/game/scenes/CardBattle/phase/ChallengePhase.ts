@@ -5,9 +5,37 @@ import { StartPhase } from "./StartPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
 
 export class ChallengePhase implements Phase {
-    private textWindow: TextWindow;
-    private commandWindow: CommandWindow;
+    #textWindow: TextWindow;
+    #commandWindow: CommandWindow;
     constructor(readonly scene: CardBattleScene) {}
+
+    changeToChallengePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    changeToStartPhase(): void {
+        this.scene.changePhase(new StartPhase(this.scene));
+    }
+
+    changeToDrawPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToLoadPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToSummonPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToCompilePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToBattlePhase(): void {
+        throw new Error("Method not implemented.");
+    }
 
     create(): void {
         this.createTextWindow('Challenge Phase started!');
@@ -16,7 +44,7 @@ export class ChallengePhase implements Phase {
     }
 
     private createTextWindow(title: string): void {
-        this.textWindow = TextWindow.createCenteredWindow(this.scene, title, {
+        this.#textWindow = TextWindow.createCenteredWindow(this.scene, title, {
             onClose: () => {
                 this.openCommandWindow();
             }
@@ -24,34 +52,36 @@ export class ChallengePhase implements Phase {
     }
 
     openCommandWindow(): void {
-        this.commandWindow.open();
+        this.#commandWindow.open();
     }
 
     private createCommandWindow(title: string): void {
-        this.commandWindow = CommandWindow.createBottom(this.scene, title, [
+        this.#commandWindow = CommandWindow.createBottom(this.scene, title, [
             {
                 description: 'Folder 1',
                 onSelect: () => {
-                    this.scene.changePhase(new StartPhase(this.scene));
+                    this.changeToStartPhase();
                 }
             },
             {
                 description: 'Folder 2',
                 onSelect: () => {
-                    this.scene.changePhase(new StartPhase(this.scene));
+                    this.changeToStartPhase();
                 }
             },
             {
                 description: 'Folder 3',
                 onSelect: () => {
-                    this.scene.changePhase(new StartPhase(this.scene));
+                    this.changeToStartPhase();
                 }
             },
         ]);
     }
 
+    
+
     openTextWindow(): void {
-        this.textWindow.open();
+        this.#textWindow.open();
     }
 
     update(): void {
@@ -59,8 +89,6 @@ export class ChallengePhase implements Phase {
     }
 
     destroy(): void {
-        if (this.textWindow) {
-            this.textWindow.destroy();
-        }
+        if (this.#textWindow) this.#textWindow.destroy();
     }
 }

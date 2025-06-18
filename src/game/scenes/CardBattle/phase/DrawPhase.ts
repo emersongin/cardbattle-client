@@ -4,16 +4,44 @@ import { TextWindow } from '@/game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
 
 export class DrawPhase implements Phase {
-    private window: TextWindow;
+    #window: TextWindow;
     constructor(readonly scene: CardBattleScene) {}
 
+    changeToChallengePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    changeToStartPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToDrawPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToLoadPhase(): void {
+        this.scene.changePhase(new LoadPhase(this.scene));
+    }
+
+    changeToSummonPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToCompilePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToBattlePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
     create(): void {
-        this.window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started!', {
+        this.#window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started!', {
             onClose: () => {
-                this.scene.changePhase(new LoadPhase(this.scene));
+                this.changeToLoadPhase();
             }
         });
-        this.window.open();
+        this.#window.open();
     }
 
     update(): void {
@@ -21,8 +49,6 @@ export class DrawPhase implements Phase {
     }
     
     destroy(): void {
-        if (this.window) {
-            this.window.destroy();
-        }
+        if (this.#window) this.#window.destroy();
     }
 }
