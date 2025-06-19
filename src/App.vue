@@ -3,7 +3,8 @@ import Phaser from 'phaser';
 import { ref, toRaw } from 'vue';
 import type { MainMenu } from './game/scenes/MainMenu';
 import PhaserGame from './PhaserGame.vue';
-import { VueScene, type API } from '@scenes/VueScene';
+import { VueScene } from '@scenes/VueScene';
+import api from '@api/main';
 
 // The sprite can only be moved in the MainMenu Scene
 const canMoveSprite = ref();
@@ -11,12 +12,6 @@ const canMoveSprite = ref();
 //  References to the PhaserGame component (game and scene are exposed)
 const phaserRef = ref();
 const spritePosition = ref({ x: 0, y: 0 });
-
-const api: API = {
-    execute: () => {
-        console.log('API executed');
-    }
-};
 
 // Event emitted from the PhaserGame component
 const currentScene = (scene: VueScene) => {
