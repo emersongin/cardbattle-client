@@ -1,15 +1,16 @@
-import { Scene } from 'phaser';
+import { VueScene } from '../VueScene';
 import { Phase } from './phase/Phase';
 import { ChallengePhase } from './phase/ChallengePhase';
+import { EventBus } from '@game/EventBus';
 
-export class CardBattleScene extends Scene {
+export class CardBattleScene extends VueScene {
     private phase: Phase;
     constructor () {
         super('CardBattle');
     }
 
-    preload () {
-        
+    init () {
+        EventBus.emit('current-scene-ready', this);
     }
 
     create () {

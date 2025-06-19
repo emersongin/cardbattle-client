@@ -1,17 +1,20 @@
-import { Scene } from 'phaser';
-import { CardUi } from '../ui/CardUi';
-import { CardContainer } from '../ui/CardContainer';
+import { CardUi } from '@ui/CardUi';
+import { CardContainer } from '@ui/CardContainer';
+import { EventBus } from '@game/EventBus';
+import { VueScene } from './VueScene';
 
-export class TestContext extends Scene
+export class TestContext extends VueScene
 {
-    constructor ()
-    {
+    constructor () {
         super('TestContext');
     }
 
-    preload ()
-    {
-        console.log('TestContext Preload');
+    init () {
+        EventBus.emit('current-scene-ready', this);
+    }
+
+    preload () {
+
     }
 
     create ()
@@ -25,5 +28,13 @@ export class TestContext extends Scene
             CardUi.create(this, 0, 0, 0xffff00),
         ];
         CardContainer.create(this, 100, 100, 300, 150, children);
+    }
+
+    update(): void {
+        // throw new Error('Method not implemented.');
+    }
+
+    destroy(): void {
+        // throw new Error('Method not implemented.');
     }
 }

@@ -1,10 +1,15 @@
-import { Scene } from 'phaser';
+import { EventBus } from '@game/EventBus';
+import { VueScene } from './VueScene';
 
-export class Boot extends Scene
+export class Boot extends VueScene
 {
     constructor ()
     {
         super('Boot');
+    }
+
+    init () {
+        EventBus.emit('current-scene-ready', this);
     }
 
     preload ()
@@ -18,5 +23,13 @@ export class Boot extends Scene
     create ()
     {
         this.scene.start('Preloader');
+    }
+
+    update(): void {
+        // throw new Error('Method not implemented.');
+    }
+
+    destroy(): void {
+        // throw new Error('Method not implemented.');
     }
 }
