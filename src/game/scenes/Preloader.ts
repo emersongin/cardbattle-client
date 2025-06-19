@@ -1,4 +1,3 @@
-import { EventBus } from '@game/EventBus';
 import { VueScene } from './VueScene';
 
 export class Preloader extends VueScene
@@ -10,8 +9,7 @@ export class Preloader extends VueScene
 
     init ()
     {
-        EventBus.emit('current-scene-ready', this);
-
+        super.init();
         //  We loaded this image in our Boot Scene, so we can display it here
         this.add.image(512, 384, 'background');
 
@@ -46,13 +44,5 @@ export class Preloader extends VueScene
 
         //  Move to the MainMenu. You could also swap this for a Scene Transition, such as a camera fade.
         this.scene.start('TestContext');
-    }
-
-    update(): void {
-        // throw new Error('Method not implemented.');
-    }
-
-    destroy(): void {
-        // throw new Error('Method not implemented.');
     }
 }

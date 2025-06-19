@@ -1,20 +1,11 @@
 import { CardUi } from '@ui/CardUi';
 import { CardContainer } from '@ui/CardContainer';
-import { EventBus } from '@game/EventBus';
 import { VueScene } from './VueScene';
 
 export class TestContext extends VueScene
 {
     constructor () {
         super('TestContext');
-    }
-
-    init () {
-        EventBus.emit('current-scene-ready', this);
-    }
-
-    preload () {
-
     }
 
     create ()
@@ -28,13 +19,5 @@ export class TestContext extends VueScene
             CardUi.create(this, 0, 0, 0xffff00),
         ];
         CardContainer.create(this, 100, 100, 300, 150, children);
-    }
-
-    update(): void {
-        // throw new Error('Method not implemented.');
-    }
-
-    destroy(): void {
-        // throw new Error('Method not implemented.');
     }
 }
