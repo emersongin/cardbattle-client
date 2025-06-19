@@ -4,15 +4,15 @@ import { TextWindow } from '@/game/ui/TextWindow';
 import { SummonPhase } from "./SummonPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
 import { TriggerPhase } from "./TriggerPhase";
+import { PowerSlots } from "../abs/PowerSlots";
 
-export class LoadPhase implements Phase {
+export class LoadPhase extends PowerSlots implements Phase {
     #textWindow: TextWindow;
     #noTextWindow: boolean = false;
     #commandWindow: CommandWindow;
     #zoneCommandWindow: CommandWindow;
-    #powerSlots: any[] = [];
     constructor(readonly scene: CardBattleScene, powerSlots: any[] = [], noTextWindow: boolean = false) {
-        this.#powerSlots = powerSlots;
+        super(powerSlots);
         this.#noTextWindow = noTextWindow;
     }
 
@@ -29,11 +29,11 @@ export class LoadPhase implements Phase {
     }
 
     changeToLoadPhase(): void {
-        this.scene.changePhase(new LoadPhase(this.scene, this.#powerSlots));
+        this.scene.changePhase(new LoadPhase(this.scene, this.getPowerSlots()));
     }
 
     changeToTriggerPhase(origin: string): void {
-        this.scene.changePhase(new TriggerPhase(this.scene, this.#powerSlots, origin));
+        this.scene.changePhase(new TriggerPhase(this.scene, this.getPowerSlots(), origin));
     }
 
     changeToSummonPhase(): void {
@@ -78,7 +78,7 @@ export class LoadPhase implements Phase {
             {
                 description: 'No',
                 onSelect: () => {
-                    if (this.#powerSlots.length) {
+                    if (this.hasPower()) {
                         const origin = 'LOAD';
                         this.changeToTriggerPhase(origin);
                         return;
@@ -94,15 +94,15 @@ export class LoadPhase implements Phase {
             {
                 description: 'Play Power card',
                 onSelect: () => {
-                    this.#powerSlots.push({
+                    this.addPowerSlot({
                         action: 'POWER_1',
                         params: {
                             cardId: 'card_1',
                             zone: 'player'
                         } 
                     });
-                    console.log(this.#powerSlots.length);
-                    if (this.#powerSlots.length >= 3) {
+                    console.log(this.powerSlotsTotal());
+                    if (this.isLimitReached()) {
                         const origin = 'LOAD';
                         this.changeToTriggerPhase(origin);
                         return;
