@@ -26,6 +26,7 @@
         "paths": {
             "@/*": ["src/*"],
             "@game/*": ["src/game/*"],
+            "@api/*": ["src/game/api/*"],
             "@scenes/*": ["src/game/scenes/*"],
             "@ui/*": ["src/game/ui/*"],
             "@utils/*": ["src/game/utils/*"],

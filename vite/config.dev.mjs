@@ -13,6 +13,7 @@ export default defineConfig({
         alias: {
             '@': fileURLToPath(new URL('../src', import.meta.url)),
             '@game': fileURLToPath(new URL('../src/game', import.meta.url)),
+            '@api': fileURLToPath(new URL('../src/game/api', import.meta.url)),
             '@scenes': fileURLToPath(new URL('../src/game/scenes', import.meta.url)),
             '@ui': fileURLToPath(new URL('../src/game/ui', import.meta.url)),
             '@utils': fileURLToPath(new URL('../src/game/utils', import.meta.url)),
