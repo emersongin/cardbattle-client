@@ -1,4 +1,4 @@
-import { CardUi } from "@/game/ui/CardUi";
+import { CardUi } from "@/game/ui/Card";
 
 export class CardContainer extends Phaser.GameObjects.Container {
     private constructor(
