@@ -1,6 +1,7 @@
-import { Cardset } from '@/game/ui/Cardset';
-import { CardData } from '@/game/ui/types/CardData';
+import { Cardset } from '@/game/ui/Cardset/Cardset';
+import { CardData } from '@/game/ui/Cardset/CardData';
 import { VueScene } from './VueScene';
+import { Card } from '@ui/Card/Card';
 
 export class TestContext extends VueScene
 {
@@ -12,8 +13,7 @@ export class TestContext extends VueScene
         this.load.image('card-picture', 'assets/card-picture.png');
     }
 
-    create ()
-    {
+    create () {
         const cardsData: CardData[] = [
             {
                 UUID: '123e4567-e89b-12d3-a456-426614174000',
@@ -40,6 +40,7 @@ export class TestContext extends VueScene
                 powerId: 'power-1'
             },
         ];
-        Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {});
+        // Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {});
+        Card.create(this, cardsData[0]);
     }
 }

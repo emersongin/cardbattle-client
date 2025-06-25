@@ -1,11 +1,15 @@
-import { CardData } from "./types/CardData";
+import { CardData } from "../Cardset/CardData";
+import { CardState } from "./CardState";
+import { EnabledState } from "./EnabledState";
 
 export class Card extends Phaser.GameObjects.Container {
-    #backgroundLayer: Phaser.GameObjects.Container;
-    #background: Phaser.GameObjects.Rectangle;
-    #frontLayer: Phaser.GameObjects.Container;
-    #picture: Phaser.GameObjects.Image;
-    #cardData: CardData;
+    backgroundLayer: Phaser.GameObjects.Container;
+    background: Phaser.GameObjects.Rectangle;
+    frontLayer: Phaser.GameObjects.Container;
+    picture: Phaser.GameObjects.Image;
+    cardData: CardData;
+    status: CardState;
+    disabled: boolean = false;
 
     private constructor(
         readonly scene: Phaser.Scene, 
@@ -16,11 +20,12 @@ export class Card extends Phaser.GameObjects.Container {
         super(scene, x, y);
         this.width = 100;
         this.height = 150;
-        this.#cardData = cardData;
+        this.cardData = cardData;
         this.createLayers();
         this.createBackground();
         this.createPicture();
         this.createDisplay();
+        this.changeStatus(new EnabledState(this));
         this.scene.add.existing(this);
     }
 
@@ -31,13 +36,13 @@ export class Card extends Phaser.GameObjects.Container {
 
     private createBackgroundLayer(): void {
         const backgroundLayer = this.scene.add.container(0, 0);
-        this.#backgroundLayer = backgroundLayer;
+        this.backgroundLayer = backgroundLayer;
         this.add(backgroundLayer);
     }
 
     private createFrontLayer(): void {
         const frontLayer = this.scene.add.container(0, 0);
-        this.#frontLayer = frontLayer;
+        this.frontLayer = frontLayer;
         this.add(frontLayer);
     }
 
@@ -45,12 +50,12 @@ export class Card extends Phaser.GameObjects.Container {
         const backgroundColor = this.getBgColor();
         const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
-        this.#background = backgroundRect;
-        this.#backgroundLayer.add(backgroundRect);
+        this.background = backgroundRect;
+        this.backgroundLayer.add(backgroundRect);
     }
 
     private getBgColor(): number {
-        switch (this.#cardData.color) {
+        switch (this.cardData.color) {
             case 'red':
                 return 0xff0000; // Red
             case 'blue':
@@ -64,12 +69,12 @@ export class Card extends Phaser.GameObjects.Container {
             case 'orange':
                 return 0xffa500; // Orange
             default:
-                throw new Error(`Unknown color: ${this.#cardData.color}`);
+                throw new Error(`Unknown color: ${this.cardData.color}`);
         }
     }
 
     private createPicture(): void {
-        const picture = this.scene.add.image(0, 0, this.#cardData.pictureName);
+        const picture = this.scene.add.image(0, 0, this.cardData.pictureName);
         picture.setOrigin(0, 0);
 
         const larguraDesejada = 100 - 12;
@@ -81,15 +86,15 @@ export class Card extends Phaser.GameObjects.Container {
 
         picture.setPosition((this.width - picture.displayWidth) / 2, (this.height - picture.displayHeight) / 2);
 
-        this.#picture = picture;
-        this.#frontLayer.add(picture);
+        this.picture = picture;
+        this.frontLayer.add(picture);
     }
 
     private createDisplay(): void {
         let label: Phaser.GameObjects.Text;
-        const cardTypeId = this.#cardData.typeId;
+        const cardTypeId = this.cardData.typeId;
         if (cardTypeId === 'battle') {
-            const { ap, hp } = this.#cardData;
+            const { ap, hp } = this.cardData;
             const apText = ap.toString().padStart(2, "0"); 
             const hpText = hp.toString().padStart(2, "0");
             label = this.scene.add.text(this.width - 80, this.height - 32, `${apText}/${hpText}`, {
@@ -107,7 +112,7 @@ export class Card extends Phaser.GameObjects.Container {
             throw new Error(`Unknown card type id: ${cardTypeId}`);
         }
         label.setOrigin(0, 0);
-        this.#frontLayer.add(label);
+        this.frontLayer.add(label);
     }
 
     static create(
@@ -115,5 +120,14 @@ export class Card extends Phaser.GameObjects.Container {
         cardData: CardData
     ): Card {
         return new Card(scene, 0, 0, cardData);
+    }
+
+    changeStatus(status: CardState) {
+        this.status = status;
+        this.status.create();
+    }
+
+    preUpdate() {
+        if (this.status) this.status.update();
     }
 }

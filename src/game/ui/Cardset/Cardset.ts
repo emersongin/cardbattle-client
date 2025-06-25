@@ -1,9 +1,12 @@
-import { Card } from "@/game/ui/Card";
-import { Dimensions } from "./types/Dimensions";
-import { CardData } from "./types/CardData";
-import { CardsetEvents } from "./types/CardsetEvents";
+import { Card } from "@/game/ui/Card/Card";
+import { Dimensions } from "./Dimensions";
+import { CardData } from "./CardData";
+import { CardsetEvents } from "./CardsetEvents";
 
 export class Cardset extends Phaser.GameObjects.Container {
+    #mode: 'static' | 'select' = 'static';
+    #events: CardsetEvents;
+
     private constructor(
         readonly scene: Phaser.Scene, 
         x: number, 
@@ -11,6 +14,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         events: CardsetEvents
     ) {
         super(scene, x, y);
+        this.#events = events;
         this.scene.add.existing(this);
     }
 
