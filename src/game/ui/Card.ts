@@ -1,23 +1,26 @@
+import { CardData } from "./types/CardData";
+
 export class Card extends Phaser.GameObjects.Container {
     #backgroundLayer: Phaser.GameObjects.Container;
     #background: Phaser.GameObjects.Rectangle;
     #frontLayer: Phaser.GameObjects.Container;
     #picture: Phaser.GameObjects.Image;
+    #cardData: CardData;
 
     private constructor(
         readonly scene: Phaser.Scene, 
         x: number, 
         y: number, 
-        bgColor: number,
-        cardType: string = 'power'
+        cardData: CardData,
     ) {
         super(scene, x, y);
         this.width = 100;
         this.height = 150;
+        this.#cardData = cardData;
         this.createLayers();
-        this.createBackground(bgColor);
+        this.createBackground();
         this.createPicture();
-        this.createDisplay(cardType);
+        this.createDisplay();
         this.scene.add.existing(this);
     }
 
@@ -38,15 +41,35 @@ export class Card extends Phaser.GameObjects.Container {
         this.add(frontLayer);
     }
 
-    private createBackground(backgroundColor: number): void {
+    private createBackground(): void {
+        const backgroundColor = this.getBgColor();
         const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
         this.#background = backgroundRect;
         this.#backgroundLayer.add(backgroundRect);
     }
 
+    private getBgColor(): number {
+        switch (this.#cardData.color) {
+            case 'red':
+                return 0xff0000; // Red
+            case 'blue':
+                return 0x0000ff; // Blue
+            case 'green':
+                return 0x00ff00; // Green
+            case 'white':
+                return 0xffffff; // White
+            case 'black':
+                return 0x000000; // Black
+            case 'orange':
+                return 0xffa500; // Orange
+            default:
+                throw new Error(`Unknown color: ${this.#cardData.color}`);
+        }
+    }
+
     private createPicture(): void {
-        const picture = this.scene.add.image(0, 0, 'card-picture');
+        const picture = this.scene.add.image(0, 0, this.#cardData.pictureName);
         picture.setOrigin(0, 0);
 
         const larguraDesejada = 100 - 12;
@@ -62,22 +85,26 @@ export class Card extends Phaser.GameObjects.Container {
         this.#frontLayer.add(picture);
     }
 
-    private createDisplay(cardType: string): void {
+    private createDisplay(): void {
         let label: Phaser.GameObjects.Text;
-        if (cardType === 'battle') {
-            label = this.scene.add.text(this.width - 80, this.height - 32, '99/99', {
+        const cardTypeId = this.#cardData.typeId;
+        if (cardTypeId === 'battle') {
+            const { ap, hp } = this.#cardData;
+            const apText = ap.toString().padStart(2, "0"); 
+            const hpText = hp.toString().padStart(2, "0");
+            label = this.scene.add.text(this.width - 80, this.height - 32, `${apText}/${hpText}`, {
                 fontSize: '24px',
                 color: '#ffffff',
                 fontStyle: 'bold',
             });
-        } else if (cardType === 'power') {
+        } else if (cardTypeId === 'power') {
             label = this.scene.add.text(this.width - 28, this.height - 32, 'P', {
                 fontSize: '24px',
                 color: '#ffffff',
                 fontStyle: 'bold',
             });
         } else {
-            throw new Error(`Unknown card type: ${cardType}`);
+            throw new Error(`Unknown card type id: ${cardTypeId}`);
         }
         label.setOrigin(0, 0);
         this.#frontLayer.add(label);
@@ -85,10 +112,8 @@ export class Card extends Phaser.GameObjects.Container {
 
     static create(
         scene: Phaser.Scene, 
-        x: number, 
-        y: number, 
-        background: number
+        cardData: CardData
     ): Card {
-        return new Card(scene, x, y, background);
+        return new Card(scene, 0, 0, cardData);
     }
 }

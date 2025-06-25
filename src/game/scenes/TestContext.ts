@@ -1,5 +1,5 @@
-import { Card } from '@/game/ui/Card';
-import { CardContainer } from '@ui/CardContainer';
+import { Cardset } from '@/game/ui/Cardset';
+import { CardData } from '@/game/ui/types/CardData';
 import { VueScene } from './VueScene';
 
 export class TestContext extends VueScene
@@ -14,9 +14,32 @@ export class TestContext extends VueScene
 
     create ()
     {
-        const children = [
-            Card.create(this, 0, 0, 0xff0000),
+        const cardsData: CardData[] = [
+            {
+                UUID: '123e4567-e89b-12d3-a456-426614174000',
+                number: 1,
+                name: 'Test Card',
+                description: 'This is a test card description.',
+                color: 'blue',
+                pictureName: 'card-picture',
+                hp: 10,
+                ap: 5,
+                typeId: 'battle',
+                powerId: 'none'
+            },
+            {
+                UUID: '123e4567-e89b-12d3-a456-426614174444',
+                number: 1,
+                name: 'Test Power Card',
+                description: 'This is a test power card description.',
+                color: 'red',
+                pictureName: 'card-picture',
+                hp: 0,
+                ap: 0,
+                typeId: 'power',
+                powerId: 'power-1'
+            },
         ];
-        CardContainer.create(this, 100, 100, 300, 150, children);
+        Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {});
     }
 }
