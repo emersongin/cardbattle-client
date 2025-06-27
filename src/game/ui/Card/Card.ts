@@ -7,6 +7,8 @@ export class Card extends Phaser.GameObjects.Container {
     image: Phaser.GameObjects.Image;
     display: Phaser.GameObjects.Text;
     status: CardState;
+    faceUp: boolean = true;
+    closed: boolean = false;
     disabled: boolean = false;
     cardData: CardData;
 
@@ -120,6 +122,15 @@ export class Card extends Phaser.GameObjects.Container {
         this.move(moves, 0);
     }
 
+    private move(moves: Move[], duration: number): void {
+        if (!this.status) return;        
+        if (this.status instanceof MovingState) {
+            this.status.addMoves(moves, duration);
+            return;
+        }
+        this.changeState(new MovingState(this, moves, duration));
+    }
+
     moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
         if (!this.status) return;
         const moves: Move[] = [
@@ -129,8 +140,39 @@ export class Card extends Phaser.GameObjects.Container {
         this.move(moves, duration);
     }
 
-    move(moves: Move[], duration: number): void {
-        if (!this.status) return;
-        this.changeState(new MovingState(this, moves, duration));
+    open(): void {
+        if (this.closed) return;
+        const moves: Move[] = [
+            {
+                x: this.x,
+                scaleX: 1,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.closed = false;
+                }, 
+            }
+        ];
+        this.move(moves, 200);
+    }
+
+    close(): void {
+        if (this.closed) return;
+        const moves: Move[] = [
+            {
+                x: this.x + (this.width / 2),
+                scaleX: 0,
+                ease: 'Linear',
+                onComplete: () => {
+                    this.closed = true;
+                }, 
+            },
+        ];
+        this.move(moves, 200);
+    }
+
+    flip(): void {
+        if (this.closed) return;
+        this.close();
+        this.open();
     }
 }

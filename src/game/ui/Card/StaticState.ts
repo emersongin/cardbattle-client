@@ -7,7 +7,7 @@ export default class StaticState implements CardState {
     ) {}
 
     create() {
-        console.log('StaticState: create called');
+        //nothing to do here
     }
 
     update() {

@@ -3,31 +3,60 @@ import { CardState, StaticState } from "./CardState";
 import { Move } from "./Move";
 
 export default class MovingState implements CardState {
-    #movesTweens: Phaser.Tweens.TweenChain | undefined;
+    #moves: Move[][] = [];
+    #tweens: Phaser.Tweens.TweenChain[] = [];
     constructor(
         readonly card: Card, 
-        readonly moves: Move[],
-        readonly duration: number = 300,
-    ) {}
+        moves: Move[],
+        duration: number = 300,
+    ) {
+        this.addMoves(moves, duration);
+    }
 
     create() {
-        const tweens = this.moves.map(move => {
+        // This method is called when the state is created.
+    }
+
+    addMoves(moves: Move[], duration: number) {
+        const movesConfig = moves.map(move => {
             return {
                 hold: 0,
-                duration: this.duration,
+                duration,
                 ...move,
             };
         });
-        this.#movesTweens = this.card.scene.tweens.chain({ targets: this.card, tweens });
-    }
-
-    isPlaying(): boolean {
-        return this.#movesTweens?.isPlaying() ?? false;
+        this.#moves.push(movesConfig);
     }
 
     update() {
         if (this.isPlaying()) return;
+        if (this.hasMoves()) this.createTweens();
+        if (this.hasTweens()) return;
         this.stopped();
+    }
+
+    createTweens() {
+        const moves = this.#moves.shift();
+        const tweens = this.card.scene.tweens.chain({ 
+            targets: this.card, 
+            tweens: moves,
+            onComplete: () => {
+                this.#tweens = this.#tweens.filter(t => t !== tweens);
+            } 
+        });
+        this.#tweens.push(tweens);
+    }
+
+    hasMoves(): boolean {
+        return this.#moves.length > 0;
+    }
+
+    hasTweens(): boolean {
+        return this.#tweens.length > 0;
+    }
+
+    isPlaying(): boolean {
+        return this.#tweens.some(tween => tween.isPlaying()) ?? false;
     }
 
     stopped() {
