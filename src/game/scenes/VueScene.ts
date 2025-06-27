@@ -18,8 +18,8 @@ export class VueScene extends Scene {
 
     async setApi(api: Api): Promise<void> {
         this.#api = api;
-        console.log(await this.#api.getChallenges(this.randomInt(1000, 3000)));
-        console.log(`API set in scene: ${this.scene.key}`);
+        // console.log(await this.#api.getChallenges(this.randomInt(1000, 3000)));
+        // console.log(`API set in scene: ${this.scene.key}`);
     }
 
     randomInt(min: number, max: number): number {

@@ -1,4 +1,4 @@
-import { Cardset } from '@/game/ui/Cardset/Cardset';
+// import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { CardData } from '@/game/ui/Cardset/CardData';
 import { VueScene } from './VueScene';
 import { Card } from '@ui/Card/Card';
@@ -41,6 +41,11 @@ export class TestContext extends VueScene
             },
         ];
         // Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {});
-        Card.create(this, cardsData[0]);
+        const card = Card.create(this, cardsData[0]);
+        card.move([
+            { x: 100, y: 100 },
+            { x: 200 },
+            { y: 200 },
+        ]);
     }
 }

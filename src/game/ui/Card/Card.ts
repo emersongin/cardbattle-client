@@ -1,6 +1,6 @@
 import { CardData } from "../Cardset/CardData";
-import { CardState } from "./CardState";
-import { EnabledState } from "./EnabledState";
+import { CardState, StaticState, MovingState } from "./CardState";
+import { Position } from "./Position";
 
 export class Card extends Phaser.GameObjects.Container {
     backgroundLayer: Phaser.GameObjects.Container;
@@ -8,7 +8,7 @@ export class Card extends Phaser.GameObjects.Container {
     frontLayer: Phaser.GameObjects.Container;
     picture: Phaser.GameObjects.Image;
     cardData: CardData;
-    status: CardState;
+    cardState: CardState;
     disabled: boolean = false;
 
     private constructor(
@@ -25,7 +25,7 @@ export class Card extends Phaser.GameObjects.Container {
         this.createBackground();
         this.createPicture();
         this.createDisplay();
-        this.changeStatus(new EnabledState(this));
+        this.changeState(new StaticState(this));
         this.scene.add.existing(this);
     }
 
@@ -122,12 +122,18 @@ export class Card extends Phaser.GameObjects.Container {
         return new Card(scene, 0, 0, cardData);
     }
 
-    changeStatus(status: CardState) {
-        this.status = status;
-        this.status.create();
+    changeState(state: CardState) {
+        this.cardState = state;
+        this.cardState.create();
     }
 
     preUpdate() {
-        if (this.status) this.status.update();
+        if (!this.cardState) return;
+        this.cardState.update();
+    }
+
+    move(moves: Position[]): void {
+        if (!this.cardState) return;
+        this.changeState(new MovingState(this, moves));
     }
 }
