@@ -189,12 +189,19 @@ export class Card extends Phaser.GameObjects.Container {
     flip(): void {
         if (this.closed) return;
         this.close(() => {
-            if (this.faceUp) {
-                this.setCardBack();
-            } else {
-                this.setCardImage();
-            }
+            this.toogleImage();
         });
         this.open();
     }
+
+    toogleImage(): void {
+        if (this.faceUp) {
+            this.setCardBack();
+            this.faceUp = false;
+        } else {
+            this.setCardImage();
+            this.faceUp = true;
+        }
+    }
+
 }
