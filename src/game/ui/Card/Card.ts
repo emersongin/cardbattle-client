@@ -1,15 +1,14 @@
 import { CardData } from "../Cardset/CardData";
 import { CardState, StaticState, MovingState } from "./CardState";
-import { Position } from "./Position";
+import { Move } from "./Move";
 
 export class Card extends Phaser.GameObjects.Container {
-    backgroundLayer: Phaser.GameObjects.Container;
     background: Phaser.GameObjects.Rectangle;
-    frontLayer: Phaser.GameObjects.Container;
-    picture: Phaser.GameObjects.Image;
-    cardData: CardData;
-    cardState: CardState;
+    image: Phaser.GameObjects.Image;
+    display: Phaser.GameObjects.Text;
+    status: CardState;
     disabled: boolean = false;
+    cardData: CardData;
 
     private constructor(
         readonly scene: Phaser.Scene, 
@@ -21,29 +20,11 @@ export class Card extends Phaser.GameObjects.Container {
         this.width = 100;
         this.height = 150;
         this.cardData = cardData;
-        this.createLayers();
         this.createBackground();
-        this.createPicture();
+        this.createImage();
         this.createDisplay();
         this.changeState(new StaticState(this));
         this.scene.add.existing(this);
-    }
-
-    private createLayers(): void {
-        this.createBackgroundLayer();
-        this.createFrontLayer();
-    }
-
-    private createBackgroundLayer(): void {
-        const backgroundLayer = this.scene.add.container(0, 0);
-        this.backgroundLayer = backgroundLayer;
-        this.add(backgroundLayer);
-    }
-
-    private createFrontLayer(): void {
-        const frontLayer = this.scene.add.container(0, 0);
-        this.frontLayer = frontLayer;
-        this.add(frontLayer);
     }
 
     private createBackground(): void {
@@ -51,7 +32,7 @@ export class Card extends Phaser.GameObjects.Container {
         const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
         this.background = backgroundRect;
-        this.backgroundLayer.add(backgroundRect);
+        this.add(backgroundRect);
     }
 
     private getBgColor(): number {
@@ -73,37 +54,37 @@ export class Card extends Phaser.GameObjects.Container {
         }
     }
 
-    private createPicture(): void {
-        const picture = this.scene.add.image(0, 0, this.cardData.pictureName);
-        picture.setOrigin(0, 0);
+    private createImage(): void {
+        const image = this.scene.add.image(0, 0, this.cardData.imageName);
+        image.setOrigin(0, 0);
 
         const larguraDesejada = 100 - 12;
         const alturaDesejada = 150 - 12;
-        const escalaX = larguraDesejada / picture.width;
-        const escalaY = alturaDesejada / picture.height;
+        const escalaX = larguraDesejada / image.width;
+        const escalaY = alturaDesejada / image.height;
         const escalaProporcional = Math.min(escalaX, escalaY);
-        picture.setScale(escalaProporcional);
+        image.setScale(escalaProporcional);
 
-        picture.setPosition((this.width - picture.displayWidth) / 2, (this.height - picture.displayHeight) / 2);
+        image.setPosition((this.width - image.displayWidth) / 2, (this.height - image.displayHeight) / 2);
 
-        this.picture = picture;
-        this.frontLayer.add(picture);
+        this.image = image;
+        this.add(image);
     }
 
     private createDisplay(): void {
-        let label: Phaser.GameObjects.Text;
+        let display: Phaser.GameObjects.Text;
         const cardTypeId = this.cardData.typeId;
         if (cardTypeId === 'battle') {
             const { ap, hp } = this.cardData;
             const apText = ap.toString().padStart(2, "0"); 
             const hpText = hp.toString().padStart(2, "0");
-            label = this.scene.add.text(this.width - 80, this.height - 32, `${apText}/${hpText}`, {
+            display = this.scene.add.text(this.width - 80, this.height - 32, `${apText}/${hpText}`, {
                 fontSize: '24px',
                 color: '#ffffff',
                 fontStyle: 'bold',
             });
         } else if (cardTypeId === 'power') {
-            label = this.scene.add.text(this.width - 28, this.height - 32, 'P', {
+            display = this.scene.add.text(this.width - 28, this.height - 32, 'P', {
                 fontSize: '24px',
                 color: '#ffffff',
                 fontStyle: 'bold',
@@ -111,8 +92,9 @@ export class Card extends Phaser.GameObjects.Container {
         } else {
             throw new Error(`Unknown card type id: ${cardTypeId}`);
         }
-        label.setOrigin(0, 0);
-        this.frontLayer.add(label);
+        display.setOrigin(0, 0);
+        this.display = display;
+        this.add(display);
     }
 
     static create(
@@ -123,17 +105,32 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     changeState(state: CardState) {
-        this.cardState = state;
-        this.cardState.create();
+        this.status = state;
+        this.status.create();
     }
 
     preUpdate() {
-        if (!this.cardState) return;
-        this.cardState.update();
+        if (!this.status) return;
+        this.status.update();
     }
 
-    move(moves: Position[]): void {
-        if (!this.cardState) return;
-        this.changeState(new MovingState(this, moves));
+    movePosition(x: number, y: number): void {
+        if (!this.status) return;
+        const moves: Move[] = [{ x, y }];
+        this.move(moves, 0);
+    }
+
+    moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
+        if (!this.status) return;
+        const moves: Move[] = [
+            { x: xFrom, y: yFrom, duration: 0 }, 
+            { x: xTo, y: yTo, duration }
+        ];
+        this.move(moves, duration);
+    }
+
+    move(moves: Move[], duration: number): void {
+        if (!this.status) return;
+        this.changeState(new MovingState(this, moves, duration));
     }
 }

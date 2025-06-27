@@ -4,7 +4,7 @@ export type CardData = {
     name: string;
     description: string;
     color: string;
-    pictureName: string;
+    imageName: string;
     hp: number;
     ap: number;
     typeId: string;

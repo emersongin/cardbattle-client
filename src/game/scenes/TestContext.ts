@@ -21,7 +21,7 @@ export class TestContext extends VueScene
                 name: 'Test Card',
                 description: 'This is a test card description.',
                 color: 'blue',
-                pictureName: 'card-picture',
+                imageName: 'card-picture',
                 hp: 10,
                 ap: 5,
                 typeId: 'battle',
@@ -33,7 +33,7 @@ export class TestContext extends VueScene
                 name: 'Test Power Card',
                 description: 'This is a test power card description.',
                 color: 'red',
-                pictureName: 'card-picture',
+                imageName: 'card-picture',
                 hp: 0,
                 ap: 0,
                 typeId: 'power',
@@ -42,10 +42,12 @@ export class TestContext extends VueScene
         ];
         // Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {});
         const card = Card.create(this, cardsData[0]);
-        card.move([
-            { x: 100, y: 100 },
-            { x: 200 },
-            { y: 200 },
-        ]);
+        // card.moveFromTo(0, 0, 500, 500, 300);
+        // card.movePosition(100, 100);
+        // card.move([
+        //     { x: 100, y: 100 },
+        //     { x: 200 },
+        //     { y: 200 },
+        // ]);
     }
 }
