@@ -7,7 +7,7 @@ export class Card extends Phaser.GameObjects.Container {
     image: Phaser.GameObjects.Image;
     display: Phaser.GameObjects.Text;
     status: CardState;
-    faceUp: boolean = true;
+    faceUp: boolean = false;
     closed: boolean = false;
     disabled: boolean = false;
     cardData: CardData;
@@ -57,20 +57,34 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     private createImage(): void {
-        const image = this.scene.add.image(0, 0, this.cardData.imageName);
-        image.setOrigin(0, 0);
+        const image = this.scene.add.image(0, 0, 'empty');
+        this.image = image;
+        this.setCardBack();
+        this.add(this.image);
+    }
 
+    private setCardImage() {
+        this.image.setTexture(this.cardData.imageName);
+        this.image.setOrigin(0, 0);
         const larguraDesejada = 100 - 12;
         const alturaDesejada = 150 - 12;
-        const escalaX = larguraDesejada / image.width;
-        const escalaY = alturaDesejada / image.height;
+        const escalaX = larguraDesejada / this.image.width;
+        const escalaY = alturaDesejada / this.image.height;
         const escalaProporcional = Math.min(escalaX, escalaY);
-        image.setScale(escalaProporcional);
+        this.image.setScale(escalaProporcional);
+        this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
+    }
 
-        image.setPosition((this.width - image.displayWidth) / 2, (this.height - image.displayHeight) / 2);
-
-        this.image = image;
-        this.add(image);
+    private setCardBack() {
+        this.image.setTexture('card-back');
+        this.image.setOrigin(0, 0);
+        const larguraDesejada = 100 - 12;
+        const alturaDesejada = 150 - 12;
+        const escalaX = larguraDesejada / this.image.width;
+        const escalaY = alturaDesejada / this.image.height;
+        const escalaProporcional = Math.min(escalaX, escalaY);
+        this.image.setScale(escalaProporcional);
+        this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
     }
 
     private createDisplay(): void {
@@ -140,7 +154,7 @@ export class Card extends Phaser.GameObjects.Container {
         this.move(moves, duration);
     }
 
-    open(): void {
+    open(onOpened?: () => void | null): void {
         if (this.closed) return;
         const moves: Move[] = [
             {
@@ -149,13 +163,14 @@ export class Card extends Phaser.GameObjects.Container {
                 ease: 'Linear',
                 onComplete: () => {
                     this.closed = false;
+                    if (onOpened) onOpened();
                 }, 
             }
         ];
         this.move(moves, 200);
     }
 
-    close(): void {
+    close(onClosed?: () => void | null): void {
         if (this.closed) return;
         const moves: Move[] = [
             {
@@ -164,6 +179,7 @@ export class Card extends Phaser.GameObjects.Container {
                 ease: 'Linear',
                 onComplete: () => {
                     this.closed = true;
+                    if (onClosed) onClosed();
                 }, 
             },
         ];
@@ -172,7 +188,13 @@ export class Card extends Phaser.GameObjects.Container {
 
     flip(): void {
         if (this.closed) return;
-        this.close();
+        this.close(() => {
+            if (this.faceUp) {
+                this.setCardBack();
+            } else {
+                this.setCardImage();
+            }
+        });
         this.open();
     }
 }
