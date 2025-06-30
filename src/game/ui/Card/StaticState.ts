@@ -7,11 +7,12 @@ export default class StaticState implements CardState {
     ) {}
 
     create() {
-        //nothing to do here
+        // This method is called when the state is created.
     }
 
     update() {
         //nothing to do here
+        // console.log("StaticState update");
     }
 
     stopped() {

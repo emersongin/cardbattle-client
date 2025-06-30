@@ -1,5 +1,5 @@
 import { CardData } from "../Cardset/CardData";
-import { CardState, StaticState, MovingState } from "./CardState";
+import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
 import { Move } from "./Move";
 
 export class Card extends Phaser.GameObjects.Container {
@@ -22,6 +22,8 @@ export class Card extends Phaser.GameObjects.Container {
         this.width = 100;
         this.height = 150;
         this.cardData = cardData;
+        this.setData('hp', cardData.hp);
+        this.setData('ap', cardData.ap);
         this.createBackground();
         this.createImage();
         this.createDisplay();
@@ -59,11 +61,11 @@ export class Card extends Phaser.GameObjects.Container {
     private createImage(): void {
         const image = this.scene.add.image(0, 0, 'empty');
         this.image = image;
-        this.setCardBack();
+        this.setBack();
         this.add(this.image);
     }
 
-    private setCardImage() {
+    private setImage() {
         this.image.setTexture(this.cardData.imageName);
         this.image.setOrigin(0, 0);
         const larguraDesejada = 100 - 12;
@@ -75,7 +77,7 @@ export class Card extends Phaser.GameObjects.Container {
         this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
     }
 
-    private setCardBack() {
+    private setBack() {
         this.image.setTexture('card-back');
         this.image.setOrigin(0, 0);
         const larguraDesejada = 100 - 12;
@@ -89,9 +91,9 @@ export class Card extends Phaser.GameObjects.Container {
 
     private createDisplay(): void {
         let display: Phaser.GameObjects.Text;
-        const cardTypeId = this.cardData.typeId;
+        const { typeId: cardTypeId } = this.cardData;
         if (cardTypeId === 'battle') {
-            const { ap, hp } = this.cardData;
+            const { ap, hp } = this.getAllData('ap', 'hp');
             const apText = ap.toString().padStart(2, "0"); 
             const hpText = hp.toString().padStart(2, "0");
             display = this.scene.add.text(this.width - 80, this.height - 32, `${apText}/${hpText}`, {
@@ -113,6 +115,19 @@ export class Card extends Phaser.GameObjects.Container {
         this.add(display);
     }
 
+    getAllData(...keys: string[]): any {
+        const result: any = {};
+        keys.forEach(key => {
+            const data = this.getData(key);
+            if (data !== undefined) {
+                result[key] = data;
+            } else {
+                throw new Error(`Key "${key}" not found in card data.`);
+            }
+        });
+        return result;
+    }
+
     static create(
         scene: Phaser.Scene, 
         cardData: CardData
@@ -120,9 +135,9 @@ export class Card extends Phaser.GameObjects.Container {
         return new Card(scene, 0, 0, cardData);
     }
 
-    changeState(state: CardState) {
+    changeState(state: CardState, ...args: any[]): void {
         this.status = state;
-        this.status.create();
+        this.status.create(...args);
     }
 
     preUpdate() {
@@ -139,10 +154,10 @@ export class Card extends Phaser.GameObjects.Container {
     private move(moves: Move[], duration: number): void {
         if (!this.status) return;        
         if (this.status instanceof MovingState) {
-            this.status.addMoves(moves, duration);
+            this.status.addTweens(moves, duration);
             return;
         }
-        this.changeState(new MovingState(this, moves, duration));
+        this.changeState(new MovingState(this), moves, duration);
     }
 
     moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
@@ -196,12 +211,17 @@ export class Card extends Phaser.GameObjects.Container {
 
     toogleImage(): void {
         if (this.faceUp) {
-            this.setCardBack();
+            this.setBack();
             this.faceUp = false;
         } else {
-            this.setCardImage();
+            this.setImage();
             this.faceUp = true;
         }
+    }
+
+    changeApDisplay(ap: number): void {
+        if (!this.status) return;   
+        this.changeState(new UpdatingState(this), ap, this.getData('hp'));
     }
 
 }
