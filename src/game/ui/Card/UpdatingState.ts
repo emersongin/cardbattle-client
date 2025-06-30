@@ -1,51 +1,72 @@
-import { CardPoints } from "./CardPoints";
-import { CardState } from "./CardState";
-import CardTweens from "./CardTweens";
+import { UpdatePoints } from "./UpdatePoints";
+import { CardState, StaticState } from "./CardState";
+import { Card } from "./Card";
 
-export default class UpdatingState extends CardTweens<CardPoints> implements CardState {
-    #cardPoints: { ap: number; hp: number };
+export default class UpdatingState implements CardState {
+    #updates: UpdatePoints[][] = [];
+    #tweens: Phaser.Tweens.Tween[][] = [];
+    
+    constructor(readonly card: Card) {}
 
-    create(ap: number, hp: number) {
-        this.#cardPoints = {
-            ap: this.card.getData('ap') ?? 0,
-            hp: this.card.getData('hp') ?? 0,
-        };
-        const apPoints: CardPoints = {
-            target: this.#cardPoints,
-            from: this.#cardPoints.ap,
-            to: ap,
-            duration: 1000,
-            ease: 'linear',
-            onUpdate: (tween: Phaser.Tweens.Tween) => {
-                const apText = Math.round(tween.getValue() ?? 0).toString().padStart(2, "0");
-                const hpText = hp.toString().padStart(2, "0");
-                this.card.display.setText(`${apText}/${hpText}`);
-            }
-        };
-        const hpPoints: CardPoints = {
-            target: this.#cardPoints,
-            from: this.#cardPoints.hp,
-            to: hp,
-            duration: 1000,
-            ease: 'linear',
-            onUpdate: (tween: Phaser.Tweens.Tween) => {
-                const apText = Math.round(this.card.getData('ap')).toString().padStart(2, "0");
-                const hpText = Math.round(tween.getValue() ?? 0).toString().padStart(2, "0");
-                this.card.display.setText(`${apText}/${hpText}`);
-            }
-        };
-        this.addTweens([apPoints, hpPoints], 300);
+    create(updatePoints: UpdatePoints[], duration: number) {
+        this.addTweens(updatePoints, duration);
     }
 
-    addTweens(cardPoints: CardPoints[], duration: number) {
-        const cardTweens = cardPoints.map(points => {
+    addTweens(moves: UpdatePoints[], duration: number) {
+        const updateTweens = moves.map(move => {
             return {
                 hold: 0,
                 duration,
-                ...points,
+                ...move,
             };
         });
-        this.pushCardTweens(cardTweens);
+        this.pushMoves(updateTweens);
+    }
+    
+    pushMoves(moves: UpdatePoints[]) {
+        this.#updates.push(moves);
     }
 
+    update() {
+        if (this.isPlaying()) return;
+        if (this.hasUpdates()) this.createTweens();
+        if (this.hasTweens()) return;
+        this.stopped();
+    }
+
+    isPlaying(): boolean {
+        return this.#tweens.some(group  => group.some(tween => tween.isPlaying())) ?? false;
+    }
+
+    hasUpdates(): boolean {
+        return this.#updates.length > 0;
+    }
+
+    createTweens() {
+        const updates = this.#updates.shift();
+        if (!updates || updates.length === 0) return;
+        let counterTweens = [];
+        for (const points of updates) {
+            const tween = this.card.scene.tweens.addCounter({
+                ...points,
+                onComplete: () => {
+                    for (let index = 0; index < this.#tweens.length; index++) {
+                        const group = this.#tweens[index];
+                        const filteredGroup = group.filter(t => t !== tween);
+                        this.#tweens[index] = filteredGroup;
+                    }
+                } 
+            });
+            counterTweens.push(tween);
+        }
+        this.#tweens.push(counterTweens);
+    }
+
+    hasTweens(): boolean {
+        return this.#tweens.length > 0;
+    }
+
+    stopped() {
+        this.card.changeState(new StaticState(this.card));
+    }
 }
