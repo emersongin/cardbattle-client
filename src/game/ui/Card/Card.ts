@@ -1,7 +1,6 @@
 import { CardData } from "../Cardset/CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
 import { Move } from "./Move";
-import { UpdatePoints } from "./UpdatePoints";
 
 export class Card extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -62,58 +61,66 @@ export class Card extends Phaser.GameObjects.Container {
     private createImage(): void {
         const image = this.scene.add.image(0, 0, 'empty');
         this.image = image;
-        this.setBack();
+        this.setImage();
         this.add(this.image);
     }
 
     private setImage() {
-        this.image.setTexture(this.cardData.imageName);
-        this.image.setOrigin(0, 0);
-        const larguraDesejada = 100 - 12;
-        const alturaDesejada = 150 - 12;
-        const escalaX = larguraDesejada / this.image.width;
-        const escalaY = alturaDesejada / this.image.height;
-        const escalaProporcional = Math.min(escalaX, escalaY);
-        this.image.setScale(escalaProporcional);
-        this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
-    }
-
-    private setBack() {
-        this.image.setTexture('card-back');
-        this.image.setOrigin(0, 0);
-        const larguraDesejada = 100 - 12;
-        const alturaDesejada = 150 - 12;
-        const escalaX = larguraDesejada / this.image.width;
-        const escalaY = alturaDesejada / this.image.height;
-        const escalaProporcional = Math.min(escalaX, escalaY);
-        this.image.setScale(escalaProporcional);
-        this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
+        if (this.faceUp) {
+            this.image.setTexture(this.cardData.imageName);
+            this.image.setOrigin(0, 0);
+            const larguraDesejada = 100 - 12;
+            const alturaDesejada = 150 - 12;
+            const escalaX = larguraDesejada / this.image.width;
+            const escalaY = alturaDesejada / this.image.height;
+            const escalaProporcional = Math.min(escalaX, escalaY);
+            this.image.setScale(escalaProporcional);
+            this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
+        } else {
+            this.image.setTexture('card-back');
+            this.image.setOrigin(0, 0);
+            const larguraDesejada = 100 - 12;
+            const alturaDesejada = 150 - 12;
+            const escalaX = larguraDesejada / this.image.width;
+            const escalaY = alturaDesejada / this.image.height;
+            const escalaProporcional = Math.min(escalaX, escalaY);
+            this.image.setScale(escalaProporcional);
+            this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
+        }
     }
 
     private createDisplay(): void {
-        let display: Phaser.GameObjects.Text;
+        const display = this.scene.add.text(this.width - 80, this.height - 32, '', {
+            fontSize: '24px',
+            color: '#ffffff',
+            fontStyle: 'bold',
+        });
+        display.setOrigin(0, 0);
+        this.display = display;
+        this.setDisplay();
+        this.add(display);
+    }
+
+    private setEmptyDisplay() {
+        this.display.setText('');
+    }
+
+    private setDisplay() {
+        if (!this.display || !this.faceUp) {
+            this.setEmptyDisplay();
+            return
+        } 
         const { typeId: cardTypeId } = this.cardData;
         if (cardTypeId === 'battle') {
             const { ap, hp } = this.getAllData('ap', 'hp');
             const apText = ap.toString().padStart(2, "0"); 
             const hpText = hp.toString().padStart(2, "0");
-            display = this.scene.add.text(this.width - 80, this.height - 32, `${apText}/${hpText}`, {
-                fontSize: '24px',
-                color: '#ffffff',
-                fontStyle: 'bold',
-            });
+            this.display.setText(`${apText}/${hpText}`);
         } else if (cardTypeId === 'power') {
-            display = this.scene.add.text(this.width - 28, this.height - 32, 'P', {
-                fontSize: '24px',
-                color: '#ffffff',
-                fontStyle: 'bold',
-            });
+            this.display.setText('P');
         } else {
             throw new Error(`Unknown card type id: ${cardTypeId}`);
         }
-        display.setOrigin(0, 0);
-        this.display = display;
-        this.add(display);
     }
 
     getAllData(...keys: string[]): any {
@@ -170,13 +177,15 @@ export class Card extends Phaser.GameObjects.Container {
         this.move(moves, duration);
     }
 
-    open(onOpened?: () => void | null): void {
-        if (this.closed) return;
+    open(onOpened?: () => void, onCanStart?: () => boolean): void {
         const moves: Move[] = [
             {
                 x: this.x,
                 scaleX: 1,
                 ease: 'Linear',
+                canStart: () => {
+                    return this.closed && (!onCanStart || onCanStart());
+                },
                 onComplete: () => {
                     this.closed = false;
                     if (onOpened) onOpened();
@@ -186,13 +195,19 @@ export class Card extends Phaser.GameObjects.Container {
         this.move(moves, 200);
     }
 
-    close(onClosed?: () => void | null): void {
-        if (this.closed) return;
+    isOpened(): boolean {
+        return !this.closed;
+    }
+
+    close(onClosed?: () => void, onCanStart?: () => boolean): void {
         const moves: Move[] = [
             {
                 x: this.x + (this.width / 2),
                 scaleX: 0,
                 ease: 'Linear',
+                canStart: () => {
+                    return this.isOpened() && (!onCanStart || onCanStart());
+                },
                 onComplete: () => {
                     this.closed = true;
                     if (onClosed) onClosed();
@@ -203,61 +218,44 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     flip(): void {
-        if (this.closed) return;
         this.close(() => {
-            this.toogleImage();
+            this.faceUp = true;
+            this.closed = true;
+            this.setImage();
+            this.setDisplay();
+        }, () => {
+            return !this.faceUp;
         });
-        this.open();
+        this.open(() => {
+            this.closed = false;
+        }, () => {
+            return this.faceUp;
+        });
     }
 
-    toogleImage(): void {
-        if (this.faceUp) {
-            this.setBack();
+    turnDown(): void {
+        this.close(() => {
             this.faceUp = false;
-        } else {
+            this.closed = true;
             this.setImage();
-            this.faceUp = true;
-        }
+            this.setDisplay();
+        }, () => {
+            return this.faceUp;
+        });
+        this.open(() => {
+            this.closed = false;
+        }, () => {
+            return !this.faceUp;
+        });
     }
 
     changeDisplayPoints(ap: number, hp: number): void {
-        if (!this.status) return;   
-        const { ap: cardAp, hp: cardHp } = this.getAllData('ap', 'hp');
-        const apCounter = { value: cardAp };
-        const hpCounter = { value: cardHp };
-        const apPoints: UpdatePoints = {
-            target: apCounter,
-            from: cardAp,
-            to: ap,
-            duration: 1000,
-            ease: 'linear',
-            onUpdate: (tween: Phaser.Tweens.Tween) => {
-                apCounter.value = Math.round(tween.getValue() ?? 0);
-                const apText = Math.round(apCounter.value).toString().padStart(2, "0");
-                const hpText = Math.round(hpCounter.value).toString().padStart(2, "0");
-                this.display.setText(`${apText}/${hpText}`);
-            },
-            onComplete: () => {
-                this.setData('ap', ap);
-            }
-        };
-        const hpPoints: UpdatePoints = {
-            target: hpCounter,
-            from: cardHp,
-            to: hp,
-            duration: 1000,
-            ease: 'linear',
-            onUpdate: (tween: Phaser.Tweens.Tween) => {
-                hpCounter.value = Math.round(tween.getValue() ?? 0);
-                const apText = Math.round(apCounter.value).toString().padStart(2, "0");
-                const hpText = Math.round(hpCounter.value).toString().padStart(2, "0");
-                this.display.setText(`${apText}/${hpText}`);
-            },
-            onComplete: () => {
-                this.setData('hp', hp);
-            }
-        };
-        this.changeState(new UpdatingState(this), [apPoints, hpPoints], 1000);
+        if (!this.status || !this.faceUp) return;
+        if (this.status instanceof UpdatingState) {
+            this.status.addTweens(ap, hp, 2000);
+            return;
+        }
+        this.changeState(new UpdatingState(this), ap, hp, 1000);
     }
 
 }

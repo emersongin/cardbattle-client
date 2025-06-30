@@ -1,6 +1,7 @@
 import { UpdatePoints } from "./UpdatePoints";
 import { CardState, StaticState } from "./CardState";
 import { Card } from "./Card";
+import { CardPoints } from "./CardPoints";
 
 export default class UpdatingState implements CardState {
     #updates: UpdatePoints[][] = [];
@@ -8,23 +9,66 @@ export default class UpdatingState implements CardState {
     
     constructor(readonly card: Card) {}
 
-    create(updatePoints: UpdatePoints[], duration: number) {
-        this.addTweens(updatePoints, duration);
+    create(ap: number, hp: number, duration: number) {
+        this.addTweens(ap, hp, duration);
     }
 
-    addTweens(moves: UpdatePoints[], duration: number) {
-        const updateTweens = moves.map(move => {
+    addTweens(ap: number, hp: number, duration: number) {
+        const fromTarget = this.card.getAllData('ap', 'hp');
+        const toTarget = { ap, hp };
+        const updates = this.createUpdatePoints(fromTarget, toTarget);
+        const updateTweens = updates.map(update => {
             return {
+                ...update,
                 hold: 0,
                 duration,
-                ...move,
             };
         });
-        this.pushMoves(updateTweens);
+        this.pushUpdates(updateTweens);
+    }
+
+    private createUpdatePoints(fromTarget: CardPoints, toTarget: CardPoints): UpdatePoints[] {
+        const apPoints = this.createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
+            (tween: Phaser.Tweens.Tween) => {
+                fromTarget.ap = Math.round(tween.getValue() ?? 0);
+                const apText = Math.round(fromTarget.ap).toString().padStart(2, "0");
+                const hpText = Math.round(fromTarget.hp).toString().padStart(2, "0");
+                this.card.display.setText(`${apText}/${hpText}`);
+            },
+            () => this.card.setData('ap', toTarget.ap)
+        );
+        const hpPoints = this.createUpdate(fromTarget, fromTarget.hp, toTarget.hp,
+            (tween: Phaser.Tweens.Tween) => {
+                fromTarget.hp = Math.round(tween.getValue() ?? 0);
+                const apText = Math.round(fromTarget.ap).toString().padStart(2, "0");
+                const hpText = Math.round(fromTarget.hp).toString().padStart(2, "0");
+                this.card.display.setText(`${apText}/${hpText}`);
+            },
+            () => this.card.setData('hp', toTarget.hp)
+        );
+        return [apPoints, hpPoints];
+    }
+
+    private createUpdate(
+        target: CardPoints,
+        fromPoints: number, 
+        toPoints: number, 
+        onUpdate: (tween: Phaser.Tweens.Tween) => void,
+        onComplete: () => void,
+    ): UpdatePoints {
+        return {
+            target,
+            from: fromPoints,
+            to: toPoints,
+            duration: 300,
+            ease: 'linear',
+            onUpdate,
+            onComplete
+        };
     }
     
-    pushMoves(moves: UpdatePoints[]) {
-        this.#updates.push(moves);
+    pushUpdates(updates: UpdatePoints[]) {
+        this.#updates.push(updates);
     }
 
     update() {
@@ -63,7 +107,7 @@ export default class UpdatingState implements CardState {
     }
 
     hasTweens(): boolean {
-        return this.#tweens.length > 0;
+        return this.hasUpdates() || this.#tweens.length > 0;
     }
 
     stopped() {

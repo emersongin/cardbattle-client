@@ -15,9 +15,9 @@ export default class MovingState implements CardState {
     addTweens(moves: Move[], duration: number) {
         const moveTweens = moves.map(move => {
             return {
+                ...move,
                 hold: 0,
                 duration,
-                ...move,
             };
         });
         this.pushMoves(moveTweens);
@@ -43,7 +43,8 @@ export default class MovingState implements CardState {
     }
 
     createTweens() {
-        const moves = this.#movesArray.shift();
+        const moves = this.#movesArray.shift()!.filter((m: Move) => m.canStart ? m.canStart() : true);
+        if (!moves || moves.length === 0) return;
         const tweens = this.card.scene.tweens.chain({ 
             targets: this.card, 
             tweens: moves,
@@ -55,7 +56,7 @@ export default class MovingState implements CardState {
     }
 
     hasTweens(): boolean {
-        return this.#tweens.length > 0;
+        return this.hasMoves() || this.#tweens.length > 0;
     }
 
     stopped() {

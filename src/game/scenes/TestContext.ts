@@ -42,10 +42,11 @@ export class TestContext extends VueScene
         ];
         // Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {});
         const card = Card.create(this, cardsData[0]);
-        card.changeDisplayPoints(30, 20);
+        // card.changeDisplayPoints(99, 99);
         // card.close();
         // card.open();
-        // card.flip();
+        card.flip();
+        card.turnDown();
         // card.moveFromTo(0, 0, 500, 500, 300);
         // card.movePosition(100, 100);
     }

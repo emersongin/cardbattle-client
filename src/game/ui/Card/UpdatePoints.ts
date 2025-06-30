@@ -1,5 +1,8 @@
+import { CardPoints } from "./CardPoints";
+
 export type UpdatePoints = {
-    target: { value: number };
+    hold?: number;
+    target: CardPoints;
     from?: number;
     to?: number;
     duration?: number;
