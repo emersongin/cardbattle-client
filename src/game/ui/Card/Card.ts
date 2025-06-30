@@ -1,6 +1,7 @@
 import { CardData } from "../Cardset/CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
 import { Move } from "./Move";
+import { UpdatePoints } from "./UpdatePoints";
 
 export class Card extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -219,9 +220,44 @@ export class Card extends Phaser.GameObjects.Container {
         }
     }
 
-    changeApDisplay(ap: number): void {
+    changeDisplayPoints(ap: number, hp: number): void {
         if (!this.status) return;   
-        this.changeState(new UpdatingState(this), ap, this.getData('hp'));
+        const { ap: cardAp, hp: cardHp } = this.getAllData('ap', 'hp');
+        const apCounter = { value: cardAp };
+        const hpCounter = { value: cardHp };
+        const apPoints: UpdatePoints = {
+            target: apCounter,
+            from: cardAp,
+            to: ap,
+            duration: 1000,
+            ease: 'linear',
+            onUpdate: (tween: Phaser.Tweens.Tween) => {
+                apCounter.value = Math.round(tween.getValue() ?? 0);
+                const apText = Math.round(apCounter.value).toString().padStart(2, "0");
+                const hpText = Math.round(hpCounter.value).toString().padStart(2, "0");
+                this.display.setText(`${apText}/${hpText}`);
+            },
+            onComplete: () => {
+                this.setData('ap', ap);
+            }
+        };
+        const hpPoints: UpdatePoints = {
+            target: hpCounter,
+            from: cardHp,
+            to: hp,
+            duration: 1000,
+            ease: 'linear',
+            onUpdate: (tween: Phaser.Tweens.Tween) => {
+                hpCounter.value = Math.round(tween.getValue() ?? 0);
+                const apText = Math.round(apCounter.value).toString().padStart(2, "0");
+                const hpText = Math.round(hpCounter.value).toString().padStart(2, "0");
+                this.display.setText(`${apText}/${hpText}`);
+            },
+            onComplete: () => {
+                this.setData('hp', hp);
+            }
+        };
+        this.changeState(new UpdatingState(this), [apPoints, hpPoints], 1000);
     }
 
 }
