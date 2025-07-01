@@ -1,6 +1,8 @@
 import { CardData } from "../Cardset/CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
-import { Move } from "./Move";
+
+const CARD_WIDTH = 100;
+const CARD_HEIGHT = 150;
 
 export class Card extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -19,27 +21,34 @@ export class Card extends Phaser.GameObjects.Container {
         cardData: CardData,
     ) {
         super(scene, x, y);
-        this.width = 100;
-        this.height = 150;
         this.cardData = cardData;
-        this.setData('hp', cardData.hp);
-        this.setData('ap', cardData.ap);
-        this.createBackground();
-        this.createImage();
-        this.createDisplay();
+        this.width = CARD_WIDTH;
+        this.height = CARD_HEIGHT;
+        this.createLayers();
+        this.setPoints();
         this.changeState(new StaticState(this));
         this.scene.add.existing(this);
     }
 
+    static create(scene: Phaser.Scene, cardData: CardData): Card {
+        return new Card(scene, 0, 0, cardData);
+    }
+
+    private createLayers(): void {
+        this.createBackground();
+        this.createImage();
+        this.createDisplay();
+    }
+
     private createBackground(): void {
-        const backgroundColor = this.getBgColor();
+        const backgroundColor = this.getBackgroundColor();
         const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
         this.background = backgroundRect;
         this.add(backgroundRect);
     }
 
-    private getBgColor(): number {
+    private getBackgroundColor(): number {
         switch (this.cardData.color) {
             case 'red':
                 return 0xff0000; // Red
@@ -68,25 +77,21 @@ export class Card extends Phaser.GameObjects.Container {
     private setImage() {
         if (this.faceUp) {
             this.image.setTexture(this.cardData.imageName);
-            this.image.setOrigin(0, 0);
-            const larguraDesejada = 100 - 12;
-            const alturaDesejada = 150 - 12;
-            const escalaX = larguraDesejada / this.image.width;
-            const escalaY = alturaDesejada / this.image.height;
-            const escalaProporcional = Math.min(escalaX, escalaY);
-            this.image.setScale(escalaProporcional);
-            this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
         } else {
             this.image.setTexture('card-back');
-            this.image.setOrigin(0, 0);
-            const larguraDesejada = 100 - 12;
-            const alturaDesejada = 150 - 12;
-            const escalaX = larguraDesejada / this.image.width;
-            const escalaY = alturaDesejada / this.image.height;
-            const escalaProporcional = Math.min(escalaX, escalaY);
-            this.image.setScale(escalaProporcional);
-            this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
         }
+        this.adjustImagePosition();
+    }
+
+    private adjustImagePosition(): void {
+        const larguraDesejada = CARD_WIDTH - 12;
+        const alturaDesejada = CARD_HEIGHT - 12;
+        const escalaX = larguraDesejada / this.image.width;
+        const escalaY = alturaDesejada / this.image.height;
+        const escalaProporcional = Math.min(escalaX, escalaY);
+        this.image.setOrigin(0, 0);
+        this.image.setScale(escalaProporcional);
+        this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
     }
 
     private createDisplay(): void {
@@ -95,14 +100,10 @@ export class Card extends Phaser.GameObjects.Container {
             color: '#ffffff',
             fontStyle: 'bold',
         });
-        display.setOrigin(0, 0);
         this.display = display;
+        this.display.setOrigin(0, 0);
         this.setDisplay();
         this.add(display);
-    }
-
-    private setEmptyDisplay() {
-        this.display.setText('');
     }
 
     private setDisplay() {
@@ -112,15 +113,23 @@ export class Card extends Phaser.GameObjects.Container {
         } 
         const { typeId: cardTypeId } = this.cardData;
         if (cardTypeId === 'battle') {
-            const { ap, hp } = this.getAllData('ap', 'hp');
-            const apText = ap.toString().padStart(2, "0"); 
-            const hpText = hp.toString().padStart(2, "0");
-            this.display.setText(`${apText}/${hpText}`);
+            this.setPointsDisplay();
         } else if (cardTypeId === 'power') {
-            this.display.setText('P');
+            this.setPowerDisplay();
         } else {
             throw new Error(`Unknown card type id: ${cardTypeId}`);
         }
+    }
+
+    private setEmptyDisplay() {
+        this.display.setText('');
+    }
+
+    private setPointsDisplay() {
+        const { ap, hp } = this.getAllData('ap', 'hp');
+        const apText = ap.toString().padStart(2, "0"); 
+        const hpText = hp.toString().padStart(2, "0");
+        this.display.setText(`${apText}/${hpText}`);
     }
 
     getAllData(...keys: string[]): any {
@@ -136,11 +145,13 @@ export class Card extends Phaser.GameObjects.Container {
         return result;
     }
 
-    static create(
-        scene: Phaser.Scene, 
-        cardData: CardData
-    ): Card {
-        return new Card(scene, 0, 0, cardData);
+    private setPowerDisplay() {
+        this.display.setText('P');
+    }
+
+    private setPoints(): void {
+        this.setData('hp', this.cardData.hp);
+        this.setData('ap', this.cardData.ap);
     }
 
     changeState(state: CardState, ...args: any[]): void {
@@ -153,102 +164,69 @@ export class Card extends Phaser.GameObjects.Container {
         this.status.update();
     }
 
-    movePosition(x: number, y: number): void {
-        if (!this.status) return;
-        const moves: Move[] = [{ x, y }];
-        this.move(moves, 0);
-    }
-
-    private move(moves: Move[], duration: number): void {
-        if (!this.status) return;        
-        if (this.status instanceof MovingState) {
-            this.status.addTweens(moves, duration);
-            return;
-        }
-        this.changeState(new MovingState(this), moves, duration);
+    // Move methods
+    movePosition(xTo: number, yTo: number): void {
+        this.changeState(new MovingState(this));
+        if (!(this.status instanceof MovingState)) return;
+        this.status.movePosition(xTo, yTo);
     }
 
     moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
-        if (!this.status) return;
-        const moves: Move[] = [
-            { x: xFrom, y: yFrom, duration: 0 }, 
-            { x: xTo, y: yTo, duration }
-        ];
-        this.move(moves, duration);
+        this.changeState(new MovingState(this));
+        if (!(this.status instanceof MovingState)) return;
+        this.status.moveFromTo(xFrom, yFrom, xTo, yTo, duration);
     }
 
-    open(onOpened?: () => void, onCanStart?: () => boolean): void {
-        const moves: Move[] = [
-            {
-                x: this.x,
-                scaleX: 1,
-                ease: 'Linear',
-                canStart: () => {
-                    return this.closed && (!onCanStart || onCanStart());
-                },
-                onComplete: () => {
-                    this.closed = false;
-                    if (onOpened) onOpened();
-                }, 
-            }
-        ];
-        this.move(moves, 200);
+    // Open and close methods
+    flip(): void {
+        const onCanStartClose = () => {
+            return !this.faceUp;
+        };
+        const onClosed = () => {
+            this.faceUp = true;
+            this.setImage();
+            this.setDisplay();
+        };
+        this.close(onCanStartClose, onClosed);
+        const onCanStartOpen = () => {
+            return this.faceUp;
+        };
+        this.open(onCanStartOpen);
+    }
+
+    turnDown(): void {
+        const onCanStartClose = () => {
+            return this.faceUp;
+        };
+        const onClosed = () => {
+            this.faceUp = false;
+            this.setImage();
+            this.setDisplay();
+        };
+        this.close(onCanStartClose, onClosed);
+        const onCanStartOpen = () => {
+            return !this.faceUp;
+        };
+        this.open(onCanStartOpen);
+    }
+
+    private close(onCanStart?: () => boolean, onClosed?: () => void): void {
+        this.changeState(new MovingState(this));
+        if (!(this.status instanceof MovingState)) return;
+        this.status.close(onCanStart, onClosed);
     }
 
     isOpened(): boolean {
         return !this.closed;
     }
 
-    close(onClosed?: () => void, onCanStart?: () => boolean): void {
-        const moves: Move[] = [
-            {
-                x: this.x + (this.width / 2),
-                scaleX: 0,
-                ease: 'Linear',
-                canStart: () => {
-                    return this.isOpened() && (!onCanStart || onCanStart());
-                },
-                onComplete: () => {
-                    this.closed = true;
-                    if (onClosed) onClosed();
-                }, 
-            },
-        ];
-        this.move(moves, 200);
+    private open(onCanStart?: () => boolean, onOpened?: () => void): void {
+        this.changeState(new MovingState(this));
+        if (!(this.status instanceof MovingState)) return;
+        this.status.open(onCanStart, onOpened);
     }
 
-    flip(): void {
-        this.close(() => {
-            this.faceUp = true;
-            this.closed = true;
-            this.setImage();
-            this.setDisplay();
-        }, () => {
-            return !this.faceUp;
-        });
-        this.open(() => {
-            this.closed = false;
-        }, () => {
-            return this.faceUp;
-        });
-    }
-
-    turnDown(): void {
-        this.close(() => {
-            this.faceUp = false;
-            this.closed = true;
-            this.setImage();
-            this.setDisplay();
-        }, () => {
-            return this.faceUp;
-        });
-        this.open(() => {
-            this.closed = false;
-        }, () => {
-            return !this.faceUp;
-        });
-    }
-
+    // Update points methods
     changeDisplayPoints(ap: number, hp: number): void {
         if (!this.status || !this.faceUp) return;
         if (this.status instanceof UpdatingState) {

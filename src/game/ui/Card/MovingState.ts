@@ -8,11 +8,11 @@ export default class MovingState implements CardState {
     
     constructor(readonly card: Card) {}
 
-    create(moves: Move[], duration: number) {
-        this.addTweens(moves, duration);
+    create() {
+        // This method is called when the state is created.
     }
 
-    addTweens(moves: Move[], duration: number) {
+    addTweens(moves: Move[], duration: number = 0) {
         const moveTweens = moves.map(move => {
             return {
                 ...move,
@@ -61,5 +61,60 @@ export default class MovingState implements CardState {
 
     stopped() {
         this.card.changeState(new StaticState(this.card));
+    }
+
+    movePosition(xTo: number, yTo: number, duration: number = 0) {
+        const moves: Move[] = [
+            MovingState.createMove(xTo, yTo, duration)
+        ];
+        this.addTweens(moves, duration);
+    }
+
+    static createMove(x: number, y: number, duration: number = 0): Move {
+        return { x, y, duration, hold: 0 };
+    }
+
+    moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number) {
+        const moves: Move[] = [
+            MovingState.createMove(xFrom, yFrom),
+            MovingState.createMove(xTo, yTo, duration)
+        ];
+        this.addTweens(moves, duration);
+    }
+
+    close(onCanStart?: () => boolean, onClosed?: () => void): void {
+        const moves: Move[] = [
+            {
+                x: this.card.x + (this.card.width / 2),
+                scaleX: 0,
+                ease: 'Linear',
+                canStart: () => {
+                    return this.card.isOpened() && (!onCanStart || onCanStart());
+                },
+                onComplete: () => {
+                    this.card.closed = true;
+                    if (onClosed) onClosed();
+                }, 
+            },
+        ];
+        this.addTweens(moves, 200);
+    }
+
+    open(onCanStart?: () => boolean, onOpened?: () => void): void {
+        const moves: Move[] = [
+            {
+                x: this.card.x,
+                scaleX: 1,
+                ease: 'Linear',
+                canStart: () => {
+                    return this.card.closed && (!onCanStart || onCanStart());
+                },
+                onComplete: () => {
+                    this.card.closed = false;
+                    if (onOpened) onOpened();
+                }, 
+            }
+        ];
+        this.addTweens(moves, 200);
     }
 }
