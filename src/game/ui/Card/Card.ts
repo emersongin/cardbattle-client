@@ -8,8 +8,16 @@ export class Card extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
     image: Phaser.GameObjects.Image;
     display: Phaser.GameObjects.Text;
+    disabledLayer: Phaser.GameObjects.Rectangle;
+    selectedLayer: Phaser.GameObjects.Graphics;
+    selectedTweens: Phaser.Tweens.Tween;
+    marked: boolean = false;
+    markedLayer: Phaser.GameObjects.Graphics;
+    markedTweens: Phaser.Tweens.Tween;
+    highlightedLayer: Phaser.GameObjects.Graphics;
+    highlightedTweens: Phaser.Tweens.Tween;
     status: CardState;
-    faceUp: boolean = false;
+    faceUp: boolean = true;
     closed: boolean = false;
     disabled: boolean = false;
     cardData: CardData;
@@ -24,20 +32,24 @@ export class Card extends Phaser.GameObjects.Container {
         this.cardData = cardData;
         this.width = CARD_WIDTH;
         this.height = CARD_HEIGHT;
-        this.createLayers();
         this.setPoints();
+        this.createLayers();
         this.changeState(new StaticState(this));
         this.scene.add.existing(this);
     }
 
     static create(scene: Phaser.Scene, cardData: CardData): Card {
-        return new Card(scene, 0, 0, cardData);
+        return new Card(scene, 100, 100, cardData);
     }
 
     private createLayers(): void {
         this.createBackground();
         this.createImage();
         this.createDisplay();
+        this.createDisabledLayer();
+        this.createSelectedLayer();
+        this.createMarkedLayer();
+        this.createHighlightedLayer();
     }
 
     private createBackground(): void {
@@ -154,6 +166,42 @@ export class Card extends Phaser.GameObjects.Container {
         this.setData('ap', this.cardData.ap);
     }
 
+    private createDisabledLayer(): void {
+        const disabledLayer = this.scene.add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
+        disabledLayer.setOrigin(0, 0);
+        disabledLayer.setVisible(false);
+        this.disabledLayer = disabledLayer;
+        this.add(disabledLayer);
+    }
+
+    private createSelectedLayer(): void {
+        const selectedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0xffff00, 6);
+        selectedLayer.setVisible(false);
+        this.selectedLayer = selectedLayer;
+        this.add(selectedLayer);
+    }
+
+    createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {
+        const g = this.scene.add.graphics();
+        g.lineStyle(thickness, color);
+        g.strokeRect(x, y, w, h);
+        return g;
+    }
+
+    private createMarkedLayer(): void {
+        const markedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0x00ff00, 6);
+        markedLayer.setVisible(false);
+        this.markedLayer = markedLayer;
+        this.add(markedLayer);
+    }
+
+    private createHighlightedLayer(): void {
+        const highlightedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0xff00ff, 6);
+        highlightedLayer.setVisible(false);
+        this.highlightedLayer = highlightedLayer;
+        this.add(highlightedLayer);
+    }
+
     changeState(state: CardState, ...args: any[]): void {
         this.status = state;
         this.status.create(...args);
@@ -162,6 +210,36 @@ export class Card extends Phaser.GameObjects.Container {
     preUpdate() {
         if (!this.status) return;
         this.status.update();
+        if (this.selectedLayer && this.selectedLayer.visible && !this.selectedTweens?.isPlaying()) {
+            this.selectedTweens = this.scene.tweens.add({
+                targets: this.selectedLayer,
+                alpha: { from: 0.4, to: 0.9 },
+                duration: 500,
+                ease: 'Linear',
+                yoyo: true,
+                repeat: -1,
+            });
+        }
+        if (this.markedLayer && this.markedLayer.visible && !this.markedTweens?.isPlaying()) {
+            this.markedTweens = this.scene.tweens.add({
+                targets: this.markedLayer,
+                alpha: { from: 0.7, to: 0.9 },
+                duration: 500,
+                ease: 'Linear',
+                yoyo: true,
+                repeat: -1,
+            });
+        }
+        if (this.highlightedLayer && this.highlightedLayer.visible && !this.highlightedTweens?.isPlaying()) {
+            this.highlightedTweens = this.scene.tweens.add({
+                targets: this.highlightedLayer,
+                alpha: { from: 0.4, to: 0.9 },
+                duration: 500,
+                ease: 'Linear',
+                yoyo: true,
+                repeat: -1,
+            });
+        }
     }
 
     // Move methods
@@ -234,6 +312,57 @@ export class Card extends Phaser.GameObjects.Container {
             return;
         }
         this.changeState(new UpdatingState(this), ap, hp, 1000);
+    }
+
+    // Disable methods
+    disable(): void {
+        this.disabled = true;
+        if (!this.disabledLayer) return;
+        this.disabledLayer.setVisible(true);
+    }
+
+    enable(): void {
+        this.disabled = false;
+        if (!this.disabledLayer) return;
+        this.disabledLayer.setVisible(false);
+    }
+
+    // Select methods
+    select(): void {
+        if (!this.selectedLayer) return;
+        this.selectedLayer.setVisible(true);
+    }
+
+    deselect(): void {
+        if (!this.selectedLayer) return;
+        this.selectedLayer.setVisible(false);
+        if (this.selectedTweens) this.selectedTweens.stop();
+    }
+
+    // Mark methods
+    mark(): void {
+        this.marked = true;
+        if (!this.markedLayer) return;
+        this.markedLayer.setVisible(true);
+    }
+
+    unmark(): void {
+        this.marked = false;
+        if (!this.markedLayer) return;
+        this.markedLayer.setVisible(false);
+        if (this.markedTweens) this.markedTweens.stop();
+    }
+
+    // Highlight methods
+    highlight(): void {
+        if (!this.highlightedLayer) return;
+        this.highlightedLayer.setVisible(true);
+    }
+
+    unhighlight(): void {
+        if (!this.highlightedLayer) return;
+        this.highlightedLayer.setVisible(false);
+        if (this.highlightedTweens) this.highlightedTweens.stop();
     }
 
 }
