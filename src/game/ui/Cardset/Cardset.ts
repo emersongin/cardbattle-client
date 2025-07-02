@@ -1,6 +1,6 @@
 import { Card } from "@/game/ui/Card/Card";
 import { Dimensions } from "./Dimensions";
-import { CardData } from "./CardData";
+import { CardData } from "../CardData";
 import { CardsetEvents } from "./CardsetEvents";
 import { CardsetState } from "./CardsetState";
 import StaticState from "./StaticState";

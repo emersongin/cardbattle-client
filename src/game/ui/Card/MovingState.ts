@@ -91,10 +91,7 @@ export default class MovingState implements CardState {
                 canStart: () => {
                     return this.card.isOpened() && (!onCanStart || onCanStart());
                 },
-                onComplete: () => {
-                    this.card.closed = true;
-                    if (onClosed) onClosed();
-                }, 
+                onComplete: onClosed, 
             },
         ];
         this.addTweens(moves, 200);
@@ -107,12 +104,9 @@ export default class MovingState implements CardState {
                 scaleX: 1,
                 ease: 'Linear',
                 canStart: () => {
-                    return this.card.closed && (!onCanStart || onCanStart());
+                    return this.card.isClosed() && (!onCanStart || onCanStart());
                 },
-                onComplete: () => {
-                    this.card.closed = false;
-                    if (onOpened) onOpened();
-                }, 
+                onComplete: onOpened, 
             }
         ];
         this.addTweens(moves, 200);

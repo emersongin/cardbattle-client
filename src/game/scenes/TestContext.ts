@@ -1,5 +1,5 @@
 // import { Cardset } from '@/game/ui/Cardset/Cardset';
-import { CardData } from '@/game/ui/Cardset/CardData';
+import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
 // import { Card } from '@ui/Card/Card';

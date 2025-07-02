@@ -1,4 +1,4 @@
-import { CardData } from "../Cardset/CardData";
+import { CardData } from "../CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
 
 const CARD_WIDTH = 100;
@@ -134,14 +134,21 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     private setEmptyDisplay() {
-        this.#display.setText('');
+        this.setDisplayText('');
+    }
+
+    public setDisplayText(text: string): void {
+        if (!this.#display) {
+            throw new Error('Display is not initialized.');
+        }
+        this.#display.setText(text);
     }
 
     private setPointsDisplay() {
         const { ap, hp } = this.getAllData('ap', 'hp');
         const apText = ap.toString().padStart(2, "0"); 
         const hpText = hp.toString().padStart(2, "0");
-        this.#display.setText(`${apText}/${hpText}`);
+        this.setDisplayText(`${apText}/${hpText}`);
     }
 
     getAllData(...keys: string[]): any {
@@ -158,7 +165,7 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     private setPowerDisplay() {
-        this.#display.setText('P');
+        this.setDisplayText('P');
     }
 
     private setPoints(): void {
@@ -291,17 +298,27 @@ export class Card extends Phaser.GameObjects.Container {
     private close(onCanStart?: () => boolean, onClosed?: () => void): void {
         this.changeState(new MovingState(this));
         if (!(this.#status instanceof MovingState)) return;
-        this.#status.close(onCanStart, onClosed);
+        this.#status.close(onCanStart, () => {
+            this.#closed = true;
+            if (onClosed) onClosed();
+        });
     }
 
     isOpened(): boolean {
         return !this.#closed;
     }
 
+    isClosed(): boolean {
+        return this.#closed;
+    }
+
     private open(onCanStart?: () => boolean, onOpened?: () => void): void {
         this.changeState(new MovingState(this));
         if (!(this.#status instanceof MovingState)) return;
-        this.#status.open(onCanStart, onOpened);
+        this.#status.open(onCanStart, () => {
+            this.#closed = false;
+            if (onOpened) onOpened();
+        });
     }
 
     // Update points methods

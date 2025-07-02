@@ -33,7 +33,7 @@ export default class UpdatingState implements CardState {
                 fromTarget.ap = Math.round(tween.getValue() ?? 0);
                 const apText = Math.round(fromTarget.ap).toString().padStart(2, "0");
                 const hpText = Math.round(fromTarget.hp).toString().padStart(2, "0");
-                this.card.display.setText(`${apText}/${hpText}`);
+                this.card.setDisplayText(`${apText}/${hpText}`);
             },
             () => this.card.setData('ap', toTarget.ap)
         );
@@ -42,7 +42,7 @@ export default class UpdatingState implements CardState {
                 fromTarget.hp = Math.round(tween.getValue() ?? 0);
                 const apText = Math.round(fromTarget.ap).toString().padStart(2, "0");
                 const hpText = Math.round(fromTarget.hp).toString().padStart(2, "0");
-                this.card.display.setText(`${apText}/${hpText}`);
+                this.card.setDisplayText(`${apText}/${hpText}`);
             },
             () => this.card.setData('hp', toTarget.hp)
         );
