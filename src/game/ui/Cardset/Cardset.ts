@@ -14,20 +14,20 @@ export class Cardset extends Phaser.GameObjects.Container {
     private constructor(
         readonly scene: Phaser.Scene, 
         dimensions: Dimensions,
-        cards: Card[] = []
+        cards: CardData[] = []
     ) {
         const { x, y, width, height } = dimensions;
         super(scene, x, y);
         this.setSize(width, height);
-        this.#cards = cards;
+        this.createCards(cards);
         this.addChildrenInline();
         this.changeState(new StaticState(this), this.#events);
         this.scene.add.existing(this);
     }
 
-    private setEvents(events?: CardsetEvents): void {
-        if (!events) return;
-        this.#events = events;
+    private createCards(cards: CardData[]): void {
+        const cardsUi = cards.map((data: CardData) => Card.create(this.scene, data));
+        this.#cards = cardsUi;
     }
 
     private addChildrenInline(): void {
@@ -41,14 +41,18 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    changeState(state: CardsetState, ...args: any[]): void {
+        this.#status = state;
+        this.#status.create(...args);
+    }
+
     static createSelectMove(
         scene: Phaser.Scene, 
         dimensions: Dimensions,
         cardData: CardData[],
         events: CardsetEvents
     ): Cardset {
-        const cardsUi = cardData.map((data: CardData) => Card.create(scene, data));
-        const cardset = new Cardset(scene, dimensions, cardsUi);
+        const cardset = new Cardset(scene, dimensions, cardData);
         cardset.selectMode(events);
         return cardset;
     }
@@ -58,27 +62,12 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.changeState(new SelectState(this), this.#events);
     }
 
-    changeState(state: CardsetState, ...args: any[]): void {
-        this.#status = state;
-        this.#status.create(...args);
+    private setEvents(events?: CardsetEvents): void {
+        if (!events) return;
+        this.#events = events;
     }
 
-    static create(
-        scene: Phaser.Scene, 
-        dimensions: Dimensions,
-        cardData: CardData[]
-    ): Cardset {
-        const { x, y, width, height } = dimensions;
-        const container = new Cardset(scene, x, y);
-        container.setSize(width, height);
-        const cardsUi = cardData.map((data: CardData) => Card.create(scene, data));
-        cardsUi.forEach((child: Card, index: number) => {
-            let padding = Math.max(0, Math.abs(container.width / cardData.length));
-            if (padding > child.width) padding = child.width;
-            child.x = padding * index;
-            child.y = 0;
-            container.add(child);
-        });
-        return container;
+    getCardsTotal(): number {
+        return this.#cards.length;
     }
 }
