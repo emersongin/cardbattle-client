@@ -23,10 +23,18 @@ export default class SelectState implements CardsetState {
             keyboard.once('keydown-ESC', this.#events.onLeave);
         }
         if (this.#events.onLeftArrow) {
-            keyboard.on('keydown-LEFT', this.#events.onLeftArrow);
+            keyboard.on('keydown-LEFT', () => {
+                this.updateCursor(this.#index - 1);
+                if (!this.#events.onLeftArrow) return;
+                this.#events.onLeftArrow();
+            });
         }
         if (this.#events.onRightArrow) {
-            keyboard.on('keydown-RIGHT', this.#events.onRightArrow);
+            keyboard.on('keydown-RIGHT', () => {
+                this.updateCursor(this.#index + 1);
+                if (!this.#events.onRightArrow) return;
+                this.#events.onRightArrow();
+            });
         }
         if (this.#events.onChoice) {
             keyboard.on('keydown-ENTER', this.#events.onChoice);
@@ -35,6 +43,12 @@ export default class SelectState implements CardsetState {
 
     update() {
         //nothing to do here
+    }
+
+    updateCursor(index: number) {
+        if (index < 0 || index > this.cardset.getCardsTotal()) return;
+        this.#index = index;
+        console.log(this.#index);
     }
 
     stopped() {
