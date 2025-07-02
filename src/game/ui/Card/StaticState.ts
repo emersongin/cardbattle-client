@@ -2,9 +2,7 @@ import { Card } from "./Card";
 import { CardState } from "./CardState";
 
 export default class StaticState implements CardState {
-    constructor(
-        readonly card: Card
-    ) {}
+    constructor(readonly card: Card) {}
 
     create() {
         // This method is called when the state is created.
