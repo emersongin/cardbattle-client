@@ -5,22 +5,22 @@ const CARD_WIDTH = 100;
 const CARD_HEIGHT = 150;
 
 export class Card extends Phaser.GameObjects.Container {
-    background: Phaser.GameObjects.Rectangle;
-    image: Phaser.GameObjects.Image;
-    display: Phaser.GameObjects.Text;
-    disabledLayer: Phaser.GameObjects.Rectangle;
-    selectedLayer: Phaser.GameObjects.Graphics;
-    selectedTweens: Phaser.Tweens.Tween;
-    marked: boolean = false;
-    markedLayer: Phaser.GameObjects.Graphics;
-    markedTweens: Phaser.Tweens.Tween;
-    highlightedLayer: Phaser.GameObjects.Graphics;
-    highlightedTweens: Phaser.Tweens.Tween;
-    status: CardState;
-    faceUp: boolean = true;
-    closed: boolean = false;
-    disabled: boolean = false;
-    cardData: CardData;
+    #background: Phaser.GameObjects.Rectangle;
+    #image: Phaser.GameObjects.Image;
+    #display: Phaser.GameObjects.Text;
+    #disabledLayer: Phaser.GameObjects.Rectangle;
+    #selectedLayer: Phaser.GameObjects.Graphics;
+    #selectedTweens: Phaser.Tweens.Tween;
+    #marked: boolean = false;
+    #markedLayer: Phaser.GameObjects.Graphics;
+    #markedTweens: Phaser.Tweens.Tween;
+    #highlightedLayer: Phaser.GameObjects.Graphics;
+    #highlightedTweens: Phaser.Tweens.Tween;
+    #status: CardState;
+    #faceUp: boolean = true;
+    #closed: boolean = false;
+    #disabled: boolean = false;
+    #cardData: CardData;
 
     private constructor(
         readonly scene: Phaser.Scene, 
@@ -29,7 +29,7 @@ export class Card extends Phaser.GameObjects.Container {
         cardData: CardData,
     ) {
         super(scene, x, y);
-        this.cardData = cardData;
+        this.#cardData = cardData;
         this.width = CARD_WIDTH;
         this.height = CARD_HEIGHT;
         this.setPoints();
@@ -56,12 +56,12 @@ export class Card extends Phaser.GameObjects.Container {
         const backgroundColor = this.getBackgroundColor();
         const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
-        this.background = backgroundRect;
-        this.add(backgroundRect);
+        this.#background = backgroundRect;
+        this.add(this.#background);
     }
 
     private getBackgroundColor(): number {
-        switch (this.cardData.color) {
+        switch (this.#cardData.color) {
             case 'red':
                 return 0xff0000; // Red
             case 'blue':
@@ -75,22 +75,22 @@ export class Card extends Phaser.GameObjects.Container {
             case 'orange':
                 return 0xffa500; // Orange
             default:
-                throw new Error(`Unknown color: ${this.cardData.color}`);
+                throw new Error(`Unknown color: ${this.#cardData.color}`);
         }
     }
 
     private createImage(): void {
         const image = this.scene.add.image(0, 0, 'empty');
-        this.image = image;
+        this.#image = image;
         this.setImage();
-        this.add(this.image);
+        this.add(this.#image);
     }
 
     private setImage() {
-        if (this.faceUp) {
-            this.image.setTexture(this.cardData.imageName);
+        if (this.#faceUp) {
+            this.#image.setTexture(this.#cardData.imageName);
         } else {
-            this.image.setTexture('card-back');
+            this.#image.setTexture('card-back');
         }
         this.adjustImagePosition();
     }
@@ -98,12 +98,12 @@ export class Card extends Phaser.GameObjects.Container {
     private adjustImagePosition(): void {
         const larguraDesejada = CARD_WIDTH - 12;
         const alturaDesejada = CARD_HEIGHT - 12;
-        const escalaX = larguraDesejada / this.image.width;
-        const escalaY = alturaDesejada / this.image.height;
+        const escalaX = larguraDesejada / this.#image.width;
+        const escalaY = alturaDesejada / this.#image.height;
         const escalaProporcional = Math.min(escalaX, escalaY);
-        this.image.setOrigin(0, 0);
-        this.image.setScale(escalaProporcional);
-        this.image.setPosition((this.width - this.image.displayWidth) / 2, (this.height - this.image.displayHeight) / 2);
+        this.#image.setOrigin(0, 0);
+        this.#image.setScale(escalaProporcional);
+        this.#image.setPosition((this.width - this.#image.displayWidth) / 2, (this.height - this.#image.displayHeight) / 2);
     }
 
     private createDisplay(): void {
@@ -112,18 +112,18 @@ export class Card extends Phaser.GameObjects.Container {
             color: '#ffffff',
             fontStyle: 'bold',
         });
-        this.display = display;
-        this.display.setOrigin(0, 0);
+        this.#display = display;
+        this.#display.setOrigin(0, 0);
         this.setDisplay();
-        this.add(display);
+        this.add(this.#display);
     }
 
     private setDisplay() {
-        if (!this.display || !this.faceUp) {
+        if (!this.#display || !this.#faceUp) {
             this.setEmptyDisplay();
             return
         } 
-        const { typeId: cardTypeId } = this.cardData;
+        const { typeId: cardTypeId } = this.#cardData;
         if (cardTypeId === 'battle') {
             this.setPointsDisplay();
         } else if (cardTypeId === 'power') {
@@ -134,14 +134,14 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     private setEmptyDisplay() {
-        this.display.setText('');
+        this.#display.setText('');
     }
 
     private setPointsDisplay() {
         const { ap, hp } = this.getAllData('ap', 'hp');
         const apText = ap.toString().padStart(2, "0"); 
         const hpText = hp.toString().padStart(2, "0");
-        this.display.setText(`${apText}/${hpText}`);
+        this.#display.setText(`${apText}/${hpText}`);
     }
 
     getAllData(...keys: string[]): any {
@@ -158,27 +158,27 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     private setPowerDisplay() {
-        this.display.setText('P');
+        this.#display.setText('P');
     }
 
     private setPoints(): void {
-        this.setData('hp', this.cardData.hp);
-        this.setData('ap', this.cardData.ap);
+        this.setData('hp', this.#cardData.hp);
+        this.setData('ap', this.#cardData.ap);
     }
 
     private createDisabledLayer(): void {
         const disabledLayer = this.scene.add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
         disabledLayer.setOrigin(0, 0);
         disabledLayer.setVisible(false);
-        this.disabledLayer = disabledLayer;
-        this.add(disabledLayer);
+        this.#disabledLayer = disabledLayer;
+        this.add(this.#disabledLayer);
     }
 
     private createSelectedLayer(): void {
         const selectedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0xffff00, 6);
         selectedLayer.setVisible(false);
-        this.selectedLayer = selectedLayer;
-        this.add(selectedLayer);
+        this.#selectedLayer = selectedLayer;
+        this.add(this.#selectedLayer);
     }
 
     createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {
@@ -191,28 +191,28 @@ export class Card extends Phaser.GameObjects.Container {
     private createMarkedLayer(): void {
         const markedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0x00ff00, 6);
         markedLayer.setVisible(false);
-        this.markedLayer = markedLayer;
-        this.add(markedLayer);
+        this.#markedLayer = markedLayer;
+        this.add(this.#markedLayer);
     }
 
     private createHighlightedLayer(): void {
         const highlightedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0xff00ff, 6);
         highlightedLayer.setVisible(false);
-        this.highlightedLayer = highlightedLayer;
-        this.add(highlightedLayer);
+        this.#highlightedLayer = highlightedLayer;
+        this.add(this.#highlightedLayer);
     }
 
     changeState(state: CardState, ...args: any[]): void {
-        this.status = state;
-        this.status.create(...args);
+        this.#status = state;
+        this.#status.create(...args);
     }
 
     preUpdate() {
-        if (!this.status) return;
-        this.status.update();
-        if (this.selectedLayer && this.selectedLayer.visible && !this.selectedTweens?.isPlaying()) {
-            this.selectedTweens = this.scene.tweens.add({
-                targets: this.selectedLayer,
+        if (!this.#status) return;
+        this.#status.update();
+        if (this.#selectedLayer && this.#selectedLayer.visible && !this.#selectedTweens?.isPlaying()) {
+            this.#selectedTweens = this.scene.tweens.add({
+                targets: this.#selectedLayer,
                 alpha: { from: 0.4, to: 0.9 },
                 duration: 500,
                 ease: 'Linear',
@@ -220,9 +220,9 @@ export class Card extends Phaser.GameObjects.Container {
                 repeat: -1,
             });
         }
-        if (this.markedLayer && this.markedLayer.visible && !this.markedTweens?.isPlaying()) {
-            this.markedTweens = this.scene.tweens.add({
-                targets: this.markedLayer,
+        if (this.#marked && this.#markedLayer && this.#markedLayer.visible && !this.#markedTweens?.isPlaying()) {
+            this.#markedTweens = this.scene.tweens.add({
+                targets: this.#markedLayer,
                 alpha: { from: 0.7, to: 0.9 },
                 duration: 500,
                 ease: 'Linear',
@@ -230,9 +230,9 @@ export class Card extends Phaser.GameObjects.Container {
                 repeat: -1,
             });
         }
-        if (this.highlightedLayer && this.highlightedLayer.visible && !this.highlightedTweens?.isPlaying()) {
-            this.highlightedTweens = this.scene.tweens.add({
-                targets: this.highlightedLayer,
+        if (this.#highlightedLayer && this.#highlightedLayer.visible && !this.#highlightedTweens?.isPlaying()) {
+            this.#highlightedTweens = this.scene.tweens.add({
+                targets: this.#highlightedLayer,
                 alpha: { from: 0.4, to: 0.9 },
                 duration: 500,
                 ease: 'Linear',
@@ -245,70 +245,70 @@ export class Card extends Phaser.GameObjects.Container {
     // Move methods
     movePosition(xTo: number, yTo: number): void {
         this.changeState(new MovingState(this));
-        if (!(this.status instanceof MovingState)) return;
-        this.status.movePosition(xTo, yTo);
+        if (!(this.#status instanceof MovingState)) return;
+        this.#status.movePosition(xTo, yTo);
     }
 
     moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
         this.changeState(new MovingState(this));
-        if (!(this.status instanceof MovingState)) return;
-        this.status.moveFromTo(xFrom, yFrom, xTo, yTo, duration);
+        if (!(this.#status instanceof MovingState)) return;
+        this.#status.moveFromTo(xFrom, yFrom, xTo, yTo, duration);
     }
 
     // Open and close methods
     flip(): void {
         const onCanStartClose = () => {
-            return !this.faceUp;
+            return !this.#faceUp;
         };
         const onClosed = () => {
-            this.faceUp = true;
+            this.#faceUp = true;
             this.setImage();
             this.setDisplay();
         };
         this.close(onCanStartClose, onClosed);
         const onCanStartOpen = () => {
-            return this.faceUp;
+            return this.#faceUp;
         };
         this.open(onCanStartOpen);
     }
 
     turnDown(): void {
         const onCanStartClose = () => {
-            return this.faceUp;
+            return this.#faceUp;
         };
         const onClosed = () => {
-            this.faceUp = false;
+            this.#faceUp = false;
             this.setImage();
             this.setDisplay();
         };
         this.close(onCanStartClose, onClosed);
         const onCanStartOpen = () => {
-            return !this.faceUp;
+            return !this.#faceUp;
         };
         this.open(onCanStartOpen);
     }
 
     private close(onCanStart?: () => boolean, onClosed?: () => void): void {
         this.changeState(new MovingState(this));
-        if (!(this.status instanceof MovingState)) return;
-        this.status.close(onCanStart, onClosed);
+        if (!(this.#status instanceof MovingState)) return;
+        this.#status.close(onCanStart, onClosed);
     }
 
     isOpened(): boolean {
-        return !this.closed;
+        return !this.#closed;
     }
 
     private open(onCanStart?: () => boolean, onOpened?: () => void): void {
         this.changeState(new MovingState(this));
-        if (!(this.status instanceof MovingState)) return;
-        this.status.open(onCanStart, onOpened);
+        if (!(this.#status instanceof MovingState)) return;
+        this.#status.open(onCanStart, onOpened);
     }
 
     // Update points methods
     changeDisplayPoints(ap: number, hp: number): void {
-        if (!this.status || !this.faceUp) return;
-        if (this.status instanceof UpdatingState) {
-            this.status.addTweens(ap, hp, 2000);
+        if (!this.#status || !this.#faceUp) return;
+        if (this.#status instanceof UpdatingState) {
+            this.#status.addTweens(ap, hp, 2000);
             return;
         }
         this.changeState(new UpdatingState(this), ap, hp, 1000);
@@ -316,53 +316,56 @@ export class Card extends Phaser.GameObjects.Container {
 
     // Disable methods
     disable(): void {
-        this.disabled = true;
-        if (!this.disabledLayer) return;
-        this.disabledLayer.setVisible(true);
+        this.#disabled = true;
+        if (!this.#disabledLayer) return;
+        this.#disabledLayer.setVisible(true);
     }
 
     enable(): void {
-        this.disabled = false;
-        if (!this.disabledLayer) return;
-        this.disabledLayer.setVisible(false);
+        this.#disabled = false;
+        if (!this.#disabledLayer) return;
+        this.#disabledLayer.setVisible(false);
     }
 
     // Select methods
     select(): void {
-        if (!this.selectedLayer) return;
-        this.selectedLayer.setVisible(true);
+        if (!this.#selectedLayer) return;
+        this.#selectedLayer.setVisible(true);
     }
 
     deselect(): void {
-        if (!this.selectedLayer) return;
-        this.selectedLayer.setVisible(false);
-        if (this.selectedTweens) this.selectedTweens.stop();
+        if (!this.#selectedLayer) return;
+        this.#selectedLayer.setVisible(false);
+        if (this.#selectedTweens) this.#selectedTweens.stop();
     }
 
     // Mark methods
     mark(): void {
-        this.marked = true;
-        if (!this.markedLayer) return;
-        this.markedLayer.setVisible(true);
+        this.#marked = true;
+        if (!this.#markedLayer) return;
+        this.#markedLayer.setVisible(true);
     }
 
     unmark(): void {
-        this.marked = false;
-        if (!this.markedLayer) return;
-        this.markedLayer.setVisible(false);
-        if (this.markedTweens) this.markedTweens.stop();
+        this.#marked = false;
+        if (!this.#markedLayer) return;
+        this.#markedLayer.setVisible(false);
+        if (this.#markedTweens) this.#markedTweens.stop();
     }
 
     // Highlight methods
     highlight(): void {
-        if (!this.highlightedLayer) return;
-        this.highlightedLayer.setVisible(true);
+        if (!this.#highlightedLayer) return;
+        this.#highlightedLayer.setVisible(true);
     }
 
     unhighlight(): void {
-        if (!this.highlightedLayer) return;
-        this.highlightedLayer.setVisible(false);
-        if (this.highlightedTweens) this.highlightedTweens.stop();
+        if (!this.#highlightedLayer) return;
+        this.#highlightedLayer.setVisible(false);
+        if (this.#highlightedTweens) this.#highlightedTweens.stop();
     }
 
+    isDisabled(): boolean {
+        return this.#disabled;
+    }
 }
