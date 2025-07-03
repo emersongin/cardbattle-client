@@ -9,9 +9,9 @@ export default class SelectState implements CardsetState {
     constructor(readonly cardset: Cardset) {}
 
     create(events: CardsetEvents) {
-        // This method is called when the state is created.
         this.#events = events;
         this.setKeyboard();
+        this.updateCursor(this.#index);
     }
 
     private setKeyboard() {
@@ -19,22 +19,17 @@ export default class SelectState implements CardsetState {
         if (!keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
+        keyboard.on('keydown-LEFT', () => {
+            this.updateCursor(this.#index - 1);
+        });
+        keyboard.on('keydown-RIGHT', () => {
+            this.updateCursor(this.#index + 1);
+        });
+
+        // todo: add support for ESC key to leave the cardset
+        // todo: add support for ENTER key to select the card
         if (this.#events.onLeave) {
             keyboard.once('keydown-ESC', this.#events.onLeave);
-        }
-        if (this.#events.onLeftArrow) {
-            keyboard.on('keydown-LEFT', () => {
-                this.updateCursor(this.#index - 1);
-                if (!this.#events.onLeftArrow) return;
-                this.#events.onLeftArrow();
-            });
-        }
-        if (this.#events.onRightArrow) {
-            keyboard.on('keydown-RIGHT', () => {
-                this.updateCursor(this.#index + 1);
-                if (!this.#events.onRightArrow) return;
-                this.#events.onRightArrow();
-            });
         }
         if (this.#events.onChoice) {
             keyboard.on('keydown-ENTER', this.#events.onChoice);
@@ -46,11 +41,19 @@ export default class SelectState implements CardsetState {
     }
 
     updateCursor(index: number) {
-        if (index < 0 || index > this.cardset.getCardsTotal()) return;
-        this.#index = index;
-        console.log(this.#index);
+        if (!this.cardset.isIndexWithinLimit(index)) return;
+        this.cardset.sendCardToBack(this.#index);
+        this.updateIndex(index);
+        this.cardset.selectCard(this.#index);
     }
 
+    updateIndex(index: number) {               
+        this.#index = index;
+        if (this.#events.onChangeIndex) {
+            this.#events.onChangeIndex(this.cardset.getCardByIndex(this.#index));
+        }
+    }
+    
     stopped() {
         throw new Error('SelectState: stopped called, this should not happen');
     }

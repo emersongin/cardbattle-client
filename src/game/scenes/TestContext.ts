@@ -2,6 +2,7 @@
 import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
+import { Card } from '../ui/Card/Card';
 // import { Card } from '@ui/Card/Card';
 
 export class TestContext extends VueScene
@@ -41,14 +42,20 @@ export class TestContext extends VueScene
                 powerId: 'power-1'
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 20);
-        Cardset.createSelectMove(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData, {
-            onLeftArrow: () => console.log('Left arrow pressed'),
-            onRightArrow: () => console.log('Right arrow pressed'),
+        const cardsData: CardData[] = this.duplicate(cards, 20); // 40
+        const dimensions = { 
+            x: this.cameras.main.centerX / 2, 
+            y: this.cameras.main.centerY - 75, 
+            width: 400, 
+            height: 400 
+        };
+        const events = {
+            onChangeIndex: (card: Card) => console.log(card.getName()),
             onChoice: () => console.log('Choice made'),
             onSelect: () => console.log('Card selected'),
             onLeave: () => console.log('Cardset left')
-        });
+        };
+        Cardset.createSelectMove(this, dimensions, cardsData, events);
         // Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData);
         // const card = Card.create(this, cardsData[0]);
         // card.changeDisplayPoints(99, 99);

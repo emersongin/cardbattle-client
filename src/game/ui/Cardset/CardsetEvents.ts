@@ -1,6 +1,7 @@
+import { Card } from "../Card/Card";
+
 export type CardsetEvents = {
-    onLeftArrow?: () => void;
-    onRightArrow?: () => void;
+    onChangeIndex?: (card: Card) => void;
     onChoice?: () => void;
     onSelect?: () => void;
     onLeave?: () => void;

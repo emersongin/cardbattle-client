@@ -385,4 +385,8 @@ export class Card extends Phaser.GameObjects.Container {
     isDisabled(): boolean {
         return this.#disabled;
     }
+
+    getName(): string {
+        return this.#cardData.name;
+    }
 }

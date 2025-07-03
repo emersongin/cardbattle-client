@@ -67,6 +67,42 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#events = events;
     }
 
+    sendCardToBack(index: number): void {
+        const cards = this.getCardListByInterval(0, index);
+        cards.reverse().forEach((card: Card) => {
+            this.sendToBack(card);
+            card.moveFromTo(card.x, card.y, card.x, 0, 10);
+            card.deselect();
+        });
+    }
+
+    selectCard(index: number): void {
+        const card = this.getCardByIndex(index);
+        this.bringToTop(card);
+        card.moveFromTo(card.x, card.y, card.x, -12, 10);
+        card.select();
+    }
+
+    getCardListByInterval(start: number, end: number): Card[] {
+        if (!this.isIndexWithinLimit(start) || !this.isIndexWithinLimit(end))
+            throw new Error(`Cardset: index ${start} or ${end} is out of bounds.`);
+        if (start > end) {
+            throw new Error(`Cardset: start index ${start} cannot be greater than end index ${end}.`);
+        }
+        return this.#cards.slice(start, end + 1);
+    }
+
+    getCardByIndex(index: number): Card {
+        if (!this.isIndexWithinLimit(index)) {
+            throw new Error(`Cardset: index ${index} is out of bounds.`);
+        }
+        return this.#cards[index];
+    }
+
+    isIndexWithinLimit(index: number) {
+        return index >= 0 && index <= this.#cards.length - 1;
+    }
+
     getCardsTotal(): number {
         return this.#cards.length;
     }
