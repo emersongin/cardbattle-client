@@ -1,8 +1,6 @@
-import { Card } from "../Card/Card";
-
 export type CardsetEvents = {
-    onChangeIndex?: (card: Card) => void;
-    onChoice?: () => void;
-    onSelect?: () => void;
+    onChangeIndex?: (cardIndex: number) => void;
+    onMarked?: (cardIndex: number) => void;
+    onCompleted?: (cardIndexes: number[]) => void;
     onLeave?: () => void;
 } 

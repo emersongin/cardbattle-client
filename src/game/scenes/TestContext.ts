@@ -2,8 +2,7 @@
 import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
-import { Card } from '../ui/Card/Card';
-// import { Card } from '@ui/Card/Card';
+// import { Card } from '../ui/Card/Card';
 
 export class TestContext extends VueScene
 {
@@ -49,15 +48,16 @@ export class TestContext extends VueScene
             width: 400, 
             height: 400 
         };
+        const cardset = new Cardset(this, dimensions, cardsData);
         const events = {
-            onChangeIndex: (card: Card) => console.log(card.getName()),
-            onChoice: () => console.log('Choice made'),
-            onSelect: () => console.log('Card selected'),
-            onLeave: () => console.log('Cardset left')
+            onChangeIndex: (cardIndex: number) => console.log(cardset.getCardByIndex(cardIndex).getName()),
+            onMarked: (cardIndex: number) => console.log(cardset.getCardByIndex(cardIndex).getName()),
+            onCompleted: (cardIndexes: number[]) => console.log(cardIndexes),
+            onLeave: () => console.log('Cardset left'),
         };
-        Cardset.createSelectMove(this, dimensions, cardsData, events);
-        // Cardset.create(this, { x: 10, y: 10, width: 400, height: 400 }, cardsData);
-        // const card = Card.create(this, cardsData[0]);
+        cardset.setEvents(events);
+        cardset.selectMode();
+        // const card = new Card(this, cardsData[0]);
         // card.changeDisplayPoints(99, 99);
         // card.flip();
         // card.turnDown();

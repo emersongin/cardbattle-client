@@ -11,7 +11,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     #events: CardsetEvents;
     #cards: Card[] = [];
 
-    private constructor(
+    constructor(
         readonly scene: Phaser.Scene, 
         dimensions: Dimensions,
         cards: CardData[] = []
@@ -21,12 +21,12 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.setSize(width, height);
         this.createCards(cards);
         this.addChildrenInline();
-        this.changeState(new StaticState(this), this.#events);
+        this.changeState(new StaticState(this));
         this.scene.add.existing(this);
     }
 
     private createCards(cards: CardData[]): void {
-        const cardsUi = cards.map((data: CardData) => Card.create(this.scene, data));
+        const cardsUi = cards.map((data: CardData) => new Card(this.scene, data));
         this.#cards = cardsUi;
     }
 
@@ -46,45 +46,16 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#status.create(...args);
     }
 
-    static createSelectMove(
-        scene: Phaser.Scene, 
-        dimensions: Dimensions,
-        cardData: CardData[],
-        events: CardsetEvents
-    ): Cardset {
-        const cardset = new Cardset(scene, dimensions, cardData);
-        cardset.selectMode(events);
-        return cardset;
+    selectMode(selectNumber: number = 0): void {
+        this.changeState(new SelectState(this), this.#events, selectNumber);
     }
 
-    selectMode(events: CardsetEvents): void {
-        this.setEvents(events);
-        this.changeState(new SelectState(this), this.#events);
-    }
-
-    private setEvents(events?: CardsetEvents): void {
-        if (!events) return;
+    setEvents(events: CardsetEvents): void {
         this.#events = events;
     }
 
-    sendCardToBack(index: number): void {
-        const cards = this.getCardListByInterval(0, index);
-        cards.reverse().forEach((card: Card) => {
-            this.sendToBack(card);
-            card.moveFromTo(card.x, card.y, card.x, 0, 10);
-            card.deselect();
-        });
-    }
-
-    selectCard(index: number): void {
-        const card = this.getCardByIndex(index);
-        this.bringToTop(card);
-        card.moveFromTo(card.x, card.y, card.x, -12, 10);
-        card.select();
-    }
-
     getCardListByInterval(start: number, end: number): Card[] {
-        if (!this.isIndexWithinLimit(start) || !this.isIndexWithinLimit(end))
+        if (!this.isValidIndex(start) || !this.isValidIndex(end))
             throw new Error(`Cardset: index ${start} or ${end} is out of bounds.`);
         if (start > end) {
             throw new Error(`Cardset: start index ${start} cannot be greater than end index ${end}.`);
@@ -93,17 +64,21 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     getCardByIndex(index: number): Card {
-        if (!this.isIndexWithinLimit(index)) {
+        if (!this.isValidIndex(index)) {
             throw new Error(`Cardset: index ${index} is out of bounds.`);
         }
         return this.#cards[index];
     }
 
-    isIndexWithinLimit(index: number) {
+    isValidIndex(index: number) {
         return index >= 0 && index <= this.#cards.length - 1;
     }
 
+    getCards(): Card[] {
+        return this.#cards;
+    }
+
     getCardsTotal(): number {
-        return this.#cards.length;
+        return this.getCards().length;
     }
 }
