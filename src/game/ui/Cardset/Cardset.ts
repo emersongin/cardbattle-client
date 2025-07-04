@@ -8,7 +8,6 @@ import SelectState from "./SelectState";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
-    #events: CardsetEvents;
     #cards: Card[] = [];
 
     constructor(
@@ -41,17 +40,15 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
-    changeState(state: CardsetState, ...args: any[]): void {
+    changeState(state: CardsetState): void {
         this.#status = state;
-        this.#status.create(...args);
     }
 
-    selectMode(selectNumber: number = 0): void {
-        this.changeState(new SelectState(this), this.#events, selectNumber);
-    }
-
-    setEvents(events: CardsetEvents): void {
-        this.#events = events;
+    selectMode(events: CardsetEvents, selectNumber: number = 0): void {
+        this.changeState(new SelectState(this));
+        if (this.#status instanceof SelectState) {
+            this.#status.create(events, selectNumber);
+        }
     }
 
     getCardListByInterval(start: number, end: number): Card[] {

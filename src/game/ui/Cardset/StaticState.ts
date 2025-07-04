@@ -4,16 +4,11 @@ import { CardsetState } from "./CardsetState";
 export default class StaticState implements CardsetState {
     constructor(readonly cardset: Cardset) {}
 
-    create() {
-        // This method is called when the state is created.
+    selectMode() {
+        throw new Error('StaticState: selectMode called, this should not happen');
     }
 
-    update() {
-        //nothing to do here
-        // console.log("StaticState update");
-    }
-
-    stopped() {
-        throw new Error('StaticState: stopped called, this should not happen');
+    staticMode() {
+        throw new Error('StaticState: staticMode called, this should not happen');
     }
 }

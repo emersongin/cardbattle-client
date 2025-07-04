@@ -2,7 +2,10 @@
 import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
-// import { Card } from '../ui/Card/Card';
+import { Card } from '../ui/Card/Card';
+
+const CARD_WIDTH = 100;
+const CARD_HEIGHT = 150;
 
 export class TestContext extends VueScene
 {
@@ -41,22 +44,23 @@ export class TestContext extends VueScene
                 powerId: 'power-1'
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 20); // 40
+        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
         const dimensions = { 
             x: this.cameras.main.centerX / 2, 
             y: this.cameras.main.centerY - 75, 
-            width: 400, 
-            height: 400 
+            width: (CARD_WIDTH * 6), 
+            height: CARD_HEIGHT 
         };
         const cardset = new Cardset(this, dimensions, cardsData);
         const events = {
             onChangeIndex: (cardIndex: number) => console.log(cardset.getCardByIndex(cardIndex).getName()),
             onMarked: (cardIndex: number) => console.log(cardset.getCardByIndex(cardIndex).getName()),
-            onCompleted: (cardIndexes: number[]) => console.log(cardIndexes),
+            onCompleted: (cardIndexes: number[]) => {
+                console.log('Selected card indexes:', cardIndexes);
+            },
             onLeave: () => console.log('Cardset left'),
         };
-        cardset.setEvents(events);
-        cardset.selectMode(1);
+        cardset.selectMode(events, 1);
         // const card = new Card(this, cardsData[0]);
         // card.changeDisplayPoints(99, 99);
         // card.flip();

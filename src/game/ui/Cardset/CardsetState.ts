@@ -1,5 +1,4 @@
 export interface CardsetState {
-    create(...args: any[]): void;
-    update(): void;
-    stopped(): void;
+    selectMode(...args: any[]): void;
+    staticMode(): void;
 }
