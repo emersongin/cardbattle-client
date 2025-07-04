@@ -22,12 +22,12 @@ export class Card extends Phaser.GameObjects.Container {
     #disabled: boolean = false;
     #cardData: CardData;
 
-    private constructor(
+    constructor(
         readonly scene: Phaser.Scene, 
-        x: number, 
-        y: number, 
-        cardData: CardData,
+        cardData: CardData
     ) {
+        const x = 100;
+        const y = 100;
         super(scene, x, y);
         this.#cardData = cardData;
         this.width = CARD_WIDTH;
@@ -36,10 +36,6 @@ export class Card extends Phaser.GameObjects.Container {
         this.createLayers();
         this.changeState(new StaticState(this));
         this.scene.add.existing(this);
-    }
-
-    static create(scene: Phaser.Scene, cardData: CardData): Card {
-        return new Card(scene, 100, 100, cardData);
     }
 
     private createLayers(): void {
