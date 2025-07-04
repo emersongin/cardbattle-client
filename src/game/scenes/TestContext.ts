@@ -56,7 +56,7 @@ export class TestContext extends VueScene
             onLeave: () => console.log('Cardset left'),
         };
         cardset.setEvents(events);
-        cardset.selectMode();
+        cardset.selectMode(1);
         // const card = new Card(this, cardsData[0]);
         // card.changeDisplayPoints(99, 99);
         // card.flip();

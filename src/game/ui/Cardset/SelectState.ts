@@ -119,6 +119,7 @@ export default class SelectState implements CardsetState {
         if (this.#events.onCompleted) this.#events.onCompleted(this.#selectIndexes);
         const keyboard = this.getKeyboard();
         keyboard.removeAllListeners();
+        // this.sendCardsToBack(this.cardset.getCardsTotal() - 1);
         this.cardset.changeState(new StaticState(this.cardset));
     }
 
