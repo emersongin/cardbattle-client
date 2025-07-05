@@ -22,6 +22,7 @@ export default class SelectState implements CardsetState {
         this.#selectNumber = selectNumber;
         this.#setKeyboard();
         this.#updateCursor(this.#index);
+        this.#updateCardsState();
     }
 
     #setKeyboard() {
@@ -47,8 +48,11 @@ export default class SelectState implements CardsetState {
             this.#selectIndex(currentIndex);
             this.#discountPoints(currentIndex);
             if (this.#selectNumber !== 1) {
-                this.#markCard(currentIndex);
+                this.#markCardByIndex(currentIndex);
             }
+            // console.log(this.#isSelectLimitReached());
+            // console.log(this.#isSelectAll());
+            // console.log(this.#isNoHasMoreColorsPoints());
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
                 if (this.#events.onCompleted) this.#events.onCompleted(this.#selectIndexes);
                 this.#resetCardsState();
@@ -114,12 +118,26 @@ export default class SelectState implements CardsetState {
         card.select();
     }
 
+    #updateCardsState(): void {
+        this.cardset.getCards().forEach((card: Card, index: number) => {
+            if (this.#isCardNoHasMorePoints(card)) {
+                this.#disabledIndexes.push(index);
+            }
+            if (this.#disabledIndexes.includes(index)) {
+                this.#disableCardByIndex(index);
+            }
+            if (this.#selectIndexes.includes(index)) {
+                this.#markCardByIndex(index);
+            }
+        });
+    }
+
     #isIndexSelected(index: number = this.#index): boolean {
         return this.#selectIndexes.includes(index);
     }
 
     #removeIndex(index: number): void {
-        this.#unmarkCard(index);
+        this.#unmarkCardByIndex(index);
         this.#selectIndexes = this.#selectIndexes.filter(i => i !== index);
     }
 
@@ -131,7 +149,7 @@ export default class SelectState implements CardsetState {
         this.#colorsPoints[cardColor] += cardCost;
     }
 
-    #unmarkCard(index: number): void {
+    #unmarkCardByIndex(index: number): void {
         const card = this.cardset.getCardByIndex(index);
         card.unmark();
     }
@@ -148,7 +166,7 @@ export default class SelectState implements CardsetState {
         this.#colorsPoints[cardColor] -= cardCost;
     }
 
-    #markCard(index: number): void {
+    #markCardByIndex(index: number): void {
         const card = this.cardset.getCardByIndex(index);
         card.mark();
     }
@@ -168,12 +186,15 @@ export default class SelectState implements CardsetState {
         const avaliableIndexes = allIndexes.filter((index: number) => !this.#selectIndexes.includes(index));
         const avaliableCards = this.cardset.getCardsByIndexes(avaliableIndexes);
         return avaliableCards.some((card: Card) => {
-            const cardColor = card.getColor();
-            const cardCost = card.getCost();
-            if (!this.#colorsPoints) return false;
-            const colorPoints = this.#colorsPoints[cardColor];
-            return colorPoints < cardCost;
+            return this.#isCardNoHasMorePoints(card);
         });
+    }
+
+    #isCardNoHasMorePoints(card: Card): boolean {
+        if (!this.#colorsPoints) return false;
+        const cardColor = card.getColor();
+        const cardCost = card.getCost();
+        return this.#colorsPoints[cardColor] < cardCost;
     }
 
     #removeAllKeyboardListeners() {
@@ -191,7 +212,7 @@ export default class SelectState implements CardsetState {
 
     #unmarkAll(): void {
         this.#selectIndexes.forEach((index: number) => {
-            this.#unmarkCard(index);
+            this.#unmarkCardByIndex(index);
         });
     }
 
@@ -222,18 +243,23 @@ export default class SelectState implements CardsetState {
         const cards = this.cardset.getCards();
         cards.forEach((card: Card, index: number) => {
             if (card.isBattleCard()) {
+                this.#disableCardByIndex(index);
                 this.#disabledIndexes.push(index);
-                card.disable();
             }
         });
+    }
+
+    #disableCardByIndex(index: number): void {
+        const card = this.cardset.getCardByIndex(index);
+        card.disable();
     }
 
     disablePowerCards(): void {
         const cards = this.cardset.getCards();
         cards.forEach((card: Card, index: number) => {
             if (card.isPowerCard()) {
+                this.#disableCardByIndex(index);
                 this.#disabledIndexes.push(index);
-                card.disable();
             }
         });
     }

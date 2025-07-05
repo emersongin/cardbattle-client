@@ -45,7 +45,7 @@ export class TestContext extends VueScene
                 ap: 0,
                 typeId: 'power' as CardType,
                 powerId: 'power-1',
-                cost: 0
+                cost: 1
             },
         ];
         const cardsData: CardData[] = this.duplicate(cards, 4); // 40
@@ -59,19 +59,21 @@ export class TestContext extends VueScene
         const events = {
             onChangeIndex: (cardIndex: number) => {
                 if (!cardset.isValidIndex(cardIndex)) return;
-                console.log(cardset.getCardByIndex(cardIndex).getName());
+                // console.log(cardset.getCardByIndex(cardIndex).getName());
             },
             onMarked: (cardIndex: number) => {
                 if (!cardset.isValidIndex(cardIndex)) return;
-                console.log(cardset.getCardByIndex(cardIndex).getName());
+                // console.log(cardset.getCardByIndex(cardIndex).getName());
             },
             onCompleted: (cardIndexes: number[]) => {
-                console.log('Selected card indexes:', cardIndexes);
+                // console.log('Selected card indexes:', cardIndexes);
             },
-            onLeave: () => console.log('Cardset left'),
+            onLeave: () => {
+                // console.log('Cardset left');
+            },
         };
         const colorPoints: ColorsPoints = {
-            red: 0,
+            red: cardsData.filter(card => card.color === 'red').length,
             blue: cardsData.filter(card => card.color === 'blue').length,
             green: 0,
             black: 0,
@@ -80,7 +82,7 @@ export class TestContext extends VueScene
         };
         cardset.selectMode(events, colorPoints);
         // cardset.disablePowerCards();
-        cardset.disableBattleCards();
+        // cardset.disableBattleCards();
         // const card = new Card(this, cardsData[0]);
         // card.changeDisplayPoints(99, 99);
         // card.flip();
