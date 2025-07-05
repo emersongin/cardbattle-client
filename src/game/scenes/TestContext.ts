@@ -2,7 +2,9 @@
 import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
-import { Card } from '../ui/Card/Card';
+import { ColorsPoints } from '../ui/ColorsPoints';
+import { CardColors } from '../ui/CardColors';
+import { CardType } from '../ui/CardType';
 
 const CARD_WIDTH = 100;
 const CARD_HEIGHT = 150;
@@ -24,27 +26,29 @@ export class TestContext extends VueScene
                 number: 1,
                 name: 'Test Card',
                 description: 'This is a test card description.',
-                color: 'blue',
+                color: 'blue' as CardColors,
                 imageName: 'card-picture',
                 hp: 10,
                 ap: 5,
-                typeId: 'battle',
-                powerId: 'none'
+                typeId: 'battle' as CardType,
+                powerId: 'none',
+                cost: 2
             },
             {
                 UUID: '123e4567-e89b-12d3-a456-426614174444',
                 number: 1,
                 name: 'Test Power Card',
                 description: 'This is a test power card description.',
-                color: 'red',
+                color: 'red' as CardColors,
                 imageName: 'card-picture',
                 hp: 0,
                 ap: 0,
-                typeId: 'power',
-                powerId: 'power-1'
+                typeId: 'power' as CardType,
+                powerId: 'power-1',
+                cost: 0
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
+        const cardsData: CardData[] = this.duplicate(cards, 4); // 40
         const dimensions = { 
             x: this.cameras.main.centerX / 2, 
             y: this.cameras.main.centerY - 75, 
@@ -53,14 +57,30 @@ export class TestContext extends VueScene
         };
         const cardset = new Cardset(this, dimensions, cardsData);
         const events = {
-            onChangeIndex: (cardIndex: number) => console.log(cardset.getCardByIndex(cardIndex).getName()),
-            onMarked: (cardIndex: number) => console.log(cardset.getCardByIndex(cardIndex).getName()),
+            onChangeIndex: (cardIndex: number) => {
+                if (!cardset.isValidIndex(cardIndex)) return;
+                console.log(cardset.getCardByIndex(cardIndex).getName());
+            },
+            onMarked: (cardIndex: number) => {
+                if (!cardset.isValidIndex(cardIndex)) return;
+                console.log(cardset.getCardByIndex(cardIndex).getName());
+            },
             onCompleted: (cardIndexes: number[]) => {
                 console.log('Selected card indexes:', cardIndexes);
             },
             onLeave: () => console.log('Cardset left'),
         };
-        cardset.selectMode(events, 1);
+        const colorPoints: ColorsPoints = {
+            red: 0,
+            blue: cardsData.filter(card => card.color === 'blue').length,
+            green: 0,
+            black: 0,
+            white: 0,
+            orange: 0
+        };
+        cardset.selectMode(events, colorPoints);
+        // cardset.disablePowerCards();
+        cardset.disableBattleCards();
         // const card = new Card(this, cardsData[0]);
         // card.changeDisplayPoints(99, 99);
         // card.flip();
