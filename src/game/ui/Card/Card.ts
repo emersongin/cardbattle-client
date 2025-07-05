@@ -1,3 +1,4 @@
+import { CardColors } from "../CardColors";
 import { CardData } from "../CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
 
@@ -384,5 +385,21 @@ export class Card extends Phaser.GameObjects.Container {
 
     getName(): string {
         return this.#cardData.name;
+    }
+
+    getColor(): CardColors {
+        return this.#cardData.color;
+    }
+
+    getCost(): number {
+        return this.#cardData.cost;
+    }
+
+    isBattleCard(): boolean {
+        return this.#cardData.typeId === 'battle';
+    }
+
+    isPowerCard(): boolean {
+        return this.#cardData.typeId === 'power';
     }
 }
