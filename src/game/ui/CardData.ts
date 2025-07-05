@@ -1,12 +1,16 @@
+import { CardColors } from "./CardColors";
+import { CardType } from "./CardType";
+
 export type CardData = {
     UUID: string;
     number: number;
     name: string;
     description: string;
-    color: string;
+    color: CardColors;
     imageName: string;
     hp: number;
     ap: number;
-    typeId: string;
+    typeId: CardType;
     powerId: string;
+    cost: number;
 } 
