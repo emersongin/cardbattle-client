@@ -2,180 +2,209 @@ import { Card } from "../Card/Card";
 import { Cardset } from "./Cardset";
 import { CardsetEvents } from "./CardsetEvents";
 import { CardsetState } from "./CardsetState";
-// import { ColorPoints } from "./ColorPoints";
+import { ColorsPoints } from "../ColorsPoints";
 import StaticState from "./StaticState";
 
 export default class SelectState implements CardsetState {
     #index: number;
     #selectNumber: number;
     #events: CardsetEvents;
-    // #colorPoints: ColorPoints;
+    #colorsPoints: ColorsPoints | null = null;
     #selectIndexes: number[] = [];
+    #disabledIndexes: number[] = [];
 
     constructor(readonly cardset: Cardset) {}
 
-    create(events: CardsetEvents, selectNumber: number = 0, startIndex: number = 0) {
-        this.setEvents(events);
-        this.setIndex(startIndex);
-        this.setSelectNumber(selectNumber);
-        this.setKeyboard();
-        this.updateCursor(this.getIndex());
-    }
-
-    private setEvents(events: CardsetEvents) {
+    create(events: CardsetEvents, colorPoints: ColorsPoints, selectNumber: number = 0, startIndex: number = 0) {
         this.#events = events;
-    }
-
-    private setIndex(index: number) {
-        this.#index = index;
-    }
-
-    private setSelectNumber(selectNumber: number) {
+        this.#colorsPoints = colorPoints;
+        this.#index = startIndex;
         this.#selectNumber = selectNumber;
+        this.#setKeyboard();
+        this.#updateCursor(this.#index);
     }
 
-    private setKeyboard() {
-        const keyboard = this.getKeyboard();
+    #setKeyboard() {
+        const keyboard = this.#getKeyboard();
         const onKeydownLeft = () => {
-            this.updateCursor(this.getIndex() - 1);
+            const newIndex = this.#index - 1;
+            if (this.#events.onChangeIndex) this.#events.onChangeIndex(newIndex);
+            this.#updateCursor(newIndex);
         };
         const onKeydownRight = () => {
-            this.updateCursor(this.getIndex() + 1);
+            const newIndex = this.#index + 1;
+            if (this.#events.onChangeIndex) this.#events.onChangeIndex(newIndex);
+            this.#updateCursor(newIndex);
         };
         const onKeydownEnter = () => {
-            const currentIndex = this.getIndex();
-            if (this.isIndexSelected()) return this.removeIndex(currentIndex);
-            this.selectIndex(currentIndex);
-            if (this.getSelectNumber() !== 1) {
-                this.markCard(currentIndex);
+            const currentIndex = this.#index;
+            if (!this.#isAvaliableCardByIndex(currentIndex)) return;
+            if (this.#isIndexSelected()) {
+                this.#removeIndex(currentIndex);
+                this.#creditPoints(currentIndex);
             }
-            if (this.isSelectLimitReached() || this.isSelectAll()) this.stopped();
+            if (this.#events.onMarked) this.#events.onMarked(currentIndex);
+            this.#selectIndex(currentIndex);
+            this.#discountPoints(currentIndex);
+            if (this.#selectNumber !== 1) {
+                this.#markCard(currentIndex);
+            }
+            if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
+                if (this.#events.onCompleted) this.#events.onCompleted(this.#selectIndexes);
+                this.#resetCardsState();
+                this.#removeAllKeyboardListeners();
+                this.#highlightSelectedCards();
+                this.staticMode();
+            }
         };
+        const onKeydownEsc = () => {
+            if (this.#events.onLeave) this.#events.onLeave();
+            this.#resetCardsState();
+            this.#removeAllKeyboardListeners();
+            this.staticMode();
+        }
         keyboard.on('keydown-LEFT', onKeydownLeft);
         keyboard.on('keydown-RIGHT', onKeydownRight);
         keyboard.on('keydown-ENTER', onKeydownEnter);
-
-        // todo: add support for ESC key to leave the cardset
-        // todo: add support for ENTER key to select the card
-        if (this.#events.onLeave) {
-            keyboard.once('keydown-ESC', this.#events.onLeave);
-        }
+        keyboard.on('keydown-ESC', onKeydownEsc);
     }
 
-    private getKeyboard(): Phaser.Input.Keyboard.KeyboardPlugin {
+    #isAvaliableCardByIndex(index: number): boolean {
+        if (!this.cardset.isValidIndex(index)) return false;
+        return !this.#disabledIndexes.includes(index);
+    }
+
+    #getKeyboard(): Phaser.Input.Keyboard.KeyboardPlugin {
         if (!this.cardset.scene.input.keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
         return this.cardset.scene.input.keyboard;
     }
 
-    private updateCursor(newIndex: number): void {
+    #updateCursor(newIndex: number): void {
         if (!this.cardset.isValidIndex(newIndex)) return;
-        const lastIndex = this.getIndex();
-        this.sendCardsToBack(lastIndex);
-        this.deselectCard(lastIndex);
-        this.updateIndex(newIndex);
-        this.selectCard(newIndex);
+        const lastIndex = this.#index;
+        this.#sendCardsToBack(lastIndex);
+        const lastCard = this.cardset.getCardByIndex(lastIndex);
+        this.#deselectCard(lastCard);
+        this.#updateIndex(newIndex);
+        const newCard = this.cardset.getCardByIndex(newIndex);
+        this.#selectCard(newCard);
     }
 
-    private getIndex(): number {
-        return this.#index;
-    }
-
-    private sendCardsToBack(index: number = this.getIndex()): void {
+    #sendCardsToBack(index: number = this.#index): void {
         const cards = this.cardset.getCardListByInterval(0, index);
         cards.reverse().forEach((card: Card) => {
             this.cardset.sendToBack(card);
         });
     }
 
-    private deselectCard(index: number): void {
-        const card = this.cardset.getCardByIndex(index);
+    #deselectCard(card: Card): void {
         card.deselect();
         card.moveFromTo(card.x, card.y, card.x, 0, 10);
     }
 
-    private updateIndex(index: number = this.getIndex()): void {               
-        this.setIndex(index);
-        if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.getIndex());
+    #updateIndex(index: number = this.#index): void {               
+        this.#index = index;
     }
 
-    private selectCard(index: number): void {
-        const card = this.cardset.getCardByIndex(index);
+    #selectCard(card: Card): void {
         this.cardset.bringToTop(card);
         card.moveFromTo(card.x, card.y, card.x, -12, 10);
         card.select();
     }
 
-    private isIndexSelected(index: number = this.getIndex()): boolean {
-        return this.getSelectedIndexes().includes(index);
+    #isIndexSelected(index: number = this.#index): boolean {
+        return this.#selectIndexes.includes(index);
     }
 
-    private getSelectedIndexes(): number[] {
-        return this.#selectIndexes;
+    #removeIndex(index: number): void {
+        this.#unmarkCard(index);
+        this.#selectIndexes = this.#selectIndexes.filter(i => i !== index);
     }
 
-    private removeIndex(index: number): void {
-        this.unmarkCard(index);
-        this.#selectIndexes = this.getSelectedIndexes().filter(i => i !== index);
+    #creditPoints(index: number): void {
+        if (!this.#colorsPoints) return;
+        const card = this.cardset.getCardByIndex(index);
+        const cardColor = card.getColor();
+        const cardCost = card.getCost();
+        this.#colorsPoints[cardColor] += cardCost;
     }
 
-    private unmarkCard(index: number): void {
+    #unmarkCard(index: number): void {
         const card = this.cardset.getCardByIndex(index);
         card.unmark();
     }
 
-    private selectIndex(index: number): void {
+    #selectIndex(index: number): void {
         this.#selectIndexes.push(index);
-        if (this.#events.onMarked) this.#events.onMarked(index);
     }
 
-    private markCard(index: number): void {
+    #discountPoints(index: number): void {
+        if (!this.#colorsPoints) return;
+        const card = this.cardset.getCardByIndex(index);
+        const cardColor = card.getColor();
+        const cardCost = card.getCost();
+        this.#colorsPoints[cardColor] -= cardCost;
+    }
+
+    #markCard(index: number): void {
         const card = this.cardset.getCardByIndex(index);
         card.mark();
     }
 
-    private isSelectLimitReached(): boolean {
-        if (this.getSelectNumber() === 0) return false;
-        return this.getSelectedIndexes().length >= this.getSelectNumber();
+    #isSelectLimitReached(): boolean {
+        if (this.#selectNumber === 0) return false;
+        return this.#selectIndexes.length >= this.#selectNumber;
     }
 
-    private isSelectAll(): boolean {
-        return this.getSelectedIndexes().length === this.cardset.getCardsTotal();
+    #isSelectAll(): boolean {
+        return this.#selectIndexes.length === (this.cardset.getCardsTotal() - this.#disabledIndexes.length);
     }
 
-    private getSelectNumber(): number {
-        return this.#selectNumber;
+    #isNoHasMoreColorsPoints(): boolean {
+        if (!this.#colorsPoints) return false;
+        const allIndexes = this.cardset.getIndexesToArray();
+        const avaliableIndexes = allIndexes.filter((index: number) => !this.#selectIndexes.includes(index));
+        const avaliableCards = this.cardset.getCardsByIndexes(avaliableIndexes);
+        return avaliableCards.some((card: Card) => {
+            const cardColor = card.getColor();
+            const cardCost = card.getCost();
+            if (!this.#colorsPoints) return false;
+            const colorPoints = this.#colorsPoints[cardColor];
+            return colorPoints < cardCost;
+        });
     }
 
-    private stopped(): void {
-        const keyboard = this.getKeyboard();
+    #removeAllKeyboardListeners() {
+        const keyboard = this.#getKeyboard();
         keyboard.removeAllListeners();
-        if (this.getSelectNumber() !== 1) {
-            this.sendCardsToBack(this.cardset.getCardsTotal() - 1);
-            this.deselectAll();
-            this.unmarkAll();
-            this.highlightSelectedCards();
+    }
+
+    #resetCardsState(): void {
+        if (this.#selectNumber !== 1) {
+            this.#sendCardsToBack(this.cardset.getCardsTotal() - 1);
+            this.#deselectAll();
+            this.#unmarkAll();
         }
-        if (this.#events.onCompleted) this.#events.onCompleted(this.getSelectedIndexes());
-        this.staticMode();
     }
 
-    unmarkAll(): void {
-        this.getSelectedIndexes().forEach((index: number) => {
-            this.unmarkCard(index);
+    #unmarkAll(): void {
+        this.#selectIndexes.forEach((index: number) => {
+            this.#unmarkCard(index);
         });
     }
 
-    deselectAll(): void {
-        this.getSelectedIndexes().forEach((index: number) => {
-            this.deselectCard(index);
+    #deselectAll(): void {
+        this.cardset.getCards().forEach((card: Card) => {
+            card.deselect();
+            card.moveFromTo(card.x, card.y, card.x, 0, 10);
         });
     }
 
-    highlightSelectedCards(): void {
+    #highlightSelectedCards(): void {
         this.cardset.getCards().forEach((card: Card, index: number) => {
-            if (this.getSelectedIndexes().includes(index)) {
+            if (this.#selectIndexes.includes(index)) {
                 card.highlight();
             }
         });
@@ -187,5 +216,25 @@ export default class SelectState implements CardsetState {
 
     staticMode() {
         this.cardset.changeState(new StaticState(this.cardset));
+    }
+
+    disableBattleCards(): void {
+        const cards = this.cardset.getCards();
+        cards.forEach((card: Card, index: number) => {
+            if (card.isBattleCard()) {
+                this.#disabledIndexes.push(index);
+                card.disable();
+            }
+        });
+    }
+
+    disablePowerCards(): void {
+        const cards = this.cardset.getCards();
+        cards.forEach((card: Card, index: number) => {
+            if (card.isPowerCard()) {
+                this.#disabledIndexes.push(index);
+                card.disable();
+            }
+        });
     }
 }

@@ -2,9 +2,8 @@ import { Card } from "@/game/ui/Card/Card";
 import { Dimensions } from "./Dimensions";
 import { CardData } from "../CardData";
 import { CardsetEvents } from "./CardsetEvents";
-import { CardsetState } from "./CardsetState";
-import StaticState from "./StaticState";
-import SelectState from "./SelectState";
+import { CardsetState, StaticState, SelectState } from "./CardsetState";
+import { ColorsPoints } from "../ColorsPoints";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
@@ -44,11 +43,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#status = state;
     }
 
-    selectMode(events: CardsetEvents, selectNumber: number = 0): void {
+    selectMode(events: CardsetEvents, colorPoints: ColorsPoints, selectNumber: number = 0): void {
         this.changeState(new SelectState(this));
-        if (this.#status instanceof SelectState) {
-            this.#status.create(events, selectNumber);
-        }
+        if (!(this.#status instanceof SelectState)) return
+        this.#status.create(events, colorPoints, selectNumber);
     }
 
     getCardListByInterval(start: number, end: number): Card[] {
@@ -75,7 +73,30 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.#cards;
     }
 
+    getCardsByIndexes(indexes: number[]): Card[] {
+        return indexes.map((index: number) => {
+            if (!this.isValidIndex(index)) {
+                throw new Error(`Cardset: index ${index} is out of bounds.`);
+            }
+            return this.#cards[index];
+        });
+    }
+
     getCardsTotal(): number {
         return this.getCards().length;
+    }
+
+    getIndexesToArray(): number[] {
+        return this.getCards().map((_card: Card, index: number) => index);
+    }
+
+    disableBattleCards(): void {
+        if (!(this.#status instanceof SelectState)) return
+        this.#status.disableBattleCards();
+    }
+
+    disablePowerCards(): void {
+        if (!(this.#status instanceof SelectState)) return
+        this.#status.disablePowerCards();
     }
 }
