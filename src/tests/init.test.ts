@@ -1,16 +1,21 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { Card } from "@ui/Card/Card";
 import { CardColors } from "@ui/CardColors";
 import { CardType } from "@ui/CardType";
-import PhaserMock from "@mocks/phaser";
+import Phaser from "@mocks/phaser";
 
 describe("MockScene", () => {
-    it("deve criar uma cena mock com tweens", () => {
-        const scene = new PhaserMock.Scene({
+    let scene: Phaser.Scene;
+
+    beforeAll(() => {
+        scene = new Phaser.Scene({
             key: "MockScene",
             active: true,
             visible: true,
         });
+    });
+
+    it("deve criar uma cena mock com tweens", () => {
         const card = new Card(scene, {
             UUID: '123e4567-e89b-12d3-a456-426614174000',
             number: 1,
