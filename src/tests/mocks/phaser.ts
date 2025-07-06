@@ -77,12 +77,21 @@ const PhaserMock = {
         };
         sys = {
             displayList: {
-            add: vi.fn(),
+                add: vi.fn(),
+                exists: vi.fn(),
             },
             updateList: {
-            add: vi.fn(),
+                add: vi.fn(),
             },
             queueDepthSort: vi.fn(),
+        };
+        input = {
+            keyboard: {
+                addKey: vi.fn(),
+                createCursorKeys: vi.fn().mockReturnValue({}),
+                on: vi.fn(),
+                once: vi.fn(),
+            },
         };
     },
 };
@@ -91,8 +100,8 @@ HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {
     return {
         fillRect: () => {},
         clearRect: () => {},
-        getImageData: (x: number, y: number, w: number, h: number) => ({
-        data: new Array(w * h * 4),
+        getImageData: (_x: number, _y: number, w: number, h: number) => ({
+            data: new Array(w * h * 4),
         }),
         putImageData: () => {},
         createImageData: () => [],

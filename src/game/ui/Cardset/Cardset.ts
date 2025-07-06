@@ -1,4 +1,4 @@
-import { Card } from "@/game/ui/Card/Card";
+import { Card } from "@ui/Card/Card";
 import { Dimensions } from "./Dimensions";
 import { CardData } from "../CardData";
 import { CardsetEvents } from "./CardsetEvents";
