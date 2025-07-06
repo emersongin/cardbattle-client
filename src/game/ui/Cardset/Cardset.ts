@@ -43,7 +43,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#status = state;
     }
 
-    selectMode(events: CardsetEvents, colorPoints: ColorsPoints, selectNumber: number = 0): void {
+    selectMode(events: CardsetEvents, colorPoints?: ColorsPoints, selectNumber: number = 0): void {
         this.changeState(new SelectState(this));
         if (!(this.#status instanceof SelectState)) return
         this.#status.create(events, colorPoints, selectNumber);
@@ -98,5 +98,13 @@ export class Cardset extends Phaser.GameObjects.Container {
     disablePowerCards(): void {
         if (!(this.#status instanceof SelectState)) return
         this.#status.disablePowerCards();
+    }
+
+    isStaticMode(): boolean {
+        return this.#status instanceof StaticState;
+    }
+
+    isSelectMode(): boolean {
+        return this.#status instanceof SelectState;
     }
 }

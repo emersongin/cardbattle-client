@@ -85,12 +85,40 @@ const PhaserMock = {
             },
             queueDepthSort: vi.fn(),
         };
-        input = {
+        input: {
             keyboard: {
+                list: any[];
+                addKey: (keyCode: string) => void;
+                createCursorKeys: () => any;
+                on: (keyCode: string, fn: any) => void;
+                once: (keyCode: string, fn: any) => void;
+                emit: (eventName: string, ...args: any[]) => void;
+                removeAllListeners: () => void;
+            }
+        } = {
+            keyboard: {
+                list: [],
                 addKey: vi.fn(),
                 createCursorKeys: vi.fn().mockReturnValue({}),
-                on: vi.fn(),
-                once: vi.fn(),
+                on: (keyCode: string, fn: any) => {
+                    this.input.keyboard.list.push({ keyCode, fn, once: false });
+                },
+                once: (keyCode: string, fn: any) => {
+                    this.input.keyboard.list.push({ keyCode, fn, once: true });
+                },
+                emit: ( eventName: string, times: number = 1) => {
+                    this.input.keyboard.list.forEach((key: any) => {
+                        if (key.keyCode === eventName) {
+                            for (let i = 0; i < times; i++) {
+                                key.fn();
+                            }
+                            if (key.once) {
+                                this.input.keyboard.list = this.input.keyboard.list.filter((k: any) => k !== key);
+                            }
+                        }
+                    });
+                },
+                removeAllListeners: vi.fn(),
             },
         };
     },

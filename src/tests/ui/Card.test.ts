@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { Card } from "@ui/Card/Card";
-import { CardColors } from "@ui/CardColors";
-import { CardType } from "@ui/CardType";
+import { CardColors } from "@/game/ui/Card/CardColors";
+import { CardType } from "@/game/ui/Card/CardType";
 import Phaser from "@mocks/phaser";
 
 describe("MockScene", () => {

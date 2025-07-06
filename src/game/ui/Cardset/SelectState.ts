@@ -15,22 +15,31 @@ export default class SelectState implements CardsetState {
 
     constructor(readonly cardset: Cardset) {}
 
-    create(events: CardsetEvents, colorPoints: ColorsPoints, selectNumber: number = 0, startIndex: number = 0) {
+    create(
+        events: CardsetEvents, 
+        colorPoints: ColorsPoints | null = null, 
+        selectNumber: number = 0, 
+        startIndex: number = 0
+    ): void {
         this.#events = events;
         this.#colorsPoints = colorPoints;
         this.#index = startIndex;
         this.#selectNumber = selectNumber;
         this.#setKeyboard();
-        this.#updateCursor(this.#index);
+        this.#updateCursor(this.#getCurrentIndex());
         this.#updateCardsState();
+    }
+
+    #getCurrentIndex(): number {
+        return this.#index;
     }
 
     #setKeyboard() {
         const keyboard = this.#getKeyboard();
         const onKeydownLeft = () => {
             const newIndex = this.#index - 1;
-            if (this.#events.onChangeIndex) this.#events.onChangeIndex(newIndex);
             this.#updateCursor(newIndex);
+            if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCurrentIndex());
         };
         const onKeydownRight = () => {
             const newIndex = this.#index + 1;
@@ -38,9 +47,9 @@ export default class SelectState implements CardsetState {
             this.#updateCursor(newIndex);
         };
         const onKeydownEnter = () => {
-            const currentIndex = this.#index;
+            const currentIndex = this.#getCurrentIndex();
             if (!this.#isAvaliableCardByIndex(currentIndex)) return;
-            if (this.#isIndexSelected()) {
+            if (this.#isIndexSelected(currentIndex)) {
                 this.#removeIndex(currentIndex);
                 this.#creditPoints(currentIndex);
             }
@@ -50,9 +59,6 @@ export default class SelectState implements CardsetState {
             if (this.#selectNumber !== 1) {
                 this.#markCardByIndex(currentIndex);
             }
-            // console.log(this.#isSelectLimitReached());
-            // console.log(this.#isSelectAll());
-            // console.log(this.#isNoHasMoreColorsPoints());
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
                 if (this.#events.onCompleted) this.#events.onCompleted(this.#selectIndexes);
                 this.#resetCardsState();
@@ -86,17 +92,15 @@ export default class SelectState implements CardsetState {
     }
 
     #updateCursor(newIndex: number): void {
-        if (!this.cardset.isValidIndex(newIndex)) return;
-        const lastIndex = this.#index;
+        const lastIndex = this.#getCurrentIndex();
         this.#sendCardsToBack(lastIndex);
-        const lastCard = this.cardset.getCardByIndex(lastIndex);
-        this.#deselectCard(lastCard);
+        this.#deselectCard(this.cardset.getCardByIndex(lastIndex));
         this.#updateIndex(newIndex);
-        const newCard = this.cardset.getCardByIndex(newIndex);
-        this.#selectCard(newCard);
+        const currentIndex = this.#getCurrentIndex();
+        this.#selectCard(this.cardset.getCardByIndex(currentIndex));
     }
 
-    #sendCardsToBack(index: number = this.#index): void {
+    #sendCardsToBack(index: number): void {
         const cards = this.cardset.getCardListByInterval(0, index);
         cards.reverse().forEach((card: Card) => {
             this.cardset.sendToBack(card);
@@ -108,8 +112,15 @@ export default class SelectState implements CardsetState {
         card.moveFromTo(card.x, card.y, card.x, 0, 10);
     }
 
-    #updateIndex(index: number = this.#index): void {               
-        this.#index = index;
+    #updateIndex(index: number): void {
+        const totalIndex = this.cardset.getCardsTotal() - 1;
+        if (index < 0) {
+            this.#index = 0;
+        } else if (index >= totalIndex) {
+            this.#index = totalIndex;
+        } else {
+            this.#index = index;
+        }
     }
 
     #selectCard(card: Card): void {
@@ -132,7 +143,7 @@ export default class SelectState implements CardsetState {
         });
     }
 
-    #isIndexSelected(index: number = this.#index): boolean {
+    #isIndexSelected(index: number): boolean {
         return this.#selectIndexes.includes(index);
     }
 

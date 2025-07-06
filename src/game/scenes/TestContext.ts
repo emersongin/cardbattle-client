@@ -3,11 +3,7 @@ import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
 import { ColorsPoints } from '../ui/ColorsPoints';
-import { CardColors } from '../ui/CardColors';
-import { CardType } from '../ui/CardType';
-
-const CARD_WIDTH = 100;
-const CARD_HEIGHT = 150;
+import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from '../ui/Card/Card';
 
 export class TestContext extends VueScene
 {
@@ -65,7 +61,7 @@ export class TestContext extends VueScene
                 if (!cardset.isValidIndex(cardIndex)) return;
                 // console.log(cardset.getCardByIndex(cardIndex).getName());
             },
-            onCompleted: (cardIndexes: number[]) => {
+            onCompleted: (_cardIndexes: number[]) => {
                 // console.log('Selected card indexes:', cardIndexes);
             },
             onLeave: () => {

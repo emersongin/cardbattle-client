@@ -1,9 +1,10 @@
-import { CardColors } from "../CardColors";
 import { CardData } from "../CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
 
-const CARD_WIDTH = 100;
-const CARD_HEIGHT = 150;
+export const CARD_WIDTH = 100;
+export const CARD_HEIGHT = 150;
+export type CardType = 'battle' | 'power';
+export type CardColors = 'red' | 'green' | 'blue' | 'black' | 'white' | 'orange';
 
 export class Card extends Phaser.GameObjects.Container {
     #background: Phaser.GameObjects.Rectangle;
