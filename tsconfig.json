@@ -25,11 +25,13 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"],
+            "@tests/*": ["src/tests/*"],
             "@game/*": ["src/game/*"],
             "@api/*": ["src/game/api/*"],
             "@scenes/*": ["src/game/scenes/*"],
             "@ui/*": ["src/game/ui/*"],
             "@utils/*": ["src/game/utils/*"],
+            "@mocks/*": ["src/tests/mocks/*"]
         }
     },
     "include": [

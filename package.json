@@ -36,10 +36,15 @@
         "@types/axios": "^0.9.36",
         "@types/node": "^20.11.20",
         "@vitejs/plugin-vue": "^5.2.2",
+        "@vitest/ui": "^3.2.4",
         "@vue/tsconfig": "^0.7.0",
+        "canvas": "^3.1.2",
+        "jsdom": "^26.1.0",
+        "phaser3spectorjs": "^0.0.8",
         "terser": "^5.31.0",
         "typescript": "~5.7.2",
         "vite": "^6.3.1",
+        "vitest": "^3.2.4",
         "vue-tsc": "^2.2.8"
     }
 }
