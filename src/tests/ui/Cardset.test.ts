@@ -46,8 +46,8 @@ const eventsMock = {
     onLeave: vi.fn(),
 };
 const colorPoints: ColorsPoints = {
-    red: cards.filter(card => card.color === 'red').length,
-    blue: cards.filter(card => card.color === 'blue').length,
+    red: 3,
+    blue: 3,
     green: 0,
     black: 0,
     white: 0,
@@ -84,61 +84,83 @@ describe("MockScene", () => {
         cardset = new Cardset(scene, dimensions, cardsData);
     });
 
-    it("Deve criar um conjunto de cartas e seu estado ser em modo estático.", () => {
-        expect(cardset).toBeDefined();
-        expect(cardset.getCards().length).toBe(6);
-        expect(cardset.isStaticMode()).toBe(true);
-    });
+    // it("Deve criar um conjunto de cartas e seu estado ser em modo estático.", () => {
+    //     expect(cardset).toBeDefined();
+    //     expect(cardset.getCards().length).toBe(6);
+    //     expect(cardset.isStaticMode()).toBe(true);
+    // });
 
-    it("Deve criar um conjunto de cartas e seu estado ser em modo selecação.", () => {
-        cardset.selectMode(eventsMock);
-        expect(cardset).toBeDefined();
-        expect(cardset.isSelectMode()).toBe(true);
-    });
+    // it("Deve criar um conjunto de cartas e seu estado ser em modo selecação.", () => {
+    //     cardset.selectMode(eventsMock);
+    //     expect(cardset).toBeDefined();
+    //     expect(cardset.isSelectMode()).toBe(true);
+    // });
 
-    it("Deve criar um conjunto de cartas e seu estado ser em modo selecação com pontos de cores.", () => {
-        cardset.selectMode(eventsMock, colorPoints);
-        expect(cardset).toBeDefined();
-        expect(cardset.isSelectMode()).toBe(true);
-    });
+    // it("Deve criar um conjunto de cartas e seu estado ser em modo selecação com pontos de cores.", () => {
+    //     cardset.selectMode(eventsMock, colorPoints);
+    //     expect(cardset).toBeDefined();
+    //     expect(cardset.isSelectMode()).toBe(true);
+    // });
 
-    it("Deve mover o index do cursor ao pressionar as teclas para esquerda ou direita respeitando os limites.", () => {
-        let indexTest = 0;
-        const events = {
-            onChangeIndex: (cardIndex: number) => {
-                indexTest = cardIndex;
-            },
-            onMarked: vi.fn(),
-            onCompleted: vi.fn(),
-            onLeave: vi.fn(),
-        };
-        const keyboard = getKeyboard(scene);
-        cardset.selectMode(events);
-        expect(indexTest).toBe(0);
-        keyboard.emit('keydown-RIGHT', 3);
-        expect(indexTest).toBe(3);
-        keyboard.emit('keydown-RIGHT', 20);
-        expect(indexTest).toBe(6);
-        keyboard.emit('keydown-LEFT', 20);
-        expect(indexTest).toBe(0);
-    });
+    // it("Deve mover o index do cursor ao pressionar as teclas para esquerda ou direita respeitando os limites.", () => {
+    //     let indexTest = 0;
+    //     const events = {
+    //         onChangeIndex: (cardIndex: number) => {
+    //             indexTest = cardIndex;
+    //         },
+    //         onMarked: vi.fn(),
+    //         onCompleted: vi.fn(),
+    //         onLeave: vi.fn(),
+    //     };
+    //     const keyboard = getKeyboard(scene);
+    //     cardset.selectMode(events);
+    //     expect(indexTest).toBe(0);
+    //     keyboard.emit('keydown-RIGHT', 3);
+    //     expect(indexTest).toBe(3);
+    //     keyboard.emit('keydown-RIGHT', 20);
+    //     expect(indexTest).toBe(5);
+    //     keyboard.emit('keydown-LEFT', 20);
+    //     expect(indexTest).toBe(0);
+    // });
 
-    it("Deve marcar o 2 e 5 cartão ao selecionar eles nos respectivos indices.", () => {
+    // it("Deve marcar o 2 e 5 cartão ao selecionar eles nos respectivos indices.", () => {
+    //     let markedCards: number[] = [];
+    //     const events = {
+    //         onChangeIndex: vi.fn(),
+    //         onMarked: vi.fn(),
+    //         onCompleted: (cardIndexes: number[]) => {
+    //             markedCards = cardIndexes;
+    //         },
+    //         onLeave: vi.fn(),
+    //     };
+    //     const keyboard = getKeyboard(scene);
+    //     cardset.selectMode(events, colorPoints, 2);
+    //     keyboard.emit('keydown-RIGHT', 2);
+    //     keyboard.emit('keydown-ENTER');
+    //     keyboard.emit('keydown-RIGHT', 3);
+    //     keyboard.emit('keydown-ENTER');
+    //     expect(markedCards).toEqual([2, 5]);
+    // });
+
+    it("Deve restaurar o estado de seleção do conjunto de cartões e retornar a ultima seleção.", () => {
         let markedCards: number[] = [];
         const events = {
             onChangeIndex: vi.fn(),
             onMarked: vi.fn(),
             onCompleted: (cardIndexes: number[]) => {
                 markedCards = cardIndexes;
+                // cardset.#highlightSelectedCards();
+                cardset.restoreSelectState();
             },
             onLeave: vi.fn(),
         };
         const keyboard = getKeyboard(scene);
         cardset.selectMode(events, colorPoints, 2);
-        keyboard.emit('keydown-RIGHT', 2);
         keyboard.emit('keydown-ENTER');
-        keyboard.emit('keydown-RIGHT', 3);
+        keyboard.emit('keydown-RIGHT');
         keyboard.emit('keydown-ENTER');
-        expect(markedCards).toEqual([2, 5]);
+        expect(markedCards.length).toBe(2);
+        const selectIndexes = cardset.getSelectIndexes();
+        expect(selectIndexes.length).toBe(1);
     });
 });

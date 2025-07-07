@@ -7,6 +7,7 @@ import { ColorsPoints } from "../ColorsPoints";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
+    #lastState: CardsetState | null = null;
     #cards: Card[] = [];
 
     constructor(
@@ -40,12 +41,13 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     changeState(state: CardsetState): void {
+        this.#lastState = this.#status;
         this.#status = state;
     }
 
     selectMode(events: CardsetEvents, colorPoints?: ColorsPoints, selectNumber: number = 0): void {
         this.changeState(new SelectState(this));
-        if (!(this.#status instanceof SelectState)) return
+        if ((this.#status instanceof SelectState) === false) return;
         this.#status.create(events, colorPoints, selectNumber);
     }
 
@@ -106,5 +108,26 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     isSelectMode(): boolean {
         return this.#status instanceof SelectState;
+    }
+
+    restoreSelectState(): void {
+        if (!this.#lastState || (this.#lastState instanceof SelectState) === false) return;
+        this.changeState(this.#lastState);
+        if ((this.#status instanceof SelectState) === false) return;
+        this.#status.removeSelectLastIndex();
+        this.#status.enable();
+    }
+
+    getSelectIndexes(): number[] {
+        if (!(this.#status instanceof SelectState)) return [];
+        return this.#status.getSelectIndexes();
+    }
+
+    highlightCardsByIndexes(cardIndexes: number[]): void {
+        this.getCards().forEach((card: Card, index: number) => {
+            if (cardIndexes.includes(index)) {
+                card.highlight();
+            }
+        });
     }
 }

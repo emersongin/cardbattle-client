@@ -25,25 +25,28 @@ export default class SelectState implements CardsetState {
         this.#colorsPoints = colorPoints;
         this.#index = startIndex;
         this.#selectNumber = selectNumber;
-        this.#setKeyboard();
-        this.#updateCursor(this.#getCurrentIndex());
+        this.enable();
+    }
+
+    enable() {
+        this.#enableAllKeyboardListeners();
+        this.#resetCardsState();
         this.#updateCardsState();
+        this.#updateCursor(this.#getCurrentIndex());
     }
 
     #getCurrentIndex(): number {
         return this.#index;
     }
 
-    #setKeyboard() {
+    #enableAllKeyboardListeners() {
         const keyboard = this.#getKeyboard();
         const onKeydownLeft = () => {
             const newIndex = this.#index - 1;
             this.#updateCursor(newIndex);
-            if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCurrentIndex());
         };
         const onKeydownRight = () => {
             const newIndex = this.#index + 1;
-            if (this.#events.onChangeIndex) this.#events.onChangeIndex(newIndex);
             this.#updateCursor(newIndex);
         };
         const onKeydownEnter = () => {
@@ -52,26 +55,29 @@ export default class SelectState implements CardsetState {
             if (this.#isIndexSelected(currentIndex)) {
                 this.#removeIndex(currentIndex);
                 this.#creditPoints(currentIndex);
+                this.#unmarkCardByIndex(currentIndex);
+                return;
             }
-            if (this.#events.onMarked) this.#events.onMarked(currentIndex);
             this.#selectIndex(currentIndex);
             this.#discountPoints(currentIndex);
-            if (this.#selectNumber !== 1) {
-                this.#markCardByIndex(currentIndex);
-            }
+            if (this.#selectNumber !== 1) this.#markCardByIndex(currentIndex);
+            if (this.#events.onMarked) this.#events.onMarked(currentIndex);
+
+            // console.log(this.#isSelectLimitReached());
+            // console.log(this.#isSelectAll());
+            // console.log(this.#isNoHasMoreColorsPoints());
+
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
-                if (this.#events.onCompleted) this.#events.onCompleted(this.#selectIndexes);
-                this.#resetCardsState();
-                this.#removeAllKeyboardListeners();
-                this.#highlightSelectedCards();
+                this.disable();
                 this.staticMode();
+                if (this.#events.onCompleted) this.#events.onCompleted(this.getSelectIndexes());
             }
         };
         const onKeydownEsc = () => {
-            if (this.#events.onLeave) this.#events.onLeave();
             this.#resetCardsState();
             this.#removeAllKeyboardListeners();
             this.staticMode();
+            if (this.#events.onLeave) this.#events.onLeave();
         }
         keyboard.on('keydown-LEFT', onKeydownLeft);
         keyboard.on('keydown-RIGHT', onKeydownRight);
@@ -79,9 +85,14 @@ export default class SelectState implements CardsetState {
         keyboard.on('keydown-ESC', onKeydownEsc);
     }
 
+    disable() {
+        this.#removeAllKeyboardListeners();
+        this.#resetCardsState();
+    }
+
     #isAvaliableCardByIndex(index: number): boolean {
         if (!this.cardset.isValidIndex(index)) return false;
-        return !this.#disabledIndexes.includes(index);
+        return !this.#disabledIndexes.includes(index) || this.#selectIndexes.includes(index);
     }
 
     #getKeyboard(): Phaser.Input.Keyboard.KeyboardPlugin {
@@ -92,12 +103,14 @@ export default class SelectState implements CardsetState {
     }
 
     #updateCursor(newIndex: number): void {
+        if (!this.cardset.isValidIndex(newIndex)) return;
         const lastIndex = this.#getCurrentIndex();
         this.#sendCardsToBack(lastIndex);
         this.#deselectCard(this.cardset.getCardByIndex(lastIndex));
         this.#updateIndex(newIndex);
         const currentIndex = this.#getCurrentIndex();
         this.#selectCard(this.cardset.getCardByIndex(currentIndex));
+        if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCurrentIndex());
     }
 
     #sendCardsToBack(index: number): void {
@@ -131,7 +144,7 @@ export default class SelectState implements CardsetState {
 
     #updateCardsState(): void {
         this.cardset.getCards().forEach((card: Card, index: number) => {
-            if (this.#isCardNoHasMorePoints(card)) {
+            if (this.#isCardNoHasMorePoints(card) && !this.#disabledIndexes.includes(index)) {
                 this.#disabledIndexes.push(index);
             }
             if (this.#disabledIndexes.includes(index)) {
@@ -148,8 +161,16 @@ export default class SelectState implements CardsetState {
     }
 
     #removeIndex(index: number): void {
-        this.#unmarkCardByIndex(index);
+        this.#removeSelectIndex(index);
+        this.#removeDisabledIndex(index);
+    }
+
+    #removeSelectIndex(index: number): void {
         this.#selectIndexes = this.#selectIndexes.filter(i => i !== index);
+    }
+
+    #removeDisabledIndex(index: number): void {
+        this.#disabledIndexes = this.#disabledIndexes.filter(i => i !== index);
     }
 
     #creditPoints(index: number): void {
@@ -163,10 +184,12 @@ export default class SelectState implements CardsetState {
     #unmarkCardByIndex(index: number): void {
         const card = this.cardset.getCardByIndex(index);
         card.unmark();
+        card.enable();
     }
 
     #selectIndex(index: number): void {
         this.#selectIndexes.push(index);
+        this.#disabledIndexes.push(index);
     }
 
     #discountPoints(index: number): void {
@@ -180,6 +203,7 @@ export default class SelectState implements CardsetState {
     #markCardByIndex(index: number): void {
         const card = this.cardset.getCardByIndex(index);
         card.mark();
+        card.disable();
     }
 
     #isSelectLimitReached(): boolean {
@@ -214,11 +238,11 @@ export default class SelectState implements CardsetState {
     }
 
     #resetCardsState(): void {
-        if (this.#selectNumber !== 1) {
             this.#sendCardsToBack(this.cardset.getCardsTotal() - 1);
             this.#deselectAll();
             this.#unmarkAll();
-        }
+            this.#unhighlightAll();
+            this.#enableAll();
     }
 
     #unmarkAll(): void {
@@ -234,11 +258,16 @@ export default class SelectState implements CardsetState {
         });
     }
 
-    #highlightSelectedCards(): void {
-        this.cardset.getCards().forEach((card: Card, index: number) => {
-            if (this.#selectIndexes.includes(index)) {
-                card.highlight();
-            }
+    #unhighlightAll(): void {
+        this.cardset.getCards().forEach((card: Card) => {
+            card.unhighlight();
+        }
+        );
+    }
+
+    #enableAll(): void {
+        this.cardset.getCards().forEach((card: Card) => {
+            card.enable();
         });
     }
 
@@ -273,5 +302,18 @@ export default class SelectState implements CardsetState {
                 this.#disabledIndexes.push(index);
             }
         });
+    }
+
+    removeSelectLastIndex(): void {
+        if (this.#selectIndexes.length === 0) return;
+        const lastIndex = this.#selectIndexes.pop();
+        if (lastIndex === undefined) return;
+        this.#unmarkCardByIndex(lastIndex);
+        this.#creditPoints(lastIndex);
+        this.#removeDisabledIndex(lastIndex);
+    }
+
+    getSelectIndexes(): number[] {
+        return this.#selectIndexes.slice();
     }
 }

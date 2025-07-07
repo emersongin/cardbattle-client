@@ -11,6 +11,7 @@ export class LoadPhase extends PowerSlots implements Phase {
     #noTextWindow: boolean = false;
     #commandWindow: CommandWindow;
     #zoneCommandWindow: CommandWindow;
+    
     constructor(readonly scene: CardBattleScene, powerSlots: any[] = [], noTextWindow: boolean = false) {
         super(powerSlots);
         this.#noTextWindow = noTextWindow;

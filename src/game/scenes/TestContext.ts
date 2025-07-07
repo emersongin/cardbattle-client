@@ -4,6 +4,7 @@ import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
 import { ColorsPoints } from '../ui/ColorsPoints';
 import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from '../ui/Card/Card';
+import { CommandWindow } from '../ui/CommandWindow';
 
 export class TestContext extends VueScene
 {
@@ -28,7 +29,7 @@ export class TestContext extends VueScene
                 ap: 5,
                 typeId: 'battle' as CardType,
                 powerId: 'none',
-                cost: 2
+                cost: 1
             },
             {
                 UUID: '123e4567-e89b-12d3-a456-426614174444',
@@ -44,7 +45,7 @@ export class TestContext extends VueScene
                 cost: 1
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 4); // 40
+        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
         const dimensions = { 
             x: this.cameras.main.centerX / 2, 
             y: this.cameras.main.centerY - 75, 
@@ -61,8 +62,23 @@ export class TestContext extends VueScene
                 if (!cardset.isValidIndex(cardIndex)) return;
                 // console.log(cardset.getCardByIndex(cardIndex).getName());
             },
-            onCompleted: (_cardIndexes: number[]) => {
-                // console.log('Selected card indexes:', cardIndexes);
+            onCompleted: (cardIndexes: number[]) => {
+                cardset.highlightCardsByIndexes(cardIndexes);
+                const commandWindow = CommandWindow.createBottom(this, 'Complete your choice?', [
+                    {
+                        description: 'Yes',
+                        onSelect: () => {
+                            console.log('Selected cards:', cardIndexes);
+                        }
+                    },
+                    {
+                        description: 'No',
+                        onSelect: () => {
+                            cardset.restoreSelectState();
+                        }
+                    },
+                ]);
+                commandWindow.open();
             },
             onLeave: () => {
                 // console.log('Cardset left');
@@ -76,7 +92,7 @@ export class TestContext extends VueScene
             white: 0,
             orange: 0
         };
-        cardset.selectMode(events, colorPoints);
+        cardset.selectMode(events, colorPoints, 1);
         // cardset.disablePowerCards();
         // cardset.disableBattleCards();
         // const card = new Card(this, cardsData[0]);
