@@ -8,17 +8,17 @@ export default class MovingState implements CardState {
     
     constructor(readonly card: Card) {}
 
-    create() {
-        // This method is called when the state is created.
+    create(moves: Move[], duration: number | null = null) {
+        this.addTweens(moves, duration);
     }
 
-    addTweens(moves: Move[], duration: number = 0) {
+    addTweens(moves: Move[], duration: number | null = null) {
         const moveTweens = moves.map(move => {
-            return {
-                ...move,
-                hold: 0,
-                duration,
-            };
+            move = { ...move, hold: 0 };
+            if (duration) {
+                move.duration = duration;
+            }
+            return move;
         });
         this.pushMoves(moveTweens);
     }
@@ -63,52 +63,54 @@ export default class MovingState implements CardState {
         this.card.changeState(new StaticState(this.card));
     }
 
-    movePosition(xTo: number, yTo: number, duration: number = 0) {
+    static createPositionMove(xTo: number, yTo: number, duration: number = 0): Move[] {
         const moves: Move[] = [
             MovingState.createMove(xTo, yTo, duration)
         ];
-        this.addTweens(moves, duration);
+        return moves;
     }
 
     static createMove(x: number, y: number, duration: number = 0): Move {
         return { x, y, duration, hold: 0 };
     }
 
-    moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number) {
+    static createFromToMove(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): Move[] {
         const moves: Move[] = [
             MovingState.createMove(xFrom, yFrom),
             MovingState.createMove(xTo, yTo, duration)
         ];
-        this.addTweens(moves, duration);
+        return moves;
     }
 
-    close(onCanStart?: () => boolean, onClosed?: () => void): void {
+    static createCloseMove(card: Card, onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0): Move[] {
         const moves: Move[] = [
             {
-                x: this.card.x + (this.card.width / 2),
+                x: card.x + (card.width / 2),
                 scaleX: 0,
                 ease: 'Linear',
                 canStart: () => {
-                    return this.card.isOpened() && (!onCanStart || onCanStart());
+                    return card.isOpened() && (!onCanStart || onCanStart());
                 },
-                onComplete: onClosed, 
+                onComplete: onClosed,
+                delay
             },
         ];
-        this.addTweens(moves, 200);
+        return moves;
     }
 
-    open(onCanStart?: () => boolean, onOpened?: () => void): void {
+    static createOpenMove(card: Card, onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0): Move[] {
         const moves: Move[] = [
             {
-                x: this.card.x,
+                x: card.x,
                 scaleX: 1,
                 ease: 'Linear',
                 canStart: () => {
-                    return this.card.isClosed() && (!onCanStart || onCanStart());
+                    return card.isClosed() && (!onCanStart || onCanStart());
                 },
                 onComplete: onOpened, 
+                delay
             }
         ];
-        this.addTweens(moves, 200);
+        return moves;
     }
 }

@@ -7,6 +7,7 @@ export type Move = {
     scaleY?: number;
     yoyo?: boolean;
     ease?: string;
+    delay?: number;
     canStart?: () => boolean;
     onComplete?: () => void;
     onYoyo?: () => void;

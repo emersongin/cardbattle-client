@@ -138,4 +138,23 @@ export class Cardset extends Phaser.GameObjects.Container {
             }
         });
     }
+
+    closeAllCards(): void {
+        this.getCards().forEach((card: Card) => {
+            card.close();
+        });
+    }
+
+    closeAllCardsDomino(): void {
+        let delay = 0;
+        this.getCards().forEach((card: Card, index: number) => {
+            delay += (index * 24);
+            card.close(() => true, () => {}, delay);
+        });
+    }
+
+    resetCardsState(): void {
+        if (!(this.#status instanceof SelectState)) return;
+        this.#status.resetCardsState();
+    }
 }

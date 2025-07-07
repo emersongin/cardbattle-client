@@ -2,7 +2,7 @@
 import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
-import { ColorsPoints } from '../ui/ColorsPoints';
+// import { ColorsPoints } from '../ui/ColorsPoints';
 import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from '../ui/Card/Card';
 import { CommandWindow } from '../ui/CommandWindow';
 
@@ -81,19 +81,22 @@ export class TestContext extends VueScene
                 commandWindow.open();
             },
             onLeave: () => {
-                // console.log('Cardset left');
+                cardset.resetCardsState();
+                cardset.closeAllCardsDomino();
             },
         };
-        const colorPoints: ColorsPoints = {
-            red: cardsData.filter(card => card.color === 'red').length,
-            blue: cardsData.filter(card => card.color === 'blue').length,
-            green: 0,
-            black: 0,
-            white: 0,
-            orange: 0
-        };
-        // cardset.selectModeOne(events);
-        cardset.selectModeMany(events, colorPoints);
+        // const colorPoints: ColorsPoints = {
+        //     red: cardsData.filter(card => card.color === 'red').length,
+        //     blue: cardsData.filter(card => card.color === 'blue').length,
+        //     green: 0,
+        //     black: 0,
+        //     white: 0,
+        //     orange: 0
+        // };
+        cardset.selectModeOne(events);
+        // cardset.selectModeMany(events, colorPoints);
+        // cardset.closeAllCards();
+        // cardset.closeAllCardsDomino();
         // cardset.disablePowerCards();
         // cardset.disableBattleCards();
         // const card = new Card(this, cardsData[0]);

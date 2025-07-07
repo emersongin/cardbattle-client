@@ -30,7 +30,7 @@ export default class SelectState implements CardsetState {
 
     enable() {
         this.#enableAllKeyboardListeners();
-        this.#resetCardsState();
+        this.resetCardsState();
         this.#updateCardsState();
         this.#updateCursor(this.#getCurrentIndex());
     }
@@ -74,7 +74,7 @@ export default class SelectState implements CardsetState {
             }
         };
         const onKeydownEsc = () => {
-            this.#resetCardsState();
+            this.resetCardsState();
             this.#removeAllKeyboardListeners();
             this.staticMode();
             if (this.#events.onLeave) this.#events.onLeave();
@@ -87,7 +87,7 @@ export default class SelectState implements CardsetState {
 
     disable() {
         this.#removeAllKeyboardListeners();
-        this.#resetCardsState();
+        this.resetCardsState();
     }
 
     #isAvaliableCardByIndex(index: number): boolean {
@@ -237,7 +237,7 @@ export default class SelectState implements CardsetState {
         keyboard.removeAllListeners();
     }
 
-    #resetCardsState(): void {
+    resetCardsState(): void {
             this.#sendCardsToBack(this.cardset.getCardsTotal() - 1);
             this.#deselectAll();
             this.#unmarkAll();

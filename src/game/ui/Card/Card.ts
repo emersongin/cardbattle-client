@@ -1,5 +1,6 @@
 import { CardData } from "../CardData";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
+import { Move } from "./Move";
 
 export const CARD_WIDTH = 100;
 export const CARD_HEIGHT = 150;
@@ -248,16 +249,20 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     // Move methods
-    movePosition(xTo: number, yTo: number): void {
-        this.changeState(new MovingState(this));
-        if (!(this.#status instanceof MovingState)) return;
-        this.#status.movePosition(xTo, yTo);
+    movePosition(xTo: number, yTo: number, delay: number = 0, duration: number = 0): void {
+        this.move(MovingState.createPositionMove(xTo, yTo, delay), duration);
+    }
+
+    move(moves: Move[], duration: number | null = null): void {
+        if (this.#status instanceof MovingState) {
+            this.#status.addTweens(moves, duration);
+            return;
+        };
+        this.changeState(new MovingState(this), moves);
     }
 
     moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
-        this.changeState(new MovingState(this));
-        if (!(this.#status instanceof MovingState)) return;
-        this.#status.moveFromTo(xFrom, yFrom, xTo, yTo, duration);
+        this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, duration));
     }
 
     // Open and close methods
@@ -293,13 +298,12 @@ export class Card extends Phaser.GameObjects.Container {
         this.open(onCanStartOpen);
     }
 
-    private close(onCanStart?: () => boolean, onClosed?: () => void): void {
-        this.changeState(new MovingState(this));
-        if (!(this.#status instanceof MovingState)) return;
-        this.#status.close(onCanStart, () => {
+    close(onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0): void {
+        const onClosedCallback = () => {
             this.#closed = true;
             if (onClosed) onClosed();
-        });
+        };
+        this.move(MovingState.createCloseMove(this, onCanStart, onClosedCallback, delay), 200);
     }
 
     isOpened(): boolean {
@@ -310,13 +314,12 @@ export class Card extends Phaser.GameObjects.Container {
         return this.#closed;
     }
 
-    private open(onCanStart?: () => boolean, onOpened?: () => void): void {
-        this.changeState(new MovingState(this));
-        if (!(this.#status instanceof MovingState)) return;
-        this.#status.open(onCanStart, () => {
+    private open(onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0): void {
+        const onOpenedCallback = () => {
             this.#closed = false;
             if (onOpened) onOpened();
-        });
+        };
+        this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay), 200);
     }
 
     // Update points methods
