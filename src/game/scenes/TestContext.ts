@@ -92,7 +92,8 @@ export class TestContext extends VueScene
             white: 0,
             orange: 0
         };
-        cardset.selectMode(events, colorPoints, 1);
+        // cardset.selectModeOne(events);
+        cardset.selectModeMany(events, colorPoints);
         // cardset.disablePowerCards();
         // cardset.disableBattleCards();
         // const card = new Card(this, cardsData[0]);

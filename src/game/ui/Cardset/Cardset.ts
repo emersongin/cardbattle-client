@@ -45,7 +45,15 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#status = state;
     }
 
-    selectMode(events: CardsetEvents, colorPoints?: ColorsPoints, selectNumber: number = 0): void {
+    selectModeOne(events: CardsetEvents): void {
+        this.#selectMode(events, null, 1);
+    }
+
+    selectModeMany(events: CardsetEvents, colorPoints: ColorsPoints): void {
+        this.#selectMode(events, colorPoints, 0);
+    }
+
+    #selectMode(events: CardsetEvents, colorPoints?: ColorsPoints | null, selectNumber: number = 0): void {
         this.changeState(new SelectState(this));
         if ((this.#status instanceof SelectState) === false) return;
         this.#status.create(events, colorPoints, selectNumber);
