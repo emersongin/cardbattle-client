@@ -5,7 +5,6 @@ type TextWindowConfig = {
 };
 
 export class TextWindow extends TextBox {
-    // #isOpen: boolean = false;
     #tween: Phaser.Tweens.Tween | null = null;
     #onCloseCallback?: () => void;
 
@@ -58,24 +57,9 @@ export class TextWindow extends TextBox {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.addActionOnKeyDown();
+                this.#addOnCompletedListener();
             }
         });
-    }
-
-    private addActionOnKeyDown() {
-        const keyboard = this.scene.input.keyboard;
-        if (!keyboard) {
-            throw new Error('Keyboard input is not available in this scene.');
-        }
-        const onKeyDown = () => {
-            if (!keyboard) {
-                throw new Error('Keyboard input is not available in this scene.');
-            }
-            keyboard.removeAllListeners();
-            this.close();
-        };
-        keyboard.once('keydown-ENTER', onKeyDown, this);
     }
 
     close() {
@@ -93,5 +77,20 @@ export class TextWindow extends TextBox {
 
     isBusy() {
         return this.#tween !== null && this.#tween.isPlaying();
+    }
+
+    #addOnCompletedListener() {
+        const keyboard = this.scene.input.keyboard;
+        if (!keyboard) {
+            throw new Error('Keyboard input is not available in this scene.');
+        }
+        const onKeyDown = () => {
+            if (!keyboard) {
+                throw new Error('Keyboard input is not available in this scene.');
+            }
+            keyboard.removeAllListeners();
+            this.close();
+        };
+        keyboard.once('keydown-ENTER', onKeyDown, this);
     }
 }

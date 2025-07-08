@@ -14,9 +14,9 @@ export default class UpdatingState implements CardState {
     }
 
     addTweens(ap: number, hp: number, duration: number) {
-        const fromTarget = this.card.getAllData('ap', 'hp');
+        const fromTarget: CardPoints = this.card.getAllData();
         const toTarget = { ap, hp };
-        const updates = this.createUpdatePoints(fromTarget, toTarget);
+        const updates = this.#createUpdatePoints(fromTarget, toTarget);
         const updateTweens = updates.map(update => {
             return {
                 ...update,
@@ -24,32 +24,44 @@ export default class UpdatingState implements CardState {
                 duration,
             };
         });
-        this.pushUpdates(updateTweens);
+        this.#pushUpdates(updateTweens);
     }
 
-    private createUpdatePoints(fromTarget: CardPoints, toTarget: CardPoints): UpdatePoints[] {
-        const apPoints = this.createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
+    static() {
+        this.card.changeState(new StaticState(this.card));
+    }
+
+    moving() {
+        throw new Error('MovingState: cannot call moving() from MovingState.');
+    }
+
+    updating() {
+        throw new Error('MovingState: cannot call updating() from MovingState.');
+    }
+
+    #createUpdatePoints(fromTarget: CardPoints, toTarget: CardPoints): UpdatePoints[] {
+        const apPoints = this.#createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
             (tween: Phaser.Tweens.Tween) => {
                 fromTarget.ap = Math.round(tween.getValue() ?? 0);
-                const apText = Math.round(fromTarget.ap).toString().padStart(2, "0");
-                const hpText = Math.round(fromTarget.hp).toString().padStart(2, "0");
-                this.card.setDisplayText(`${apText}/${hpText}`);
+                const ap = Math.round(fromTarget.ap);
+                const hp = Math.round(fromTarget.hp);
+                this.card.setPointsDisplay(ap, hp);
             },
-            () => this.card.setData('ap', toTarget.ap)
+            () => this.card.setAp(toTarget.ap)
         );
-        const hpPoints = this.createUpdate(fromTarget, fromTarget.hp, toTarget.hp,
+        const hpPoints = this.#createUpdate(fromTarget, fromTarget.hp, toTarget.hp,
             (tween: Phaser.Tweens.Tween) => {
                 fromTarget.hp = Math.round(tween.getValue() ?? 0);
-                const apText = Math.round(fromTarget.ap).toString().padStart(2, "0");
-                const hpText = Math.round(fromTarget.hp).toString().padStart(2, "0");
-                this.card.setDisplayText(`${apText}/${hpText}`);
+                const ap = Math.round(fromTarget.ap);
+                const hp = Math.round(fromTarget.hp);
+                this.card.setPointsDisplay(ap, hp);
             },
-            () => this.card.setData('hp', toTarget.hp)
+            () => this.card.setHp(toTarget.hp)
         );
         return [apPoints, hpPoints];
     }
 
-    private createUpdate(
+    #createUpdate(
         target: CardPoints,
         fromPoints: number, 
         toPoints: number, 
@@ -67,26 +79,26 @@ export default class UpdatingState implements CardState {
         };
     }
     
-    pushUpdates(updates: UpdatePoints[]) {
+    #pushUpdates(updates: UpdatePoints[]) {
         this.#updates.push(updates);
     }
 
     preUpdate() {
-        if (this.isPlaying()) return;
-        if (this.hasUpdates()) this.createTweens();
-        if (this.hasTweens()) return;
+        if (this.#isPlaying()) return;
+        if (this.#hasUpdates()) this.#createTweens();
+        if (this.#hasTweens()) return;
         this.static();
     }
 
-    isPlaying(): boolean {
+    #isPlaying(): boolean {
         return this.#tweens.some(group  => group.some(tween => tween.isPlaying())) ?? false;
     }
 
-    hasUpdates(): boolean {
+    #hasUpdates(): boolean {
         return this.#updates.length > 0;
     }
 
-    createTweens() {
+    #createTweens() {
         const updates = this.#updates.shift();
         if (!updates || updates.length === 0) return;
         let counterTweens = [];
@@ -106,19 +118,7 @@ export default class UpdatingState implements CardState {
         this.#tweens.push(counterTweens);
     }
 
-    hasTweens(): boolean {
-        return this.hasUpdates() || this.#tweens.length > 0;
-    }
-
-    static() {
-        this.card.changeState(new StaticState(this.card));
-    }
-
-    moving() {
-        throw new Error('MovingState: cannot call moving() from MovingState.');
-    }
-
-    updating() {
-        throw new Error('MovingState: cannot call updating() from MovingState.');
+    #hasTweens(): boolean {
+        return this.#hasUpdates() || this.#tweens.length > 0;
     }
 }

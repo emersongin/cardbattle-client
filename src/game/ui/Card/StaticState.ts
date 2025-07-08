@@ -8,6 +8,10 @@ export default class StaticState implements CardState {
         // nothing to do here
     }
 
+    addTweens() {
+        // nothing to do here
+    }
+
     preUpdate() {
         //nothing to do here
     }

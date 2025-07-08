@@ -45,7 +45,7 @@ export class TestContext extends VueScene
                 cost: 1
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 20); // 40
+        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
         const dimensions = { 
             x: this.cameras.main.centerX / 2, 
             y: this.cameras.main.centerY - 75, 

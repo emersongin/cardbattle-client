@@ -200,13 +200,13 @@ export default class SelectState implements CardsetState {
     #sendCardsToBack(index: number): void {
         const cards = this.cardset.getCardsByFromTo(0, index);
         cards.reverse().forEach((card: Card) => {
-            this.cardset.sendToBack(card);
+            this.cardset.sendToBack(card.getUi());
         });
     }
 
     #deselectCard(card: Card): void {
         this.cardset.deselectCard(card);
-        card.moveFromTo(card.x, card.y, card.x, 0, 10);
+        card.moveFromTo(card.getX(), card.getY(), card.getX(), 0, 10);
     }
 
     #updateIndex(index: number): void {
@@ -222,7 +222,7 @@ export default class SelectState implements CardsetState {
 
     #selectCard(card: Card): void {
         this.cardset.selectCard(card);
-        card.moveFromTo(card.x, card.y, card.x, -12, 10);
+        card.moveFromTo(card.getX(), card.getY(), card.getX(), -12, 10);
     }
 
     #isIndexSelected(index: number): boolean {

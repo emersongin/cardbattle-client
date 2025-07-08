@@ -86,7 +86,7 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     selectCard(card: Card): void {
         card.select();
-        this.bringToTop(card);
+        this.bringToTop(card.getUi());
         if (this.#selectedTweens) this.#selectedTweens.forEach(tween => tween.stop());
     }
 
@@ -166,12 +166,12 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     #addChildrenInline(): void {
         if (this.#cards.length === 0) return;
-        this.#cards.forEach((child: Card, index: number) => {
+        this.#cards.forEach((card: Card, index: number) => {
             let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
-            if (padding > child.width) padding = child.width;
-            child.x = padding * index;
-            child.y = 0;
-            this.add(child);
+            if (padding > card.getWidth()) padding = card.getWidth();
+            card.setX(padding * index);
+            card.setY(0);
+            this.add(card.getUi());
         });
     }
 
@@ -182,9 +182,14 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     preUpdate(): void {
+        this.#preUpdateCards();
         this.#preUpdateSelectedTweens();
         this.#preUpdateMarkedTweens();
         this.#preUpdateHighlightedTweens();
+    }
+
+    #preUpdateCards(): void {
+        this.getCards().forEach((card: Card) => card.preUpdate());
     }
 
     #preUpdateSelectedTweens(): void {

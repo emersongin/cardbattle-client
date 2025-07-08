@@ -4,6 +4,7 @@ import UpdatingState from "./UpdatingState";
 
 export interface CardState {
     create(...args: any[]): void;
+    addTweens(...args: any[]): void;
     preUpdate(): void;
     static(): void;
     moving(): void;

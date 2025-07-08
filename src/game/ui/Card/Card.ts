@@ -1,5 +1,7 @@
 import { CardData } from "../CardData";
+import { CardPoints } from "./CardPoints";
 import { CardState, StaticState, MovingState, UpdatingState } from "./CardState";
+import { CardUi } from "./CardUi";
 import { Move } from "./Move";
 
 export const CARD_WIDTH = 100;
@@ -7,202 +9,35 @@ export const CARD_HEIGHT = 150;
 export type CardType = 'battle' | 'power';
 export type CardColors = 'red' | 'green' | 'blue' | 'black' | 'white' | 'orange';
 
-export class Card extends Phaser.GameObjects.Container {
-    #background: Phaser.GameObjects.Rectangle;
-    #image: Phaser.GameObjects.Image;
-    #display: Phaser.GameObjects.Text;
-    #disabledLayer: Phaser.GameObjects.Rectangle;
-    #selectedLayer: Phaser.GameObjects.Graphics;
-    #marked: boolean = false;
-    #markedLayer: Phaser.GameObjects.Graphics;
-    #highlightedLayer: Phaser.GameObjects.Graphics;
+export class Card {
+    #ui: CardUi;
     #status: CardState;
-    #faceUp: boolean = true;
+    #data: CardData; 
+    #ap: number = 0;
+    #hp: number = 0;
+    #faceUp: boolean = false;
     #closed: boolean = false;
+    #marked: boolean = false;
     #disabled: boolean = false;
-    #cardData: CardData;
 
     constructor(
         readonly scene: Phaser.Scene, 
         cardData: CardData
     ) {
-        const x = 100;
-        const y = 100;
-        super(scene, x, y);
-        this.#cardData = cardData;
-        this.width = CARD_WIDTH;
-        this.height = CARD_HEIGHT;
-        this.setPoints();
-        this.createLayers();
+        this.#ui = new CardUi(this.scene, cardData);
+        this.#data = cardData;
+        this.#setPoints();
         this.changeState(new StaticState(this));
-        this.scene.add.existing(this);
+        this.scene.add.existing(this.#ui);
     }
 
-    private createLayers(): void {
-        this.createBackground();
-        this.createImage();
-        this.createDisplay();
-        this.createDisabledLayer();
-        this.createSelectedLayer();
-        this.createMarkedLayer();
-        this.createHighlightedLayer();
+    getAllData(): CardPoints {
+        return { ap: this.#ap, hp: this.#hp };
     }
 
-    private createBackground(): void {
-        const backgroundColor = this.getBackgroundColor();
-        const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
-        backgroundRect.setOrigin(0, 0);
-        this.#background = backgroundRect;
-        this.add(this.#background);
-    }
-
-    private getBackgroundColor(): number {
-        switch (this.#cardData.color) {
-            case 'red':
-                return 0xff0000; // Red
-            case 'blue':
-                return 0x0000ff; // Blue
-            case 'green':
-                return 0x00ff00; // Green
-            case 'white':
-                return 0xffffff; // White
-            case 'black':
-                return 0x000000; // Black
-            case 'orange':
-                return 0xffa500; // Orange
-            default:
-                throw new Error(`Unknown color: ${this.#cardData.color}`);
-        }
-    }
-
-    private createImage(): void {
-        const image = this.scene.add.image(0, 0, 'empty');
-        this.#image = image;
-        this.setImage();
-        this.add(this.#image);
-    }
-
-    private setImage() {
-        if (this.#faceUp) {
-            this.#image.setTexture(this.#cardData.imageName);
-        } else {
-            this.#image.setTexture('card-back');
-        }
-        this.adjustImagePosition();
-    }
-
-    private adjustImagePosition(): void {
-        const larguraDesejada = CARD_WIDTH - 12;
-        const alturaDesejada = CARD_HEIGHT - 12;
-        const escalaX = larguraDesejada / this.#image.width;
-        const escalaY = alturaDesejada / this.#image.height;
-        const escalaProporcional = Math.min(escalaX, escalaY);
-        this.#image.setOrigin(0, 0);
-        this.#image.setScale(escalaProporcional);
-        this.#image.setPosition((this.width - this.#image.displayWidth) / 2, (this.height - this.#image.displayHeight) / 2);
-    }
-
-    private createDisplay(): void {
-        const display = this.scene.add.text(this.width - 80, this.height - 32, '', {
-            fontSize: '24px',
-            color: '#ffffff',
-            fontStyle: 'bold',
-        });
-        this.#display = display;
-        this.#display.setOrigin(0, 0);
-        this.setDisplay();
-        this.add(this.#display);
-    }
-
-    private setDisplay() {
-        if (!this.#display || !this.#faceUp) {
-            this.setEmptyDisplay();
-            return
-        } 
-        const { typeId: cardTypeId } = this.#cardData;
-        if (cardTypeId === 'battle') {
-            this.setPointsDisplay();
-        } else if (cardTypeId === 'power') {
-            this.setPowerDisplay();
-        } else {
-            throw new Error(`Unknown card type id: ${cardTypeId}`);
-        }
-    }
-
-    private setEmptyDisplay() {
-        this.setDisplayText('');
-    }
-
-    public setDisplayText(text: string): void {
-        if (!this.#display) {
-            throw new Error('Display is not initialized.');
-        }
-        this.#display.setText(text);
-    }
-
-    private setPointsDisplay() {
-        const { ap, hp } = this.getAllData('ap', 'hp');
-        const apText = ap.toString().padStart(2, "0"); 
-        const hpText = hp.toString().padStart(2, "0");
-        this.setDisplayText(`${apText}/${hpText}`);
-    }
-
-    getAllData(...keys: string[]): any {
-        const result: any = {};
-        keys.forEach(key => {
-            const data = this.getData(key);
-            if (data !== undefined) {
-                result[key] = data;
-            } else {
-                throw new Error(`Key "${key}" not found in card data.`);
-            }
-        });
-        return result;
-    }
-
-    private setPowerDisplay() {
-        this.setDisplayText('P');
-    }
-
-    private setPoints(): void {
-        this.setData('hp', this.#cardData.hp);
-        this.setData('ap', this.#cardData.ap);
-    }
-
-    private createDisabledLayer(): void {
-        const disabledLayer = this.scene.add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
-        disabledLayer.setOrigin(0, 0);
-        disabledLayer.setVisible(false);
-        this.#disabledLayer = disabledLayer;
-        this.add(this.#disabledLayer);
-    }
-
-    private createSelectedLayer(): void {
-        const selectedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0xffff00, 6);
-        selectedLayer.setVisible(false);
-        this.#selectedLayer = selectedLayer;
-        this.add(this.#selectedLayer);
-    }
-
-    createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {
-        const g = this.scene.add.graphics();
-        g.lineStyle(thickness, color);
-        g.strokeRect(x, y, w, h);
-        return g;
-    }
-
-    private createMarkedLayer(): void {
-        const markedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0x00ff00, 6);
-        markedLayer.setVisible(false);
-        this.#markedLayer = markedLayer;
-        this.add(this.#markedLayer);
-    }
-
-    private createHighlightedLayer(): void {
-        const highlightedLayer = this.createOutlinedRect(0, 0, this.width, this.height, 0xff00ff, 6);
-        highlightedLayer.setVisible(false);
-        this.#highlightedLayer = highlightedLayer;
-        this.add(this.#highlightedLayer);
+    #setPoints(): void {
+        this.#ap = this.#data.hp;
+        this.#hp = this.#data.ap;
     }
 
     changeState(state: CardState, ...args: any[]): void {
@@ -211,15 +46,15 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     getSelectedLayer(): Phaser.GameObjects.Graphics {
-        return this.#selectedLayer;
+        return this.#ui.selectedLayer;
     }
 
     getMarkedLayer(): Phaser.GameObjects.Graphics {
-        return this.#markedLayer;
+        return this.#ui.markedLayer;
     }
 
     getHighlightedLayer(): Phaser.GameObjects.Graphics {
-        return this.#highlightedLayer;
+        return this.#ui.highlightedLayer;
     }
 
     preUpdate() {
@@ -250,14 +85,14 @@ export class Card extends Phaser.GameObjects.Container {
         };
         const onClosed = () => {
             this.#faceUp = true;
-            this.setImage();
-            this.setDisplay();
+            this.#ui.setImage(this.#faceUp);
+            this.#ui.setDisplay(this.#faceUp, this.#ap, this.#hp);
         };
         this.close(onCanStartClose, onClosed);
         const onCanStartOpen = () => {
             return this.#faceUp;
         };
-        this.open(onCanStartOpen);
+        this.#open(onCanStartOpen);
     }
 
     turnDown(): void {
@@ -266,14 +101,14 @@ export class Card extends Phaser.GameObjects.Container {
         };
         const onClosed = () => {
             this.#faceUp = false;
-            this.setImage();
-            this.setDisplay();
+            this.#ui.setImage(this.#faceUp);
+            this.#ui.setDisplay(this.#faceUp);
         };
         this.close(onCanStartClose, onClosed);
         const onCanStartOpen = () => {
             return !this.#faceUp;
         };
-        this.open(onCanStartOpen);
+        this.#open(onCanStartOpen);
     }
 
     close(onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0): void {
@@ -292,7 +127,7 @@ export class Card extends Phaser.GameObjects.Container {
         return this.#closed;
     }
 
-    private open(onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0): void {
+    #open(onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0): void {
         const onOpenedCallback = () => {
             this.#closed = false;
             if (onOpened) onOpened();
@@ -313,36 +148,36 @@ export class Card extends Phaser.GameObjects.Container {
     // Disable methods
     disable(): void {
         this.#disabled = true;
-        if (!this.#disabledLayer) return;
-        this.#disabledLayer.setVisible(true);
+        if (!this.#ui.disabledLayer) return;
+        this.#ui.disabledLayer.setVisible(true);
     }
 
     enable(): void {
         this.#disabled = false;
-        if (!this.#disabledLayer) return;
-        this.#disabledLayer.setVisible(false);
+        if (!this.#ui.disabledLayer) return;
+        this.#ui.disabledLayer.setVisible(false);
     }
 
     // Select methods
     select(): void {
-        if (!this.#selectedLayer) return;
-        this.#selectedLayer.setVisible(true);
+        if (!this.#ui.selectedLayer) return;
+        this.#ui.selectedLayer.setVisible(true);
     }
 
     isSelected(): boolean {
-        return this.#selectedLayer && this.#selectedLayer.visible;
+        return this.#ui.selectedLayer && this.#ui.selectedLayer.visible;
     }
 
     deselect(): void {
-        if (!this.#selectedLayer) return;
-        this.#selectedLayer.setVisible(false);
+        if (!this.#ui.selectedLayer) return;
+        this.#ui.selectedLayer.setVisible(false);
     }
 
     // Mark methods
     mark(): void {
         this.#marked = true;
-        if (!this.#markedLayer) return;
-        this.#markedLayer.setVisible(true);
+        if (!this.#ui.markedLayer) return;
+        this.#ui.markedLayer.setVisible(true);
     }
 
     isMarked(): boolean {
@@ -351,23 +186,23 @@ export class Card extends Phaser.GameObjects.Container {
 
     unmark(): void {
         this.#marked = false;
-        if (!this.#markedLayer) return;
-        this.#markedLayer.setVisible(false);
+        if (!this.#ui.markedLayer) return;
+        this.#ui.markedLayer.setVisible(false);
     }
 
     // Highlight methods
     highlight(): void {
-        if (!this.#highlightedLayer) return;
-        this.#highlightedLayer.setVisible(true);
+        if (!this.#ui.highlightedLayer) return;
+        this.#ui.highlightedLayer.setVisible(true);
     }
 
     isHighlighted(): boolean {
-        return this.#highlightedLayer && this.#highlightedLayer.visible;
+        return this.#ui.highlightedLayer && this.#ui.highlightedLayer.visible;
     }
 
     unhighlight(): void {
-        if (!this.#highlightedLayer) return;
-        this.#highlightedLayer.setVisible(false);
+        if (!this.#ui.highlightedLayer) return;
+        this.#ui.highlightedLayer.setVisible(false);
     }
 
     isDisabled(): boolean {
@@ -375,22 +210,62 @@ export class Card extends Phaser.GameObjects.Container {
     }
 
     getName(): string {
-        return this.#cardData.name;
+        return this.#data.name;
     }
 
     getColor(): CardColors {
-        return this.#cardData.color;
+        return this.#data.color;
     }
 
     getCost(): number {
-        return this.#cardData.cost;
+        return this.#data.cost;
     }
 
     isBattleCard(): boolean {
-        return this.#cardData.typeId === 'battle';
+        return this.#data.typeId === 'battle';
     }
 
     isPowerCard(): boolean {
-        return this.#cardData.typeId === 'power';
+        return this.#data.typeId === 'power';
+    }
+
+    setX(x: number): void {
+        this.#ui.x = x;
+    }
+
+    getX(): number {
+        return this.#ui.x;
+    }
+
+    setY(y: number): void {
+        this.#ui.y = y;
+    }
+
+    getY(): number {
+        return this.#ui.y;
+    }
+
+    getWidth(): number {
+        return this.#ui.width;
+    }
+
+    getHeight(): number {
+        return this.#ui.height;
+    }
+
+    getUi(): CardUi {
+        return this.#ui;
+    }
+
+    setPointsDisplay(ap: number = 0, hp: number = 0): void {
+        this.#ui.setPointsDisplay(ap, hp);
+    }
+
+    setAp(ap: number): void {
+        this.#ap = ap;
+    }
+
+    setHp(hp: number): void {
+        this.#hp = hp;
     }
 }
