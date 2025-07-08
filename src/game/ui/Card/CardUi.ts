@@ -61,7 +61,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     #createImage(): void {
         const image = this.scene.add.image(0, 0, 'empty');
         this.image = image;
-        this.setImage();
+        this.setImage(true);
         this.add(this.image);
     }
 
@@ -92,8 +92,7 @@ export class CardUi extends Phaser.GameObjects.Container {
             fontStyle: 'bold',
         });
         this.display = display;
-        this.display.setOrigin(0, 0);
-        this.setDisplay();
+        this.setDisplay(true, this.#data.ap, this.#data.hp);
         this.add(this.display);
     }
 
