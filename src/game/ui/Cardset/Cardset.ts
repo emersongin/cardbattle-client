@@ -21,54 +21,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         const { x, y, width, height } = dimensions;
         super(scene, x, y);
         this.setSize(width, height);
-        this.createCards(cards);
-        this.addChildrenInline();
         this.changeState(new StaticState(this));
+        this.#createCards(cards);
+        this.#addChildrenInline();
         this.scene.add.existing(this);
     }
 
-    private createCards(cards: CardData[]): void {
-        const cardsUi = cards.map((data: CardData) => new Card(this.scene, data));
-        this.#cards = cardsUi;
-    }
-
-    private addChildrenInline(): void {
-        if (this.#cards.length === 0) return;
-        this.#cards.forEach((child: Card, index: number) => {
-            let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
-            if (padding > child.width) padding = child.width;
-            child.x = padding * index;
-            child.y = 0;
-            this.add(child);
-        });
-    }
-
-    changeState(state: CardsetState): void {
-        this.#lastState = this.#status;
-        this.#status = state;
-    }
-
-    selectModeOne(events: CardsetEvents): void {
-        this.#selectMode(events, null, 1);
-    }
-
-    selectModeMany(events: CardsetEvents, colorPoints: ColorsPoints): void {
-        this.#selectMode(events, colorPoints, 0);
-    }
-
-    #selectMode(events: CardsetEvents, colorPoints?: ColorsPoints | null, selectNumber: number = 0): void {
-        this.changeState(new SelectState(this));
-        if ((this.#status instanceof SelectState) === false) return;
-        this.#status.create(events, colorPoints, selectNumber);
-    }
-
-    getCardListByInterval(start: number, end: number): Card[] {
-        if (!this.isValidIndex(start) || !this.isValidIndex(end))
-            throw new Error(`Cardset: index ${start} or ${end} is out of bounds.`);
-        if (start > end) {
-            throw new Error(`Cardset: start index ${start} cannot be greater than end index ${end}.`);
-        }
-        return this.#cards.slice(start, end + 1);
+    getCards(): Card[] {
+        return this.#cards;
     }
 
     getCardByIndex(index: number): Card {
@@ -78,12 +38,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.#cards[index];
     }
 
-    isValidIndex(index: number) {
-        return index >= 0 && index <= this.#cards.length - 1;
-    }
-
-    getCards(): Card[] {
-        return this.#cards;
+    getCardsByFromTo(start: number, end: number): Card[] {
+        if (!this.isValidIndex(start) || !this.isValidIndex(end))
+            throw new Error(`Cardset: index ${start} or ${end} is out of bounds.`);
+        if (start > end) {
+            throw new Error(`Cardset: start index ${start} cannot be greater than end index ${end}.`);
+        }
+        return this.#cards.slice(start, end + 1);
     }
 
     getCardsByIndexes(indexes: number[]): Card[] {
@@ -103,6 +64,16 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.getCards().map((_card: Card, index: number) => index);
     }
 
+    getSelectIndexes(): number[] {
+        if (!(this.#status instanceof SelectState)) return [];
+        return this.#status.getSelectIndexes();
+    }
+
+    changeState(state: CardsetState): void {
+        this.#lastState = this.#status;
+        this.#status = state;
+    }
+
     disableBattleCards(): void {
         if (!(this.#status instanceof SelectState)) return
         this.#status.disableBattleCards();
@@ -113,25 +84,30 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#status.disablePowerCards();
     }
 
-    isStaticMode(): boolean {
-        return this.#status instanceof StaticState;
+    selectCard(card: Card): void {
+        card.select();
+        this.bringToTop(card);
+        if (this.#selectedTweens) this.#selectedTweens.forEach(tween => tween.stop());
     }
 
-    isSelectMode(): boolean {
-        return this.#status instanceof SelectState;
+    deselectCard(card: Card): void {
+        card.deselect();
+        if (this.#selectedTweens) this.#selectedTweens?.forEach(tween => tween.stop());
     }
 
-    restoreSelectState(): void {
-        if (!this.#lastState || (this.#lastState instanceof SelectState) === false) return;
-        this.changeState(this.#lastState);
-        if ((this.#status instanceof SelectState) === false) return;
-        this.#status.removeSelectLastIndex();
-        this.#status.enable();
+    markCard(card: Card): void {
+        card.mark();
+        if (this.#markedTweens) this.#markedTweens.forEach(tween => tween.stop());
     }
 
-    getSelectIndexes(): number[] {
-        if (!(this.#status instanceof SelectState)) return [];
-        return this.#status.getSelectIndexes();
+    unmarkCard(card: Card): void {
+        card.unmark();
+        if (this.#markedTweens) this.#markedTweens.forEach(tween => tween.stop());
+    }
+
+    unhighlightCard(card: Card): void {
+        card.unhighlight();
+        if (this.#highlightedTweens) this.#highlightedTweens.forEach(tween => tween.stop());
     }
 
     highlightCardsByIndexes(cardIndexes: number[]): void {
@@ -139,12 +115,6 @@ export class Cardset extends Phaser.GameObjects.Container {
             if (cardIndexes.includes(index)) {
                 card.highlight();
             }
-        });
-    }
-
-    closeAllCards(): void {
-        this.getCards().forEach((card: Card) => {
-            card.close();
         });
     }
 
@@ -156,9 +126,65 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    restoreSelectState(): void {
+        if (!this.#lastState || (this.#lastState instanceof SelectState) === false) return;
+        this.changeState(this.#lastState);
+        if ((this.#status instanceof SelectState) === false) return;
+        this.#status.removeSelectLastIndex();
+        this.#status.enable();
+    }
+
     resetCardsState(): void {
         if (!(this.#status instanceof SelectState)) return;
         this.#status.resetCardsState();
+    }
+
+    isValidIndex(index: number) {
+        return index >= 0 && index <= this.#cards.length - 1;
+    }
+
+    isStaticMode(): boolean {
+        return this.#status instanceof StaticState;
+    }
+
+    isSelectMode(): boolean {
+        return this.#status instanceof SelectState;
+    }
+
+    selectModeOne(events: CardsetEvents): void {
+        this.#selectMode(events, null, 1);
+    }
+
+    selectModeMany(events: CardsetEvents, colorPoints: ColorsPoints): void {
+        this.#selectMode(events, colorPoints, 0);
+    }
+
+    #createCards(cards: CardData[]): void {
+        const cardsUi = cards.map((data: CardData) => new Card(this.scene, data));
+        this.#cards = cardsUi;
+    }
+
+    #addChildrenInline(): void {
+        if (this.#cards.length === 0) return;
+        this.#cards.forEach((child: Card, index: number) => {
+            let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
+            if (padding > child.width) padding = child.width;
+            child.x = padding * index;
+            child.y = 0;
+            this.add(child);
+        });
+    }
+
+    #selectMode(events: CardsetEvents, colorPoints?: ColorsPoints | null, selectNumber: number = 0): void {
+        this.changeState(new SelectState(this));
+        if ((this.#status instanceof SelectState) === false) return;
+        this.#status.create(events, colorPoints, selectNumber);
+    }
+
+    preUpdate(): void {
+        this.#preUpdateSelectedTweens();
+        this.#preUpdateMarkedTweens();
+        this.#preUpdateHighlightedTweens();
     }
 
     #preUpdateSelectedTweens(): void {
@@ -222,37 +248,5 @@ export class Cardset extends Phaser.GameObjects.Container {
                 })));
             }
         }
-    }
-
-    preUpdate(): void {
-        this.#preUpdateSelectedTweens();
-        this.#preUpdateMarkedTweens();
-        this.#preUpdateHighlightedTweens();
-    }
-
-    selectCard(card: Card): void {
-        card.select();
-        this.bringToTop(card);
-        if (this.#selectedTweens) this.#selectedTweens.forEach(tween => tween.stop());
-    }
-
-    deselectCard(card: Card): void {
-        card.deselect();
-        if (this.#selectedTweens) this.#selectedTweens?.forEach(tween => tween.stop());
-    }
-
-    markCard(card: Card): void {
-        card.mark();
-        if (this.#markedTweens) this.#markedTweens.forEach(tween => tween.stop());
-    }
-
-    unmarkCard(card: Card): void {
-        card.unmark();
-        if (this.#markedTweens) this.#markedTweens.forEach(tween => tween.stop());
-    }
-
-    unhighlightCard(card: Card): void {
-        card.unhighlight();
-        if (this.#highlightedTweens) this.#highlightedTweens.forEach(tween => tween.stop());
     }
 }
