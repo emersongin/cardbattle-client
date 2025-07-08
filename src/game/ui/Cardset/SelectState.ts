@@ -55,12 +55,12 @@ export default class SelectState implements CardsetState {
             if (this.#isIndexSelected(currentIndex)) {
                 this.#removeIndex(currentIndex);
                 this.#creditPoints(currentIndex);
-                this.#unmarkCardByIndex(currentIndex);
+                this.#unmarkCard(this.cardset.getCardByIndex(currentIndex));
                 return;
             }
             this.#selectIndex(currentIndex);
             this.#discountPoints(currentIndex);
-            if (this.#selectNumber !== 1) this.#markCardByIndex(currentIndex);
+            if (this.#selectNumber !== 1) this.#markCard(this.cardset.getCardByIndex(currentIndex));
             if (this.#events.onMarked) this.#events.onMarked(currentIndex);
 
             // console.log(this.#isSelectLimitReached());
@@ -121,7 +121,7 @@ export default class SelectState implements CardsetState {
     }
 
     #deselectCard(card: Card): void {
-        card.deselect();
+        this.cardset.deselectCard(card);
         card.moveFromTo(card.x, card.y, card.x, 0, 10);
     }
 
@@ -137,9 +137,8 @@ export default class SelectState implements CardsetState {
     }
 
     #selectCard(card: Card): void {
-        this.cardset.bringToTop(card);
+        this.cardset.selectCard(card);
         card.moveFromTo(card.x, card.y, card.x, -12, 10);
-        card.select();
     }
 
     #updateCardsState(): void {
@@ -151,7 +150,7 @@ export default class SelectState implements CardsetState {
                 this.#disableCardByIndex(index);
             }
             if (this.#selectIndexes.includes(index)) {
-                this.#markCardByIndex(index);
+                this.#markCard(this.cardset.getCardByIndex(index));
             }
         });
     }
@@ -181,9 +180,8 @@ export default class SelectState implements CardsetState {
         this.#colorsPoints[cardColor] += cardCost;
     }
 
-    #unmarkCardByIndex(index: number): void {
-        const card = this.cardset.getCardByIndex(index);
-        card.unmark();
+    #unmarkCard(card: Card): void {
+        this.cardset.unmarkCard(card);
         card.enable();
     }
 
@@ -200,9 +198,8 @@ export default class SelectState implements CardsetState {
         this.#colorsPoints[cardColor] -= cardCost;
     }
 
-    #markCardByIndex(index: number): void {
-        const card = this.cardset.getCardByIndex(index);
-        card.mark();
+    #markCard(card: Card): void {
+        this.cardset.markCard(card);
         card.disable();
     }
 
@@ -246,23 +243,25 @@ export default class SelectState implements CardsetState {
     }
 
     #unmarkAll(): void {
-        this.#selectIndexes.forEach((index: number) => {
-            this.#unmarkCardByIndex(index);
+        this.cardset.getCards().forEach((card: Card) => {
+            this.#unmarkCard(card);
         });
     }
 
     #deselectAll(): void {
         this.cardset.getCards().forEach((card: Card) => {
-            card.deselect();
-            card.moveFromTo(card.x, card.y, card.x, 0, 10);
+            this.#deselectCard(card);
         });
     }
 
     #unhighlightAll(): void {
         this.cardset.getCards().forEach((card: Card) => {
-            card.unhighlight();
-        }
-        );
+            this.#unhighlightCard(card);
+        });
+    }
+
+    #unhighlightCard(card: Card): void {
+        this.cardset.unhighlightCard(card);
     }
 
     #enableAll(): void {
@@ -308,7 +307,7 @@ export default class SelectState implements CardsetState {
         if (this.#selectIndexes.length === 0) return;
         const lastIndex = this.#selectIndexes.pop();
         if (lastIndex === undefined) return;
-        this.#unmarkCardByIndex(lastIndex);
+        this.#unmarkCard(this.cardset.getCardByIndex(lastIndex));
         this.#creditPoints(lastIndex);
         this.#removeDisabledIndex(lastIndex);
     }

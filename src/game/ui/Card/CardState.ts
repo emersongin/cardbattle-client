@@ -4,8 +4,10 @@ import UpdatingState from "./UpdatingState";
 
 export interface CardState {
     create(...args: any[]): void;
-    update(): void;
-    stopped(): void;
+    preUpdate(): void;
+    static(): void;
+    moving(): void;
+    updating(): void;
 }
 
 export { StaticState, MovingState, UpdatingState };

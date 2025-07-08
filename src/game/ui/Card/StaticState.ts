@@ -5,15 +5,22 @@ export default class StaticState implements CardState {
     constructor(readonly card: Card) {}
 
     create() {
-        // This method is called when the state is created.
+        // nothing to do here
     }
 
-    update() {
+    preUpdate() {
         //nothing to do here
-        // console.log("StaticState update");
     }
 
-    stopped() {
-        throw new Error('StaticState: stopped called, this should not happen');
+    static() {
+        throw new Error("StaticState is not implemented in StaticState.");
+    }
+
+    moving() {
+        throw new Error("MovingState is not implemented in StaticState.");
+    }
+
+    updating() {
+        throw new Error("UpdatingState is not implemented in StaticState.");
     }
 }

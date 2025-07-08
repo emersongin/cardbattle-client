@@ -71,11 +71,11 @@ export default class UpdatingState implements CardState {
         this.#updates.push(updates);
     }
 
-    update() {
+    preUpdate() {
         if (this.isPlaying()) return;
         if (this.hasUpdates()) this.createTweens();
         if (this.hasTweens()) return;
-        this.stopped();
+        this.static();
     }
 
     isPlaying(): boolean {
@@ -110,7 +110,15 @@ export default class UpdatingState implements CardState {
         return this.hasUpdates() || this.#tweens.length > 0;
     }
 
-    stopped() {
+    static() {
         this.card.changeState(new StaticState(this.card));
+    }
+
+    moving() {
+        throw new Error('MovingState: cannot call moving() from MovingState.');
+    }
+
+    updating() {
+        throw new Error('MovingState: cannot call updating() from MovingState.');
     }
 }

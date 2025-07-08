@@ -2,7 +2,7 @@
 import { CardData } from '@/game/ui/CardData';
 import { VueScene } from './VueScene';
 import { Cardset } from '../ui/Cardset/Cardset';
-// import { ColorsPoints } from '../ui/ColorsPoints';
+import { ColorsPoints } from '../ui/ColorsPoints';
 import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from '../ui/Card/Card';
 import { CommandWindow } from '../ui/CommandWindow';
 
@@ -45,7 +45,7 @@ export class TestContext extends VueScene
                 cost: 1
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
+        const cardsData: CardData[] = this.duplicate(cards, 20); // 40
         const dimensions = { 
             x: this.cameras.main.centerX / 2, 
             y: this.cameras.main.centerY - 75, 
@@ -85,16 +85,16 @@ export class TestContext extends VueScene
                 cardset.closeAllCardsDomino();
             },
         };
-        // const colorPoints: ColorsPoints = {
-        //     red: cardsData.filter(card => card.color === 'red').length,
-        //     blue: cardsData.filter(card => card.color === 'blue').length,
-        //     green: 0,
-        //     black: 0,
-        //     white: 0,
-        //     orange: 0
-        // };
-        cardset.selectModeOne(events);
-        // cardset.selectModeMany(events, colorPoints);
+        const colorPoints: ColorsPoints = {
+            red: cardsData.filter(card => card.color === 'red').length,
+            blue: cardsData.filter(card => card.color === 'blue').length,
+            green: 0,
+            black: 0,
+            white: 0,
+            orange: 0
+        };
+        // cardset.selectModeOne(events);
+        cardset.selectModeMany(events, colorPoints);
         // cardset.closeAllCards();
         // cardset.closeAllCardsDomino();
         // cardset.disablePowerCards();
