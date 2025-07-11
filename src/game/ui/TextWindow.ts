@@ -1,7 +1,10 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 
 type TextWindowConfig = {
-    onClose?: () => void
+    color?: string,
+    align?: 'center' | 'left' | 'right',
+    onClose?: () => void,
+    relativeParent?: TextWindow
 };
 
 export class TextWindow extends TextBox {
@@ -15,6 +18,8 @@ export class TextWindow extends TextBox {
         width: number, 
         height: number, 
         text: string,
+        color: string = '#ffffff',
+        align: 'center' | 'left' | 'right' = 'left',
         callback?: () => void
     ) {
         super(scene, {
@@ -25,10 +30,11 @@ export class TextWindow extends TextBox {
             background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 4, 0x222222),
             text: scene.add.text(0, 0, text, {
                 fontSize: '24px',
-                align: 'center',
+                align,
+                color,
                 wordWrap: { 
                     width: width - 20, 
-                }
+                },
             }),
             expandTextWidth: true,
             space: {
@@ -42,11 +48,15 @@ export class TextWindow extends TextBox {
     }
 
     static createCenteredWindow(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
+        const { onClose, relativeParent, color, align } = config;
         const x = scene.cameras.main.centerX;
-        const y = scene.cameras.main.centerY;
+        let y = scene.cameras.main.centerY;
+        if (relativeParent) {
+            y = relativeParent.y + relativeParent.height + 2;
+        }
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);
-        return new TextWindow(scene,  x, y, width, height, text, config.onClose);
+        return new TextWindow(scene,  x, y, width, height, text, color, align, onClose);
     }
 
     open() {

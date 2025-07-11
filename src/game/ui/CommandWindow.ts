@@ -83,7 +83,7 @@ export class CommandWindow extends Sizer {
 
     #createTitle(scene: Phaser.Scene, title: string) {
         const titleLabel = scene.rexUI.add.label({
-            text: scene.add.text(0, 0, title, {
+            text: scene.add.text(0, 0, ` ${title}`, {
                 fontSize: '24px',
                 color: '#ffffff'
             }),

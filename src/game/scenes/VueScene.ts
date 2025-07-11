@@ -1,12 +1,16 @@
 import { Scene } from 'phaser';
 import { EventBus } from '@game/EventBus';
+import { Challenging, Folder } from '../api/main';
 
 export type Api = {
-    getChallenges: (timeout: number) => void;
+    getChallenges: (timeout?: number) => Promise<Challenging>;
+    getFolders: (timeout?: number) => Promise<Folder[]>;
+    setFolder: (folderId: string, timeout?: number) => Promise<string>;
+    iGo: (timeout?: number) => Promise<boolean>;
 }
 
 export class VueScene extends Scene {
-    #api: any = null;
+    #api: Api;
 
     constructor (name: string) {
         super(name);
@@ -22,7 +26,14 @@ export class VueScene extends Scene {
         // console.log(`API set in scene: ${this.scene.key}`);
     }
 
-    randomInt(min: number, max: number): number {
-        return Math.floor(Math.random() * (max - min + 1)) + min;
+    getApi(): Api {
+        if (!this.#api) {
+            throw new Error('API not set in scene');
+        }
+        return this.#api;
     }
+
+    // randomInt(min: number, max: number): number {
+    //     return Math.floor(Math.random() * (max - min + 1)) + min;
+    // }
 }
