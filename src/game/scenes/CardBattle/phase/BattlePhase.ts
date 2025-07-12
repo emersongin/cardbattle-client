@@ -5,6 +5,7 @@ import { ChallengePhase } from "./ChallengePhase";
 
 export class BattlePhase implements Phase {
     #window: TextWindow;
+    
     constructor(readonly scene: CardBattleScene) {}
 
     changeToChallengePhase(): void {

@@ -5,6 +5,7 @@ import { LoadPhase } from "./LoadPhase";
 
 export class DrawPhase implements Phase {
     #window: TextWindow;
+    
     constructor(readonly scene: CardBattleScene) {}
 
     changeToChallengePhase(): void {

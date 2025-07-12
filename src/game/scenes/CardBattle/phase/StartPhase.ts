@@ -3,21 +3,21 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { DrawPhase } from "./DrawPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
-import { CardBattleApi } from "@/game/api/CardBattle";
+import { CardBattle } from "@/game/api/CardBattle";
 
 export class StartPhase implements Phase {
-    #api: CardBattleApi;
+    #cardBattle: CardBattle;
     #waitingWindow: TextWindow;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #commandWindow: CommandWindow;
 
     constructor(readonly scene: CardBattleScene) {
-        this.#api = scene.getApi();
+        this.#cardBattle = scene.getCardBattle();
     }
 
     async create(): Promise<void> {
-        const iGo = await this.#api.iGo();
+        const iGo = await this.#cardBattle.iGo();
         if (!iGo) {
             this.createWaitingWindow();
             this.openWaitingWindow();

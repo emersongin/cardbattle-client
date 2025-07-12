@@ -5,6 +5,7 @@ import { CompilePhase } from "./CompilePhase";
 
 export class SummonPhase implements Phase {
     #window: TextWindow;
+    
     constructor(readonly scene: CardBattleScene) {}
 
     changeToChallengePhase(): void {

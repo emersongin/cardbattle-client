@@ -7,18 +7,18 @@ import { CardsFolder, Challenging } from "@/game/types";
 import { CardBattle } from "@/game/api/CardBattle";
 
 export class ChallengePhase implements Phase {
-    #api: CardBattle;
+    #cardBattle: CardBattle;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #commandWindow: CommandWindow;
 
     constructor(readonly scene: CardBattleScene) {
-        this.#api = scene.getCardBattle();
+        this.#cardBattle = scene.getCardBattle();
     }
 
     async create(): Promise<void> {
-        const challenging: Challenging = await this.#api.getChallenging();
-        const folders: CardsFolder[] = await this.#api.getFolders();
+        const challenging: Challenging = await this.#cardBattle.getChallenging();
+        const folders: CardsFolder[] = await this.#cardBattle.getFolders();
         this.createChallengeWindows(challenging);
         this.createCommandWindow(folders);
         this.openChallengeWindows();
@@ -57,21 +57,21 @@ export class ChallengePhase implements Phase {
             {
                 description: `${folder1.name.padEnd(padValue)} ${Object.entries(folder1.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
-                    await this.#api.setFolder(folder1.id);
+                    await this.#cardBattle.setFolder(folder1.id);
                     this.changeToStartPhase();
                 }
             },
             {
                 description: `${folder2.name.padEnd(padValue)} ${Object.entries(folder2.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
-                    await this.#api.setFolder(folder2.id);
+                    await this.#cardBattle.setFolder(folder2.id);
                     this.changeToStartPhase();
                 }
             },
             {
                 description: `${folder3.name.padEnd(padValue)} ${Object.entries(folder3.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
-                    await this.#api.setFolder(folder3.id);
+                    await this.#cardBattle.setFolder(folder3.id);
                     this.changeToStartPhase();
                 }
             },
