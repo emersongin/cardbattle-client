@@ -3,10 +3,10 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { DrawPhase } from "./DrawPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
-import { Api } from "../../VueScene";
+import { CardBattleApi } from "@/game/api/CardBattleApi";
 
 export class StartPhase implements Phase {
-    #api: Api;
+    #api: CardBattleApi;
     #waitingWindow: TextWindow;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;

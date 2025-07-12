@@ -1,6 +1,6 @@
-import { Card } from "./Card";
+import { Card } from "../Card";
 import { CardState, StaticState } from "./CardState";
-import { Move } from "./Move";
+import { Move } from "../types/Move";
 
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];

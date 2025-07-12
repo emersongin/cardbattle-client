@@ -4,7 +4,7 @@ import { ref } from 'vue';
 // import type { MainMenu } from './game/scenes/MainMenu';
 import PhaserGame from './PhaserGame.vue';
 import { VueScene } from '@scenes/VueScene';
-import api from '@api/main';
+import CardBattleApiSocketIO from './game/api/CardBattleApiSocketIo';
 
 // The sprite can only be moved in the MainMenu Scene
 // const canMoveSprite = ref();
@@ -15,6 +15,7 @@ const phaserRef = ref();
 
 // Event emitted from the PhaserGame component
 const currentScene = (scene: VueScene) => {
+    const api = new CardBattleApiSocketIO();
     scene.setApi(api);
 }
 

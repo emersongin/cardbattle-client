@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeAll, vi } from "vitest";
 import Phaser from "@mocks/phaser";
-import { CardData } from "@ui/CardData";
+import { CardData } from "@/game/ui/types/CardData";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from "@ui/Card/Card";
-import { ColorsPoints } from "@/game/ui/ColorsPoints";
+import { ColorsPoints } from "@/game/types/ColorsPoints";
 
 const cards = [
     {

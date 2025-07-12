@@ -1,5 +1,5 @@
 import { Cardset } from "./Cardset";
-import { CardsetState } from "./CardsetState";
+import { CardsetState } from "./state/CardsetState";
 
 export default class StaticState implements CardsetState {
     constructor(readonly cardset: Cardset) {}

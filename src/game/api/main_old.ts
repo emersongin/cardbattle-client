@@ -1,20 +1,7 @@
-import { Api } from "../scenes/VueScene";
-import { ColorsPoints } from "../ui/ColorsPoints";
+
+import { CardsFolder } from "../types/CardsFolder";
+import { Challenging } from "../types/Challenging";
 // import axios from 'axios';
-
-export type Challenging = {
-    id: string;
-    name: string;
-    description: string;
-    completed: boolean;
-    reward: number;
-};
-
-export type Folder = {
-    id: string;
-    name: string;
-    colors: ColorsPoints;
-};
 
 const getChallenges = (timeout: number = 1000): Promise<Challenging> => {
     return new Promise((resolve) => {
@@ -30,7 +17,7 @@ const getChallenges = (timeout: number = 1000): Promise<Challenging> => {
     });
 };
 
-const getFolders = (timeout: number = 1000): Promise<Folder[]> => {
+const getFolders = (timeout: number = 1000): Promise<CardsFolder[]> => {
     return new Promise((resolve) => {
         setTimeout(() => {
             resolve([
@@ -97,4 +84,4 @@ export default {
     getFolders,
     setFolder,
     iGo,
-} as Api;
+};

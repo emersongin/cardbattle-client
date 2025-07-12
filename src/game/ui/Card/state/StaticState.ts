@@ -1,4 +1,4 @@
-import { Card } from "./Card";
+import { Card } from "../Card";
 import { CardState } from "./CardState";
 
 export default class StaticState implements CardState {

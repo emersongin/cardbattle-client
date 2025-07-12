@@ -1,8 +1,8 @@
-import { Card } from "../Card/Card";
-import { Cardset } from "./Cardset";
-import { CardsetEvents } from "./CardsetEvents";
+import { Card } from "../../Card/Card";
+import { Cardset } from "../Cardset";
+import { CardsetEvents } from "../types/CardsetEvents";
 import { CardsetState } from "./CardsetState";
-import { ColorsPoints } from "../ColorsPoints";
+import { ColorsPoints } from "../../../types/ColorsPoints";
 import StaticState from "./StaticState";
 
 export default class SelectState implements CardsetState {

@@ -1,7 +1,7 @@
-import { UpdatePoints } from "./UpdatePoints";
+import { UpdatePoints } from "../types/UpdatePoints";
 import { CardState, StaticState } from "./CardState";
-import { Card } from "./Card";
-import { CardPoints } from "./CardPoints";
+import { Card } from "../Card";
+import { CardPoints } from "../types/CardPoints";
 
 export default class UpdatingState implements CardState {
     #updates: UpdatePoints[][] = [];

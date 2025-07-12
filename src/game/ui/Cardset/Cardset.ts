@@ -1,9 +1,9 @@
 import { Card } from "@ui/Card/Card";
-import { Dimensions } from "./Dimensions";
-import { CardData } from "../CardData";
-import { CardsetEvents } from "./CardsetEvents";
-import { CardsetState, StaticState, SelectState } from "./CardsetState";
-import { ColorsPoints } from "../ColorsPoints";
+import { Dimensions } from "./types/Dimensions";
+import { CardData } from "../types/CardData";
+import { CardsetEvents } from "./types/CardsetEvents";
+import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
+import { ColorsPoints } from "../../types/ColorsPoints";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;

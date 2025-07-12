@@ -3,11 +3,11 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { StartPhase } from "./StartPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
-import { Api } from "../../VueScene";
-import { Challenging, Folder } from "@/game/api/main";
+import { CardsFolder, Challenging } from "@/game/types";
+import { CardBattleApi } from "@/game/api/CardBattleApi";
 
 export class ChallengePhase implements Phase {
-    #api: Api;
+    #api: CardBattleApi;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #commandWindow: CommandWindow;
@@ -18,7 +18,7 @@ export class ChallengePhase implements Phase {
 
     async create(): Promise<void> {
         const challenging: Challenging = await this.#api.getChallenges();
-        const folders: Folder[] = await this.#api.getFolders();
+        const folders: CardsFolder[] = await this.#api.getFolders();
         this.createChallengeWindows(challenging);
         this.createCommandWindow(folders);
         this.openChallengeWindows();
@@ -50,7 +50,7 @@ export class ChallengePhase implements Phase {
         });
     }
 
-    private createCommandWindow(folders: Folder[]): void {
+    private createCommandWindow(folders: CardsFolder[]): void {
         const [folder1, folder2, folder3] = folders;
         const padValue = 16;
         this.#commandWindow = CommandWindow.createBottom(this.scene, 'Choose your folder', [
