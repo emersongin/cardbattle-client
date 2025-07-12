@@ -5,6 +5,7 @@ import { EventBus } from '@game/EventBus';
 
 export class CardBattleScene extends VueScene {
     private phase: Phase;
+    
     constructor () {
         super('CardBattleScene');
     }

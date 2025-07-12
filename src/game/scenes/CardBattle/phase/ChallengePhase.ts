@@ -4,20 +4,20 @@ import { TextWindow } from '@/game/ui/TextWindow';
 import { StartPhase } from "./StartPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
 import { CardsFolder, Challenging } from "@/game/types";
-import { CardBattleApi } from "@/game/api/CardBattleApi";
+import { CardBattle } from "@/game/api/CardBattle";
 
 export class ChallengePhase implements Phase {
-    #api: CardBattleApi;
+    #api: CardBattle;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #commandWindow: CommandWindow;
 
     constructor(readonly scene: CardBattleScene) {
-        this.#api = scene.getApi();
+        this.#api = scene.getCardBattle();
     }
 
     async create(): Promise<void> {
-        const challenging: Challenging = await this.#api.getChallenges();
+        const challenging: Challenging = await this.#api.getChallenging();
         const folders: CardsFolder[] = await this.#api.getFolders();
         this.createChallengeWindows(challenging);
         this.createCommandWindow(folders);

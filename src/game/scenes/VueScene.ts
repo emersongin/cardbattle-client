@@ -1,9 +1,9 @@
 import { Scene } from 'phaser';
 import { EventBus } from '@game/EventBus';
-import { CardBattleApi } from '../api/CardBattleApi';
+import { CardBattle } from '../api/CardBattle';
 
 export class VueScene extends Scene {
-    #api: CardBattleApi;
+    #api: CardBattle;
 
     constructor (name: string) {
         super(name);
@@ -13,20 +13,16 @@ export class VueScene extends Scene {
         EventBus.emit('current-scene-ready', this);
     }
 
-    async setApi(api: CardBattleApi): Promise<void> {
+    async setCardBattle(api: CardBattle): Promise<void> {
         this.#api = api;
         // console.log(await this.#api.getChallenges(this.randomInt(1000, 3000)));
         // console.log(`API set in scene: ${this.scene.key}`);
     }
 
-    getApi(): CardBattleApi {
+    getCardBattle(): CardBattle {
         if (!this.#api) {
             throw new Error('API not set in scene');
         }
         return this.#api;
     }
-
-    // randomInt(min: number, max: number): number {
-    //     return Math.floor(Math.random() * (max - min + 1)) + min;
-    // }
 }

@@ -1,8 +1,8 @@
 import { CardsFolder, Challenging } from '@game/types';
-import { CardBattleApi } from './CardBattleApi';
+import { CardBattle } from './CardBattle';
 
-export default class CardBattleApiSocketIO implements CardBattleApi {
-    getChallenges(timeout?: number): Promise<Challenging> {
+export default class CardBattleSocketIo implements CardBattle {
+    getChallenging(timeout?: number): Promise<Challenging> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve({
@@ -35,6 +35,18 @@ export default class CardBattleApiSocketIO implements CardBattleApi {
                     {
                         id: 'folder-2',
                         name: 'Folder 2',
+                        colors: {
+                            red: 50,
+                            green: 30,
+                            blue: 20,
+                            black: 10,
+                            white: 5,
+                            orange: 15
+                        },
+                    },
+                    {
+                        id: 'folder-3',
+                        name: 'Folder 3',
                         colors: {
                             red: 50,
                             green: 30,
