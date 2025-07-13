@@ -1,4 +1,4 @@
-export type Challenging = {
+export type Opponent = {
     id: string;
     name: string;
     description: string;

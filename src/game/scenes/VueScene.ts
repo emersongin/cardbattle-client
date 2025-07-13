@@ -15,8 +15,6 @@ export class VueScene extends Scene {
 
     async setCardBattle(cardBattle: CardBattle): Promise<void> {
         this.#cardBattle = cardBattle;
-        // console.log(await this.#cardBattle.getChallenges(this.randomInt(1000, 3000)));
-        // console.log(`API set in scene: ${this.scene.key}`);
     }
 
     getCardBattle(): CardBattle {

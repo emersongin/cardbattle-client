@@ -3,7 +3,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { StartPhase } from "./StartPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
-import { CardsFolder, Challenging } from "@/game/types";
+import { CardsFolder, Opponent } from "@/game/types";
 import { CardBattle } from "@/game/api/CardBattle";
 
 export class ChallengePhase implements Phase {
@@ -17,16 +17,16 @@ export class ChallengePhase implements Phase {
     }
 
     async create(): Promise<void> {
-        const challenging: Challenging = await this.#cardBattle.getChallenging();
+        const opponent: Opponent = await this.#cardBattle.getOpponentData();
         const folders: CardsFolder[] = await this.#cardBattle.getFolders();
-        this.createChallengeWindows(challenging);
+        this.createChallengeWindows(opponent);
         this.createCommandWindow(folders);
         this.openChallengeWindows();
     }
 
-    private createChallengeWindows(challenging: Challenging): void {
+    private createChallengeWindows(opponent: Opponent): void {
         this.createTitleWindow();
-        const { name, description } = challenging;
+        const { name, description } = opponent;
         this.createTextWindow(name, description);
     }
 

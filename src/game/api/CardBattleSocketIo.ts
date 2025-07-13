@@ -1,4 +1,4 @@
-import { CardsFolder, Challenging } from '@game/types';
+import { CardsFolder, Opponent } from '@game/types';
 import { CardBattle } from './CardBattle';
 import { io, Socket } from "socket.io-client";
 
@@ -9,13 +9,13 @@ export default class CardBattleSocketIo implements CardBattle {
         this.#socket = io('http://localhost:3000');
     }
 
-    getChallenging(timeout?: number): Promise<Challenging> {
+    getOpponentData(timeout?: number): Promise<Opponent> {
         return new Promise((resolve, reject) => {
-            this.#socket.emit('getChallenging', timeout, (response: Challenging) => {
+            this.#socket.emit('getOpponentData', timeout, (response: Opponent) => {
                 if (response) {
                     resolve(response);
                 } else {
-                    reject(new Error('Failed to get challenging'));
+                    reject(new Error('Failed to get opponent data'));
                 }
             });
         });
@@ -55,5 +55,19 @@ export default class CardBattleSocketIo implements CardBattle {
                 }
             });
         });
+    }
+
+    listenOpponentChoice(callback: (choice: string) => void): Promise<void> {
+        return new Promise((resolve) => {
+            this.#socket.on('setOpponentChoice', (choice: string) => {
+                callback(choice);
+            });
+            resolve();
+        });
+    }
+
+    setOpponentChoice(choice: string): void {
+        this.#socket.emit('setOpponentChoice', choice);
+        console.log(`Opponent choice set to: ${choice}`);
     }
 }

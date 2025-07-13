@@ -1,22 +1,22 @@
-import { CardsFolder, Challenging } from '@game/types';
+import { CardsFolder, Opponent } from '@game/types';
 import { CardBattle } from './CardBattle';
 
 export default class CardBattleSocketIo implements CardBattle {
-    getChallenging(timeout?: number): Promise<Challenging> {
+    getOpponentData(): Promise<Opponent> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve({
-                    id: 'challenge-1',
-                    name: 'First Challenge',
-                    description: 'Complete the first challenge to proceed.',
+                    id: 'opponent-1',
+                    name: 'First Opponent',
+                    description: 'Complete the first opponent to proceed.',
                     completed: false,
                     reward: 100,
                 });
-            }, timeout);
+            }, 100);
         });
     }
 
-    getFolders(timeout?: number): Promise<CardsFolder[]> {
+    getFolders(): Promise<CardsFolder[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve([
@@ -57,23 +57,37 @@ export default class CardBattleSocketIo implements CardBattle {
                         },
                     }
                 ]);
-            }, timeout);
+            }, 1000);
         });
     }
 
-    setFolder(folderId: string, timeout?: number): Promise<string> {
+    setFolder(folderId: string): Promise<string> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(folderId);
-            }, timeout);
+            }, 1000);
         });
     }
 
-    iGo(timeout?: number): Promise<boolean> {
+    iGo(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(Math.random() < 0.5);
-            }, timeout);
+            }, 1000);
         });
+    }
+
+    listenOpponentChoice(callback: (choice: string) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const choice = Math.random() < 0.5 ? 'White' : 'Black';
+                callback(choice);
+                resolve();
+            }, 1000);
+        });
+    }
+
+    setOpponentChoice(choice: string): void {
+        console.log(`Opponent choice set to: ${choice}`);
     }
 }

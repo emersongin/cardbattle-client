@@ -21,6 +21,10 @@ export class StartPhase implements Phase {
         if (!iGo) {
             this.createWaitingWindow();
             this.openWaitingWindow();
+            await this.#cardBattle.listenOpponentChoice((choice) => {
+                console.log("Received opponent choice:", choice);
+                // this.#waitingWindow.close();
+            });
             return;
         }
         this.createChallengeWindows();
@@ -64,12 +68,14 @@ export class StartPhase implements Phase {
             {
                 description: 'White',
                 onSelect: async () => {
+                    this.#cardBattle.setOpponentChoice('white');
                     this.changeToDrawPhase();
                 }
             },
             {
                 description: 'Black',
                 onSelect: async () => {
+                    this.#cardBattle.setOpponentChoice('black');
                     this.changeToDrawPhase();
                 }
             },
