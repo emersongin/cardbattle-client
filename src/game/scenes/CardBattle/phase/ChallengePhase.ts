@@ -34,6 +34,9 @@ export class ChallengePhase implements Phase {
         this.#titleWindow = TextWindow.createCenteredWindow(this.scene, 'CardBattle Challenge!', {
             align: 'center',
             color: '#ff3c3c',
+            onStartClose: () => {
+                this.#textWindow.close();
+            },
             onClose: () => {
                 this.openCommandWindow();
             }

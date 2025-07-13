@@ -3,13 +3,15 @@ import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 type TextWindowConfig = {
     color?: string,
     align?: 'center' | 'left' | 'right',
+    onStartClose?: () => void,
     onClose?: () => void,
     relativeParent?: TextWindow
 };
 
 export class TextWindow extends TextBox {
     #tween: Phaser.Tweens.Tween | null = null;
-    #onCloseCallback?: () => void;
+    #onStartClose?: () => void;
+    #onClose?: () => void;
 
     private constructor(
         readonly scene: Phaser.Scene, 
@@ -20,7 +22,8 @@ export class TextWindow extends TextBox {
         text: string,
         color: string = '#ffffff',
         align: 'center' | 'left' | 'right' = 'left',
-        callback?: () => void
+        startClose?: () => void,
+        onClose?: () => void
     ) {
         super(scene, {
             x,
@@ -43,12 +46,23 @@ export class TextWindow extends TextBox {
         });
         this.layout();
         this.setScale(1, 0);
-        this.#onCloseCallback = callback;
+        this.setStartClose(startClose);
+        this.setOnClose(onClose);
         scene.add.existing(this);
     }
 
+    setStartClose(onStartClose?: () => void): void {
+        if (typeof onStartClose !== 'function') return;
+        this.#onStartClose = onStartClose;
+    }
+
+    setOnClose(onClose?: () => void): void {
+        if (typeof onClose !== 'function') return;
+        this.#onClose = onClose;
+    }
+
     static createCenteredWindow(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
-        const { onClose, relativeParent, color, align } = config;
+        const { onStartClose, onClose, relativeParent, color, align } = config;
         const x = scene.cameras.main.centerX;
         let y = scene.cameras.main.centerY;
         if (relativeParent) {
@@ -56,7 +70,7 @@ export class TextWindow extends TextBox {
         }
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);
-        return new TextWindow(scene,  x, y, width, height, text, color, align, onClose);
+        return new TextWindow(scene,  x, y, width, height, text, color, align, onStartClose, onClose);
     }
 
     open() {
@@ -67,7 +81,7 @@ export class TextWindow extends TextBox {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.#addOnCompletedListener();
+                if (this.#onClose) this.#addOnCompletedListener();
             }
         });
     }
@@ -80,7 +94,7 @@ export class TextWindow extends TextBox {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                if (this.#onCloseCallback) this.#onCloseCallback();
+                if (this.#onClose) this.#onClose();
             }
         });
     }
@@ -100,6 +114,7 @@ export class TextWindow extends TextBox {
             }
             keyboard.removeAllListeners();
             this.close();
+            if (this.#onStartClose) this.#onStartClose();
         };
         keyboard.once('keydown-ENTER', onKeyDown, this);
     }

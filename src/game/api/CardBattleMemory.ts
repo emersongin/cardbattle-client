@@ -87,7 +87,12 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    setOpponentChoice(choice: string): void {
-        console.log(`Opponent choice set to: ${choice}`);
+    setOpponentChoice(choice: string): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log(`Opponent choice set to: ${choice}`);
+                resolve();
+            }, 1000);
+        });
     }
 }

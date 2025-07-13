@@ -4,6 +4,7 @@ import { TextWindow } from '@/game/ui/TextWindow';
 import { DrawPhase } from "./DrawPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
 import { CardBattle } from "@/game/api/CardBattle";
+import { COLORS } from "@/game/constants/Colors";
 
 export class StartPhase implements Phase {
     #cardBattle: CardBattle;
@@ -11,6 +12,7 @@ export class StartPhase implements Phase {
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #commandWindow: CommandWindow;
+    #resultWindow: TextWindow;
 
     constructor(readonly scene: CardBattleScene) {
         this.#cardBattle = scene.getCardBattle();
@@ -20,15 +22,19 @@ export class StartPhase implements Phase {
         const iGo = await this.#cardBattle.iGo();
         if (!iGo) {
             this.createWaitingWindow();
+            this.createResultWindow();
             this.openWaitingWindow();
             await this.#cardBattle.listenOpponentChoice((choice) => {
-                console.log("Received opponent choice:", choice);
-                // this.#waitingWindow.close();
+                const onClose = () => {
+                    this.openResultWindow(choice);
+                }
+                this.closeWaitingWindow(onClose);
             });
             return;
         }
         this.createChallengeWindows();
         this.createCommandWindow();
+        this.createResultWindow();
         this.openChallengeWindows();
     }
 
@@ -38,8 +44,13 @@ export class StartPhase implements Phase {
         });
     }
 
-    openWaitingWindow(): void {
+    private openWaitingWindow(): void {
         this.#waitingWindow.open();
+    }
+
+    private closeWaitingWindow(onClose: () => void): void {
+        this.#waitingWindow.setOnClose(onClose);
+        this.#waitingWindow.close();
     }
 
     private createChallengeWindows(): void {
@@ -51,6 +62,9 @@ export class StartPhase implements Phase {
         this.#titleWindow = TextWindow.createCenteredWindow(this.scene, 'Start Phase', {
             align: 'center',
             color: '#ff3c3c',
+            onStartClose: () => {
+                this.#textWindow.close();
+            },
             onClose: () => {
                 this.openCommandWindow();
             }
@@ -66,22 +80,31 @@ export class StartPhase implements Phase {
     private createCommandWindow(): void {
         const options = [
             {
-                description: 'White',
+                description: COLORS.WHITE,
                 onSelect: async () => {
-                    this.#cardBattle.setOpponentChoice('white');
-                    this.changeToDrawPhase();
+                    await this.#cardBattle.setOpponentChoice(COLORS.WHITE);
+                    this.openResultWindow(COLORS.WHITE);
                 }
             },
             {
-                description: 'Black',
+                description: COLORS.BLACK,
                 onSelect: async () => {
-                    this.#cardBattle.setOpponentChoice('black');
-                    this.changeToDrawPhase();
+                    await this.#cardBattle.setOpponentChoice(COLORS.BLACK);
+                    this.openResultWindow(COLORS.BLACK);
                 }
             },
         ];
         options.sort(() => Math.random() - 0.5);
         this.#commandWindow = CommandWindow.createBottom(this.scene, 'Select a card', options);
+    }
+
+    private createResultWindow(): void {
+        this.#resultWindow = TextWindow.createCenteredWindow(this.scene, '', {
+            align: 'center',
+            onClose: () => {
+                this.changeToDrawPhase();
+            }
+        });
     }
 
     private openChallengeWindows(): void {
@@ -99,6 +122,11 @@ export class StartPhase implements Phase {
 
     openCommandWindow(): void {
         this.#commandWindow.open();
+    }
+
+    openResultWindow(choice: string): void {
+        this.#resultWindow.setText(choice === COLORS.WHITE ? 'You go first!' : 'Opponent goes first!');
+        this.#resultWindow.open();
     }
 
     update(): void {

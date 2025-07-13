@@ -6,5 +6,5 @@ export interface CardBattle {
     setFolder: (folderId: string, timeout?: number) => Promise<string>;
     iGo: (timeout?: number) => Promise<boolean>;
     listenOpponentChoice: (callback: (choice: string) => void) => Promise<void>;
-    setOpponentChoice: (choice: string) => void;
+    setOpponentChoice: (choice: string) => Promise<void>;
 }
