@@ -42,19 +42,19 @@ export class TestContext extends VueScene
         const updatePoints = {
             cardPoints: {
                 ap: 999,
-                hp: 0
+                hp: 999
             },
             colorsPoints: {
-                red: 0,
-                blue: 0,
-                green: 0,
-                black: 0,
-                white: 0,
+                red: 99,
+                blue: 99,
+                green: 99,
+                black: 99,
+                white: 99,
                 orange: 0
             },
-            numberOfCardsInHand: 0,
-            numberOfCardsInDeck: 0,
-            numberOfWins: 0
+            numberOfCardsInHand: 99,
+            numberOfCardsInDeck: 99,
+            numberOfWins: 9
         };
         boardWindow.updating(updatePoints);
         // const cards = [
