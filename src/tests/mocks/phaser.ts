@@ -46,6 +46,16 @@ class MockTween {
     getValue = vi.fn().mockReturnValue(0);
 }
 
+export type KeyboardPluginMock = {
+    list: any[];
+    addKey: (keyCode: string) => void;
+    createCursorKeys: () => any;
+    on: (keyCode: string, fn: any) => void;
+    once: (keyCode: string, fn: any) => void;
+    emit: (eventName: string, ...args: any[]) => void;
+    removeAllListeners: () => void;
+};
+
 const PhaserMock = {
     GameObjects: {
         Container: MockContainer,
@@ -86,15 +96,7 @@ const PhaserMock = {
             queueDepthSort: vi.fn(),
         };
         input: {
-            keyboard: {
-                list: any[];
-                addKey: (keyCode: string) => void;
-                createCursorKeys: () => any;
-                on: (keyCode: string, fn: any) => void;
-                once: (keyCode: string, fn: any) => void;
-                emit: (eventName: string, ...args: any[]) => void;
-                removeAllListeners: () => void;
-            }
+            keyboard: KeyboardPluginMock
         } = {
             keyboard: {
                 list: [],
@@ -106,7 +108,7 @@ const PhaserMock = {
                 once: (keyCode: string, fn: any) => {
                     this.input.keyboard.list.push({ keyCode, fn, once: true });
                 },
-                emit: ( eventName: string, times: number = 1) => {
+                emit: (eventName: string, times: number = 1) => {
                     this.input.keyboard.list.forEach((key: any) => {
                         if (key.keyCode === eventName) {
                             for (let i = 0; i < times; i++) {
@@ -118,7 +120,10 @@ const PhaserMock = {
                         }
                     });
                 },
-                removeAllListeners: vi.fn(),
+                removeAllListeners: () => {
+                    this.input.keyboard.list = [];
+                    console.log("All keyboard listeners removed.");
+                },
             },
         };
     },

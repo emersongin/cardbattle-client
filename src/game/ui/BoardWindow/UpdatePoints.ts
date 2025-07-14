@@ -1,7 +1,7 @@
-import { CardPoints } from "./CardPoints";
+import { BoardWindowConfig } from "./BoardWindow";
 
 export type UpdatePoints = {
-    target: CardPoints;
+    target: BoardWindowConfig;
     hold?: number;
     from?: number;
     to?: number;

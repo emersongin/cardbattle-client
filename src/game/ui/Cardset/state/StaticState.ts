@@ -1,11 +1,15 @@
-import { Cardset } from "./Cardset";
-import { CardsetState } from "./state/CardsetState";
+import { Cardset } from "../Cardset";
+import { CardsetState, SelectState } from "./CardsetState";
 
 export default class StaticState implements CardsetState {
     constructor(readonly cardset: Cardset) {}
 
+    create(): void {
+        throw new Error("StaticState: create method should not be called.");
+    }
+
     selectMode() {
-        throw new Error('StaticState: selectMode called, this should not happen');
+        this.cardset.changeState(new SelectState(this.cardset));
     }
 
     staticMode() {

@@ -6,7 +6,7 @@ import { VueScene } from './VueScene';
 // import { CardColors, CardType } from '../ui/Card/Card';
 import { CardPoints } from '../ui/Card/types/CardPoints';
 import { ColorsPoints } from '../types';
-import BoardWindow from '../ui/BoardWindow';
+import BoardWindow from '../ui/BoardWindow/BoardWindow';
 // import { CommandWindow } from '../ui/CommandWindow';
 
 export class TestContext extends VueScene
@@ -20,26 +20,43 @@ export class TestContext extends VueScene
     }
 
     create () {
-        const cardPoints: CardPoints = {
-            ap: 0,
-            hp: 0
-        };
-        const colorsPoints: ColorsPoints = {
-            red: 0,
-            blue: 0,
-            green: 0,
-            black: 0,
-            white: 0,
-            orange: 0
-        };
-        const boardWindow = BoardWindow.createCentered(this, {
-            cardPoints,
-            colorsPoints,
+        const startPoints = {
+            cardPoints: {
+                ap: 0,
+                hp: 0
+            },
+            colorsPoints: {
+                red: 0,
+                blue: 0,
+                green: 0,
+                black: 0,
+                white: 0,
+                orange: 0
+            },
             numberOfCardsInHand: 0,
             numberOfCardsInDeck: 0,
             numberOfWins: 0
-        });
+        };
+        const boardWindow = BoardWindow.createCentered(this, startPoints);
         boardWindow.open();
+        const updatePoints = {
+            cardPoints: {
+                ap: 999,
+                hp: 0
+            },
+            colorsPoints: {
+                red: 0,
+                blue: 0,
+                green: 0,
+                black: 0,
+                white: 0,
+                orange: 0
+            },
+            numberOfCardsInHand: 0,
+            numberOfCardsInDeck: 0,
+            numberOfWins: 0
+        };
+        boardWindow.updateWindow(updatePoints);
         // const cards = [
         //     {
         //         UUID: '123e4567-e89b-12d3-a456-426614174000',

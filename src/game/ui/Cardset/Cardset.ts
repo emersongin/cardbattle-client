@@ -176,8 +176,12 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     #selectMode(events: CardsetEvents, colorPoints?: ColorsPoints | null, selectNumber: number = 0): void {
-        this.changeState(new SelectState(this));
-        if ((this.#status instanceof SelectState) === false) return;
+        if (!this.#status) return;
+        if (this.#status instanceof SelectState) return;
+        this.#status.selectMode(events);
+        if (this.#status instanceof StaticState) {
+            throw new Error('Cardset: selectMode called on StaticState, this should not happen');
+        }
         this.#status.create(events, colorPoints, selectNumber);
     }
 

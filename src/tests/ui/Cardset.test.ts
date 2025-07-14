@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, vi } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import Phaser from "@mocks/phaser";
 import { CardData } from "@/game/ui/types/CardData";
 import { Cardset } from "@ui/Cardset/Cardset";
@@ -80,8 +80,16 @@ describe("MockScene", () => {
             active: true,
             visible: true,
         });
+    });
+
+    beforeEach(() => {
         const cardsData: CardData[] = duplicate(cards, 3);
         cardset = new Cardset(scene, dimensions, cardsData);
+    });
+
+    afterEach(() => {
+        const keyboard = getKeyboard(scene);
+        keyboard.removeAllListeners();
     });
 
     it("Deve criar um conjunto de cartões estático.", () => {

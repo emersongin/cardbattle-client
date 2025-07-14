@@ -67,11 +67,13 @@ export class Card {
     }
 
     move(moves: Move[], duration: number | null = null): void {
+        if (!this.#status) return;
         if (this.#status instanceof MovingState) {
             this.#status.addTweens(moves, duration);
             return;
         };
-        this.changeState(new MovingState(this), moves);
+        if (!(this.#status instanceof StaticState)) return
+        this.#status.moving(moves);
     }
 
     moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
@@ -142,7 +144,8 @@ export class Card {
             this.#status.addTweens(ap, hp, 2000);
             return;
         }
-        this.changeState(new UpdatingState(this), ap, hp, 1000);
+        if (!(this.#status instanceof StaticState)) return;
+        this.#status.updating(ap, hp);
     }
 
     // Disable methods
