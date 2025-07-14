@@ -41,7 +41,7 @@ export class BattlePhase implements Phase {
     }
 
     create(): void {
-        this.#window = TextWindow.createCenteredWindow(this.scene, 'Battle Phase started!', {
+        this.#window = TextWindow.createCentered(this.scene, 'Battle Phase started!', {
             onClose: () => {
                 this.changeToChallengePhase();
             }

@@ -61,7 +61,7 @@ export class LoadPhase extends PowerSlots implements Phase {
     }
 
     private createTextWindow(title: string): void {
-        this.#textWindow = TextWindow.createCenteredWindow(this.scene, title, {
+        this.#textWindow = TextWindow.createCentered(this.scene, title, {
             onClose: () => {
                 this.openCommandWindow();
             }

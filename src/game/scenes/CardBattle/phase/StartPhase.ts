@@ -4,7 +4,7 @@ import { TextWindow } from '@/game/ui/TextWindow';
 import { DrawPhase } from "./DrawPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
 import { CardBattle } from "@/game/api/CardBattle";
-import { COLORS } from "@/game/constants/Colors";
+import { WHITE, BLACK } from "@/game/constants/Colors";
 
 export class StartPhase implements Phase {
     #cardBattle: CardBattle;
@@ -21,85 +21,88 @@ export class StartPhase implements Phase {
     async create(): Promise<void> {
         const iGo = await this.#cardBattle.iGo();
         if (!iGo) {
-            this.createWaitingWindow();
-            this.createResultWindow();
-            this.openWaitingWindow();
+            this.#createWaitingWindow();
+            this.#createResultWindow();
+            this.#openWaitingWindow();
             await this.#cardBattle.listenOpponentChoice((choice) => {
                 const onClose = () => {
-                    this.openResultWindow(choice);
+                    this.#openResultWindow(choice);
                 }
-                this.closeWaitingWindow(onClose);
+                this.#closeWaitingWindow(onClose);
             });
             return;
         }
-        this.createChallengeWindows();
-        this.createCommandWindow();
-        this.createResultWindow();
-        this.openChallengeWindows();
+        this.#createWindows();
+        this.#createCommandWindow();
+        this.#createResultWindow();
+        this.#openWindows();
     }
 
-    private createWaitingWindow(): void {
-        this.#waitingWindow = TextWindow.createCenteredWindow(this.scene, 'Waiting for opponent...', {
+    #createWaitingWindow(): void {
+        this.#waitingWindow = TextWindow.createCentered(this.scene, 'Waiting for opponent...', {
             align: 'center',
         });
     }
 
-    private openWaitingWindow(): void {
+    #openWaitingWindow(): void {
         this.#waitingWindow.open();
     }
 
-    private closeWaitingWindow(onClose: () => void): void {
+    #closeWaitingWindow(onClose: () => void): void {
         this.#waitingWindow.setOnClose(onClose);
         this.#waitingWindow.close();
     }
 
-    private createChallengeWindows(): void {
-        this.createTitleWindow();
-        this.createTextWindow();
+    #createWindows(): void {
+        this.#createTitleWindow();
+        this.#createTextWindow();
     }
 
-    private createTitleWindow(): void {
-        this.#titleWindow = TextWindow.createCenteredWindow(this.scene, 'Start Phase', {
+    #createTitleWindow(): void {
+        this.#titleWindow = TextWindow.createCentered(this.scene, 'Start Phase', {
             align: 'center',
-            color: '#ff3c3c',
             onStartClose: () => {
-                this.#textWindow.close();
+                this.#closeTextWindow();
             },
             onClose: () => {
-                this.openCommandWindow();
+                this.#openCommandWindow();
             }
         });
     }
 
-    private createTextWindow(): void {
-        this.#textWindow = TextWindow.createCenteredWindow(this.scene, 'Draw white card to go first.', {
+    #closeTextWindow(): void {
+        this.#textWindow.close();
+    }
+
+    #createTextWindow(): void {
+        this.#textWindow = TextWindow.createCentered(this.scene, 'Draw white card to go first.', {
             relativeParent: this.#titleWindow
         });
     }
 
-    private createCommandWindow(): void {
+    #createCommandWindow(): void {
         const options = [
             {
-                description: COLORS.WHITE,
+                description: WHITE,
                 onSelect: async () => {
-                    await this.#cardBattle.setOpponentChoice(COLORS.WHITE);
-                    this.openResultWindow(COLORS.WHITE);
+                    await this.#cardBattle.setOpponentChoice(WHITE);
+                    this.#openResultWindow(WHITE);
                 }
             },
             {
-                description: COLORS.BLACK,
+                description: BLACK,
                 onSelect: async () => {
-                    await this.#cardBattle.setOpponentChoice(COLORS.BLACK);
-                    this.openResultWindow(COLORS.BLACK);
+                    await this.#cardBattle.setOpponentChoice(BLACK);
+                    this.#openResultWindow(BLACK);
                 }
             },
         ];
         options.sort(() => Math.random() - 0.5);
-        this.#commandWindow = CommandWindow.createBottom(this.scene, 'Select a card', options);
+        this.#commandWindow = CommandWindow.createCentered(this.scene, 'Select a card', options);
     }
 
-    private createResultWindow(): void {
-        this.#resultWindow = TextWindow.createCenteredWindow(this.scene, '', {
+    #createResultWindow(): void {
+        this.#resultWindow = TextWindow.createCentered(this.scene, '', {
             align: 'center',
             onClose: () => {
                 this.changeToDrawPhase();
@@ -107,25 +110,25 @@ export class StartPhase implements Phase {
         });
     }
 
-    private openChallengeWindows(): void {
-        this.openTitleWindow();
-        this.openTextWindow();
+    #openWindows(): void {
+        this.#openTitleWindow();
+        this.#openTextWindow();
     }
 
-    openTitleWindow(): void {
+    #openTitleWindow(): void {
         this.#titleWindow.open();
     }
 
-    openTextWindow(): void {
+    #openTextWindow(): void {
         this.#textWindow.open();
     }
 
-    openCommandWindow(): void {
+    #openCommandWindow(): void {
         this.#commandWindow.open();
     }
 
-    openResultWindow(choice: string): void {
-        this.#resultWindow.setText(choice === COLORS.WHITE ? 'You go first!' : 'Opponent goes first!');
+    #openResultWindow(choice: string): void {
+        this.#resultWindow.setText(choice === WHITE ? 'You go first!' : 'Opponent goes first!');
         this.#resultWindow.open();
     }
 
@@ -168,6 +171,9 @@ export class StartPhase implements Phase {
     destroy(): void {
         if (this.#textWindow) this.#textWindow.destroy();
         if (this.#commandWindow) this.#commandWindow.destroy();
+        if (this.#titleWindow) this.#titleWindow.destroy();
+        if (this.#waitingWindow) this.#waitingWindow.destroy();
+        if (this.#resultWindow) this.#resultWindow.destroy();
     }
     
 }

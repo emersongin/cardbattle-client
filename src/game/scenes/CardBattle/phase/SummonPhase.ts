@@ -41,7 +41,7 @@ export class SummonPhase implements Phase {
     }
 
     create(): void {
-        this.#window = TextWindow.createCenteredWindow(this.scene, 'Summon Phase started!', {
+        this.#window = TextWindow.createCentered(this.scene, 'Summon Phase started!', {
             onClose: () => {
                 this.changeToCompilePhase();
             }

@@ -47,6 +47,14 @@ export class CommandWindow extends Sizer {
         return new CommandWindow(scene, x, y, width, height, title, commands);
     }
 
+    static createCentered(scene: Phaser.Scene, title: string, commands: CommandOption[]) {
+        const width = scene.scale.width;
+        const height = DisplayUtil.column3of12(scene.scale.height);
+        const x = width / 2;
+        const y = scene.scale.height / 2;
+        return new CommandWindow(scene, x, y, width, height, title, commands);
+    }
+
     open() {
         this.#tween = this.scene.tweens.add({
             targets: this,
@@ -89,7 +97,6 @@ export class CommandWindow extends Sizer {
             }),
             align: 'center'
         });
-
         this.add(titleLabel, { align: 'left', expand: false, padding: { top: 20, bottom: 20 } });
     }
     

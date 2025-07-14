@@ -61,7 +61,7 @@ export class TextWindow extends TextBox {
         this.#onClose = onClose;
     }
 
-    static createCenteredWindow(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
+    static createCentered(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
         const { onStartClose, onClose, relativeParent, color, align } = config;
         const x = scene.cameras.main.centerX;
         let y = scene.cameras.main.centerY;

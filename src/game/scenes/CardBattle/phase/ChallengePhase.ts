@@ -19,44 +19,44 @@ export class ChallengePhase implements Phase {
     async create(): Promise<void> {
         const opponent: Opponent = await this.#cardBattle.getOpponentData();
         const folders: CardsFolder[] = await this.#cardBattle.getFolders();
-        this.createChallengeWindows(opponent);
-        this.createCommandWindow(folders);
-        this.openChallengeWindows();
+        this.#createWindows(opponent);
+        this.#createCommandWindow(folders);
+        this.#openChallengeWindows();
     }
 
-    private createChallengeWindows(opponent: Opponent): void {
-        this.createTitleWindow();
+    #createWindows(opponent: Opponent): void {
+        this.#createTitleWindow();
         const { name, description } = opponent;
-        this.createTextWindow(name, description);
+        this.#createTextWindow(name, description);
     }
 
-    private createTitleWindow(): void {
-        this.#titleWindow = TextWindow.createCenteredWindow(this.scene, 'CardBattle Challenge!', {
+    #createTitleWindow(): void {
+        this.#titleWindow = TextWindow.createCentered(this.scene, 'CardBattle Challenge!', {
             align: 'center',
             color: '#ff3c3c',
             onStartClose: () => {
                 this.#textWindow.close();
             },
             onClose: () => {
-                this.openCommandWindow();
+                this.#openCommandWindow();
             }
         });
     }
 
-    openCommandWindow(): void {
+    #openCommandWindow(): void {
         this.#commandWindow.open();
     }
 
-    private createTextWindow(name: string, description: string): void {
-        this.#textWindow = TextWindow.createCenteredWindow(this.scene, `${name}\n${description}`, {
+    #createTextWindow(name: string, description: string): void {
+        this.#textWindow = TextWindow.createCentered(this.scene, `${name}\n${description}`, {
             relativeParent: this.#titleWindow
         });
     }
 
-    private createCommandWindow(folders: CardsFolder[]): void {
+    #createCommandWindow(folders: CardsFolder[]): void {
         const [folder1, folder2, folder3] = folders;
         const padValue = 16;
-        this.#commandWindow = CommandWindow.createBottom(this.scene, 'Choose your folder', [
+        this.#commandWindow = CommandWindow.createCentered(this.scene, 'Choose your folder', [
             {
                 description: `${folder1.name.padEnd(padValue)} ${Object.entries(folder1.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
@@ -81,16 +81,16 @@ export class ChallengePhase implements Phase {
         ]);
     }
 
-    private openChallengeWindows(): void {
-        this.openTitleWindow();
-        this.openTextWindow();
+    #openChallengeWindows(): void {
+        this.#openTitleWindow();
+        this.#openTextWindow();
     }
 
-    openTitleWindow(): void {
+    #openTitleWindow(): void {
         this.#titleWindow.open();
     }
 
-    openTextWindow(): void {
+    #openTextWindow(): void {
         this.#textWindow.open();
     }
 
@@ -132,5 +132,7 @@ export class ChallengePhase implements Phase {
 
     destroy(): void {
         if (this.#textWindow) this.#textWindow.destroy();
+        if (this.#commandWindow) this.#commandWindow.destroy();
+        if (this.#titleWindow) this.#titleWindow.destroy();;
     }
 }

@@ -143,24 +143,24 @@ describe("MockScene", () => {
         expect(markedCards).toEqual([2, 5]);
     });
 
-    // it("Deve restaurar o estado de seleção do conjunto de cartões e retornar a ultima seleção.", () => {
-    //     let markedCards: number[] = [];
-    //     const events = {
-    //         onChangeIndex: vi.fn(),
-    //         onMarked: vi.fn(),
-    //         onCompleted: (cardIndexes: number[]) => {
-    //             markedCards = cardIndexes;
-    //             // cardset.#highlightSelectedCards();
-    //             cardset.restoreSelectState();
-    //         },
-    //         onLeave: vi.fn(),
-    //     };
-    //     const keyboard = getKeyboard(scene);
-    //     cardset.selectModeMany(events, colorPoints);
-    //     keyboard.emit('keydown-ENTER');
-    //     keyboard.emit('keydown-ESC');
-    //     expect(markedCards.length).toBe(1);
-    //     const selectIndexes = cardset.getSelectIndexes();
-    //     expect(selectIndexes.length).toBe(1);
-    // });
+    it("Deve restaurar o estado de seleção do conjunto de cartões e retornar a ultima seleção.", () => {
+        let markedCards: number[] = [];
+        const events = {
+            onChangeIndex: vi.fn(),
+            onMarked: vi.fn(),
+            onCompleted: (cardIndexes: number[]) => {
+                markedCards = cardIndexes;
+                // cardset.#highlightSelectedCards();
+                cardset.restoreSelectState();
+            },
+            onLeave: vi.fn(),
+        };
+        const keyboard = getKeyboard(scene);
+        cardset.selectModeMany(events, colorPoints);
+        keyboard.emit('keydown-ENTER');
+        keyboard.emit('keydown-ESC');
+        expect(markedCards.length).toBe(1);
+        const selectIndexes = cardset.getSelectIndexes();
+        expect(selectIndexes.length).toBe(0);
+    });
 });

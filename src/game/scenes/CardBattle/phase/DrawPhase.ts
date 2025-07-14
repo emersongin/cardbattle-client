@@ -2,13 +2,62 @@ import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
+import { CardBattle } from "@/game/api/CardBattle";
 
 export class DrawPhase implements Phase {
-    #window: TextWindow;
+    #cardBattle: CardBattle;
+    #titleWindow: TextWindow;
+    #textWindow: TextWindow;
     
-    constructor(readonly scene: CardBattleScene) {}
+    constructor(readonly scene: CardBattleScene) {
+        this.#cardBattle = scene.getCardBattle();
+    }
 
-    changeToChallengePhase(): void {
+    create(): void {
+        this.#createWindows();
+        this.#openWindows();    }
+
+    #createWindows(): void {
+        this.#createTitleWindow();
+        this.#createTextWindow();
+    }
+
+    #createTitleWindow(): void {
+        this.#titleWindow = TextWindow.createCentered(this.scene, 'Draw Phase', {
+            align: 'center',
+            onStartClose: () => {
+                this.#textWindow.close();
+            },
+            onClose: () => {
+                // Transition to the next phase
+            }
+        });
+    }
+
+    #createTextWindow(): void {
+        this.#textWindow = TextWindow.createCentered(this.scene, '6 cards will be draw.', {
+            relativeParent: this.#titleWindow
+        });
+    }
+
+    #openWindows(): void {
+        this.#openTitleWindow();
+        this.#openTextWindow();
+    }
+
+    #openTitleWindow(): void {
+        this.#titleWindow.open();
+    }
+
+    #openTextWindow(): void {
+        this.#textWindow.open();
+    }
+
+    update(): void {
+        console.log("Updating Draw Phase...");
+    }
+
+        changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }
     
@@ -40,20 +89,8 @@ export class DrawPhase implements Phase {
         throw new Error("Method not implemented.");
     }
 
-    create(): void {
-        this.#window = TextWindow.createCenteredWindow(this.scene, 'Draw Phase started!', {
-            onClose: () => {
-                this.changeToLoadPhase();
-            }
-        });
-        this.#window.open();
-    }
-
-    update(): void {
-        console.log("Updating Draw Phase...");
-    }
-    
     destroy(): void {
-        if (this.#window) this.#window.destroy();
+        if (this.#titleWindow) this.#titleWindow.destroy();
+        if (this.#textWindow) this.#textWindow.destroy();
     }
 }
