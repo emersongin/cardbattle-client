@@ -1,5 +1,5 @@
-import BoardWindow from "./BoardWindow";
-import { WindowState } from "./WindowState";
+import BoardWindow, { BoardWindowConfig } from "./BoardWindow";
+import { UpdatingState, WindowState } from "./WindowState";
 
 export default class StaticState implements WindowState {
     constructor(readonly window: BoardWindow) {}
@@ -17,10 +17,10 @@ export default class StaticState implements WindowState {
     }
 
     static() {
-        this.window.changeState(new StaticState(this.window));
+        throw new Error("StaticState is not implemented in StaticState.");
     }
 
-    updating() {
-        throw new Error("UpdatingState is not implemented in StaticState.");
+    updating(toTarget: BoardWindowConfig) {
+        this.window.changeState(new UpdatingState(this.window), toTarget);
     }
 }

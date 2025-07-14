@@ -200,7 +200,11 @@ export default class BoardWindow extends Sizer {
         this.#numberOfWins = count;
     }
 
-    updateWindow(toTarget: BoardWindowConfig): void {
+    preUpdate() {
+        if (this.#status) this.#status.preUpdate();
+    }
+
+    updating(toTarget: BoardWindowConfig): void {
         if (!this.#status) return
         if (this.#status instanceof UpdatingState) {
             this.#status.addTweens(toTarget, 2000);

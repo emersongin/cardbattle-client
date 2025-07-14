@@ -4,8 +4,8 @@ import { VueScene } from './VueScene';
 // import { Cardset } from '../ui/Cardset/Cardset';
 // import { ColorsPoints } from '../types/ColorsPoints';
 // import { CardColors, CardType } from '../ui/Card/Card';
-import { CardPoints } from '../ui/Card/types/CardPoints';
-import { ColorsPoints } from '../types';
+// import { CardPoints } from '../ui/Card/types/CardPoints';
+// import { ColorsPoints } from '../types';
 import BoardWindow from '../ui/BoardWindow/BoardWindow';
 // import { CommandWindow } from '../ui/CommandWindow';
 
@@ -56,7 +56,7 @@ export class TestContext extends VueScene
             numberOfCardsInDeck: 0,
             numberOfWins: 0
         };
-        boardWindow.updateWindow(updatePoints);
+        boardWindow.updating(updatePoints);
         // const cards = [
         //     {
         //         UUID: '123e4567-e89b-12d3-a456-426614174000',

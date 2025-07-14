@@ -29,10 +29,6 @@ export default class UpdatingState implements WindowState {
         this.window.changeState(new StaticState(this.window));
     }
 
-    moving() {
-        throw new Error('MovingState: cannot call moving() from MovingState.');
-    }
-
     updating() {
         throw new Error('MovingState: cannot call updating() from MovingState.');
     }
