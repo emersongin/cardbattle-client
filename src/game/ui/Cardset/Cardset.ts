@@ -4,6 +4,7 @@ import { CardData } from "../types/CardData";
 import { CardsetEvents } from "./types/CardsetEvents";
 import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
 import { ColorsPoints } from "../../types/ColorsPoints";
+import MovingState from "../Card/state/MovingState";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
@@ -127,16 +128,49 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     showSideMovement(): void {
-        let delay = 0;
-        let duration = 0;
-        let xFrom = 0;
-        const widthEdge = this.scene.scale.width - this.x;
-        this.getCards().forEach((card: Card, index: number) => {
-            delay = (index * 100);
-            duration = (index * 12);
-            xFrom = (index * card.getWidth());
-            card.movePosition(widthEdge, 0);
-            card.moveFromTo(xFrom, 0, widthEdge, card.getY(), delay, (duration + 300));
+        const positionsTweensConfig = this.getCards().map((card: Card) => {
+            const widthEdge = this.scene.scale.width - this.x;
+            const moves = MovingState.createMove(widthEdge, 0, 0, 0);
+            return {
+                targets: card.getUi(),
+                ...moves,
+            }
+        });
+        this.#runMultipleTweens(this.scene, positionsTweensConfig, () => {
+            const positionsTweensConfig = this.getCards().map((card: Card, index: number) => {
+                const delay = (index * 64);
+                const duration = (index * 24);
+                const xTo = (index * card.getWidth());
+                const moves = MovingState.createMove(xTo, 0, delay, duration);
+                return {
+                    targets: card.getUi(),
+                    ...moves,
+                }
+            });
+            this.#runMultipleTweens(this.scene, positionsTweensConfig, () => {
+                console.log('Cardset: showSideMovement completed.');
+            });
+        });
+    }
+
+    #runMultipleTweens(
+        scene: Phaser.Scene,
+        tweensConfig: Phaser.Types.Tweens.TweenBuilderConfig[],
+        onCompleteAll?: () => void
+    ): void {
+        const promises = tweensConfig.map(tweenConfig => {
+            return new Promise<void>((resolve) => {
+                const config = {
+                    ...tweenConfig,
+                    onComplete: () => {
+                        resolve();
+                    },
+                };
+                scene.tweens.add(config);
+            });
+        });
+        Promise.all(promises).then(() => {
+            onCompleteAll?.();
         });
     }
 
