@@ -13,6 +13,7 @@ export type BoardWindowConfig = {
 };
 
 export default class BoardWindow extends Sizer {
+    #tween: Phaser.Tweens.Tween | null = null;
     #status: WindowState;
     #reverse: boolean;
     #contentLabel: Label;
@@ -50,7 +51,9 @@ export default class BoardWindow extends Sizer {
 
         this.#createBackground(scene);
         this.#createContentLabel(scene, config);
+
         this.layout();
+        this.setScale(1, 0);
         scene.add.existing(this);
     }
 
@@ -129,20 +132,45 @@ export default class BoardWindow extends Sizer {
         const deck = numberOfCardsInDeck.toString().padStart(2, ' ');
         const wins = numberOfWins.toString();
         const boardPoints = `Hand:${hand} Deck:${deck} Wins:${wins}`;
-        return `${colorsPoints} - ${boardPoints}`;
+        return `${colorsPoints}          ${boardPoints}`;
     }
 
-    static createCentered(scene: Phaser.Scene, config: BoardWindowConfig, reverse: boolean = false): BoardWindow {
+    static createBottom(scene: Phaser.Scene, config: BoardWindowConfig): BoardWindow {
         const width = scene.scale.width;
         const height = DisplayUtil.column1of12(scene.scale.height);
         const x = width / 2;
-        const y = scene.scale.height / 2;
-        return new BoardWindow(scene, x, y, width, height, config, reverse);
+        const y = (scene.scale.height - height);
+        return new BoardWindow(scene, x, y, width, height, config);
+    }
+
+    static createTopReverse(scene: Phaser.Scene, config: BoardWindowConfig): BoardWindow {
+        const width = scene.scale.width;
+        const height = DisplayUtil.column1of12(scene.scale.height);
+        const x = width / 2;
+        const y = height;
+        return new BoardWindow(scene, x, y, width, height, config, true);
     }
 
     open() {
-        this.scene.add.existing(this);
-        this.setVisible(true);
+        this.#tween = this.scene.tweens.add({
+            targets: this,
+            scaleY: 1,
+            duration: 300,
+            ease: 'Back.easeOut',
+        });
+    }
+
+    close() {
+        this.#tween = this.scene.tweens.add({
+            targets: this,
+            scaleY: 0,
+            duration: 300,
+            ease: 'Back.easeIn',
+        });
+    }
+
+    isBusy() {
+        return this.#tween !== null && this.#tween.isPlaying();
     }
 
     changeState(state: WindowState, ...args: any[]): void {
