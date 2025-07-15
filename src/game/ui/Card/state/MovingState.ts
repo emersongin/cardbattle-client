@@ -33,7 +33,8 @@ export default class MovingState implements CardState {
                     return card.isOpened() && (!onCanStart || onCanStart());
                 },
                 onComplete: onClosed,
-                delay
+                delay,
+                duration: 200,
             },
         ];
         return moves;
@@ -49,7 +50,8 @@ export default class MovingState implements CardState {
                     return card.isClosed() && (!onCanStart || onCanStart());
                 },
                 onComplete: onOpened, 
-                delay
+                delay,
+                duration: 200,
             }
         ];
         return moves;
