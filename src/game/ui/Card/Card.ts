@@ -63,10 +63,10 @@ export class Card {
 
     // Move methods
     movePosition(xTo: number, yTo: number, delay: number = 0, duration: number = 0): void {
-        this.move(MovingState.createPositionMove(xTo, yTo, delay), duration);
+        this.move(MovingState.createPositionMove(xTo, yTo, delay, duration));
     }
 
-    move(moves: Move[], duration: number | null = null): void {
+    move(moves: Move[], duration?: number): void {
         if (!this.#status) return;
         if (this.#status instanceof MovingState) {
             this.#status.addTweens(moves, duration);
@@ -76,8 +76,15 @@ export class Card {
         this.#status.moving(moves);
     }
 
-    moveFromTo(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): void {
-        this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, duration));
+    moveFromTo(
+        xTo: number, 
+        yTo: number, 
+        xFrom: number = this.getX(), 
+        yFrom: number = this.getY(), 
+        delay: number = 0, 
+        duration: number = 0
+    ): void {
+        this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, delay, duration));
     }
 
     // Open and close methods

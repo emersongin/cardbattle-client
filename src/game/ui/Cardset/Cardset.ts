@@ -118,11 +118,25 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
-    closeAllCardsDomino(): void {
+    closeAllCardsDominoMovement(): void {
         let delay = 0;
         this.getCards().forEach((card: Card, index: number) => {
             delay += (index * 24);
             card.close(() => true, () => {}, delay);
+        });
+    }
+
+    showSideMovement(): void {
+        let delay = 0;
+        let duration = 0;
+        let xFrom = 0;
+        const widthEdge = this.scene.scale.width - this.x;
+        this.getCards().forEach((card: Card, index: number) => {
+            delay = (index * 100);
+            duration = (index * 12);
+            xFrom = (index * card.getWidth());
+            card.movePosition(widthEdge, 0);
+            card.moveFromTo(xFrom, 0, widthEdge, card.getY(), delay, (duration + 300));
         });
     }
 

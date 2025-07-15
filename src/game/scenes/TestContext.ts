@@ -98,7 +98,7 @@ export class TestContext extends VueScene
             height: CARD_HEIGHT 
         };
         const cardset = new Cardset(this, dimensions, cardsData);
-        cardset.closeAllCardsDomino();
+        cardset.showSideMovement();
         // const events = {
         //     onChangeIndex: (cardIndex: number) => {
         //         if (!cardset.isValidIndex(cardIndex)) return;
@@ -128,7 +128,7 @@ export class TestContext extends VueScene
         //     },
         //     onLeave: () => {
         //         cardset.resetCardsState();
-        //         cardset.closeAllCardsDomino();
+        //         cardset.closeAllCardsDominoMovement();
         //     },
         // };
         // const colorPoints: ColorsPoints = {
@@ -141,8 +141,7 @@ export class TestContext extends VueScene
         // };
         // cardset.selectModeOne(events);
         // cardset.selectModeMany(events, colorPoints);
-        // cardset.closeAllCards();
-        // cardset.closeAllCardsDomino();
+        // cardset.closeAllCardsDominoMovement();
         // cardset.disablePowerCards();
         // cardset.disableBattleCards();
         // const card = new Card(this, cardsData[0]);

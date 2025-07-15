@@ -8,17 +8,17 @@ export default class MovingState implements CardState {
     
     constructor(readonly card: Card) {}
 
-    static createPositionMove(xTo: number, yTo: number, duration: number = 0): Move[] {
+    static createPositionMove(xTo: number, yTo: number, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
-            MovingState.#createMove(xTo, yTo, duration)
+            MovingState.#createMove(xTo, yTo, delay, duration)
         ];
         return moves;
     }
 
-    static createFromToMove(xFrom: number, yFrom: number, xTo: number, yTo: number, duration: number): Move[] {
+    static createFromToMove(xFrom: number, yFrom: number, xTo: number, yTo: number, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
             MovingState.#createMove(xFrom, yFrom),
-            MovingState.#createMove(xTo, yTo, duration)
+            MovingState.#createMove(xTo, yTo, delay, duration)
         ];
         return moves;
     }
@@ -57,11 +57,11 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    create(moves: Move[], duration: number | null = null) {
+    create(moves: Move[], duration: number = 0): void {
         this.addTweens(moves, duration);
     }
 
-    addTweens(moves: Move[], duration: number | null = null) {
+    addTweens(moves: Move[], duration: number = 0): void {
         const moveTweens = moves.map(move => {
             move = { ...move, hold: 0 };
             if (duration) {
@@ -91,8 +91,9 @@ export default class MovingState implements CardState {
         this.static();
     }
 
-    static #createMove(x: number, y: number, duration: number = 0): Move {
-        return { x, y, duration, hold: 0 };
+    static #createMove(x: number, y: number, delay: number = 0, duration: number = 0): Move {
+        console.log('createMove: ', { x, y, delay, duration, hold: 0 });
+        return { x, y, delay, duration, hold: 0 };
     }
 
     #pushMoves(moves: Move[]) {
@@ -115,7 +116,7 @@ export default class MovingState implements CardState {
             tweens: moves,
             onComplete: () => {
                 this.#tweens = this.#tweens.filter(t => t !== tweens);
-            } 
+            },
         });
         this.#tweens.push(tweens);
     }
