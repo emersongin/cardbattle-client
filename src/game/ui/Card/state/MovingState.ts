@@ -10,15 +10,15 @@ export default class MovingState implements CardState {
 
     static createPositionMove(xTo: number, yTo: number, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
-            MovingState.createMove(xTo, yTo, delay, duration)
+            MovingState.#createMove(xTo, yTo, delay, duration)
         ];
         return moves;
     }
 
     static createFromToMove(xFrom: number, yFrom: number, xTo: number, yTo: number, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
-            MovingState.createMove(xFrom, yFrom),
-            MovingState.createMove(xTo, yTo, delay, duration)
+            MovingState.#createMove(xFrom, yFrom),
+            MovingState.#createMove(xTo, yTo, delay, duration)
         ];
         return moves;
     }
@@ -91,7 +91,7 @@ export default class MovingState implements CardState {
         this.static();
     }
 
-    static createMove(x: number, y: number, delay: number = 0, duration: number = 0): Move {
+    static #createMove(x: number, y: number, delay: number = 0, duration: number = 0): Move {
         return { x, y, delay, duration, hold: 0 };
     }
 
