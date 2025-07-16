@@ -133,20 +133,21 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     showSideMovement(): void {
         const widthEdge = this.scene.scale.width - this.x;
+        const onComplete = () => {
+            this.scene.timeline({
+                targets: this.getCardsUi(),
+                x: 0,
+                eachX: CARD_WIDTH,
+                eachDuration: 100,
+            });
+        };
         this.scene.timeline({
             targets: this.getCardsUi(),
             x: widthEdge,
-            eachX: CARD_WIDTH,
             delay: 0,
             durantion: 0,
-            onComplete: () => {
-                this.scene.timeline({
-                    targets: this.getCardsUi(),
-                    x: 0,
-                    eachX: CARD_WIDTH,
-                    eachDuration: 100,
-                });
-            }
+            eachX: CARD_WIDTH,
+            onComplete, 
         });
     }
 
