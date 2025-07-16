@@ -1,10 +1,10 @@
-import { Card } from "@ui/Card/Card";
+import { Card, CARD_WIDTH } from "@ui/Card/Card";
 import { Dimensions } from "./types/Dimensions";
 import { CardData } from "../types/CardData";
 import { CardsetEvents } from "./types/CardsetEvents";
 import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
 import { ColorsPoints } from "../../types/ColorsPoints";
-import MovingState from "../Card/state/MovingState";
+import { VueScene } from "@/game/scenes/VueScene";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
@@ -15,7 +15,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     #highlightedTweens: Phaser.Tweens.Tween[];
 
     constructor(
-        readonly scene: Phaser.Scene, 
+        readonly scene: VueScene, 
         dimensions: Dimensions,
         cards: CardData[] = []
     ) {
@@ -30,6 +30,10 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     getCards(): Card[] {
         return this.#cards;
+    }
+
+    getCardsUi(): Phaser.GameObjects.Container[] {
+        return this.getCards().map((card: Card) => card.getUi());
     }
 
     getCardByIndex(index: number): Card {
@@ -128,49 +132,21 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     showSideMovement(): void {
-        const positionsTweensConfig = this.getCards().map((card: Card) => {
-            const widthEdge = this.scene.scale.width - this.x;
-            const moves = MovingState.createMove(widthEdge, 0, 0, 0);
-            return {
-                targets: card.getUi(),
-                ...moves,
+        const widthEdge = this.scene.scale.width - this.x;
+        this.scene.timeline({
+            targets: this.getCardsUi(),
+            x: widthEdge,
+            eachX: CARD_WIDTH,
+            delay: 0,
+            durantion: 0,
+            onComplete: () => {
+                this.scene.timeline({
+                    targets: this.getCardsUi(),
+                    x: 0,
+                    eachX: CARD_WIDTH,
+                    eachDuration: 100,
+                });
             }
-        });
-        this.#runMultipleTweens(this.scene, positionsTweensConfig, () => {
-            const positionsTweensConfig = this.getCards().map((card: Card, index: number) => {
-                const delay = (index * 64);
-                const duration = (index * 24);
-                const xTo = (index * card.getWidth());
-                const moves = MovingState.createMove(xTo, 0, delay, duration);
-                return {
-                    targets: card.getUi(),
-                    ...moves,
-                }
-            });
-            this.#runMultipleTweens(this.scene, positionsTweensConfig, () => {
-                console.log('Cardset: showSideMovement completed.');
-            });
-        });
-    }
-
-    #runMultipleTweens(
-        scene: Phaser.Scene,
-        tweensConfig: Phaser.Types.Tweens.TweenBuilderConfig[],
-        onCompleteAll?: () => void
-    ): void {
-        const promises = tweensConfig.map(tweenConfig => {
-            return new Promise<void>((resolve) => {
-                const config = {
-                    ...tweenConfig,
-                    onComplete: () => {
-                        resolve();
-                    },
-                };
-                scene.tweens.add(config);
-            });
-        });
-        Promise.all(promises).then(() => {
-            onCompleteAll?.();
         });
     }
 
