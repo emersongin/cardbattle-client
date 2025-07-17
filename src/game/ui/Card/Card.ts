@@ -274,10 +274,9 @@ export class Card {
         this.#hp = hp;
     }
 
-    flash(color: number = 0xffffff, durantion: number): void {
+    flash(color: number = 0xffffff, delay?: number, durantion?: number): void {
         if (!this.#status) return;
         if (!(this.#status instanceof StaticState)) return;
-        this.#status.flash(color, durantion);
-        
+        this.#status.flash(color, delay, durantion);
     }
 }

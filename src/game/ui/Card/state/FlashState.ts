@@ -7,28 +7,32 @@ export default class FlashState implements CardState {
     
     constructor(readonly card: Card) {}
 
-    create(color: number = 0xffffff, duration: number = 600): void {
+    create(color: number, delay?: number, duration?: number): void {
         this.#createFlashLayer(color);
-        this.#flash(duration);
+        this.#flash(delay, duration);
     }
 
-    #createFlashLayer(color: number): void {
+    #createFlashLayer(color: number = 0xffffff): void {
         const flashLayer = this.card.scene.add.rectangle(0, 0, this.card.getWidth(), this.card.getHeight(), color, 1);
         flashLayer.setOrigin(0, 0);
-        flashLayer.setVisible(true);
+        flashLayer.setVisible(false);
         this.#flashLayer = flashLayer;
         this.card.getUi().add(this.#flashLayer);
     }
 
-    #flash(duration: number): void {
+    #flash(delay: number = 100, duration: number = 600): void {
         this.card.scene.tweens.add({
             targets: this.#flashLayer,
             alpha: 0,
+            delay,
             duration,
             ease: 'Power2',
+            onStart: () => {
+                this.#flashLayer.setVisible(true);
+            },
             onComplete: () => {
-                this.#flashLayer.setVisible(false);
                 this.#flashLayer.alpha = 1;
+                this.#flashLayer.setVisible(false);
                 this.static();
             }
         });

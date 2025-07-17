@@ -18,7 +18,7 @@ export default class StaticState implements CardState {
         this.card.changeState(new UpdatingState(this.card), ap, hp, 1000);
     }
 
-    flash(color: number, duration?: number) {
-        this.card.changeState(new FlashState(this.card), color, duration);
+    flash(color: number, delay?: number, duration?: number) {
+        this.card.changeState(new FlashState(this.card), color, delay, duration);
     }
 }
