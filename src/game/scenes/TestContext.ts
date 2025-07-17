@@ -98,7 +98,7 @@ export class TestContext extends VueScene
             height: CARD_HEIGHT 
         };
         const cardset = new Cardset(this, dimensions, cardsData);
-        cardset.flashAllCardsDominoMovement();
+        // cardset.flashAllCardsDominoMovement();
         // cardset.showSideMovement();
 
         // const events = {

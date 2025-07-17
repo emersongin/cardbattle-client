@@ -97,11 +97,11 @@ export class Card {
             this.#ui.setImage(this.#faceUp);
             this.#ui.setDisplay(this.#faceUp, this.#ap, this.#hp);
         };
-        this.close(onCanStartClose, onClosed);
+        this.close(100, 100, onCanStartClose, onClosed);
         const onCanStartOpen = () => {
             return this.#faceUp;
         };
-        this.#open(onCanStartOpen);
+        this.#open(100, 100, onCanStartOpen);
     }
 
     turnDown(): void {
@@ -113,19 +113,19 @@ export class Card {
             this.#ui.setImage(this.#faceUp);
             this.#ui.setDisplay(this.#faceUp);
         };
-        this.close(onCanStartClose, onClosed);
+        this.close(100, 100,onCanStartClose, onClosed);
         const onCanStartOpen = () => {
             return !this.#faceUp;
         };
-        this.#open(onCanStartOpen);
+        this.#open(100, 100, onCanStartOpen);
     }
 
-    close(onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0): void {
+    close(delay?: number, duration?: number, onCanStart?: () => boolean, onClosed?: () => void): void {
         const onClosedCallback = () => {
             this.#closed = true;
             if (onClosed) onClosed();
         };
-        this.move(MovingState.createCloseMove(this, onCanStart, onClosedCallback, delay), 200);
+        this.move(MovingState.createCloseMove(this, onCanStart, onClosedCallback, delay, duration));
     }
 
     isOpened(): boolean {
@@ -136,12 +136,12 @@ export class Card {
         return this.#closed;
     }
 
-    #open(onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0): void {
+    #open(delay: number = 0, duration: number = 0, onCanStart?: () => boolean, onOpened?: () => void): void {
         const onOpenedCallback = () => {
             this.#closed = false;
             if (onOpened) onOpened();
         };
-        this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay), 200);
+        this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay, duration));
     }
 
     changeDisplayPoints(ap: number, hp: number): void {

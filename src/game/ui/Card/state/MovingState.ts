@@ -23,7 +23,7 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    static createCloseMove(card: Card, onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0): Move[] {
+    static createCloseMove(card: Card, onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
             {
                 x: card.getX() + (card.getWidth() / 2),
@@ -34,13 +34,13 @@ export default class MovingState implements CardState {
                 },
                 onComplete: onClosed,
                 delay,
-                duration: 200,
+                duration,
             },
         ];
         return moves;
     }
 
-    static createOpenMove(card: Card, onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0): Move[] {
+    static createOpenMove(card: Card, onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
             {
                 x: card.getX(),
@@ -51,7 +51,7 @@ export default class MovingState implements CardState {
                 },
                 onComplete: onOpened, 
                 delay,
-                duration: 200,
+                duration,
             }
         ];
         return moves;
