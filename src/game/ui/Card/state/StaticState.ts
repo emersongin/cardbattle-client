@@ -1,24 +1,13 @@
 import { Card } from "../Card";
 import { Move } from "../types/Move";
 import { CardState, MovingState, UpdatingState } from "./CardState";
+import FlashState from "./FlashState";
 
 export default class StaticState implements CardState {
     constructor(readonly card: Card) {}
 
-    create() {
-        // nothing to do here
-    }
-
-    addTweens() {
-        // nothing to do here
-    }
-
-    preUpdate() {
-        //nothing to do here
-    }
-
     static() {
-        throw new Error("StaticState is not implemented in StaticState.");
+        throw new Error("cannot call updating() from StaticState.");
     }
 
     moving(moves: Move[]) {
@@ -27,5 +16,9 @@ export default class StaticState implements CardState {
 
     updating(ap: number, hp: number) {
         this.card.changeState(new UpdatingState(this.card), ap, hp, 1000);
+    }
+
+    flash(color: number, duration?: number) {
+        this.card.changeState(new FlashState(this.card), color, duration);
     }
 }

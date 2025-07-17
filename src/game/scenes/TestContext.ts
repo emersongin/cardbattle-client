@@ -1,12 +1,13 @@
 // import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { CardData } from '@/game/ui/types/CardData';
 import { VueScene } from './VueScene';
-import { Cardset } from '../ui/Cardset/Cardset';
-import { ColorsPoints } from '../types/ColorsPoints';
+import { Card } from '../ui/Card/Card';
+// import { Cardset } from '../ui/Cardset/Cardset';
+// import { ColorsPoints } from '../types/ColorsPoints';
 import { CARD_HEIGHT, CARD_WIDTH, CardColors, CardType } from '../ui/Card/Card';
-import { CardPoints } from '../ui/Card/types/CardPoints';
-import BoardWindow from '../ui/BoardWindow/BoardWindow';
-import { CommandWindow } from '../ui/CommandWindow';
+// import { CardPoints } from '../ui/Card/types/CardPoints';
+// import BoardWindow from '../ui/BoardWindow/BoardWindow';
+// import { CommandWindow } from '../ui/CommandWindow';
 
 export class TestContext extends VueScene
 {
@@ -90,15 +91,16 @@ export class TestContext extends VueScene
                 cost: 1
             },
         ];
-        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
-        const dimensions = { 
-            x: this.cameras.main.centerX / 2, 
-            y: this.cameras.main.centerY - 75, 
-            width: (CARD_WIDTH * 6), 
-            height: CARD_HEIGHT 
-        };
-        const cardset = new Cardset(this, dimensions, cardsData);
-        cardset.showSideMovement();
+        // const cardsData: CardData[] = this.duplicate(cards, 3); // 40
+        // const dimensions = { 
+        //     x: this.cameras.main.centerX / 2, 
+        //     y: this.cameras.main.centerY - 75, 
+        //     width: (CARD_WIDTH * 6), 
+        //     height: CARD_HEIGHT 
+        // };
+        // const cardset = new Cardset(this, dimensions, cardsData);
+        // cardset.showSideMovement();
+
         // const events = {
         //     onChangeIndex: (cardIndex: number) => {
         //         if (!cardset.isValidIndex(cardIndex)) return;
@@ -144,7 +146,9 @@ export class TestContext extends VueScene
         // cardset.closeAllCardsDominoMovement();
         // cardset.disablePowerCards();
         // cardset.disableBattleCards();
-        // const card = new Card(this, cardsData[0]);
+
+        const card = new Card(this, cards[0]);
+        card.flash(0xff0000, 1000);
         // card.changeDisplayPoints(99, 99);
         // card.flip();
         // card.turnDown();

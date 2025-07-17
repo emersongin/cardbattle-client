@@ -32,11 +32,15 @@ export default class UpdatingState implements CardState {
     }
 
     moving() {
-        throw new Error('MovingState: cannot call moving() from MovingState.');
+        throw new Error('cannot call moving() from UpdatingState.');
     }
 
     updating() {
-        throw new Error('MovingState: cannot call updating() from MovingState.');
+        throw new Error('cannot call updating() from UpdatingState.');
+    }
+
+    flash() {
+        throw new Error('cannot call flash() from UpdatingState.');
     }
 
     #createUpdatePoints(fromTarget: CardPoints, toTarget: CardPoints): UpdatePoints[] {

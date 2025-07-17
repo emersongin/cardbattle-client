@@ -42,7 +42,7 @@ export class Card {
 
     changeState(state: CardState, ...args: any[]): void {
         this.#status = state;
-        this.#status.create(...args);
+        if (this.#status.create) this.#status.create(...args);
     }
 
     getSelectedLayer(): Phaser.GameObjects.Graphics {
@@ -58,10 +58,11 @@ export class Card {
     }
 
     preUpdate() {
-        if (this.#status) this.#status.preUpdate();
+        if (this.#status && this.#status.preUpdate) {
+            this.#status.preUpdate();
+        }
     }
 
-    // Move methods
     movePosition(xTo: number, yTo: number, delay: number = 0, duration: number = 0): void {
         this.move(MovingState.createPositionMove(xTo, yTo, delay, duration));
     }
@@ -87,7 +88,6 @@ export class Card {
         this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, delay, duration));
     }
 
-    // Open and close methods
     flip(): void {
         const onCanStartClose = () => {
             return !this.#faceUp;
@@ -144,7 +144,6 @@ export class Card {
         this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay), 200);
     }
 
-    // Update points methods
     changeDisplayPoints(ap: number, hp: number): void {
         if (!this.#status || !this.#faceUp) return;
         if (this.#status instanceof UpdatingState) {
@@ -155,7 +154,6 @@ export class Card {
         this.#status.updating(ap, hp);
     }
 
-    // Disable methods
     disable(): void {
         this.#disabled = true;
         if (!this.#ui.disabledLayer) return;
@@ -168,7 +166,6 @@ export class Card {
         this.#ui.disabledLayer.setVisible(false);
     }
 
-    // Select methods
     select(): void {
         if (!this.#ui.selectedLayer) return;
         this.#ui.selectedLayer.setVisible(true);
@@ -183,7 +180,6 @@ export class Card {
         this.#ui.selectedLayer.setVisible(false);
     }
 
-    // Mark methods
     mark(): void {
         this.#marked = true;
         if (!this.#ui.markedLayer) return;
@@ -200,7 +196,6 @@ export class Card {
         this.#ui.markedLayer.setVisible(false);
     }
 
-    // Highlight methods
     highlight(): void {
         if (!this.#ui.highlightedLayer) return;
         this.#ui.highlightedLayer.setVisible(true);
@@ -277,5 +272,12 @@ export class Card {
 
     setHp(hp: number): void {
         this.#hp = hp;
+    }
+
+    flash(color: number = 0xffffff, durantion: number): void {
+        if (!this.#status) return;
+        if (!(this.#status instanceof StaticState)) return;
+        this.#status.flash(color, durantion);
+        
     }
 }

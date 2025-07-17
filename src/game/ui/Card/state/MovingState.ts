@@ -77,11 +77,15 @@ export default class MovingState implements CardState {
     }
 
     moving() {
-        throw new Error('MovingState: cannot call moving() from MovingState.');
+        throw new Error('cannot call moving() from MovingState.');
     }
 
     updating() {
-        throw new Error('MovingState: cannot call updating() from MovingState.');
+        throw new Error('cannot call updating() from MovingState.');
+    }
+
+    flash() {
+        throw new Error('cannot call flash() from MovingState.');
     }
     
     preUpdate() {

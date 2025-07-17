@@ -4,12 +4,13 @@ import UpdatingState from "./UpdatingState";
 import { Move } from "../types/Move";
 
 export interface CardState {
-    create(...args: any[]): void;
-    addTweens(...args: any[]): void;
-    preUpdate(): void;
+    create?(...args: any[]): void;
+    addTweens?(...args: any[]): void;
+    preUpdate?(): void;
     static(): void;
     moving(moves: Move[]): void;
     updating(ap: number, hp: number): void;
+    flash(color: number, durantion?: number): void;
 }
 
 export { StaticState, MovingState, UpdatingState };
