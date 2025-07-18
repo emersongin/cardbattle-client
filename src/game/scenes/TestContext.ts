@@ -1,11 +1,11 @@
 import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { CardData } from '@/game/ui/types/CardData';
 import { VueScene } from './VueScene';
-// import { Card } from '../ui/Card/Card';
+import { Card } from '../ui/Card/Card';
 // import { ColorsPoints } from '../types/ColorsPoints';
 import { CARD_HEIGHT, CARD_WIDTH, CardColors, CardType } from '../ui/Card/Card';
 // import { CardPoints } from '../ui/Card/types/CardPoints';
-// import BoardWindow from '../ui/BoardWindow/BoardWindow';
+import BoardWindow from '../ui/BoardWindow/BoardWindow';
 // import { CommandWindow } from '../ui/CommandWindow';
 
 export class TestContext extends VueScene
@@ -19,26 +19,26 @@ export class TestContext extends VueScene
     }
 
     create () {
-        // const startPoints = {
-        //     cardPoints: {
-        //         ap: 0,
-        //         hp: 0
-        //     },
-        //     colorsPoints: {
-        //         red: 0,
-        //         blue: 0,
-        //         green: 0,
-        //         black: 0,
-        //         white: 0,
-        //         orange: 0
-        //     },
-        //     numberOfCardsInHand: 0,
-        //     numberOfCardsInDeck: 0,
-        //     numberOfWins: 0
-        // };
-        // const boardWindow = BoardWindow.createBottom(this, startPoints);
+        const startPoints = {
+            cardPoints: {
+                ap: 0,
+                hp: 0
+            },
+            colorsPoints: {
+                red: 0,
+                blue: 0,
+                green: 0,
+                black: 0,
+                white: 0,
+                orange: 0
+            },
+            numberOfCardsInHand: 0,
+            numberOfCardsInDeck: 0,
+            numberOfWins: 0
+        };
+        const boardWindow = BoardWindow.createBottom(this, startPoints);
         // const boardWindow2 = BoardWindow.createTopReverse(this, startPoints);
-        // boardWindow.open();
+        boardWindow.open();
         // boardWindow2.open();
         // const updatePoints = {
         //     cardPoints: {
@@ -68,7 +68,7 @@ export class TestContext extends VueScene
                 number: 1,
                 name: 'Test Card',
                 description: 'This is a test card description.',
-                color: 'blue' as CardColors,
+                color: 'red' as CardColors,
                 imageName: 'card-picture',
                 hp: 10,
                 ap: 5,
@@ -81,7 +81,7 @@ export class TestContext extends VueScene
                 number: 1,
                 name: 'Test Power Card',
                 description: 'This is a test power card description.',
-                color: 'red' as CardColors,
+                color: 'green' as CardColors,
                 imageName: 'card-picture',
                 hp: 0,
                 ap: 0,
@@ -98,7 +98,11 @@ export class TestContext extends VueScene
             height: CARD_HEIGHT 
         };
         const cardset = new Cardset(this, dimensions, cardsData);
-        // cardset.flashAllCardsDominoMovement();
+        cardset.flashAllCardsDominoMovement((card: Card) => {
+            const cardColor = card.getColor();
+            if (cardColor === 'orange') return;
+            boardWindow.updateColorsPoints(cardColor, 1);
+        });
         // cardset.showSideMovement();
 
         // const events = {
@@ -148,7 +152,10 @@ export class TestContext extends VueScene
         // cardset.disableBattleCards();
 
         // const card = new Card(this, cards[0]);
-        // card.flash(0xffff00, 1000);
+        // card.flash({
+        //     color: 0xff0000,
+        //     delay: 500,
+        // });
         // card.changeDisplayPoints(99, 99);
         // card.flip();
         // card.turnDown();

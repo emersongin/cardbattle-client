@@ -3,6 +3,7 @@ import { CardPoints } from "../Card/types/CardPoints";
 import { ColorsPoints } from "../../types";
 import { DisplayUtil } from "../../utils/DisplayUtil";
 import { StaticState, UpdatingState, WindowState } from "./WindowState";
+import { CardColors } from "../Card/Card";
 
 export type BoardWindowConfig = {
     cardPoints: CardPoints,
@@ -11,6 +12,7 @@ export type BoardWindowConfig = {
     numberOfCardsInDeck: number,
     numberOfWins: number,
 };
+export type MaybePartialBoardWindowConfig = BoardWindowConfig | Partial<BoardWindowConfig>;
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;
@@ -49,22 +51,32 @@ export default class BoardWindow extends Sizer {
         this.#numberOfCardsInDeck = config.numberOfCardsInDeck;
         this.#numberOfWins = config.numberOfWins;
 
-        this.#createBackground(scene);
-        this.#createContentLabel(scene, config);
+        this.#enableDataManager(config);
+        this.#createBackground();
+        this.#createContentLabel(config);
 
         this.layout();
         this.setScale(1, 0);
         scene.add.existing(this);
     }
 
-    #createBackground(scene: Phaser.Scene) {
-        const background = scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x222222);
+    #enableDataManager(config: BoardWindowConfig) {
+        this.setDataEnabled();
+        this.data.set('colorsPoints', config.colorsPoints);
+        this.data.set('cardPoints', config.cardPoints);
+        this.data.set('numberOfCardsInHand', config.numberOfCardsInHand);
+        this.data.set('numberOfCardsInDeck', config.numberOfCardsInDeck);
+        this.data.set('numberOfWins', config.numberOfWins);
+    }
+
+    #createBackground() {
+        const background = this.scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x222222);
         this.addBackground(background);
     }
 
-    #createContentLabel(scene: Phaser.Scene, config: BoardWindowConfig) {
-        const contentLabel = scene.rexUI.add.label({
-            text: scene.add.text(0, 0, this.createContent(config), {
+    #createContentLabel(config: BoardWindowConfig) {
+        const contentLabel = this.scene.rexUI.add.label({
+            text: this.scene.add.text(0, 0, this.createContent(config), {
                 fontSize: '24px',
                 color: '#ffffff'
             }),
@@ -188,6 +200,10 @@ export default class BoardWindow extends Sizer {
         };
     }
 
+    getColorsPoints(): ColorsPoints {
+        return this.#colorsPoints;
+    }
+
     setAp(ap: number) {
         this.#battlePoints.ap = ap;
     }
@@ -232,12 +248,39 @@ export default class BoardWindow extends Sizer {
         if (this.#status) this.#status.preUpdate();
     }
 
-    updating(toTarget: BoardWindowConfig): void {
+    // updateColorsPoints(colorsPoints: ColorsPoints): void {
+    //     this.#updating({ colorsPoints });
+    // }
+
+    updateColorsPoints(cardColor: CardColors, value: number): void {
+        const colorsPoints = this.data.get('colorsPoints') as ColorsPoints;
+        colorsPoints[cardColor] = (colorsPoints[cardColor] || 0) + value;
+        this.#updating({ colorsPoints });
+    }
+
+    #updating(toTarget: MaybePartialBoardWindowConfig): void {
         if (!this.#status) return
+        const config = {
+            cardPoints: {
+                ap: toTarget.cardPoints?.ap ?? this.#battlePoints.ap,
+                hp: toTarget.cardPoints?.hp ?? this.#battlePoints.hp,
+            },
+            colorsPoints: {
+                red: toTarget.colorsPoints?.red ?? this.#colorsPoints.red,
+                green: toTarget.colorsPoints?.green ?? this.#colorsPoints.green,
+                blue: toTarget.colorsPoints?.blue ?? this.#colorsPoints.blue,
+                black: toTarget.colorsPoints?.black ?? this.#colorsPoints.black,
+                white: toTarget.colorsPoints?.white ?? this.#colorsPoints.white,
+                orange: toTarget.colorsPoints?.orange ?? 0,
+            },
+            numberOfCardsInHand: toTarget.numberOfCardsInHand ?? this.#numberOfCardsInHand,
+            numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.#numberOfCardsInDeck,
+            numberOfWins: toTarget.numberOfWins ?? this.#numberOfWins,
+        };
         if (this.#status instanceof UpdatingState) {
-            this.#status.addTweens(toTarget, 2000);
+            this.#status.addTweens(config);
             return;
         }
-        this.#status.updating(toTarget);
+        this.#status.updating(config);
     }
 }
