@@ -1,6 +1,6 @@
 import { CardData } from "../types/CardData";
 import { CardPoints } from "./types/CardPoints";
-import { CardState, StaticState, MovingState, UpdatingState } from "./state/CardState";
+import { CardState, StaticState, MovingState, UpdatingState, FlashConfig } from "./state/CardState";
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 
@@ -274,9 +274,9 @@ export class Card {
         this.#hp = hp;
     }
 
-    flash(color: number = 0xffffff, delay?: number, durantion?: number): void {
+    flash(config: FlashConfig): void {
         if (!this.#status) return;
         if (!(this.#status instanceof StaticState)) return;
-        this.#status.flash(color, delay, durantion);
+        this.#status.flash(config);
     }
 }

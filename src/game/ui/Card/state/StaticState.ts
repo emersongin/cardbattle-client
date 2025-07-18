@@ -1,7 +1,6 @@
 import { Card } from "../Card";
 import { Move } from "../types/Move";
-import { CardState, MovingState, UpdatingState } from "./CardState";
-import FlashState from "./FlashState";
+import { CardState, FlashConfig, FlashState, MovingState, UpdatingState } from "./CardState";
 
 export default class StaticState implements CardState {
     constructor(readonly card: Card) {}
@@ -18,7 +17,7 @@ export default class StaticState implements CardState {
         this.card.changeState(new UpdatingState(this.card), ap, hp, 1000);
     }
 
-    flash(color: number, delay?: number, duration?: number) {
-        this.card.changeState(new FlashState(this.card), color, delay, duration);
+    flash(config: FlashConfig) {
+        this.card.changeState(new FlashState(this.card), config);
     }
 }

@@ -2,14 +2,22 @@ import { Card } from "../Card";
 import { CardState } from "./CardState";
 import StaticState from "./StaticState";
 
+export type FlashConfig = {
+    color: number,
+    delay?: number,
+    duration?: number,
+    onStart?: (card: Card) => void
+};
+
 export default class FlashState implements CardState {
     #flashLayer: Phaser.GameObjects.Rectangle;
     
     constructor(readonly card: Card) {}
 
-    create(color: number, delay?: number, duration?: number): void {
+    create(config: FlashConfig): void {
+        const { color, delay, duration, onStart } = config;
         this.#createFlashLayer(color);
-        this.#flash(delay, duration);
+        this.#flash(delay, duration, onStart);
     }
 
     #createFlashLayer(color: number = 0xffffff): void {
@@ -20,7 +28,7 @@ export default class FlashState implements CardState {
         this.card.getUi().add(this.#flashLayer);
     }
 
-    #flash(delay: number = 100, duration: number = 600): void {
+    #flash(delay: number = 100, duration: number = 600, onStart?: (card: Card) => void): void {
         this.card.scene.tweens.add({
             targets: this.#flashLayer,
             alpha: 0,
@@ -29,6 +37,7 @@ export default class FlashState implements CardState {
             ease: 'Power2',
             onStart: () => {
                 this.#flashLayer.setVisible(true);
+                if (onStart) onStart(this.card);
             },
             onComplete: () => {
                 this.#flashLayer.alpha = 1;
