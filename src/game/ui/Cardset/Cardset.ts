@@ -131,10 +131,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
-    flashAllCardsDominoMovement(): void {
+    flashAllCardsDominoMovement(onStart?: (card: Card) => void): void {
         this.getCards().forEach((card: Card, index: number) => {
             const delay = (index * 100);
-            card.flash(0xffffff, delay);
+            card.flash({
+                color: 0xffff00,
+                delay,
+                onStart
+            });
         });
     }
 

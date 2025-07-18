@@ -12,7 +12,7 @@ export default class UpdatingState implements WindowState {
         this.addTweens(toTarget, duration);
     }
 
-    addTweens(toTarget: BoardWindowConfig, duration: number) {
+    addTweens(toTarget: BoardWindowConfig, duration: number = 0): void {
         const fromTarget = this.window.getAllData();
         const updates = this.#createUpdatePoints(fromTarget, toTarget);
         const updateTweens = updates.map(update => {
