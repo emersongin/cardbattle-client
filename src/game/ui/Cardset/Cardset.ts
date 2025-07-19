@@ -1,10 +1,10 @@
 import { Card, CARD_WIDTH } from "@ui/Card/Card";
 import { Dimensions } from "./types/Dimensions";
-import { CardData } from "../types/CardData";
 import { CardsetEvents } from "./types/CardsetEvents";
 import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
 import { ColorsPoints } from "../../types/ColorsPoints";
 import { VueScene } from "@/game/scenes/VueScene";
+import { CardData } from "@/game/types";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;

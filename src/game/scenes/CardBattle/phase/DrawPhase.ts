@@ -3,8 +3,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
 import { CardBattle } from "@/game/api/CardBattle";
-import { BoardWindowData } from "@/game/ui/BoardWindow/BoardWindow";
-import { CardData } from "@/game/ui/types/CardData";
+import { BoardWindowData, CardData } from "@/game/types";
 
 export class DrawPhase implements Phase {
     #cardBattle: CardBattle;

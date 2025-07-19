@@ -1,4 +1,5 @@
-import BoardWindow, { BoardWindowData } from "./BoardWindow";
+import { BoardWindowData } from "@/game/types";
+import BoardWindow from "./BoardWindow";
 import { UpdatePoints } from "./UpdatePoints";
 import { StaticState, WindowState } from "./WindowState";
 

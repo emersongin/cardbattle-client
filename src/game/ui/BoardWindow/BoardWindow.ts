@@ -4,21 +4,7 @@ import { ColorsPoints } from "../../types";
 import { DisplayUtil } from "../../utils/DisplayUtil";
 import { StaticState, UpdatingState, WindowState } from "./WindowState";
 import { CardColors } from "../Card/Card";
-
-export type BoardWindowData = {
-    ap: number;
-    hp: number;
-    redPoints: number;
-    greenPoints: number;
-    bluePoints: number;
-    blackPoints: number;
-    whitePoints: number;
-    orangePoints: number;
-    numberOfCardsInHand: number,
-    numberOfCardsInDeck: number,
-    numberOfWins: number,
-};
-export type MaybePartialBoardWindowData = BoardWindowData | Partial<BoardWindowData>;
+import { BoardWindowData, MaybePartialBoardWindowData } from "@/game/types/BoardWindowData";
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;

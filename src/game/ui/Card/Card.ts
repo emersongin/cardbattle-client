@@ -1,8 +1,8 @@
-import { CardData } from "../types/CardData";
 import { CardPoints } from "./types/CardPoints";
 import { CardState, StaticState, MovingState, UpdatingState, FlashConfig } from "./state/CardState";
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
+import { CardData } from "@/game/types";
 
 export const CARD_WIDTH = 100;
 export const CARD_HEIGHT = 150;

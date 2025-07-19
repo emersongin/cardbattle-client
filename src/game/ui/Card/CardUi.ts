@@ -1,4 +1,4 @@
-import { CardData } from "../types/CardData";
+import { CardData } from "@/game/types";
 import { CARD_HEIGHT, CARD_WIDTH } from "./Card";
 
 export class CardUi extends Phaser.GameObjects.Container {

@@ -1,4 +1,4 @@
-import { CardsFolder, Opponent } from '@game/types';
+import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardBattle } from './CardBattle';
 import { io, Socket } from "socket.io-client";
 
@@ -9,9 +9,9 @@ export default class CardBattleSocketIo implements CardBattle {
         this.#socket = io('http://localhost:3000');
     }
 
-    getOpponentData(timeout?: number): Promise<Opponent> {
+    getOpponentData(timeout?: number): Promise<OpponentData> {
         return new Promise((resolve, reject) => {
-            this.#socket.emit('getOpponentData', timeout, (response: Opponent) => {
+            this.#socket.emit('getOpponentData', timeout, (response: OpponentData) => {
                 if (response) {
                     resolve(response);
                 } else {
@@ -21,9 +21,9 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    getFolders(timeout?: number): Promise<CardsFolder[]> {
+    getFolders(timeout?: number): Promise<CardsFolderData[]> {
         return new Promise((resolve, reject) => {
-            this.#socket.emit('getFolders', timeout, (response: CardsFolder[]) => {
+            this.#socket.emit('getFolders', timeout, (response: CardsFolderData[]) => {
                 if (response) {
                     resolve(response);
                 } else {
@@ -70,6 +70,38 @@ export default class CardBattleSocketIo implements CardBattle {
         return new Promise((resolve) => {
             this.#socket.emit('setOpponentChoice', choice);
             resolve();
+        });
+    }
+
+    drawPlayerCardsData(timeout?: number): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            this.#socket.emit('drawPlayerCardsData', timeout, (response: CardData[]) => {
+                resolve(response);
+            });
+        });
+    }
+
+    drawOpponentCardsData(timeout?: number): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            this.#socket.emit('drawOpponentCardsData', timeout, (response: CardData[]) => {
+                resolve(response);
+            });
+        });
+    }
+
+    getPlayerBoardData(timeout?: number): Promise<BoardWindowData> {
+        return new Promise((resolve) => {
+            this.#socket.emit('getPlayerBoardData', timeout, (response: BoardWindowData) => {
+                resolve(response);
+            });
+        });
+    }
+
+    getOpponentBoardData(timeout?: number): Promise<BoardWindowData> {
+        return new Promise((resolve) => {
+            this.#socket.emit('getOpponentBoardData', timeout, (response: BoardWindowData) => {
+                resolve(response);
+            });
         });
     }
 }

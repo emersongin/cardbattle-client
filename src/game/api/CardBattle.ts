@@ -1,9 +1,7 @@
-import { CardsFolderData, Opponent } from '@game/types';
-import { CardData } from '../ui/types/CardData';
-import { BoardWindowData } from '../ui/BoardWindow/BoardWindow';
+import { BoardWindowData, CardData, CardsFolderData, OpponentData } from "../types";
 
 export interface CardBattle {
-    getOpponentData: (timeout?: number) => Promise<Opponent>;
+    getOpponentData: (timeout?: number) => Promise<OpponentData>;
     getFolders: (timeout?: number) => Promise<CardsFolderData[]>;
     setFolder: (folderId: string, timeout?: number) => Promise<string>;
     iGo: (timeout?: number) => Promise<boolean>;

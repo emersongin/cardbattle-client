@@ -1,4 +1,4 @@
-export type Opponent = {
+export type OpponentData = {
     id: string;
     name: string;
     description: string;

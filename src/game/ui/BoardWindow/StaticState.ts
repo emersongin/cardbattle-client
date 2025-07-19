@@ -1,4 +1,5 @@
-import BoardWindow, { BoardWindowData } from "./BoardWindow";
+import { BoardWindowData } from "@/game/types";
+import BoardWindow from "./BoardWindow";
 import { UpdatingState, WindowState } from "./WindowState";
 
 export default class StaticState implements WindowState {

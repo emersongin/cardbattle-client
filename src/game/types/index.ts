@@ -1,3 +1,5 @@
+export * from './BoardWindowData';
 export * from './CardsFolderData';
-export * from './Opponent';
+export * from './CardData';
 export * from './ColorsPoints';
+export * from './OpponentData';
