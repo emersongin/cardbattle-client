@@ -5,14 +5,20 @@ import { DisplayUtil } from "../../utils/DisplayUtil";
 import { StaticState, UpdatingState, WindowState } from "./WindowState";
 import { CardColors } from "../Card/Card";
 
-export type BoardWindowConfig = {
-    cardPoints: CardPoints,
-    colorsPoints: ColorsPoints,
+export type BoardWindowData = {
+    ap: number;
+    hp: number;
+    redPoints: number;
+    greenPoints: number;
+    bluePoints: number;
+    blackPoints: number;
+    whitePoints: number;
+    orangePoints: number;
     numberOfCardsInHand: number,
     numberOfCardsInDeck: number,
     numberOfWins: number,
 };
-export type MaybePartialBoardWindowConfig = BoardWindowConfig | Partial<BoardWindowConfig>;
+export type MaybePartialBoardWindowData = BoardWindowData | Partial<BoardWindowData>;
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;
@@ -31,7 +37,7 @@ export default class BoardWindow extends Sizer {
         y: number,
         width: number,
         height: number,
-        config: BoardWindowConfig,
+        data: BoardWindowData,
         reverse: boolean = false
     ) {
         const vertical = 1;
@@ -45,28 +51,43 @@ export default class BoardWindow extends Sizer {
 
         this.#reverse = reverse;
         this.#status = new StaticState(this);
-        this.#colorsPoints = config.colorsPoints;
-        this.#battlePoints = config.cardPoints;
-        this.#numberOfCardsInHand = config.numberOfCardsInHand;
-        this.#numberOfCardsInDeck = config.numberOfCardsInDeck;
-        this.#numberOfWins = config.numberOfWins;
+        this.#colorsPoints = {
+            red: data.redPoints,
+            green: data.greenPoints,
+            blue: data.bluePoints,
+            black: data.blackPoints,
+            white: data.whitePoints,
+            orange: 0,
+        }
+        this.#battlePoints = {
+            ap: data.ap,
+            hp: data.hp,
+        };
+        this.#numberOfCardsInHand = data.numberOfCardsInHand;
+        this.#numberOfCardsInDeck = data.numberOfCardsInDeck;
+        this.#numberOfWins = data.numberOfWins;
 
-        this.#enableDataManager(config);
+        this.#enableDataManager(data);
         this.#createBackground();
-        this.#createContentLabel(config);
+        this.#createContentLabel(data);
 
         this.layout();
         this.setScale(1, 0);
         scene.add.existing(this);
     }
 
-    #enableDataManager(config: BoardWindowConfig) {
+    #enableDataManager(data: BoardWindowData) {
         this.setDataEnabled();
-        this.data.set('colorsPoints', config.colorsPoints);
-        this.data.set('cardPoints', config.cardPoints);
-        this.data.set('numberOfCardsInHand', config.numberOfCardsInHand);
-        this.data.set('numberOfCardsInDeck', config.numberOfCardsInDeck);
-        this.data.set('numberOfWins', config.numberOfWins);
+        this.data.set('ap', data.ap);
+        this.data.set('hp', data.hp);
+        this.data.set('redPoints', data.redPoints);
+        this.data.set('greenPoints', data.greenPoints);
+        this.data.set('bluePoints', data.bluePoints);
+        this.data.set('blackPoints', data.blackPoints);
+        this.data.set('whitePoints', data.whitePoints);
+        this.data.set('numberOfCardsInHand', data.numberOfCardsInHand);
+        this.data.set('numberOfCardsInDeck', data.numberOfCardsInDeck);
+        this.data.set('numberOfWins', data.numberOfWins);
     }
 
     #createBackground() {
@@ -74,7 +95,7 @@ export default class BoardWindow extends Sizer {
         this.addBackground(background);
     }
 
-    #createContentLabel(config: BoardWindowConfig) {
+    #createContentLabel(config: BoardWindowData) {
         const contentLabel = this.scene.rexUI.add.label({
             text: this.scene.add.text(0, 0, this.createContent(config), {
                 fontSize: '24px',
@@ -91,25 +112,33 @@ export default class BoardWindow extends Sizer {
         this.#contentLabel.layout();
     }
 
-    createContent(config: BoardWindowConfig): string {
-        const battlePoints = this.#createBattlePoints(config.cardPoints);
+    createContent(data: BoardWindowData): string {
+        const battlePoints = this.#createBattlePoints(data.ap, data.hp);
         const boardPoints = this.#createBoardPoints(
-            config.colorsPoints, 
-            config.numberOfCardsInHand, 
-            config.numberOfCardsInDeck, 
-            config.numberOfWins
+            data.redPoints,
+            data.greenPoints,
+            data.bluePoints,
+            data.blackPoints,
+            data.whitePoints,
+            data.numberOfCardsInHand, 
+            data.numberOfCardsInDeck, 
+            data.numberOfWins
         );
         return this.#reverse ? `${boardPoints}\n\n${battlePoints}` : `${battlePoints}\n\n${boardPoints}`;
     }
 
-    #createBattlePoints(cardPoints: CardPoints): string {
-        const ap = cardPoints.ap.toString().padStart(3, ' ');
-        const hp = cardPoints.hp.toString().padStart(3, ' ');
-        return `Ap:${ap} Hp:${hp}`;
+    #createBattlePoints(ap: number, hp: number): string {
+        const apText = ap.toString().padStart(3, ' ');
+        const hpText = hp.toString().padStart(3, ' ');
+        return `Ap:${apText} Hp:${hpText}`;
     }
 
     #createBoardPoints(
-        points: ColorsPoints, 
+        redPoints: number,
+        greenPoints: number,
+        bluePoints: number,
+        blackPoints: number,
+        whitePoints: number, 
         numberOfCardsInHand: number, 
         numberOfCardsInDeck: number, 
         numberOfWins: number
@@ -117,23 +146,23 @@ export default class BoardWindow extends Sizer {
         const colorsTag = [
             {
                 color: 'Red',
-                points: points.red
+                points: redPoints
             },
             {
                 color: 'Grn',
-                points: points.green
+                points: greenPoints
             },
             {
                 color: 'Blu',
-                points: points.blue
+                points: bluePoints
             },
             {
                 color: 'Wht',
-                points: points.white
+                points: whitePoints
             },
             {
                 color: 'Blk',
-                points: points.black
+                points: blackPoints
             },
         ];
         const colorsPoints = colorsTag.map(color => {
@@ -147,7 +176,7 @@ export default class BoardWindow extends Sizer {
         return `${colorsPoints}          ${boardPoints}`;
     }
 
-    static createBottom(scene: Phaser.Scene, config: BoardWindowConfig): BoardWindow {
+    static createBottom(scene: Phaser.Scene, config: BoardWindowData): BoardWindow {
         const width = scene.scale.width;
         const height = DisplayUtil.column1of12(scene.scale.height);
         const x = width / 2;
@@ -155,7 +184,7 @@ export default class BoardWindow extends Sizer {
         return new BoardWindow(scene, x, y, width, height, config);
     }
 
-    static createTopReverse(scene: Phaser.Scene, config: BoardWindowConfig): BoardWindow {
+    static createTopReverse(scene: Phaser.Scene, config: BoardWindowData): BoardWindow {
         const width = scene.scale.width;
         const height = DisplayUtil.column1of12(scene.scale.height);
         const x = width / 2;
@@ -190,10 +219,16 @@ export default class BoardWindow extends Sizer {
         this.#status.create(...args);
     }
 
-    getAllData(): BoardWindowConfig {
+    getAllData(): BoardWindowData {
         return {
-            cardPoints: this.#battlePoints,
-            colorsPoints: this.#colorsPoints,
+            ap: this.#battlePoints.ap,
+            hp: this.#battlePoints.hp,
+            redPoints: this.#colorsPoints.red,
+            greenPoints: this.#colorsPoints.green,
+            bluePoints: this.#colorsPoints.blue,
+            blackPoints: this.#colorsPoints.black,
+            whitePoints: this.#colorsPoints.white,
+            orangePoints: this.#colorsPoints.orange,
             numberOfCardsInHand: this.#numberOfCardsInHand,
             numberOfCardsInDeck: this.#numberOfCardsInDeck,
             numberOfWins: this.#numberOfWins,
@@ -248,39 +283,36 @@ export default class BoardWindow extends Sizer {
         if (this.#status) this.#status.preUpdate();
     }
 
-    // updateColorsPoints(colorsPoints: ColorsPoints): void {
-    //     this.#updating({ colorsPoints });
-    // }
-
     updateColorsPoints(cardColor: CardColors, value: number): void {
-        const colorsPoints = this.data.get('colorsPoints') as ColorsPoints;
-        colorsPoints[cardColor] = (colorsPoints[cardColor] || 0) + value;
-        this.#updating({ colorsPoints });
+        let colorsPoints = {
+            redPoints: this.data.get('redPoints') + (cardColor === 'red' ? value : 0),
+            greenPoints: this.data.get('greenPoints') + (cardColor === 'green' ? value : 0),
+            bluePoints: this.data.get('bluePoints') + (cardColor === 'blue' ? value : 0),
+            blackPoints: this.data.get('blackPoints') + (cardColor === 'black' ? value : 0),
+            whitePoints: this.data.get('whitePoints') + (cardColor === 'white' ? value : 0),
+        } as MaybePartialBoardWindowData;
+        this.#updating(colorsPoints);
     }
 
-    #updating(toTarget: MaybePartialBoardWindowConfig): void {
+    #updating(toTarget: MaybePartialBoardWindowData): void {
         if (!this.#status) return
-        const config = {
-            cardPoints: {
-                ap: toTarget.cardPoints?.ap ?? this.#battlePoints.ap,
-                hp: toTarget.cardPoints?.hp ?? this.#battlePoints.hp,
-            },
-            colorsPoints: {
-                red: toTarget.colorsPoints?.red ?? this.#colorsPoints.red,
-                green: toTarget.colorsPoints?.green ?? this.#colorsPoints.green,
-                blue: toTarget.colorsPoints?.blue ?? this.#colorsPoints.blue,
-                black: toTarget.colorsPoints?.black ?? this.#colorsPoints.black,
-                white: toTarget.colorsPoints?.white ?? this.#colorsPoints.white,
-                orange: toTarget.colorsPoints?.orange ?? 0,
-            },
+        const boardWindowData = {
+            ap: toTarget.ap ?? this.#battlePoints.ap,
+            hp: toTarget.hp ?? this.#battlePoints.hp,
+            redPoints: toTarget.redPoints ?? this.#colorsPoints.red,
+            greenPoints: toTarget.greenPoints ?? this.#colorsPoints.green,
+            bluePoints: toTarget.bluePoints ?? this.#colorsPoints.blue,
+            blackPoints: toTarget.blackPoints ?? this.#colorsPoints.black,
+            whitePoints: toTarget.whitePoints ?? this.#colorsPoints.white,
+            orangePoints: toTarget.orangePoints ?? this.#colorsPoints.orange,
             numberOfCardsInHand: toTarget.numberOfCardsInHand ?? this.#numberOfCardsInHand,
             numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.#numberOfCardsInDeck,
             numberOfWins: toTarget.numberOfWins ?? this.#numberOfWins,
         };
         if (this.#status instanceof UpdatingState) {
-            this.#status.addTweens(config);
+            this.#status.addTweens(boardWindowData);
             return;
         }
-        this.#status.updating(config);
+        this.#status.updating(boardWindowData);
     }
 }

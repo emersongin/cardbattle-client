@@ -3,6 +3,8 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
 import { CardBattle } from "@/game/api/CardBattle";
+import { BoardWindowData } from "@/game/ui/BoardWindow/BoardWindow";
+import { CardData } from "@/game/ui/types/CardData";
 
 export class DrawPhase implements Phase {
     #cardBattle: CardBattle;
@@ -13,9 +15,14 @@ export class DrawPhase implements Phase {
         this.#cardBattle = scene.getCardBattle();
     }
 
-    create(): void {
+    async create(): Promise<void> {
+        const playerCards: CardData[] = await this.#cardBattle.drawPlayerCardsData();
+        const opponentCards: CardData[] = await this.#cardBattle.drawOpponentCardsData();
+        const playerBoardData: BoardWindowData = await this.#cardBattle.getPlayerBoardData();
+        const opponentBoardData: BoardWindowData = await this.#cardBattle.getOpponentBoardData();
         this.#createWindows();
-        this.#openWindows();    }
+        this.#openWindows();    
+    }
 
     #createWindows(): void {
         this.#createTitleWindow();

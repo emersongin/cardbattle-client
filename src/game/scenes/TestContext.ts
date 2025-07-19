@@ -20,18 +20,14 @@ export class TestContext extends VueScene
 
     create () {
         const startPoints = {
-            cardPoints: {
-                ap: 0,
-                hp: 0
-            },
-            colorsPoints: {
-                red: 0,
-                blue: 0,
-                green: 0,
-                black: 0,
-                white: 0,
-                orange: 0
-            },
+            ap: 0,
+            hp: 0,
+            redPoints: 0,
+            greenPoints: 0,
+            bluePoints: 0,
+            blackPoints: 0,
+            whitePoints: 0,
+            orangePoints: 0,
             numberOfCardsInHand: 0,
             numberOfCardsInDeck: 0,
             numberOfWins: 0

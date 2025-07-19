@@ -1,7 +1,7 @@
-import { BoardWindowConfig } from "./BoardWindow";
+import { BoardWindowData } from "./BoardWindow";
 
 export type UpdatePoints = {
-    target: BoardWindowConfig;
+    target: BoardWindowData;
     hold?: number;
     from?: number;
     to?: number;

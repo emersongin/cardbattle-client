@@ -4,6 +4,7 @@ import { CardData } from "@/game/ui/types/CardData";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from "@ui/Card/Card";
 import { ColorsPoints } from "@/game/types/ColorsPoints";
+import { VueScene } from "@/game/scenes/VueScene";
 
 const cards = [
     {
@@ -71,7 +72,7 @@ function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin 
 }
 
 describe("MockScene", () => {
-    let scene: Phaser.Scene;
+    let scene: VueScene;
     let cardset: Cardset;
 
     beforeAll(() => {
@@ -79,7 +80,7 @@ describe("MockScene", () => {
             key: "MockScene",
             active: true,
             visible: true,
-        });
+        }) as VueScene;
     });
 
     beforeEach(() => {

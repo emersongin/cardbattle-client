@@ -3,7 +3,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow';
 import { StartPhase } from "./StartPhase";
 import { CommandWindow } from "@/game/ui/CommandWindow";
-import { CardsFolder, Opponent } from "@/game/types";
+import { CardsFolderData, Opponent } from "@/game/types";
 import { CardBattle } from "@/game/api/CardBattle";
 
 export class ChallengePhase implements Phase {
@@ -18,7 +18,7 @@ export class ChallengePhase implements Phase {
 
     async create(): Promise<void> {
         const opponent: Opponent = await this.#cardBattle.getOpponentData();
-        const folders: CardsFolder[] = await this.#cardBattle.getFolders();
+        const folders: CardsFolderData[] = await this.#cardBattle.getFolders();
         this.#createWindows(opponent);
         this.#createCommandWindow(folders);
         this.#openChallengeWindows();
@@ -53,26 +53,50 @@ export class ChallengePhase implements Phase {
         });
     }
 
-    #createCommandWindow(folders: CardsFolder[]): void {
+    #createCommandWindow(folders: CardsFolderData[]): void {
         const [folder1, folder2, folder3] = folders;
         const padValue = 16;
+        const folderColorsPoints1 = {
+            red: folder1.redPoints,
+            green: folder1.greenPoints,
+            blue: folder1.bluePoints,
+            black: folder1.blackPoints,
+            white: folder1.whitePoints,
+            orange: folder1.orangePoints
+        };
+        const folderColorsPoints2 = {
+            red: folder2.redPoints,
+            green: folder2.greenPoints,
+            blue: folder2.bluePoints,
+            black: folder2.blackPoints,
+            white: folder2.whitePoints,
+            orange: folder2.orangePoints
+        };
+        const folderColorsPoints3 = {
+            red: folder3.redPoints,
+            green: folder3.greenPoints,
+            blue: folder3.bluePoints,
+            black: folder3.blackPoints,
+            white: folder3.whitePoints,
+            orange: folder3.orangePoints
+        };
         this.#commandWindow = CommandWindow.createCentered(this.scene, 'Choose your folder', [
             {
-                description: `${folder1.name.padEnd(padValue)} ${Object.entries(folder1.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
+                description: `${folder1.name.padEnd(padValue)} ${Object.entries(folderColorsPoints1).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
                     await this.#cardBattle.setFolder(folder1.id);
                     this.changeToStartPhase();
                 }
             },
             {
-                description: `${folder2.name.padEnd(padValue)} ${Object.entries(folder2.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
+                description: `${folder2.name.padEnd(padValue)} ${Object.entries(folderColorsPoints2).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
                     await this.#cardBattle.setFolder(folder2.id);
                     this.changeToStartPhase();
                 }
             },
             {
-                description: `${folder3.name.padEnd(padValue)} ${Object.entries(folder3.colors).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
+                description: `${folder3.name.padEnd(padValue)} ${Object.entries(folderColorsPoints3).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
                     await this.#cardBattle.setFolder(folder3.id);
                     this.changeToStartPhase();

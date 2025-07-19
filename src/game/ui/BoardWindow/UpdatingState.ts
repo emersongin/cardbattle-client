@@ -1,4 +1,4 @@
-import BoardWindow, { BoardWindowConfig } from "./BoardWindow";
+import BoardWindow, { BoardWindowData } from "./BoardWindow";
 import { UpdatePoints } from "./UpdatePoints";
 import { StaticState, WindowState } from "./WindowState";
 
@@ -8,11 +8,11 @@ export default class UpdatingState implements WindowState {
     
     constructor(readonly window: BoardWindow) {}
 
-    create(toTarget: BoardWindowConfig, duration: number) {
+    create(toTarget: BoardWindowData, duration: number) {
         this.addTweens(toTarget, duration);
     }
 
-    addTweens(toTarget: BoardWindowConfig, duration: number = 0): void {
+    addTweens(toTarget: BoardWindowData, duration: number = 0): void {
         const fromTarget = this.window.getAllData();
         const updates = this.#createUpdatePoints(fromTarget, toTarget);
         const updateTweens = updates.map(update => {
@@ -33,7 +33,7 @@ export default class UpdatingState implements WindowState {
         throw new Error('MovingState: cannot call updating() from MovingState.');
     }
 
-    #createUpdatePoints(fromTarget: BoardWindowConfig, toTarget: BoardWindowConfig): UpdatePoints[] {
+    #createUpdatePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints[] {
         const { apPoints, hpPoints } = this.#createUpdateBattlePoints(fromTarget, toTarget);
         const { redPoints, greenPoints, bluePoints, blackPoints, whitePoints } = 
             this.#createUpdateColorsPoints(fromTarget, toTarget);
@@ -52,79 +52,79 @@ export default class UpdatingState implements WindowState {
         ];
     }
 
-    #createUpdateBattlePoints(fromTarget: BoardWindowConfig, toTarget: BoardWindowConfig): {
+    #createUpdateBattlePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
         apPoints: UpdatePoints, hpPoints: UpdatePoints
     } {
-        const apPoints = this.#createUpdate(fromTarget, fromTarget.cardPoints.ap, toTarget.cardPoints.ap,
+        const apPoints = this.#createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.cardPoints.ap = Math.round(tween.getValue() ?? 0);
+                fromTarget.ap = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setAp(toTarget.cardPoints.ap)
+            () => this.window.setAp(toTarget.ap)
         );
-        const hpPoints = this.#createUpdate(fromTarget, fromTarget.cardPoints.hp, toTarget.cardPoints.hp,
+        const hpPoints = this.#createUpdate(fromTarget, fromTarget.hp, toTarget.hp,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.cardPoints.hp = Math.round(tween.getValue() ?? 0);
+                fromTarget.hp = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setHp(toTarget.cardPoints.hp)
+            () => this.window.setHp(toTarget.hp)
         );
         return { apPoints, hpPoints };
     }
 
-    #createUpdateColorsPoints(fromTarget: BoardWindowConfig, toTarget: BoardWindowConfig): {
+    #createUpdateColorsPoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
         redPoints: UpdatePoints, 
         greenPoints: UpdatePoints, 
         bluePoints: UpdatePoints, 
         blackPoints: UpdatePoints, 
         whitePoints: UpdatePoints
     } {
-                const redPoints = this.#createUpdate(fromTarget, fromTarget.colorsPoints.red, toTarget.colorsPoints.red,
+                const redPoints = this.#createUpdate(fromTarget, fromTarget.redPoints, toTarget.redPoints,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.colorsPoints.red = Math.round(tween.getValue() ?? 0);
+                fromTarget.redPoints = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setRedColorPoints(toTarget.colorsPoints.red)
+            () => this.window.setRedColorPoints(toTarget.redPoints)
         );
-        const greenPoints = this.#createUpdate(fromTarget, fromTarget.colorsPoints.green, toTarget.colorsPoints.green,
+        const greenPoints = this.#createUpdate(fromTarget, fromTarget.greenPoints, toTarget.greenPoints,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.colorsPoints.green = Math.round(tween.getValue() ?? 0);
+                fromTarget.greenPoints = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setGreenColorPoints(toTarget.colorsPoints.green)
+            () => this.window.setGreenColorPoints(toTarget.greenPoints)
         );
-        const bluePoints = this.#createUpdate(fromTarget, fromTarget.colorsPoints.blue, toTarget.colorsPoints.blue,
+        const bluePoints = this.#createUpdate(fromTarget, fromTarget.bluePoints, toTarget.bluePoints,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.colorsPoints.blue = Math.round(tween.getValue() ?? 0);
+                fromTarget.bluePoints = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setBlueColorPoints(toTarget.colorsPoints.blue)
+            () => this.window.setBlueColorPoints(toTarget.bluePoints)
         );
-        const blackPoints = this.#createUpdate(fromTarget, fromTarget.colorsPoints.black, toTarget.colorsPoints.black,
+        const blackPoints = this.#createUpdate(fromTarget, fromTarget.blackPoints, toTarget.blackPoints,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.colorsPoints.black = Math.round(tween.getValue() ?? 0);
+                fromTarget.blackPoints = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setBlackColorPoints(toTarget.colorsPoints.black)
+            () => this.window.setBlackColorPoints(toTarget.blackPoints)
         );
-        const whitePoints = this.#createUpdate(fromTarget, fromTarget.colorsPoints.white, toTarget.colorsPoints.white,
+        const whitePoints = this.#createUpdate(fromTarget, fromTarget.whitePoints, toTarget.whitePoints,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.colorsPoints.white = Math.round(tween.getValue() ?? 0);
+                fromTarget.whitePoints = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             },
-            () => this.window.setWhiteColorPoints(toTarget.colorsPoints.white)
+            () => this.window.setWhiteColorPoints(toTarget.whitePoints)
         );
         return { redPoints, greenPoints, bluePoints, blackPoints, whitePoints };
     }
 
-    #createUpdateBoardPoints(fromTarget: BoardWindowConfig, toTarget: BoardWindowConfig): {
+    #createUpdateBoardPoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
         numberOfCardsInHand: UpdatePoints,
         numberOfCardsInDeck: UpdatePoints,
         numberOfWins: UpdatePoints
@@ -157,7 +157,7 @@ export default class UpdatingState implements WindowState {
     }
 
     #createUpdate(
-        target: BoardWindowConfig,
+        target: BoardWindowData,
         fromPoints: number, 
         toPoints: number, 
         onUpdate: (tween: Phaser.Tweens.Tween) => void,

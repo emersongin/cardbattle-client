@@ -1,4 +1,4 @@
-import { BoardWindowConfig } from "./BoardWindow";
+import { BoardWindowData } from "./BoardWindow";
 import StaticState from "./StaticState";
 import UpdatingState from "./UpdatingState";
 
@@ -7,7 +7,7 @@ export interface WindowState {
     addTweens(...args: any[]): void;
     preUpdate(): void;
     static(): void;
-    updating(toTarget: BoardWindowConfig): void;
+    updating(toTarget: BoardWindowData): void;
 }
 
 export { StaticState, UpdatingState };
