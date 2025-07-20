@@ -99,7 +99,7 @@ export class TestContext extends VueScene
             if (cardColor === 'orange') return;
             boardWindow.updateColorsPoints(cardColor, 1);
         });
-        // cardset.showSideMovement();
+        cardset.showSideMovement();
 
         // const events = {
         //     onChangeIndex: (cardIndex: number) => {

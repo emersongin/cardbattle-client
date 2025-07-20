@@ -27,36 +27,55 @@ export class DrawPhase implements Phase {
         const playerBoardData: BoardWindowData = await this.#cardBattle.getPlayerBoardData();
         const opponentBoardData: BoardWindowData = await this.#cardBattle.getOpponentBoardData();
         this.#createWindows();
-        this.#createcardSets(playerCards, opponentCards);
         this.#createBoards(playerBoardData, opponentBoardData);
+        this.#createcardSets(playerCards, opponentCards);
         this.#openWindows();
     }
 
     #createcardSets(playerCards: CardData[], opponentCards: CardData[]): void {
-        // ao adicionar não deve ser visivel os cardsets ou deve ficar já na posição inicial.
         this.#createPlayerCardSet(playerCards);
-        // this.#createOpponentCardSet(opponentCards);
+        this.#createOpponentCardSet(opponentCards);
     }
 
     #createPlayerCardSet(playerCards: CardData[]): void {
         const dimensions = { 
-            x: this.scene.cameras.main.centerX / 2, 
-            y: this.scene.cameras.main.centerY - 75, 
+            x: (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)), 
+            y: (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10, 
             width: (CARD_WIDTH * 6), 
             height: CARD_HEIGHT 
         };
-        const cardset = new Cardset(this.scene, dimensions, playerCards);
+        const widthEdge = this.scene.scale.width;
+        const cardset = Cardset.createCardsAtPosition(this.scene, dimensions, playerCards, widthEdge, 0);
+        // cardset.setChildrenInlinePosition();
         this.#playerCardset = cardset;
+    }
+
+    #createOpponentCardSet(opponentCards: CardData[]): void {
+        const dimensions = { 
+            x: (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)),
+            y: (this.#opponentBoard.y + (this.#playerBoard.height / 2)) + 10, 
+            width: (CARD_WIDTH * 6), 
+            height: CARD_HEIGHT 
+        };
+        const widthEdge = this.scene.scale.width;
+        const cardset = Cardset.createCardsAtPosition(this.scene, dimensions, opponentCards, widthEdge, 0);
+        // cardset.setChildrenInlinePosition();
+        this.#opponentCardset = cardset;
     }
 
     #createBoards(playerBoardData: BoardWindowData, opponentBoardData: BoardWindowData): void {
         this.#createPlayerBoard(playerBoardData);
-        // this.#createOpponentBoard(opponentBoardData);
+        this.#createOpponentBoard(opponentBoardData);
     }
 
     #createPlayerBoard(playerBoardData: BoardWindowData): void {
         const boardWindow = BoardWindow.createBottom(this.scene, playerBoardData);
         this.#playerBoard = boardWindow;
+    }
+
+    #createOpponentBoard(opponentBoardData: BoardWindowData): void {
+        const boardWindow = BoardWindow.createTopReverse(this.scene, opponentBoardData);
+        this.#opponentBoard = boardWindow;
     }
 
     #createWindows(): void {
@@ -71,7 +90,8 @@ export class DrawPhase implements Phase {
                 this.#textWindow.close();
             },
             onClose: () => {
-                // Transition to the next phase
+                this.#openBoards();
+                this.#moveCardSetsToBoards();
             }
         });
     }
@@ -93,6 +113,24 @@ export class DrawPhase implements Phase {
 
     #openTextWindow(): void {
         this.#textWindow.open();
+    }
+
+    #openBoards(): void {
+        this.#openPlayerBoard();
+        this.#openOpponentBoard();
+    }
+
+    #openPlayerBoard(): void {
+        this.#playerBoard.open();
+    }
+
+    #openOpponentBoard(): void {
+        this.#opponentBoard.open();
+    }
+
+    #moveCardSetsToBoards(): void {
+        this.#playerCardset.showSideMovement();
+        this.#opponentCardset.showSideMovement();
     }
 
     update(): void {

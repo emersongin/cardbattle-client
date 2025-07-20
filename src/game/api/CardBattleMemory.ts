@@ -2,6 +2,8 @@ import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../typ
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle } from './CardBattle';
 
+const delayMock = 100;
+
 const cards = [
     {
         UUID: '123e4567-e89b-12d3-a456-426614174000',
@@ -50,7 +52,7 @@ export default class CardBattleSocketIo implements CardBattle {
                     completed: false,
                     reward: 100,
                 });
-            }, 100);
+            }, delayMock);
         });
     }
 
@@ -89,7 +91,7 @@ export default class CardBattleSocketIo implements CardBattle {
                         orangePoints: 15
                     }
                 ]);
-            }, 1000);
+            }, delayMock);
         });
     }
 
@@ -97,7 +99,7 @@ export default class CardBattleSocketIo implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(folderId);
-            }, 1000);
+            }, delayMock);
         });
     }
 
@@ -105,7 +107,7 @@ export default class CardBattleSocketIo implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(Math.random() < 0.5);
-            }, 1000);
+            }, delayMock);
         });
     }
 
@@ -115,7 +117,7 @@ export default class CardBattleSocketIo implements CardBattle {
                 const choice = Math.random() < 0.5 ? 'White' : 'Black';
                 callback(choice);
                 resolve();
-            }, 1000);
+            }, delayMock);
         });
     }
 
@@ -124,29 +126,29 @@ export default class CardBattleSocketIo implements CardBattle {
             setTimeout(() => {
                 console.log(`Opponent choice set to: ${choice}`);
                 resolve();
-            }, 1000);
+            }, delayMock);
         });
     }
 
-    drawPlayerCardsData(timeout?: number): Promise<CardData[]> {
+    drawPlayerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const playerCards = this.duplicate(cards, 3);
                 resolve(playerCards);
-            }, timeout || 1000);
+            }, delayMock);
         });
     }
 
-    drawOpponentCardsData(timeout?: number): Promise<CardData[]> {
+    drawOpponentCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const playerCards = this.duplicate(cards, 3);
                 resolve(playerCards);
-            }, timeout || 1000);
+            }, delayMock);
         });
     }
 
-    getPlayerBoardData(timeout?: number): Promise<BoardWindowData> {
+    getPlayerBoardData(): Promise<BoardWindowData> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve({
@@ -162,11 +164,11 @@ export default class CardBattleSocketIo implements CardBattle {
                     numberOfCardsInDeck: 0,
                     numberOfWins: 0
                 });
-            }, timeout || 1000);
+            }, delayMock);
         });
     }
     
-    getOpponentBoardData(timeout?: number): Promise<BoardWindowData> {
+    getOpponentBoardData(): Promise<BoardWindowData> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve({
@@ -182,7 +184,7 @@ export default class CardBattleSocketIo implements CardBattle {
                     numberOfCardsInDeck: 0,
                     numberOfWins: 0
                 });
-            }, timeout || 1000);
+            }, delayMock);
         });
     }
 }

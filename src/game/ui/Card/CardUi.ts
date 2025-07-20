@@ -13,7 +13,7 @@ export class CardUi extends Phaser.GameObjects.Container {
 
     constructor(
         scene: Phaser.Scene,
-        data: CardData,
+        data: CardData
     ) {
         super(scene);
         this.#data = data;

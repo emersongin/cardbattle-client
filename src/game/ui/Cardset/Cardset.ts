@@ -1,4 +1,4 @@
-import { Card, CARD_WIDTH } from "@ui/Card/Card";
+import { Card, CARD_HEIGHT, CARD_WIDTH } from "@ui/Card/Card";
 import { Dimensions } from "./types/Dimensions";
 import { CardsetEvents } from "./types/CardsetEvents";
 import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
@@ -17,15 +17,27 @@ export class Cardset extends Phaser.GameObjects.Container {
     constructor(
         readonly scene: VueScene, 
         dimensions: Dimensions,
-        cards: CardData[] = []
+        cards: CardData[] = [],
+        x: number = 0,
+        y: number = 0
     ) {
-        const { x, y, width, height } = dimensions;
-        super(scene, x, y);
-        this.setSize(width, height);
+        const { x: cardsetX, y: cardsetY, width, height } = dimensions;
+        super(scene, cardsetX, cardsetY);
+        console.log(cardsetX, cardsetY);
+        this.setSize(width, height || CARD_HEIGHT);
         this.changeState(new StaticState(this));
-        this.#createCards(cards);
-        this.#addChildrenInline();
+        this.#createCards(cards, x, y);
         this.scene.add.existing(this);
+    }
+
+    static createCardsAtPosition(
+        scene: VueScene, 
+        dimensions: Dimensions,
+        cards: CardData[] = [],
+        x: number = 0,
+        y: number = 0
+    ): Cardset {
+        return new Cardset(scene, dimensions, cards, x, y);
     }
 
     getCards(): Card[] {
@@ -143,23 +155,24 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     showSideMovement(): void {
-        const widthEdge = this.scene.scale.width - this.x;
-        const onComplete = () => {
-            this.scene.timeline({
-                targets: this.getCardsUi(),
-                x: 0,
-                eachX: CARD_WIDTH,
-                eachDuration: 100,
-            });
-        };
+        // const widthEdge = this.scene.scale.width - this.x;
         this.scene.timeline({
             targets: this.getCardsUi(),
-            x: widthEdge,
-            delay: 0,
-            durantion: 0,
+            x: 0,
             eachX: CARD_WIDTH,
-            onComplete, 
+            eachDuration: 100,
         });
+        // const onComplete = () => {
+        //     // vai aqui...
+        // };
+        // this.scene.timeline({
+        //     targets: this.getCardsUi(),
+        //     x: widthEdge,
+        //     delay: 0,
+        //     durantion: 0,
+        //     eachX: CARD_WIDTH,
+        //     onComplete, 
+        // });
     }
 
     restoreSelectState(): void {
@@ -195,12 +208,16 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode(events, colorPoints, 0);
     }
 
-    #createCards(cards: CardData[]): void {
-        const cardsUi = cards.map((data: CardData) => new Card(this.scene, data));
+    #createCards(cards: CardData[], x: number, y: number): void {
+        const cardsUi = cards.map((data: CardData) => {
+            const card = new Card(this.scene, this, data);
+            card.setPosition(x, y);
+            return card;
+        });
         this.#cards = cardsUi;
     }
 
-    #addChildrenInline(): void {
+    setChildrenInlinePosition(): void {
         if (this.#cards.length === 0) return;
         this.#cards.forEach((card: Card, index: number) => {
             let padding = Math.max(0, Math.abs(this.width / this.#cards.length));

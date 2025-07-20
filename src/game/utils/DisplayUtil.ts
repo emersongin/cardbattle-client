@@ -1,3 +1,5 @@
+import { Container } from "phaser3-rex-plugins/templates/ui/ui-components";
+
 export class DisplayUtil {
     static column1of12(width: number): number {
         return width / 12;

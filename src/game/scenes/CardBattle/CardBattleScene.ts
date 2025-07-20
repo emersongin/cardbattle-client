@@ -1,7 +1,8 @@
 import { VueScene } from '../VueScene';
 import { Phase } from './phase/Phase';
-import { ChallengePhase } from './phase/ChallengePhase';
+// import { ChallengePhase } from './phase/ChallengePhase';
 import { EventBus } from '@game/EventBus';
+import { DrawPhase } from './phase/DrawPhase';
 
 export class CardBattleScene extends VueScene {
     private phase: Phase;
@@ -15,7 +16,7 @@ export class CardBattleScene extends VueScene {
     }
 
     create () {
-        this.changePhase(new ChallengePhase(this));
+        this.changePhase(new DrawPhase(this));
     }
 
     changePhase(phase: Phase) {

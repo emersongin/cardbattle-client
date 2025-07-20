@@ -3,6 +3,7 @@ import { CardState, StaticState, MovingState, UpdatingState, FlashConfig } from 
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@/game/types";
+import { Cardset } from "../Cardset/Cardset";
 
 export const CARD_WIDTH = 100;
 export const CARD_HEIGHT = 150;
@@ -22,13 +23,14 @@ export class Card {
 
     constructor(
         readonly scene: Phaser.Scene, 
+        readonly cardset: Cardset,
         cardData: CardData
     ) {
         this.#ui = new CardUi(this.scene, cardData);
         this.#data = cardData;
         this.#setPoints();
         this.changeState(new StaticState(this));
-        this.scene.add.existing(this.#ui);
+        this.cardset.add(this.#ui);
     }
 
     getAllData(): CardPoints {
@@ -232,6 +234,11 @@ export class Card {
 
     isPowerCard(): boolean {
         return this.#data.typeId === 'power';
+    }
+
+    setPosition(x: number, y: number): void {
+        this.setX(x);
+        this.setY(y);
     }
 
     setX(x: number): void {
