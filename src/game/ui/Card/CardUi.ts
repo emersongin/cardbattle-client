@@ -2,7 +2,6 @@ import { CardData } from "@/game/types";
 import { CARD_HEIGHT, CARD_WIDTH } from "./Card";
 
 export class CardUi extends Phaser.GameObjects.Container {
-    #data: CardData; 
     background: Phaser.GameObjects.Rectangle;
     image: Phaser.GameObjects.Image;
     display: Phaser.GameObjects.Text;
@@ -12,11 +11,10 @@ export class CardUi extends Phaser.GameObjects.Container {
     highlightedLayer: Phaser.GameObjects.Graphics;
 
     constructor(
-        scene: Phaser.Scene,
-        data: CardData
+        readonly scene: Phaser.Scene,
+        readonly staticData: CardData
     ) {
         super(scene);
-        this.#data = data;
         this.setSize(CARD_WIDTH, CARD_HEIGHT);
         this.#createLayers();
     }
@@ -40,7 +38,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #getBackgroundColor(): number {
-        switch (this.#data.color) {
+        switch (this.staticData.color) {
             case 'red':
                 return 0xff0000; // Red
             case 'blue':
@@ -54,20 +52,20 @@ export class CardUi extends Phaser.GameObjects.Container {
             case 'orange':
                 return 0xffa500; // Orange
             default:
-                throw new Error(`Unknown color: ${this.#data.color}`);
+                throw new Error(`Unknown color: ${this.staticData.color}`);
         }
     }
 
     #createImage(): void {
         const image = this.scene.add.image(0, 0, 'empty');
         this.image = image;
-        this.setImage(true);
+        this.setImage();
         this.add(this.image);
     }
 
     setImage(faceUp: boolean = false): void {
         if (faceUp) {
-            this.image.setTexture(this.#data.imageName);
+            this.image.setTexture(this.staticData.imageName);
         } else {
             this.image.setTexture('card-back');
         }
@@ -92,16 +90,16 @@ export class CardUi extends Phaser.GameObjects.Container {
             fontStyle: 'bold',
         });
         this.display = display;
-        this.setDisplay(true, this.#data.ap, this.#data.hp);
+        this.setDisplay(this.staticData.ap, this.staticData.hp);
         this.add(this.display);
     }
 
-    setDisplay(faceUp: boolean = false, ap?: number, hp?: number): void {
+    setDisplay(ap?: number, hp?: number, faceUp: boolean = false): void {
         if (!this.display || !faceUp) {
             this.#setEmptyDisplay();
             return
         } 
-        const { typeId: cardTypeId } = this.#data;
+        const { typeId: cardTypeId } = this.staticData;
         if (cardTypeId === 'battle') {
             this.setPointsDisplay(ap, hp);
         } else if (cardTypeId === 'power') {

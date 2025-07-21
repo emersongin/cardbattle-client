@@ -46,7 +46,6 @@ export class DrawPhase implements Phase {
         };
         const widthEdge = this.scene.scale.width;
         const cardset = Cardset.createCardsAtPosition(this.scene, dimensions, playerCards, widthEdge, 0);
-        // cardset.setChildrenInlinePosition();
         this.#playerCardset = cardset;
     }
 
@@ -59,7 +58,6 @@ export class DrawPhase implements Phase {
         };
         const widthEdge = this.scene.scale.width;
         const cardset = Cardset.createCardsAtPosition(this.scene, dimensions, opponentCards, widthEdge, 0);
-        // cardset.setChildrenInlinePosition();
         this.#opponentCardset = cardset;
     }
 
@@ -129,8 +127,31 @@ export class DrawPhase implements Phase {
     }
 
     #moveCardSetsToBoards(): void {
-        this.#playerCardset.showSideMovement();
-        this.#opponentCardset.showSideMovement();
+        this.#movePlayerCardSetToBoard();
+        this.#moveOpponentCardSetToBoard();
+    }
+
+    #movePlayerCardSetToBoard(): void {
+        this.scene.timeline({
+            targets: this.#playerCardset.getCardsUi(),
+            x: 0,
+            eachX: CARD_WIDTH,
+            eachDuration: 100,
+            onComplete: () => {
+                // devem ser timeline
+                // this.#playerCardset.flipAllCardsDominoMovement();
+                // this.#playerCardset.flashAllCardsDominoMovement();
+            }
+        });
+    }
+
+    #moveOpponentCardSetToBoard(): void {
+        this.scene.timeline({
+            targets: this.#opponentCardset.getCardsUi(),
+            x: 0,
+            eachX: CARD_WIDTH,
+            eachDuration: 100,
+        });
     }
 
     update(): void {

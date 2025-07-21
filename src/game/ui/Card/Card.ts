@@ -10,36 +10,34 @@ export const CARD_HEIGHT = 150;
 export type CardType = 'battle' | 'power';
 export type CardColors = 'red' | 'green' | 'blue' | 'black' | 'white' | 'orange';
 
-export class Card {
+export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
     #status: CardState;
-    #data: CardData; 
-    #ap: number = 0;
-    #hp: number = 0;
-    #faceUp: boolean = false;
-    #closed: boolean = false;
-    #marked: boolean = false;
-    #disabled: boolean = false;
 
     constructor(
         readonly scene: Phaser.Scene, 
         readonly cardset: Cardset,
-        cardData: CardData
+        readonly staticData: CardData
     ) {
-        this.#ui = new CardUi(this.scene, cardData);
-        this.#data = cardData;
-        this.#setPoints();
+        super(scene, 'Card');
+        this.#ui = new CardUi(this.scene, staticData);
+        this.#setStartData();
         this.changeState(new StaticState(this));
         this.cardset.add(this.#ui);
     }
 
     getAllData(): CardPoints {
-        return { ap: this.#ap, hp: this.#hp };
+        return { ap: this.data.get('ap'), hp: this.data.get('hp') };
     }
 
-    #setPoints(): void {
-        this.#ap = this.#data.hp;
-        this.#hp = this.#data.ap;
+    #setStartData(): void {
+        this.setDataEnabled();
+        this.data.set('ap', this.staticData.hp);
+        this.data.set('hp', this.staticData.ap);
+        this.data.set('faceUp', false);
+        this.data.set('closed', false);
+        this.data.set('marked', false);
+        this.data.set('disabled', false);
     }
 
     changeState(state: CardState, ...args: any[]): void {
@@ -90,64 +88,64 @@ export class Card {
         this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, delay, duration));
     }
 
-    flip(): void {
+    flip(delay: number = 100): void {
         const onCanStartClose = () => {
-            return !this.#faceUp;
+            return !this.data.get('faceUp');
         };
         const onClosed = () => {
-            this.#faceUp = true;
-            this.#ui.setImage(this.#faceUp);
-            this.#ui.setDisplay(this.#faceUp, this.#ap, this.#hp);
+            this.data.set('faceUp', true);
+            this.#ui.setImage(this.data.get('faceUp'));
+            this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
         };
-        this.close(100, 100, onCanStartClose, onClosed);
+        this.close(delay, 100, onCanStartClose, onClosed);
         const onCanStartOpen = () => {
-            return this.#faceUp;
+            return this.data.get('faceUp');
         };
         this.#open(100, 100, onCanStartOpen);
     }
 
     turnDown(): void {
         const onCanStartClose = () => {
-            return this.#faceUp;
+            return this.data.get('faceUp');
         };
         const onClosed = () => {
-            this.#faceUp = false;
-            this.#ui.setImage(this.#faceUp);
-            this.#ui.setDisplay(this.#faceUp);
+            this.data.set('faceUp', false);
+            this.#ui.setImage(this.data.get('faceUp'));
+            this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
         };
         this.close(100, 100,onCanStartClose, onClosed);
         const onCanStartOpen = () => {
-            return !this.#faceUp;
+            return !this.data.get('faceUp');
         };
         this.#open(100, 100, onCanStartOpen);
     }
 
     close(delay?: number, duration?: number, onCanStart?: () => boolean, onClosed?: () => void): void {
         const onClosedCallback = () => {
-            this.#closed = true;
+            this.data.set('closed', true);
             if (onClosed) onClosed();
         };
         this.move(MovingState.createCloseMove(this, onCanStart, onClosedCallback, delay, duration));
     }
 
     isOpened(): boolean {
-        return !this.#closed;
+        return !this.data.get('closed');
     }
 
     isClosed(): boolean {
-        return this.#closed;
+        return this.data.get('closed');
     }
 
     #open(delay: number = 0, duration: number = 0, onCanStart?: () => boolean, onOpened?: () => void): void {
         const onOpenedCallback = () => {
-            this.#closed = false;
+            this.data.set('closed', false);
             if (onOpened) onOpened();
         };
         this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay, duration));
     }
 
     changeDisplayPoints(ap: number, hp: number): void {
-        if (!this.#status || !this.#faceUp) return;
+        if (!this.#status || !this.data.get('faceUp')) return;
         if (this.#status instanceof UpdatingState) {
             this.#status.addTweens(ap, hp, 2000);
             return;
@@ -157,13 +155,13 @@ export class Card {
     }
 
     disable(): void {
-        this.#disabled = true;
+        this.data.set('disabled', true);
         if (!this.#ui.disabledLayer) return;
         this.#ui.disabledLayer.setVisible(true);
     }
 
     enable(): void {
-        this.#disabled = false;
+        this.data.set('disabled', false);
         if (!this.#ui.disabledLayer) return;
         this.#ui.disabledLayer.setVisible(false);
     }
@@ -183,17 +181,17 @@ export class Card {
     }
 
     mark(): void {
-        this.#marked = true;
+        this.data.set('marked', true);
         if (!this.#ui.markedLayer) return;
         this.#ui.markedLayer.setVisible(true);
     }
 
     isMarked(): boolean {
-        return this.#marked;
+        return this.data.get('marked');
     }
 
     unmark(): void {
-        this.#marked = false;
+        this.data.set('marked', false);
         if (!this.#ui.markedLayer) return;
         this.#ui.markedLayer.setVisible(false);
     }
@@ -213,27 +211,27 @@ export class Card {
     }
 
     isDisabled(): boolean {
-        return this.#disabled;
+        return this.data.get('disabled');
     }
 
     getName(): string {
-        return this.#data.name;
+        return this.staticData.name;
     }
 
     getColor(): CardColors {
-        return this.#data.color;
+        return this.staticData.color;
     }
 
     getCost(): number {
-        return this.#data.cost;
+        return this.staticData.cost;
     }
 
     isBattleCard(): boolean {
-        return this.#data.typeId === 'battle';
+        return this.staticData.typeId === 'battle';
     }
 
     isPowerCard(): boolean {
-        return this.#data.typeId === 'power';
+        return this.staticData.typeId === 'power';
     }
 
     setPosition(x: number, y: number): void {
@@ -274,11 +272,11 @@ export class Card {
     }
 
     setAp(ap: number): void {
-        this.#ap = ap;
+        this.data.set('ap', ap);
     }
 
     setHp(hp: number): void {
-        this.#hp = hp;
+        this.data.set('hp', hp);
     }
 
     flash(config: FlashConfig): void {

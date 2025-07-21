@@ -53,7 +53,7 @@ export default class BoardWindow extends Sizer {
         this.#numberOfCardsInDeck = data.numberOfCardsInDeck;
         this.#numberOfWins = data.numberOfWins;
 
-        this.#enableDataManager(data);
+        this.#setStartData(data);
         this.#createBackground();
         this.#createContentLabel(data);
 
@@ -62,7 +62,7 @@ export default class BoardWindow extends Sizer {
         scene.add.existing(this);
     }
 
-    #enableDataManager(data: BoardWindowData) {
+    #setStartData(data: BoardWindowData) {
         this.setDataEnabled();
         this.data.set('ap', data.ap);
         this.data.set('hp', data.hp);

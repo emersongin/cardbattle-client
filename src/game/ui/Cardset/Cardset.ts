@@ -16,8 +16,8 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     constructor(
         readonly scene: VueScene, 
-        dimensions: Dimensions,
-        cards: CardData[] = [],
+        readonly dimensions: Dimensions,
+        readonly cards: CardData[],
         x: number = 0,
         y: number = 0
     ) {
@@ -154,6 +154,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    flipAllCardsDominoMovement(): void {
+        this.getCards().forEach((card: Card, index: number) => {
+            const delay = (index * 100);
+            card.flip(delay);
+        });
+    }
+
     showSideMovement(): void {
         // const widthEdge = this.scene.scale.width - this.x;
         this.scene.timeline({
@@ -208,13 +215,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode(events, colorPoints, 0);
     }
 
-    #createCards(cards: CardData[], x: number, y: number): void {
-        const cardsUi = cards.map((data: CardData) => {
+    #createCards(cardsData: CardData[], x: number, y: number): void {
+        const cards = cardsData.map((data: CardData) => {
             const card = new Card(this.scene, this, data);
             card.setPosition(x, y);
             return card;
         });
-        this.#cards = cardsUi;
+        this.#cards = cards;
     }
 
     setChildrenInlinePosition(): void {
