@@ -1,5 +1,5 @@
 import { CardData } from "@/game/types";
-import { CARD_HEIGHT, CARD_WIDTH } from "./Card";
+import { Card, CARD_HEIGHT, CARD_WIDTH } from "./Card";
 
 export class CardUi extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -12,6 +12,7 @@ export class CardUi extends Phaser.GameObjects.Container {
 
     constructor(
         readonly scene: Phaser.Scene,
+        readonly card: Card,
         readonly staticData: CardData
     ) {
         super(scene);
@@ -30,14 +31,14 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #createBackground(): void {
-        const backgroundColor = this.#getBackgroundColor();
+        const backgroundColor = this.getBackgroundColor();
         const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
         this.background = backgroundRect;
         this.add(this.background);
     }
 
-    #getBackgroundColor(): number {
+    getBackgroundColor(): number {
         switch (this.staticData.color) {
             case 'red':
                 return 0xff0000; // Red

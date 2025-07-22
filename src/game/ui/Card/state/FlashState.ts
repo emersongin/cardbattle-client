@@ -3,10 +3,11 @@ import { CardState } from "./CardState";
 import StaticState from "./StaticState";
 
 export type FlashConfig = {
-    color: number,
+    color?: number,
     delay?: number,
     duration?: number,
-    onStart?: (card: Card) => void
+    onStart?: (card: Card) => void,
+    onComplete?: (card: Card) => void
 };
 
 export default class FlashState implements CardState {
@@ -15,9 +16,9 @@ export default class FlashState implements CardState {
     constructor(readonly card: Card) {}
 
     create(config: FlashConfig): void {
-        const { color, delay, duration, onStart } = config;
+        const { color, delay, duration, onStart, onComplete } = config;
         this.#createFlashLayer(color);
-        this.#flash(delay, duration, onStart);
+        this.#flash(delay, duration, onStart, onComplete);
     }
 
     #createFlashLayer(color: number = 0xffffff): void {
@@ -28,7 +29,7 @@ export default class FlashState implements CardState {
         this.card.getUi().add(this.#flashLayer);
     }
 
-    #flash(delay: number = 100, duration: number = 600, onStart?: (card: Card) => void): void {
+    #flash(delay: number = 100, duration: number = 600, onStart?: (card: Card) => void, onComplete?: (card: Card) => void): void {
         this.card.scene.tweens.add({
             targets: this.#flashLayer,
             alpha: 0,
@@ -42,6 +43,7 @@ export default class FlashState implements CardState {
             onComplete: () => {
                 this.#flashLayer.alpha = 1;
                 this.#flashLayer.setVisible(false);
+                if (onComplete) onComplete(this.card);
                 this.static();
             }
         });

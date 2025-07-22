@@ -4,6 +4,7 @@ import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@/game/types";
 import { Cardset } from "../Cardset/Cardset";
+import { FlipConfig } from "./state/MovingState";
 
 export const CARD_WIDTH = 100;
 export const CARD_HEIGHT = 150;
@@ -20,7 +21,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         readonly staticData: CardData
     ) {
         super(scene, 'Card');
-        this.#ui = new CardUi(this.scene, staticData);
+        this.#ui = new CardUi(this.scene, this, staticData);
         this.#setStartData();
         this.changeState(new StaticState(this));
         this.cardset.add(this.#ui);
@@ -88,7 +89,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, delay, duration));
     }
 
-    flip(delay: number = 100): void {
+    flip(config: FlipConfig): void {
         const onCanStartClose = () => {
             return !this.data.get('faceUp');
         };
@@ -97,11 +98,11 @@ export class Card extends Phaser.GameObjects.GameObject {
             this.#ui.setImage(this.data.get('faceUp'));
             this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
         };
-        this.close(delay, 100, onCanStartClose, onClosed);
+        this.close(config?.delay || 100, 100, onCanStartClose, onClosed);
         const onCanStartOpen = () => {
             return this.data.get('faceUp');
         };
-        this.#open(100, 100, onCanStartOpen);
+        this.#open(100, 100, onCanStartOpen, config?.onComplete);
     }
 
     turnDown(): void {
@@ -136,10 +137,10 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('closed');
     }
 
-    #open(delay: number = 0, duration: number = 0, onCanStart?: () => boolean, onOpened?: () => void): void {
+    #open(delay: number = 0, duration: number = 0, onCanStart?: () => boolean, onOpened?: (card: Card) => void): void {
         const onOpenedCallback = () => {
             this.data.set('closed', false);
-            if (onOpened) onOpened();
+            if (onOpened) onOpened(this);
         };
         this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay, duration));
     }
@@ -261,6 +262,10 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     getHeight(): number {
         return this.#ui.height;
+    }
+
+    getBackgroundColor(): number {
+        return this.#ui.getBackgroundColor();
     }
 
     getUi(): CardUi {

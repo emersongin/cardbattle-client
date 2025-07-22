@@ -7,6 +7,8 @@ import { BoardWindowData, CardData } from "@/game/types";
 import { CARD_HEIGHT, CARD_WIDTH } from "@/game/ui/Card/Card";
 import { Cardset } from "@/game/ui/Cardset/Cardset";
 import BoardWindow from "@/game/ui/BoardWindow/BoardWindow";
+import { CardUi } from "@/game/ui/Card/CardUi";
+import { TimelineConfig } from "../../VueScene";
 
 export class DrawPhase implements Phase {
     #cardBattle: CardBattle;
@@ -138,11 +140,43 @@ export class DrawPhase implements Phase {
             eachX: CARD_WIDTH,
             eachDuration: 100,
             onComplete: () => {
-                // devem ser timeline
-                // this.#playerCardset.flipAllCardsDominoMovement();
-                // this.#playerCardset.flashAllCardsDominoMovement();
+                this.#flipPlayerCardSetToBoard();
             }
         });
+    }
+
+    #flipPlayerCardSetToBoard() {
+        const flipConfig: TimelineConfig<CardUi> = {
+            targets: this.#playerCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
+                tween.pause();
+                card.flip({
+                    onComplete: () => {
+                        tween.resume();
+                    }
+                });
+            },
+            onComplete: () => {
+                this.#flashPlayerCardSetToBoard();
+            }
+        };
+        this.scene.timeline(flipConfig);
+    }
+
+    #flashPlayerCardSetToBoard(): void {
+        const flashConfig: TimelineConfig<CardUi> = {
+            targets: this.#playerCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi) => {
+                card.flash({
+                    onStart: () => {
+                        this.#playerBoard.updateColorsPoints(card.getColor(), 1);
+                    }
+                });
+            }
+        };
+        this.scene.timeline(flashConfig);
     }
 
     #moveOpponentCardSetToBoard(): void {
@@ -151,14 +185,51 @@ export class DrawPhase implements Phase {
             x: 0,
             eachX: CARD_WIDTH,
             eachDuration: 100,
+            onComplete: () => {
+                this.#flipOpponentCardSetToBoard();
+            }
         });
     }
 
-    update(): void {
-        console.log("Updating Draw Phase...");
+    #flipOpponentCardSetToBoard() {
+        const flipConfig: TimelineConfig<CardUi> = {
+            targets: this.#opponentCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
+                tween.pause();
+                card.flip({
+                    onComplete: () => {
+                        tween.resume();
+                    }
+                });
+            },
+            onComplete: () => {
+                this.#flashOpponentCardSetToBoard();
+            }
+        };
+        this.scene.timeline(flipConfig);
     }
 
-        changeToChallengePhase(): void {
+    #flashOpponentCardSetToBoard(): void {
+        const flashConfig: TimelineConfig<CardUi> = {
+            targets: this.#opponentCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi) => {
+                card.flash({
+                    onStart: () => {
+                        this.#opponentBoard.updateColorsPoints(card.getColor(), 1);
+                    }
+                });
+            }
+        };
+        this.scene.timeline(flashConfig);
+    }
+
+    update(): void {
+        // No specific update logic for DrawPhase
+    }
+
+    changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }
     

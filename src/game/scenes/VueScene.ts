@@ -2,8 +2,8 @@ import { Scene } from 'phaser';
 import { EventBus } from '@game/EventBus';
 import { CardBattle } from '../api/CardBattle';
 
-export type TimelineConfig = {
-    targets: Phaser.GameObjects.Components.Transform[];
+export type TimelineConfig<T extends Phaser.GameObjects.Components.Transform> = {
+    targets: T[];
     delay?: number;
     eachDelay?: number;
     durantion?: number;
@@ -12,6 +12,7 @@ export type TimelineConfig = {
     eachX?: number;
     y?: number;
     eachY?: number;
+    onStart?: (target: T, tween: Phaser.Tweens.Tween) => void;
     onComplete?: () => void;
 }
 
@@ -37,10 +38,8 @@ export class VueScene extends Scene {
         return this.#cardBattle;
     }
 
-    timeline(
-        timiline: TimelineConfig
-    ): void {
-        const promises = timiline.targets.map((target: Phaser.GameObjects.Components.Transform, index: number) => {
+    timeline<T extends Phaser.GameObjects.Components.Transform>(timiline: TimelineConfig<T>): void {
+        const promises = timiline.targets.map((target: T, index: number) => {
             return new Promise<void>((resolve) => {
                 let delay = 0;
                 let duration = 0;
@@ -60,6 +59,11 @@ export class VueScene extends Scene {
                     delay, 
                     duration, 
                     hold: 0,
+                    onStart: (tween: Phaser.Tweens.Tween) => {
+                        if (timiline.onStart) {
+                            timiline.onStart(target, tween);
+                        }
+                    },
                     onComplete: () => {
                         resolve();
                     },

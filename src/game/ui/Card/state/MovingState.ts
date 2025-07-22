@@ -2,6 +2,11 @@ import { Card } from "../Card";
 import { CardState, StaticState } from "./CardState";
 import { Move } from "../types/Move";
 
+export type FlipConfig = {
+    delay?: number,
+    onComplete?: (card: Card) => void
+};
+
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];
     #tweens: Phaser.Tweens.TweenChain[] = [];

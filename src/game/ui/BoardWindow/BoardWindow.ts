@@ -270,12 +270,17 @@ export default class BoardWindow extends Sizer {
     }
 
     updateColorsPoints(cardColor: CardColors, value: number): void {
+        this.data.set('redPoints', this.data.get('redPoints') + (cardColor === 'red' ? value : 0));
+        this.data.set('greenPoints', this.data.get('greenPoints') + (cardColor === 'green' ? value : 0));
+        this.data.set('bluePoints', this.data.get('bluePoints') + (cardColor === 'blue' ? value : 0));
+        this.data.set('blackPoints', this.data.get('blackPoints') + (cardColor === 'black' ? value : 0));
+        this.data.set('whitePoints', this.data.get('whitePoints') + (cardColor === 'white' ? value : 0));
         let colorsPoints = {
-            redPoints: this.data.get('redPoints') + (cardColor === 'red' ? value : 0),
-            greenPoints: this.data.get('greenPoints') + (cardColor === 'green' ? value : 0),
-            bluePoints: this.data.get('bluePoints') + (cardColor === 'blue' ? value : 0),
-            blackPoints: this.data.get('blackPoints') + (cardColor === 'black' ? value : 0),
-            whitePoints: this.data.get('whitePoints') + (cardColor === 'white' ? value : 0),
+            redPoints: this.data.get('redPoints'),
+            greenPoints: this.data.get('greenPoints'),
+            bluePoints: this.data.get('bluePoints'),
+            blackPoints: this.data.get('blackPoints'),
+            whitePoints: this.data.get('whitePoints'),
         } as MaybePartialBoardWindowData;
         this.#updating(colorsPoints);
     }

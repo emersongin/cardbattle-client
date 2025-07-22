@@ -58,48 +58,42 @@ export class TestContext extends VueScene
         // boardWindow.close();
         // boardWindow2.close();
 
-        const cards = [
-            {
-                UUID: '123e4567-e89b-12d3-a456-426614174000',
-                number: 1,
-                name: 'Test Card',
-                description: 'This is a test card description.',
-                color: 'red' as CardColors,
-                imageName: 'card-picture',
-                hp: 10,
-                ap: 5,
-                typeId: 'battle' as CardType,
-                powerId: 'none',
-                cost: 1
-            },
-            {
-                UUID: '123e4567-e89b-12d3-a456-426614174444',
-                number: 1,
-                name: 'Test Power Card',
-                description: 'This is a test power card description.',
-                color: 'green' as CardColors,
-                imageName: 'card-picture',
-                hp: 0,
-                ap: 0,
-                typeId: 'power' as CardType,
-                powerId: 'power-1',
-                cost: 1
-            },
-        ];
-        const cardsData: CardData[] = this.duplicate(cards, 3); // 40
-        const dimensions = { 
-            x: this.cameras.main.centerX / 2, 
-            y: this.cameras.main.centerY - 75, 
-            width: (CARD_WIDTH * 6), 
-            height: CARD_HEIGHT 
-        };
-        const cardset = new Cardset(this, dimensions, cardsData);
-        cardset.flashAllCardsDominoMovement((card: Card) => {
-            const cardColor = card.getColor();
-            if (cardColor === 'orange') return;
-            boardWindow.updateColorsPoints(cardColor, 1);
-        });
-        cardset.showSideMovement();
+        // const cards = [
+        //     {
+        //         UUID: '123e4567-e89b-12d3-a456-426614174000',
+        //         number: 1,
+        //         name: 'Test Card',
+        //         description: 'This is a test card description.',
+        //         color: 'red' as CardColors,
+        //         imageName: 'card-picture',
+        //         hp: 10,
+        //         ap: 5,
+        //         typeId: 'battle' as CardType,
+        //         powerId: 'none',
+        //         cost: 1
+        //     },
+        //     {
+        //         UUID: '123e4567-e89b-12d3-a456-426614174444',
+        //         number: 1,
+        //         name: 'Test Power Card',
+        //         description: 'This is a test power card description.',
+        //         color: 'green' as CardColors,
+        //         imageName: 'card-picture',
+        //         hp: 0,
+        //         ap: 0,
+        //         typeId: 'power' as CardType,
+        //         powerId: 'power-1',
+        //         cost: 1
+        //     },
+        // ];
+        // const cardsData: CardData[] = this.duplicate(cards, 3); // 40
+        // const dimensions = { 
+        //     x: this.cameras.main.centerX / 2, 
+        //     y: this.cameras.main.centerY - 75, 
+        //     width: (CARD_WIDTH * 6), 
+        //     height: CARD_HEIGHT 
+        // };
+        // const cardset = new Cardset(this, dimensions, cardsData);
 
         // const events = {
         //     onChangeIndex: (cardIndex: number) => {

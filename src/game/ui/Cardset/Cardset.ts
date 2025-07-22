@@ -1,10 +1,11 @@
-import { Card, CARD_HEIGHT, CARD_WIDTH } from "@ui/Card/Card";
+import { Card, CARD_HEIGHT } from "@ui/Card/Card";
 import { Dimensions } from "./types/Dimensions";
 import { CardsetEvents } from "./types/CardsetEvents";
 import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
 import { ColorsPoints } from "../../types/ColorsPoints";
 import { VueScene } from "@/game/scenes/VueScene";
 import { CardData } from "@/game/types";
+import { CardUi } from "../Card/CardUi";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
@@ -21,10 +22,8 @@ export class Cardset extends Phaser.GameObjects.Container {
         x: number = 0,
         y: number = 0
     ) {
-        const { x: cardsetX, y: cardsetY, width, height } = dimensions;
-        super(scene, cardsetX, cardsetY);
-        console.log(cardsetX, cardsetY);
-        this.setSize(width, height || CARD_HEIGHT);
+        super(scene, dimensions.x, dimensions.y);
+        this.setSize(dimensions.width, dimensions.height || CARD_HEIGHT);
         this.changeState(new StaticState(this));
         this.#createCards(cards, x, y);
         this.scene.add.existing(this);
@@ -44,7 +43,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.#cards;
     }
 
-    getCardsUi(): Phaser.GameObjects.Container[] {
+    getCardsUi(): CardUi[] {
         return this.getCards().map((card: Card) => card.getUi());
     }
 
@@ -141,45 +140,6 @@ export class Cardset extends Phaser.GameObjects.Container {
             const duration = 100;
             card.close(delay, duration);
         });
-    }
-
-    flashAllCardsDominoMovement(onStart?: (card: Card) => void): void {
-        this.getCards().forEach((card: Card, index: number) => {
-            const delay = (index * 100);
-            card.flash({
-                color: 0xffff00,
-                delay,
-                onStart
-            });
-        });
-    }
-
-    flipAllCardsDominoMovement(): void {
-        this.getCards().forEach((card: Card, index: number) => {
-            const delay = (index * 100);
-            card.flip(delay);
-        });
-    }
-
-    showSideMovement(): void {
-        // const widthEdge = this.scene.scale.width - this.x;
-        this.scene.timeline({
-            targets: this.getCardsUi(),
-            x: 0,
-            eachX: CARD_WIDTH,
-            eachDuration: 100,
-        });
-        // const onComplete = () => {
-        //     // vai aqui...
-        // };
-        // this.scene.timeline({
-        //     targets: this.getCardsUi(),
-        //     x: widthEdge,
-        //     delay: 0,
-        //     durantion: 0,
-        //     eachX: CARD_WIDTH,
-        //     onComplete, 
-        // });
     }
 
     restoreSelectState(): void {
