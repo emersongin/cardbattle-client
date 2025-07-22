@@ -141,12 +141,12 @@ export class DrawPhase implements Phase {
             eachX: CARD_WIDTH,
             eachDuration: 100,
             onComplete: () => {
-                this.#flipPlayerCardSetToBoard();
+                this.#flipPlayerCardSet();
             }
         });
     }
 
-    #flipPlayerCardSetToBoard() {
+    #flipPlayerCardSet() {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
             eachDelay: 100,
@@ -159,31 +159,99 @@ export class DrawPhase implements Phase {
                 });
             },
             onComplete: () => {
-                this.#flashPlayerCardSetToBoard();
-                this.#flashOpponentCardSetToBoard();
+                this.#flashPlayerCardSet();
+                this.#flashOpponentCardSet();
             }
         };
         this.scene.timeline(flipConfig);
     }
 
-    #flashPlayerCardSetToBoard(): void {
+    #flashPlayerCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
             eachDelay: 100,
-            onStart: ({ card }: CardUi) => {
+            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
+                tween.pause();
                 card.flash({
                     onStart: () => {
                         this.#playerBoard.updateColorsPoints(card.getColor(), 1);
+                    },
+                    onComplete: () => {
+                        tween.resume();
                     }
                 });
+            },
+            onComplete: () => {
+                this.#addOnCompletedListener();
             }
         };
         this.scene.timeline(flashConfig);
     }
 
-    #flashOpponentCardSetToBoard(): void {
+    #addOnCompletedListener() {
+        const keyboard = this.scene.input.keyboard;
+        if (!keyboard) {
+            throw new Error('Keyboard input is not available in this scene.');
+        }
+        const onKeyDown = () => {
+            if (!keyboard) {
+                throw new Error('Keyboard input is not available in this scene.');
+            }
+            keyboard.removeAllListeners();
+            this.#closeWindows();
+            this.#closeCardSets();
+        };
+        keyboard.once('keydown-ENTER', onKeyDown, this);
+    }
+
+    #closeWindows(): void {
+        this.#playerBoard.close();
+        this.#opponentBoard.close();
+    }
+
+    #closeCardSets(): void {
+        this.#closePlayerCardSet();
+        this.#closeOpponentCardSet();
+    }
+
+    #closePlayerCardSet(): void {
+        const flipConfig: TimelineConfig<CardUi> = {
+            targets: this.#playerCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
+                tween.pause();
+                card.close({
+                    onClosed: () => {
+                        tween.resume();
+                    }
+                });
+            },
+            onComplete: () => {
+                this.changeToLoadPhase();
+            }
+        };
+        this.scene.timeline(flipConfig);
+    }
+
+    #closeOpponentCardSet(): void {
+        const flipConfig: TimelineConfig<CardUi> = {
+            targets: this.#opponentCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
+                tween.pause();
+                card.close({
+                    onClosed: () => {
+                        tween.resume();
+                    }
+                });
+            },
+        };
+        this.scene.timeline(flipConfig);
+    }
+
+    #flashOpponentCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
             eachDelay: 100,

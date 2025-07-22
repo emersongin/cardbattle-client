@@ -7,6 +7,13 @@ export type FlipConfig = {
     onComplete?: (card: Card) => void
 };
 
+export type CloseConfig = {
+    delay?: number, 
+    duration?: number, 
+    onCanStart?: () => boolean, 
+    onClosed?: () => void
+}
+
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];
     #tweens: Phaser.Tweens.TweenChain[] = [];
