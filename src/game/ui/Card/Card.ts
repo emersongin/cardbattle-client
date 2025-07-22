@@ -4,7 +4,7 @@ import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@/game/types";
 import { Cardset } from "../Cardset/Cardset";
-import { CloseConfig, FlipConfig } from "./state/MovingState";
+import { CloseConfig, FlipConfig, OpenConfig } from "./state/MovingState";
 import { RED, GREEN, BLUE, BLACK, WHITE, ORANGE } from "@/game/constants/Colors";
 import { BATTLE, POWER } from "@/game/constants/CardTypes";
 
@@ -115,7 +115,12 @@ export class Card extends Phaser.GameObjects.GameObject {
         const onCanStartOpen = () => {
             return this.data.get('faceUp');
         };
-        this.#open(100, 100, onCanStartOpen, config?.onComplete);
+        this.#open({
+            delay: 100, 
+            duration: 100, 
+            onCanStart: onCanStartOpen, 
+            onComplete
+        });
     }
 
     turnDown(): void {
@@ -136,7 +141,11 @@ export class Card extends Phaser.GameObjects.GameObject {
         const onCanStartOpen = () => {
             return !this.data.get('faceUp');
         };
-        this.#open(100, 100, onCanStartOpen);
+        this.#open({
+            delay: 100, 
+            duration: 100, 
+            onCanStart: onCanStartOpen
+        });
     }
 
     close(config: CloseConfig): void {
@@ -144,7 +153,12 @@ export class Card extends Phaser.GameObjects.GameObject {
             this.data.set('closed', true);
             if (config?.onComplete) config.onComplete();
         };
-        this.move(MovingState.createCloseMove(this, config.onCanStart, onCompleteCallback, config.delay || 100, config.duration || 100));
+        this.move(MovingState.createCloseMove(this, {
+            delay: config?.delay || 100, 
+            duration: config?.duration || 100, 
+            onCanStart: config?.onCanStart, 
+            onComplete: onCompleteCallback
+        }));
     }
 
     isOpened(): boolean {
@@ -155,12 +169,17 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('closed');
     }
 
-    #open(delay: number = 0, duration: number = 0, onCanStart?: () => boolean, onOpened?: (card: Card) => void): void {
+    #open(config: OpenConfig): void {
         const onOpenedCallback = () => {
             this.data.set('closed', false);
-            if (onOpened) onOpened(this);
+            if (config.onComplete) config.onComplete(this);
         };
-        this.move(MovingState.createOpenMove(this, onCanStart, onOpenedCallback, delay, duration));
+        this.move(MovingState.createOpenMove(this, {
+            delay: config?.delay || 100, 
+            duration: config?.duration || 100, 
+            onCanStart: config?.onCanStart, 
+            onComplete: onOpenedCallback
+        }));
     }
 
     changeDisplayPoints(ap: number, hp: number): void {

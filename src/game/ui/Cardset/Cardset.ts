@@ -138,7 +138,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.getCards().forEach((card: Card, index: number) => {
             const delay = (index * 100);
             const duration = 100;
-            card.close(delay, duration);
+            card.close({ delay, duration });
         });
     }
 

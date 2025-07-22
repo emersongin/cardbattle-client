@@ -7,11 +7,18 @@ export type FlipConfig = {
     onComplete?: (card: Card) => void
 };
 
+export type OpenConfig = {
+    delay: number, 
+    duration: number, 
+    onCanStart?: () => boolean, 
+    onComplete?: (card?: Card) => void
+}
+
 export type CloseConfig = {
     delay?: number, 
     duration?: number, 
     onCanStart?: () => boolean, 
-    onComplete?: () => void
+    onComplete?: (card?: Card) => void
 }
 
 export default class MovingState implements CardState {
@@ -35,35 +42,35 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    static createCloseMove(card: Card, onCanStart?: () => boolean, onComplete?: () => void, delay: number = 0, duration: number = 0): Move[] {
+    static createCloseMove(card: Card, config: CloseConfig): Move[] {
         const moves: Move[] = [
             {
                 x: card.getX() + (card.getWidth() / 2),
                 scaleX: 0,
                 ease: 'Linear',
                 canStart: () => {
-                    return card.isOpened() && (!onCanStart || onCanStart());
+                    return card.isOpened() && (!config.onCanStart || config.onCanStart());
                 },
-                onComplete,
-                delay,
-                duration,
+                onComplete: config.onComplete,
+                delay: config.delay,
+                duration: config.duration,
             },
         ];
         return moves;
     }
 
-    static createOpenMove(card: Card, onCanStart?: () => boolean, onOpened?: () => void, delay: number = 0, duration: number = 0): Move[] {
+    static createOpenMove(card: Card, config: OpenConfig): Move[] {
         const moves: Move[] = [
             {
                 x: card.getX(),
                 scaleX: 1,
                 ease: 'Linear',
                 canStart: () => {
-                    return card.isClosed() && (!onCanStart || onCanStart());
+                    return card.isClosed() && (!config.onCanStart || config.onCanStart());
                 },
-                onComplete: onOpened, 
-                delay,
-                duration,
+                onComplete: config.onComplete, 
+                delay: config.delay,
+                duration: config.duration,
             }
         ];
         return moves;

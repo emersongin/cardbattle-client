@@ -1,3 +1,5 @@
+import { Card } from "../Card";
+
 export type Move = {
     hold?: number;
     x?: number;
@@ -9,6 +11,6 @@ export type Move = {
     ease?: string;
     delay?: number;
     canStart?: () => boolean;
-    onComplete?: () => void;
+    onComplete?: (card?: Card) => void;
     onYoyo?: () => void;
 }
