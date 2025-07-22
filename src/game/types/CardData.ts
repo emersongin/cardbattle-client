@@ -1,4 +1,4 @@
-import { CardColors, CardType } from "../Card/Card";
+import { CardColors, CardType } from "../ui/Card/Card";
 
 export type CardData = {
     UUID: string;

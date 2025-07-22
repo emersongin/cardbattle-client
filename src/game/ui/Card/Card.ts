@@ -5,11 +5,19 @@ import { Move } from "./types/Move";
 import { CardData } from "@/game/types";
 import { Cardset } from "../Cardset/Cardset";
 import { FlipConfig } from "./state/MovingState";
+import { RED, GREEN, BLUE, BLACK, WHITE, ORANGE } from "@/game/constants/Colors";
+import { BATTLE, POWER } from "@/game/constants/CardTypes";
 
 export const CARD_WIDTH = 100;
 export const CARD_HEIGHT = 150;
-export type CardType = 'battle' | 'power';
-export type CardColors = 'red' | 'green' | 'blue' | 'black' | 'white' | 'orange';
+export type CardType = | typeof BATTLE | typeof POWER;
+export type CardColors = 
+    | typeof RED 
+    | typeof GREEN 
+    | typeof BLUE 
+    | typeof BLACK 
+    | typeof WHITE 
+    | typeof ORANGE;
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
@@ -228,11 +236,11 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     isBattleCard(): boolean {
-        return this.staticData.typeId === 'battle';
+        return this.staticData.typeId === BATTLE;
     }
 
     isPowerCard(): boolean {
-        return this.staticData.typeId === 'power';
+        return this.staticData.typeId === POWER;
     }
 
     setPosition(x: number, y: number): void {

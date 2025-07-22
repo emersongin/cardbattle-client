@@ -1,3 +1,5 @@
+import { BATTLE, POWER } from '../constants/CardTypes';
+import { BLUE, RED } from '../constants/Colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle } from './CardBattle';
@@ -10,11 +12,11 @@ const cards = [
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
-        color: 'red' as CardColors,
+        color: RED as CardColors,
         imageName: 'card-picture',
         hp: 10,
         ap: 5,
-        typeId: 'battle' as CardType,
+        typeId: BATTLE as CardType,
         powerId: 'none',
         cost: 1
     },
@@ -23,11 +25,11 @@ const cards = [
         number: 1,
         name: 'Test Power Card',
         description: 'This is a test power card description.',
-        color: 'green' as CardColors,
+        color: BLUE as CardColors,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: 'power' as CardType,
+        typeId: POWER as CardType,
         powerId: 'power-1',
         cost: 1
     },
@@ -117,7 +119,7 @@ export default class CardBattleSocketIo implements CardBattle {
                 const choice = Math.random() < 0.5 ? 'White' : 'Black';
                 callback(choice);
                 resolve();
-            }, delayMock);
+            }, 1000);
         });
     }
 

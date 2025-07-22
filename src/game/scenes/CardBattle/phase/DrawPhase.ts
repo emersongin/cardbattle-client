@@ -9,6 +9,7 @@ import { Cardset } from "@/game/ui/Cardset/Cardset";
 import BoardWindow from "@/game/ui/BoardWindow/BoardWindow";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineConfig } from "../../VueScene";
+import { ORANGE } from "@/game/constants/Colors";
 
 export class DrawPhase implements Phase {
     #cardBattle: CardBattle;
@@ -159,6 +160,7 @@ export class DrawPhase implements Phase {
             },
             onComplete: () => {
                 this.#flashPlayerCardSetToBoard();
+                this.#flashOpponentCardSetToBoard();
             }
         };
         this.scene.timeline(flipConfig);
@@ -169,9 +171,28 @@ export class DrawPhase implements Phase {
             targets: this.#playerCardset.getCardsUi(),
             eachDelay: 100,
             onStart: ({ card }: CardUi) => {
+                const cardColor = card.getColor();
+                if (cardColor === ORANGE) return;
                 card.flash({
                     onStart: () => {
                         this.#playerBoard.updateColorsPoints(card.getColor(), 1);
+                    }
+                });
+            }
+        };
+        this.scene.timeline(flashConfig);
+    }
+
+    #flashOpponentCardSetToBoard(): void {
+        const flashConfig: TimelineConfig<CardUi> = {
+            targets: this.#opponentCardset.getCardsUi(),
+            eachDelay: 100,
+            onStart: ({ card }: CardUi) => {
+                const cardColor = card.getColor();
+                if (cardColor === ORANGE) return;
+                card.flash({
+                    onStart: () => {
+                        this.#opponentBoard.updateColorsPoints(card.getColor(), 1);
                     }
                 });
             }
@@ -185,44 +206,7 @@ export class DrawPhase implements Phase {
             x: 0,
             eachX: CARD_WIDTH,
             eachDuration: 100,
-            onComplete: () => {
-                this.#flipOpponentCardSetToBoard();
-            }
         });
-    }
-
-    #flipOpponentCardSetToBoard() {
-        const flipConfig: TimelineConfig<CardUi> = {
-            targets: this.#opponentCardset.getCardsUi(),
-            eachDelay: 100,
-            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
-                tween.pause();
-                card.flip({
-                    onComplete: () => {
-                        tween.resume();
-                    }
-                });
-            },
-            onComplete: () => {
-                this.#flashOpponentCardSetToBoard();
-            }
-        };
-        this.scene.timeline(flipConfig);
-    }
-
-    #flashOpponentCardSetToBoard(): void {
-        const flashConfig: TimelineConfig<CardUi> = {
-            targets: this.#opponentCardset.getCardsUi(),
-            eachDelay: 100,
-            onStart: ({ card }: CardUi) => {
-                card.flash({
-                    onStart: () => {
-                        this.#opponentBoard.updateColorsPoints(card.getColor(), 1);
-                    }
-                });
-            }
-        };
-        this.scene.timeline(flashConfig);
     }
 
     update(): void {

@@ -1,5 +1,7 @@
 import { CardData } from "@/game/types";
 import { Card, CARD_HEIGHT, CARD_WIDTH } from "./Card";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/Colors";
+import { BATTLE, POWER } from "@/game/constants/CardTypes";
 
 export class CardUi extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -40,17 +42,17 @@ export class CardUi extends Phaser.GameObjects.Container {
 
     getBackgroundColor(): number {
         switch (this.staticData.color) {
-            case 'red':
+            case RED:
                 return 0xff0000; // Red
-            case 'blue':
+            case BLUE:
                 return 0x0000ff; // Blue
-            case 'green':
+            case GREEN:
                 return 0x00ff00; // Green
-            case 'white':
+            case WHITE:
                 return 0xffffff; // White
-            case 'black':
+            case BLACK:
                 return 0x000000; // Black
-            case 'orange':
+            case ORANGE:
                 return 0xffa500; // Orange
             default:
                 throw new Error(`Unknown color: ${this.staticData.color}`);
@@ -101,9 +103,9 @@ export class CardUi extends Phaser.GameObjects.Container {
             return
         } 
         const { typeId: cardTypeId } = this.staticData;
-        if (cardTypeId === 'battle') {
+        if (cardTypeId === BATTLE) {
             this.setPointsDisplay(ap, hp);
-        } else if (cardTypeId === 'power') {
+        } else if (cardTypeId === POWER) {
             this.#setPowerDisplay();
         } else {
             throw new Error(`Unknown card type id: ${cardTypeId}`);
