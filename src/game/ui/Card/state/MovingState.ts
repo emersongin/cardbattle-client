@@ -11,7 +11,7 @@ export type CloseConfig = {
     delay?: number, 
     duration?: number, 
     onCanStart?: () => boolean, 
-    onClosed?: () => void
+    onComplete?: () => void
 }
 
 export default class MovingState implements CardState {
@@ -35,7 +35,7 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    static createCloseMove(card: Card, onCanStart?: () => boolean, onClosed?: () => void, delay: number = 0, duration: number = 0): Move[] {
+    static createCloseMove(card: Card, onCanStart?: () => boolean, onComplete?: () => void, delay: number = 0, duration: number = 0): Move[] {
         const moves: Move[] = [
             {
                 x: card.getX() + (card.getWidth() / 2),
@@ -44,7 +44,7 @@ export default class MovingState implements CardState {
                 canStart: () => {
                     return card.isOpened() && (!onCanStart || onCanStart());
                 },
-                onComplete: onClosed,
+                onComplete,
                 delay,
                 duration,
             },

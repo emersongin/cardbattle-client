@@ -223,7 +223,7 @@ export class DrawPhase implements Phase {
             onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
                 tween.pause();
                 card.close({
-                    onClosed: () => {
+                    onComplete: () => {
                         tween.resume();
                     }
                 });
@@ -242,7 +242,7 @@ export class DrawPhase implements Phase {
             onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
                 tween.pause();
                 card.close({
-                    onClosed: () => {
+                    onComplete: () => {
                         tween.resume();
                     }
                 });

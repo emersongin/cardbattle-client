@@ -101,7 +101,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         const onCanStartClose = () => {
             return !this.data.get('faceUp');
         };
-        const onClosed = () => {
+        const onComplete = () => {
             this.data.set('faceUp', true);
             this.#ui.setImage(this.data.get('faceUp'));
             this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
@@ -110,7 +110,7 @@ export class Card extends Phaser.GameObjects.GameObject {
             delay: config?.delay || 100, 
             duration: 100, 
             onCanStart: onCanStartClose, 
-            onClosed
+            onComplete
         });
         const onCanStartOpen = () => {
             return this.data.get('faceUp');
@@ -122,7 +122,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         const onCanStartClose = () => {
             return this.data.get('faceUp');
         };
-        const onClosed = () => {
+        const onComplete = () => {
             this.data.set('faceUp', false);
             this.#ui.setImage(this.data.get('faceUp'));
             this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
@@ -131,7 +131,7 @@ export class Card extends Phaser.GameObjects.GameObject {
             delay: 100, 
             duration: 100, 
             onCanStart: onCanStartClose, 
-            onClosed
+            onComplete
         });
         const onCanStartOpen = () => {
             return !this.data.get('faceUp');
@@ -140,11 +140,11 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     close(config: CloseConfig): void {
-        const onClosedCallback = () => {
+        const onCompleteCallback = () => {
             this.data.set('closed', true);
-            if (config?.onClosed) config.onClosed();
+            if (config?.onComplete) config.onComplete();
         };
-        this.move(MovingState.createCloseMove(this, config.onCanStart, onClosedCallback, config.delay || 100, config.duration || 100));
+        this.move(MovingState.createCloseMove(this, config.onCanStart, onCompleteCallback, config.delay || 100, config.duration || 100));
     }
 
     isOpened(): boolean {
