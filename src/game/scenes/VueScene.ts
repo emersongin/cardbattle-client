@@ -12,8 +12,9 @@ export type TimelineConfig<T extends Phaser.GameObjects.Components.Transform> = 
     eachX?: number;
     y?: number;
     eachY?: number;
-    onStart?: (target: T, tween: Phaser.Tweens.Tween) => void;
-    onComplete?: () => void;
+    onStart?: (target: T, tween: Phaser.Tweens.Tween, index: number) => void;
+    onComplete?: (target: T, tween: Phaser.Tweens.Tween, index: number) => void;
+    onAllComplete?: () => void;
 }
 
 export class VueScene extends Scene {
@@ -58,13 +59,14 @@ export class VueScene extends Scene {
                     x, y, 
                     delay, 
                     duration, 
-                    hold: 0,
+                    hold: 100,
                     onStart: (tween: Phaser.Tweens.Tween) => {
-                        if (timiline.onStart) {
-                            timiline.onStart(target, tween);
-                        }
+                        if (timiline.onStart) timiline.onStart(target, tween, index);
                     },
-                    onComplete: () => {
+                    onComplete: (tween: Phaser.Tweens.Tween) => {
+                        if (timiline.onComplete) {
+                            timiline.onComplete(target, tween, index);
+                        }
                         resolve();
                     },
                 };
@@ -72,7 +74,7 @@ export class VueScene extends Scene {
             });
         });
         Promise.all(promises).then(() => {
-            timiline.onComplete?.();
+            timiline.onAllComplete?.();
         });
     }
 }

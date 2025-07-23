@@ -163,7 +163,7 @@ export default class CardBattleSocketIo implements CardBattle {
                     whitePoints: 0,
                     orangePoints: 0,
                     numberOfCardsInHand: 0,
-                    numberOfCardsInDeck: 0,
+                    numberOfCardsInDeck: 40,
                     numberOfWins: 0
                 });
             }, delayMock);
@@ -183,7 +183,7 @@ export default class CardBattleSocketIo implements CardBattle {
                     whitePoints: 0,
                     orangePoints: 0,
                     numberOfCardsInHand: 0,
-                    numberOfCardsInDeck: 0,
+                    numberOfCardsInDeck: 40,
                     numberOfWins: 0
                 });
             }, delayMock);
