@@ -1,22 +1,20 @@
 import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
-import { CardPoints } from "../Card/types/CardPoints";
-import { ColorsPoints } from "../../types";
 import { DisplayUtil } from "../../utils/DisplayUtil";
 import { StaticState, UpdatingState, WindowState } from "./WindowState";
 import { CardColors } from "../Card/Card";
 import { BoardWindowData, MaybePartialBoardWindowData } from "@game/types/BoardWindowData";
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/Colors";
+import { BLACK, BLUE, GREEN, RED, WHITE } from "@game/constants/Colors";
+import { DECK, HAND, TRASH } from "@/game/constants/Keys";
+
+export type BoardZones = 
+    | typeof HAND 
+    | typeof DECK
+    | typeof TRASH;
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;
     #status: WindowState;
-    #reverse: boolean;
     #contentLabel: Label;
-    #colorsPoints: ColorsPoints;
-    #battlePoints: CardPoints;
-    #numberOfCardsInHand: number;
-    #numberOfCardsInDeck: number;
-    #numberOfWins: number;
 
     private constructor(
         readonly scene: Phaser.Scene,
@@ -35,35 +33,16 @@ export default class BoardWindow extends Sizer {
             height,
             orientation: vertical,
         });
-
-        this.#reverse = reverse;
         this.#status = new StaticState(this);
-        this.#colorsPoints = {
-            [RED]: data.redPoints,
-            [GREEN]: data.greenPoints,
-            [BLUE]: data.bluePoints,
-            [BLACK]: data.blackPoints,
-            [WHITE]: data.whitePoints,
-            [ORANGE]: data.orangePoints,
-        };
-        this.#battlePoints = {
-            ap: data.ap,
-            hp: data.hp,
-        };
-        this.#numberOfCardsInHand = data.numberOfCardsInHand;
-        this.#numberOfCardsInDeck = data.numberOfCardsInDeck;
-        this.#numberOfWins = data.numberOfWins;
-
-        this.#setStartData(data);
+        this.#setStartData(data, reverse);
         this.#createBackground();
         this.#createContentLabel(data);
-
         this.layout();
         this.setScale(1, 0);
         scene.add.existing(this);
     }
 
-    #setStartData(data: BoardWindowData) {
+    #setStartData(data: BoardWindowData, reverse: boolean = false) {
         this.setDataEnabled();
         this.data.set('ap', data.ap);
         this.data.set('hp', data.hp);
@@ -75,6 +54,7 @@ export default class BoardWindow extends Sizer {
         this.data.set('numberOfCardsInHand', data.numberOfCardsInHand);
         this.data.set('numberOfCardsInDeck', data.numberOfCardsInDeck);
         this.data.set('numberOfWins', data.numberOfWins);
+        this.data.set('reverse', reverse);
     }
 
     #createBackground() {
@@ -111,7 +91,7 @@ export default class BoardWindow extends Sizer {
             data.numberOfCardsInDeck, 
             data.numberOfWins
         );
-        return this.#reverse ? `${boardPoints}\n\n${battlePoints}` : `${battlePoints}\n\n${boardPoints}`;
+        return this.data.get('reverse') ? `${boardPoints}\n\n${battlePoints}` : `${battlePoints}\n\n${boardPoints}`;
     }
 
     #createBattlePoints(ap: number, hp: number): string {
@@ -208,69 +188,49 @@ export default class BoardWindow extends Sizer {
 
     getAllData(): BoardWindowData {
         return {
-            ap: this.#battlePoints.ap,
-            hp: this.#battlePoints.hp,
-            redPoints: this.#colorsPoints[RED],
-            greenPoints: this.#colorsPoints[GREEN],
-            bluePoints: this.#colorsPoints[BLUE],
-            blackPoints: this.#colorsPoints[BLACK],
-            whitePoints: this.#colorsPoints[WHITE],
-            orangePoints: this.#colorsPoints[ORANGE],
-            numberOfCardsInHand: this.#numberOfCardsInHand,
-            numberOfCardsInDeck: this.#numberOfCardsInDeck,
-            numberOfWins: this.#numberOfWins,
+            ap: this.data.get('ap'),
+            hp: this.data.get('hp'),
+            redPoints: this.data.get('redPoints'),
+            greenPoints: this.data.get('greenPoints'),
+            bluePoints: this.data.get('bluePoints'),
+            blackPoints: this.data.get('blackPoints'),
+            whitePoints: this.data.get('whitePoints'),
+            orangePoints: this.data.get('orangePoints'),
+            numberOfCardsInHand: this.data.get('numberOfCardsInHand'),
+            numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
+            numberOfWins: this.data.get('numberOfWins'),
         };
-    }
-
-    getColorsPoints(): ColorsPoints {
-        return this.#colorsPoints;
-    }
-
-    setAp(ap: number) {
-        this.#battlePoints.ap = ap;
-    }
-
-    setHp(hp: number) {
-        this.#battlePoints.hp = hp;
-    }
-
-    setRedColorPoints(points: number) {
-        this.#colorsPoints[RED] = points;
-    }
-
-    setGreenColorPoints(points: number) {
-        this.#colorsPoints[GREEN]= points;
-    }
-
-    setBlueColorPoints(points: number) {
-        this.#colorsPoints[BLUE] = points;
-    }
-
-    setBlackColorPoints(points: number) {
-        this.#colorsPoints[BLACK] = points;
-    }
-
-    setWhiteColorPoints(points: number) {
-        this.#colorsPoints[WHITE] = points;
-    }
-
-    setNumberOfCardsInHand(count: number) {
-        this.#numberOfCardsInHand = count;
-    }
-
-    setNumberOfCardsInDeck(count: number) {
-        this.#numberOfCardsInDeck = count;
-    }
-
-    setNumberOfWins(count: number) {
-        this.#numberOfWins = count;
     }
 
     preUpdate() {
         if (this.#status) this.#status.preUpdate();
     }
 
-    updateColorsPoints(cardColor: CardColors, value: number): void {
+    addZonePoints(boardZone: BoardZones, value: number): void {
+        this.data.set('numberOfCardsInHand', this.data.get('numberOfCardsInHand') + (boardZone === HAND ? value : 0));
+        this.data.set('numberOfCardsInDeck', this.data.get('numberOfCardsInDeck') + (boardZone === DECK ? value : 0));
+        this.data.set('numberOfWins', this.data.get('numberOfWins') + (boardZone === TRASH ? value : 0));
+        let boardPoints = {
+            numberOfCardsInHand: this.data.get('numberOfCardsInHand'),
+            numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
+            numberOfWins: this.data.get('numberOfWins'),
+        } as MaybePartialBoardWindowData;
+        this.#updating(boardPoints);
+    }
+
+    removeZonePoints(boardZone: BoardZones, value: number): void {
+        this.data.set('numberOfCardsInHand', this.data.get('numberOfCardsInHand') - (boardZone === HAND ? value : 0));
+        this.data.set('numberOfCardsInDeck', this.data.get('numberOfCardsInDeck') - (boardZone === DECK ? value : 0));
+        this.data.set('numberOfWins', this.data.get('numberOfWins') - (boardZone === TRASH ? value : 0));
+        let boardPoints = {
+            numberOfCardsInHand: this.data.get('numberOfCardsInHand'),
+            numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
+            numberOfWins: this.data.get('numberOfWins'),
+        } as MaybePartialBoardWindowData;
+        this.#updating(boardPoints);
+    }
+
+    addColorPoints(cardColor: CardColors, value: number): void {
         this.data.set('redPoints', this.data.get('redPoints') + (cardColor === RED ? value : 0));
         this.data.set('greenPoints', this.data.get('greenPoints') + (cardColor === GREEN ? value : 0));
         this.data.set('bluePoints', this.data.get('bluePoints') + (cardColor === BLUE ? value : 0));
@@ -286,20 +246,36 @@ export default class BoardWindow extends Sizer {
         this.#updating(colorsPoints);
     }
 
+    removeColorPoints(cardColor: CardColors, value: number): void {
+        this.data.set('redPoints', this.data.get('redPoints') - (cardColor === RED ? value : 0));
+        this.data.set('greenPoints', this.data.get('greenPoints') - (cardColor === GREEN ? value : 0));
+        this.data.set('bluePoints', this.data.get('bluePoints') - (cardColor === BLUE ? value : 0));
+        this.data.set('blackPoints', this.data.get('blackPoints') - (cardColor === BLACK ? value : 0));
+        this.data.set('whitePoints', this.data.get('whitePoints') - (cardColor === WHITE ? value : 0));
+        let colorsPoints = {
+            redPoints: this.data.get('redPoints'),
+            greenPoints: this.data.get('greenPoints'),
+            bluePoints: this.data.get('bluePoints'),
+            blackPoints: this.data.get('blackPoints'),
+            whitePoints: this.data.get('whitePoints'),
+        } as MaybePartialBoardWindowData;
+        this.#updating(colorsPoints);
+    }
+
     #updating(toTarget: MaybePartialBoardWindowData): void {
         if (!this.#status) return
         const boardWindowData = {
-            ap: toTarget.ap ?? this.#battlePoints.ap,
-            hp: toTarget.hp ?? this.#battlePoints.hp,
-            redPoints: toTarget.redPoints ?? this.#colorsPoints[RED],
-            greenPoints: toTarget.greenPoints ?? this.#colorsPoints[GREEN],
-            bluePoints: toTarget.bluePoints ?? this.#colorsPoints[BLUE],
-            blackPoints: toTarget.blackPoints ?? this.#colorsPoints[BLACK],
-            whitePoints: toTarget.whitePoints ?? this.#colorsPoints[WHITE],
-            orangePoints: toTarget.orangePoints ?? this.#colorsPoints[ORANGE],
-            numberOfCardsInHand: toTarget.numberOfCardsInHand ?? this.#numberOfCardsInHand,
-            numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.#numberOfCardsInDeck,
-            numberOfWins: toTarget.numberOfWins ?? this.#numberOfWins,
+            ap: toTarget.ap ?? this.data.get('ap'),
+            hp: toTarget.hp ?? this.data.get('hp'),
+            redPoints: toTarget.redPoints ?? this.data.get('redPoints'),
+            greenPoints: toTarget.greenPoints ?? this.data.get('greenPoints'),
+            bluePoints: toTarget.bluePoints ?? this.data.get('bluePoints'),
+            blackPoints: toTarget.blackPoints ?? this.data.get('blackPoints'),
+            whitePoints: toTarget.whitePoints ?? this.data.get('whitePoints'),
+            orangePoints: toTarget.orangePoints ?? this.data.get('orangePoints'),
+            numberOfCardsInHand: toTarget.numberOfCardsInHand ?? this.data.get('numberOfCardsInHand'),
+            numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.data.get('numberOfCardsInDeck'),
+            numberOfWins: toTarget.numberOfWins ?? this.data.get('numberOfWins'),
         };
         if (this.#status instanceof UpdatingState) {
             this.#status.addTweens(boardWindowData);
