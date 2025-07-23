@@ -1,10 +1,11 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import Phaser from "@mocks/phaser";
 import { Cardset } from "@ui/Cardset/Cardset";
-import { CardColors, CardType, CARD_WIDTH, CARD_HEIGHT } from "@ui/Card/Card";
-import { ColorsPoints } from "@/game/types/ColorsPoints";
-import { VueScene } from "@/game/scenes/VueScene";
-import { CardData } from "@/game/types";
+import { CardColors, CardType } from "@ui/Card/Card";
+import { ColorsPoints } from "@game/types/ColorsPoints";
+import { VueScene } from "@game/scenes/VueScene";
+import { CardData } from "@game/types";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/Colors";
 
 const cards = [
     {
@@ -12,7 +13,7 @@ const cards = [
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
-        color: 'blue' as CardColors,
+        color: BLUE as CardColors,
         imageName: 'card-picture',
         hp: 10,
         ap: 5,
@@ -25,7 +26,7 @@ const cards = [
         number: 1,
         name: 'Test Power Card',
         description: 'This is a test power card description.',
-        color: 'red' as CardColors,
+        color: RED as CardColors,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -34,12 +35,6 @@ const cards = [
         cost: 1
     },
 ];
-const dimensions = { 
-    x: 0, 
-    y: 0, 
-    width: (CARD_WIDTH * 6), 
-    height: CARD_HEIGHT 
-};
 const eventsMock = {
     onChangeIndex: vi.fn(),
     onMarked: vi.fn(),
@@ -47,12 +42,12 @@ const eventsMock = {
     onLeave: vi.fn(),
 };
 const colorPoints: ColorsPoints = {
-    red: 3,
-    blue: 3,
-    green: 0,
-    black: 0,
-    white: 0,
-    orange: 0
+    [RED]: 3,
+    [BLUE]: 3,
+    [GREEN]: 0,
+    [BLACK]: 0,
+    [WHITE]: 0,
+    [ORANGE]: 0
 };
 
 function duplicate(cards: CardData[], number: number) {
@@ -85,7 +80,7 @@ describe("MockScene", () => {
 
     beforeEach(() => {
         const cardsData: CardData[] = duplicate(cards, 3);
-        cardset = new Cardset(scene, dimensions, cardsData);
+        cardset = new Cardset(scene, cardsData);
     });
 
     afterEach(() => {

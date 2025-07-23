@@ -1,11 +1,10 @@
-import { Card, CARD_HEIGHT } from "@ui/Card/Card";
-import { Dimensions } from "./types/Dimensions";
+import { Card, CARD_HEIGHT, CARD_WIDTH } from "@ui/Card/Card";
 import { CardsetEvents } from "./types/CardsetEvents";
 import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
 import { ColorsPoints } from "../../types/ColorsPoints";
-import { VueScene } from "@/game/scenes/VueScene";
-import { CardData } from "@/game/types";
+import { CardData } from "@game/types";
 import { CardUi } from "../Card/CardUi";
+import { Scene } from "phaser";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
@@ -16,27 +15,34 @@ export class Cardset extends Phaser.GameObjects.Container {
     #highlightedTweens: Phaser.Tweens.Tween[];
 
     constructor(
-        readonly scene: VueScene, 
-        readonly dimensions: Dimensions,
+        readonly scene: Scene, 
         readonly cards: CardData[],
         x: number = 0,
-        y: number = 0
+        y: number = 0,
     ) {
-        super(scene, dimensions.x, dimensions.y);
-        this.setSize(dimensions.width, dimensions.height || CARD_HEIGHT);
+        super(scene, x, y);
+        this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.changeState(new StaticState(this));
-        this.#createCards(cards, x, y);
+        this.#createCards(cards);
         this.scene.add.existing(this);
     }
 
-    static createCardsAtPosition(
-        scene: VueScene, 
-        dimensions: Dimensions,
-        cards: CardData[] = [],
+    static create(
+        scene: Scene,
+        cards: CardData[],
         x: number = 0,
         y: number = 0
     ): Cardset {
-        return new Cardset(scene, dimensions, cards, x, y);
+        return new Cardset(scene, cards, x, y);
+    }
+
+    setCardsPosition(x: number, y: number): void {
+        this.getCards().forEach((card: Card, index: number) => {
+            let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
+            if (padding > card.getWidth()) padding = card.getWidth();
+            card.setX(x + (padding * index));
+            card.setY(y);
+        });
     }
 
     getCards(): Card[] {
@@ -175,24 +181,12 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode(events, colorPoints, 0);
     }
 
-    #createCards(cardsData: CardData[], x: number, y: number): void {
+    #createCards(cardsData: CardData[]): void {
         const cards = cardsData.map((data: CardData) => {
             const card = new Card(this.scene, this, data);
-            card.setPosition(x, y);
             return card;
         });
         this.#cards = cards;
-    }
-
-    setChildrenInlinePosition(): void {
-        if (this.#cards.length === 0) return;
-        this.#cards.forEach((card: Card, index: number) => {
-            let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
-            if (padding > card.getWidth()) padding = card.getWidth();
-            card.setX(padding * index);
-            card.setY(0);
-            this.add(card.getUi());
-        });
     }
 
     #selectMode(events: CardsetEvents, colorPoints?: ColorsPoints | null, selectNumber: number = 0): void {
