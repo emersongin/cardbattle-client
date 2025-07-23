@@ -4,7 +4,7 @@ import { Move } from "../types/Move";
 
 export type FlipConfig = {
     delay?: number,
-    onComplete?: (card: Card) => void
+    onComplete?: (card?: Card) => void
 };
 
 export type OpenConfig = {

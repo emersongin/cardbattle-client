@@ -119,7 +119,7 @@ export class Card extends Phaser.GameObjects.GameObject {
             delay: 100, 
             duration: 100, 
             onCanStart: onCanStartOpen, 
-            onComplete
+            onComplete: config?.onComplete
         });
     }
 
