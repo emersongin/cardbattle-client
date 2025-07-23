@@ -1,6 +1,6 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@/game/ui/TextWindow';
+import { TextWindow } from '@game/ui/TextWindow';
 import { CompilePhase } from "./CompilePhase";
 
 export class SummonPhase implements Phase {

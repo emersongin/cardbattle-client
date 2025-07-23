@@ -1,8 +1,8 @@
-import { Cardset } from '@/game/ui/Cardset/Cardset';
+// import { Cardset } from '@game/ui/Cardset/Cardset';
 import { VueScene } from './VueScene';
-import { Card } from '../ui/Card/Card';
+// import { Card } from '../ui/Card/Card';
 // import { ColorsPoints } from '../types/ColorsPoints';
-import { CARD_HEIGHT, CARD_WIDTH, CardColors, CardType } from '../ui/Card/Card';
+// import { CARD_HEIGHT, CARD_WIDTH, CardColors, CardType } from '../ui/Card/Card';
 // import { CardPoints } from '../ui/Card/types/CardPoints';
 import BoardWindow from '../ui/BoardWindow/BoardWindow';
 import { CardData } from '../types';
@@ -90,8 +90,6 @@ export class TestContext extends VueScene
         // const dimensions = { 
         //     x: this.cameras.main.centerX / 2, 
         //     y: this.cameras.main.centerY - 75, 
-        //     width: (CARD_WIDTH * 6), 
-        //     height: CARD_HEIGHT 
         // };
         // const cardset = new Cardset(this, dimensions, cardsData);
 

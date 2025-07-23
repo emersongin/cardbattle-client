@@ -1,7 +1,7 @@
-import { CardData } from "@/game/types";
+import { CardData } from "@game/types";
 import { Card, CARD_HEIGHT, CARD_WIDTH } from "./Card";
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/Colors";
-import { BATTLE, POWER } from "@/game/constants/CardTypes";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/Colors";
+import { BATTLE, POWER } from "@game/constants/CardTypes";
 
 export class CardUi extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;

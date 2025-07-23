@@ -159,5 +159,4 @@ HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {
     };
 } as any;
 
-
 export default PhaserMock as unknown as typeof Phaser;

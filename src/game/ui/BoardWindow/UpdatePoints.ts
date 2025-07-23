@@ -1,4 +1,4 @@
-import { BoardWindowData } from "@/game/types";
+import { BoardWindowData } from "@game/types";
 
 export type UpdatePoints = {
     target: BoardWindowData;

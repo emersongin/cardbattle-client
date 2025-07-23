@@ -1,8 +1,8 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@/game/ui/TextWindow';
+import { TextWindow } from '@game/ui/TextWindow';
 import { SummonPhase } from "./SummonPhase";
-import { CommandWindow } from "@/game/ui/CommandWindow";
+import { CommandWindow } from "@game/ui/CommandWindow";
 import { TriggerPhase } from "./TriggerPhase";
 import { PowerSlots } from "../abs/PowerSlots";
 

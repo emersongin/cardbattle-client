@@ -1,5 +1,5 @@
 import { BATTLE, POWER } from '../constants/CardTypes';
-import { BLUE, RED } from '../constants/Colors';
+import { BLUE, ORANGE } from '../constants/Colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle } from './CardBattle';
@@ -12,7 +12,7 @@ const cards = [
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
-        color: RED as CardColors,
+        color: ORANGE as CardColors,
         imageName: 'card-picture',
         hp: 10,
         ap: 5,
@@ -135,7 +135,7 @@ export default class CardBattleSocketIo implements CardBattle {
     drawPlayerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerCards = this.duplicate(cards, 3);
+                const playerCards = this.duplicate(cards, 3).reverse();
                 resolve(playerCards);
             }, delayMock);
         });
@@ -144,8 +144,8 @@ export default class CardBattleSocketIo implements CardBattle {
     drawOpponentCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerCards = this.duplicate(cards, 3);
-                resolve(playerCards);
+                const opponentCards = this.duplicate(cards, 3);
+                resolve(opponentCards);
             }, delayMock);
         });
     }

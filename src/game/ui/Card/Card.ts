@@ -2,11 +2,11 @@ import { CardPoints } from "./types/CardPoints";
 import { CardState, StaticState, MovingState, UpdatingState, FlashConfig } from "./state/CardState";
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
-import { CardData } from "@/game/types";
+import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
 import { CloseConfig, FlipConfig, OpenConfig } from "./state/MovingState";
-import { RED, GREEN, BLUE, BLACK, WHITE, ORANGE } from "@/game/constants/Colors";
-import { BATTLE, POWER } from "@/game/constants/CardTypes";
+import { RED, GREEN, BLUE, BLACK, WHITE, ORANGE } from "@game/constants/Colors";
+import { BATTLE, POWER } from "@game/constants/CardTypes";
 
 export const CARD_WIDTH = 100;
 export const CARD_HEIGHT = 150;

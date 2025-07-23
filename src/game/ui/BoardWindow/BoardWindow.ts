@@ -4,8 +4,8 @@ import { ColorsPoints } from "../../types";
 import { DisplayUtil } from "../../utils/DisplayUtil";
 import { StaticState, UpdatingState, WindowState } from "./WindowState";
 import { CardColors } from "../Card/Card";
-import { BoardWindowData, MaybePartialBoardWindowData } from "@/game/types/BoardWindowData";
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/Colors";
+import { BoardWindowData, MaybePartialBoardWindowData } from "@game/types/BoardWindowData";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/Colors";
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;

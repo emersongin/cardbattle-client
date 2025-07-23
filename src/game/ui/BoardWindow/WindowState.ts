@@ -1,4 +1,4 @@
-import { BoardWindowData } from "@/game/types";
+import { BoardWindowData } from "@game/types";
 import StaticState from "./StaticState";
 import UpdatingState from "./UpdatingState";
 

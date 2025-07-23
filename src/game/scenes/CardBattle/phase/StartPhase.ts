@@ -1,10 +1,10 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@/game/ui/TextWindow';
+import { TextWindow } from '@game/ui/TextWindow';
 import { DrawPhase } from "./DrawPhase";
-import { CommandWindow } from "@/game/ui/CommandWindow";
-import { CardBattle } from "@/game/api/CardBattle";
-import { WHITE, BLACK } from "@/game/constants/Colors";
+import { CommandWindow } from "@game/ui/CommandWindow";
+import { CardBattle } from "@game/api/CardBattle";
+import { WHITE, BLACK } from "@game/constants/Colors";
 
 export class StartPhase implements Phase {
     #cardBattle: CardBattle;

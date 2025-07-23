@@ -1,10 +1,10 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@/game/ui/TextWindow';
+import { TextWindow } from '@game/ui/TextWindow';
 import { StartPhase } from "./StartPhase";
-import { CommandWindow } from "@/game/ui/CommandWindow";
-import { CardsFolderData, OpponentData } from "@/game/types";
-import { CardBattle } from "@/game/api/CardBattle";
+import { CommandWindow } from "@game/ui/CommandWindow";
+import { CardsFolderData, OpponentData } from "@game/types";
+import { CardBattle } from "@game/api/CardBattle";
 
 export class ChallengePhase implements Phase {
     #cardBattle: CardBattle;

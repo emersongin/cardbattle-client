@@ -1,15 +1,15 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@/game/ui/TextWindow';
+import { TextWindow } from '@game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
-import { CardBattle } from "@/game/api/CardBattle";
-import { BoardWindowData, CardData } from "@/game/types";
-import { CARD_HEIGHT, CARD_WIDTH } from "@/game/ui/Card/Card";
-import { Cardset } from "@/game/ui/Cardset/Cardset";
-import BoardWindow from "@/game/ui/BoardWindow/BoardWindow";
-import { CardUi } from "@/game/ui/Card/CardUi";
+import { CardBattle } from "@game/api/CardBattle";
+import { BoardWindowData, CardData } from "@game/types";
+import { CARD_HEIGHT, CARD_WIDTH } from "@game/ui/Card/Card";
+import { Cardset } from "@game/ui/Cardset/Cardset";
+import BoardWindow from "@game/ui/BoardWindow/BoardWindow";
+import { CardUi } from "@game/ui/Card/CardUi";
 import { TimelineConfig } from "../../VueScene";
-import { ORANGE } from "@/game/constants/Colors";
+import { ORANGE } from "@game/constants/Colors";
 
 export class DrawPhase implements Phase {
     #cardBattle: CardBattle;
@@ -41,26 +41,20 @@ export class DrawPhase implements Phase {
     }
 
     #createPlayerCardSet(playerCards: CardData[]): void {
-        const dimensions = { 
-            x: (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)), 
-            y: (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10, 
-            width: (CARD_WIDTH * 6), 
-            height: CARD_HEIGHT 
-        };
+        const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
+        const y = (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10; 
+        const cardset = Cardset.create(this.scene, playerCards, x, y);
         const widthEdge = this.scene.scale.width;
-        const cardset = Cardset.createCardsAtPosition(this.scene, dimensions, playerCards, widthEdge, 0);
+        cardset.setCardsPosition(widthEdge, 0);
         this.#playerCardset = cardset;
     }
 
     #createOpponentCardSet(opponentCards: CardData[]): void {
-        const dimensions = { 
-            x: (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)),
-            y: (this.#opponentBoard.y + (this.#playerBoard.height / 2)) + 10, 
-            width: (CARD_WIDTH * 6), 
-            height: CARD_HEIGHT 
-        };
+        const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
+        const y = (this.#opponentBoard.y + (this.#playerBoard.height / 2)) + 10;
+        const cardset = Cardset.create(this.scene, opponentCards, x, y);
         const widthEdge = this.scene.scale.width;
-        const cardset = Cardset.createCardsAtPosition(this.scene, dimensions, opponentCards, widthEdge, 0);
+        cardset.setCardsPosition(widthEdge, 0);
         this.#opponentCardset = cardset;
     }
 
@@ -169,7 +163,7 @@ export class DrawPhase implements Phase {
     #flashPlayerCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
-            eachDelay: 100,
+            eachDelay: 200,
             onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
@@ -254,7 +248,7 @@ export class DrawPhase implements Phase {
     #flashOpponentCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
-            eachDelay: 100,
+            eachDelay: 200,
             onStart: ({ card }: CardUi) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
