@@ -10,6 +10,7 @@ import BoardWindow from "@game/ui/BoardWindow/BoardWindow";
 import { CardUi } from "@game/ui/Card/CardUi";
 import { TimelineConfig } from "../../VueScene";
 import { ORANGE } from "@game/constants/Colors";
+import { DECK, HAND } from "@/game/constants/Keys";
 
 export class DrawPhase implements Phase {
     #cardBattle: CardBattle;
@@ -133,8 +134,15 @@ export class DrawPhase implements Phase {
             targets: this.#playerCardset.getCardsUi(),
             x: 0,
             eachX: CARD_WIDTH,
+            eachDelay: 50,
             eachDuration: 100,
-            onComplete: () => {
+            onStart: (_c: CardUi, _t: Phaser.Tweens.Tween, index: number) => {
+                setTimeout(() => {
+                    this.#playerBoard.addZonePoints(HAND, 1);
+                    this.#playerBoard.removeZonePoints(DECK, 1);
+                }, 100 * index);
+            },
+            onAllComplete: () => {
                 this.#flipPlayerCardSet();
             }
         });
@@ -152,7 +160,7 @@ export class DrawPhase implements Phase {
                     }
                 });
             },
-            onComplete: () => {
+            onAllComplete: () => {
                 this.#flashPlayerCardSet();
                 this.#flashOpponentCardSet();
             }
@@ -170,14 +178,14 @@ export class DrawPhase implements Phase {
                 tween.pause();
                 card.flash({
                     onStart: () => {
-                        this.#playerBoard.updateColorsPoints(card.getColor(), 1);
+                        this.#playerBoard.addColorPoints(card.getColor(), 1);
                     },
                     onComplete: () => {
                         tween.resume();
                     }
                 });
             },
-            onComplete: () => {
+            onAllComplete: () => {
                 this.#addOnCompletedListener();
             }
         };
@@ -222,7 +230,7 @@ export class DrawPhase implements Phase {
                     }
                 });
             },
-            onComplete: () => {
+            onAllComplete: () => {
                 this.changeToLoadPhase();
             }
         };
@@ -254,7 +262,7 @@ export class DrawPhase implements Phase {
                 if (cardColor === ORANGE) return;
                 card.flash({
                     onStart: () => {
-                        this.#opponentBoard.updateColorsPoints(card.getColor(), 1);
+                        this.#opponentBoard.addColorPoints(card.getColor(), 1);
                     }
                 });
             }
@@ -267,7 +275,14 @@ export class DrawPhase implements Phase {
             targets: this.#opponentCardset.getCardsUi(),
             x: 0,
             eachX: CARD_WIDTH,
+            eachDelay: 50,
             eachDuration: 100,
+            onStart: (_c: CardUi, _t: Phaser.Tweens.Tween, index: number) => {
+                setTimeout(() => {
+                    this.#opponentBoard.addZonePoints(HAND, 1);
+                    this.#opponentBoard.removeZonePoints(DECK, 1);
+                }, 100 * index);
+            },
         });
     }
 
