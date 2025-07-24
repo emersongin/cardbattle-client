@@ -8,7 +8,7 @@ import { CARD_HEIGHT, CARD_WIDTH } from "@game/ui/Card/Card";
 import { Cardset } from "@game/ui/Cardset/Cardset";
 import BoardWindow from "@game/ui/BoardWindow/BoardWindow";
 import { CardUi } from "@game/ui/Card/CardUi";
-import { TimelineConfig } from "../../VueScene";
+import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@game/constants/Colors";
 import { DECK, HAND } from "@/game/constants/Keys";
 
@@ -132,15 +132,21 @@ export class DrawPhase implements Phase {
     #movePlayerCardSetToBoard(): void {
         this.scene.timeline({
             targets: this.#playerCardset.getCardsUi(),
-            x: 0,
-            eachX: CARD_WIDTH,
-            eachDelay: 50,
-            eachDuration: 100,
-            onStart: (_c: CardUi, _t: Phaser.Tweens.Tween, index: number) => {
-                setTimeout(() => {
-                    this.#playerBoard.addZonePoints(HAND, 1);
-                    this.#playerBoard.removeZonePoints(DECK, 1);
-                }, 100 * index);
+            onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
+                tween!.pause();
+                card.moveFromTo({
+                    xFrom: card.getX(),
+                    yFrom: card.getY(),
+                    xTo: 0 + (index! * CARD_WIDTH),
+                    yTo: 0,
+                    delay: (index! * 100), 
+                    duration: 300,
+                    onStart: () => {
+                        tween!.resume();
+                        this.#playerBoard.addZonePoints(HAND, 1);
+                        this.#playerBoard.removeZonePoints(DECK, 1);
+                    }
+                });
             },
             onAllComplete: () => {
                 this.#flipPlayerCardSet();
@@ -152,11 +158,11 @@ export class DrawPhase implements Phase {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
             eachDelay: 100,
-            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
-                tween.pause();
+            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+                tween!.pause();
                 card.flip({
                     onComplete: () => {
-                        tween.resume();
+                        tween!.resume();
                     }
                 });
             },
@@ -172,16 +178,16 @@ export class DrawPhase implements Phase {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
             eachDelay: 200,
-            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
+            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
-                tween.pause();
+                tween!.pause();
                 card.flash({
                     onStart: () => {
                         this.#playerBoard.addColorPoints(card.getColor(), 1);
                     },
                     onComplete: () => {
-                        tween.resume();
+                        tween!.resume();
                     }
                 });
             },
@@ -222,11 +228,11 @@ export class DrawPhase implements Phase {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
             eachDelay: 100,
-            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
-                tween.pause();
+            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+                tween!.pause();
                 card.close({
                     onComplete: () => {
-                        tween.resume();
+                        tween!.resume();
                     }
                 });
             },
@@ -241,11 +247,11 @@ export class DrawPhase implements Phase {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
             eachDelay: 100,
-            onStart: ({ card }: CardUi, tween: Phaser.Tweens.Tween) => {
-                tween.pause();
+            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+                tween!.pause();
                 card.close({
                     onComplete: () => {
-                        tween.resume();
+                        tween!.resume();
                     }
                 });
             },
@@ -257,7 +263,7 @@ export class DrawPhase implements Phase {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
             eachDelay: 200,
-            onStart: ({ card }: CardUi) => {
+            onStart: ({ target: { card }  }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
                 card.flash({
@@ -275,13 +281,21 @@ export class DrawPhase implements Phase {
             targets: this.#opponentCardset.getCardsUi(),
             x: 0,
             eachX: CARD_WIDTH,
-            eachDelay: 50,
-            eachDuration: 100,
-            onStart: (_c: CardUi, _t: Phaser.Tweens.Tween, index: number) => {
-                setTimeout(() => {
-                    this.#opponentBoard.addZonePoints(HAND, 1);
-                    this.#opponentBoard.removeZonePoints(DECK, 1);
-                }, 100 * index);
+            onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
+                tween!.pause();
+                card.moveFromTo({
+                    xFrom: card.getX(),
+                    yFrom: card.getY(),
+                    xTo: 0 + (index! * CARD_WIDTH),
+                    yTo: 0,
+                    delay: (index! * 100), 
+                    duration: 300,
+                    onStart: () => {
+                        tween!.resume();
+                        this.#opponentBoard.addZonePoints(HAND, 1);
+                        this.#opponentBoard.removeZonePoints(DECK, 1);
+                    }
+                });
             },
         });
     }

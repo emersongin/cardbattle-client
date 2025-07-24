@@ -4,7 +4,7 @@ import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
-import { CloseConfig, FlipConfig, OpenConfig } from "./state/MovingState";
+import { CloseConfig, FlipConfig, MoveConfig, OpenConfig } from "./state/MovingState";
 import { RED, GREEN, BLUE, BLACK, WHITE, ORANGE } from "@game/constants/Colors";
 import { BATTLE, POWER } from "@game/constants/CardTypes";
 
@@ -72,29 +72,18 @@ export class Card extends Phaser.GameObjects.GameObject {
         }
     }
 
-    movePosition(xTo: number, yTo: number, delay: number = 0, duration: number = 0): void {
-        this.move(MovingState.createPositionMove(xTo, yTo, delay, duration));
-    }
-
-    move(moves: Move[], duration?: number): void {
+    move(moves: Move[]): void {
         if (!this.#status) return;
         if (this.#status instanceof MovingState) {
-            this.#status.addTweens(moves, duration);
+            this.#status.addTweens(moves);
             return;
         };
         if (!(this.#status instanceof StaticState)) return
         this.#status.moving(moves);
     }
 
-    moveFromTo(
-        xTo: number, 
-        yTo: number, 
-        xFrom: number = this.getX(), 
-        yFrom: number = this.getY(), 
-        delay: number = 0, 
-        duration: number = 0
-    ): void {
-        this.move(MovingState.createFromToMove(xFrom, yFrom, xTo, yTo, delay, duration));
+    moveFromTo(config: MoveConfig): void {
+        this.move(MovingState.createFromToMove(config));
     }
 
     flip(config: FlipConfig): void {

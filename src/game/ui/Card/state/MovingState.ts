@@ -21,23 +21,26 @@ export type CloseConfig = {
     onComplete?: (card?: Card) => void
 }
 
+export type MoveConfig = {
+    xTo: number, 
+    yTo: number, 
+    xFrom: number, 
+    yFrom: number, 
+    delay?: number, 
+    duration?: number,
+    onStart?: (card?: Card) => void,
+}
+
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];
     #tweens: Phaser.Tweens.TweenChain[] = [];
     
     constructor(readonly card: Card) {}
 
-    static createPositionMove(xTo: number, yTo: number, delay: number = 0, duration: number = 0): Move[] {
+    static createFromToMove(config: MoveConfig): Move[] {
         const moves: Move[] = [
-            MovingState.#createMove(xTo, yTo, delay, duration)
-        ];
-        return moves;
-    }
-
-    static createFromToMove(xFrom: number, yFrom: number, xTo: number, yTo: number, delay: number = 0, duration: number = 0): Move[] {
-        const moves: Move[] = [
-            MovingState.#createMove(xFrom, yFrom),
-            MovingState.#createMove(xTo, yTo, delay, duration)
+            MovingState.#createMove(config.xFrom, config.yFrom),
+            MovingState.#createMove(config.xTo, config.yTo, config.delay, config.duration, config.onStart)
         ];
         return moves;
     }
@@ -76,19 +79,12 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    create(moves: Move[], duration: number = 0): void {
-        this.addTweens(moves, duration);
+    create(moves: Move[]): void {
+        this.addTweens(moves);
     }
 
-    addTweens(moves: Move[], duration: number = 0): void {
-        const moveTweens = moves.map(move => {
-            move = { ...move, hold: 0 };
-            if (duration) {
-                move.duration = duration;
-            }
-            return move;
-        });
-        this.#pushMoves(moveTweens);
+    addTweens(moves: Move[]): void {
+        this.#pushMoves(moves);
     }
 
     static() {
@@ -114,8 +110,8 @@ export default class MovingState implements CardState {
         this.static();
     }
 
-    static #createMove(x: number, y: number, delay: number = 0, duration: number = 0): Move {
-        return { x, y, delay, duration, hold: 0 };
+    static #createMove(x: number, y: number, delay: number = 0, duration: number = 0, onStart?: (card?: Card) => void): Move {
+        return { x, y, delay, duration, hold: 0, onStart };
     }
 
     #pushMoves(moves: Move[]) {
@@ -133,6 +129,7 @@ export default class MovingState implements CardState {
     #createTweens() {
         const moves = this.#movesArray.shift()!.filter((m: Move) => m.canStart ? m.canStart() : true);
         if (!moves || moves.length === 0) return;
+        // console.log(moves);
         const tweens = this.card.scene.tweens.chain({ 
             targets: this.card.getUi(), 
             tweens: moves,

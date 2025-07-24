@@ -11,6 +11,7 @@ export type Move = {
     ease?: string;
     delay?: number;
     canStart?: () => boolean;
+    onStart?: (card?: Card) => void;
     onComplete?: (card?: Card) => void;
     onYoyo?: () => void;
 }
