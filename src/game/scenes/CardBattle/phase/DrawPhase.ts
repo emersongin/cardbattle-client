@@ -157,10 +157,10 @@ export class DrawPhase implements Phase {
     #flipPlayerCardSet() {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
-            eachDelay: 100,
-            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+            onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
                 tween!.pause();
                 card.flip({
+                    delay: (index! * 100),
                     onComplete: () => {
                         tween!.resume();
                     }
@@ -177,12 +177,12 @@ export class DrawPhase implements Phase {
     #flashPlayerCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
-            eachDelay: 200,
-            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+            onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
                 tween!.pause();
                 card.flash({
+                    delay: (index! * 100),
                     onStart: () => {
                         this.#playerBoard.addColorPoints(card.getColor(), 1);
                     },
@@ -227,10 +227,10 @@ export class DrawPhase implements Phase {
     #closePlayerCardSet(): void {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
-            eachDelay: 100,
-            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+            onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
                 tween!.pause();
                 card.close({
+                    delay: (index! * 100),
                     onComplete: () => {
                         tween!.resume();
                     }
@@ -246,10 +246,10 @@ export class DrawPhase implements Phase {
     #closeOpponentCardSet(): void {
         const flipConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
-            eachDelay: 100,
-            onStart: ({ target: { card }, tween  }: TimelineEvent<CardUi>) => {
+            onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
                 tween!.pause();
                 card.close({
+                    delay: (index! * 100),
                     onComplete: () => {
                         tween!.resume();
                     }
@@ -262,13 +262,17 @@ export class DrawPhase implements Phase {
     #flashOpponentCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
-            eachDelay: 200,
-            onStart: ({ target: { card }  }: TimelineEvent<CardUi>) => {
+            onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
+                // tween!.pause();
                 card.flash({
+                    delay: (index! * 100),
                     onStart: () => {
                         this.#opponentBoard.addColorPoints(card.getColor(), 1);
+                    },
+                    onComplete: () => {
+                        // tween!.resume();
                     }
                 });
             }
