@@ -135,7 +135,8 @@ export default class CardBattleSocketIo implements CardBattle {
     drawPlayerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerCards = this.duplicate(cards, 3).reverse();
+                const playerCards = this.duplicate(cards, 3);
+                // .reverse();
                 resolve(playerCards);
             }, delayMock);
         });

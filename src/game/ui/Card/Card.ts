@@ -83,7 +83,14 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     moveFromTo(config: MoveConfig): void {
-        this.move(MovingState.createFromToMove(config));
+        const defaultConfig = {
+            xFrom: this.getX(),
+            yFrom: this.getY(),
+        };
+        this.move(MovingState.createFromToMove(({
+            ...defaultConfig,
+            ...config
+        })));
     }
 
     flip(config: FlipConfig): void {

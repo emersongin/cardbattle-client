@@ -130,13 +130,11 @@ export class DrawPhase implements Phase {
     }
 
     #movePlayerCardSetToBoard(): void {
-        this.scene.timeline({
+        const moveConfig = {
             targets: this.#playerCardset.getCardsUi(),
             onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
                 tween!.pause();
                 card.moveFromTo({
-                    xFrom: card.getX(),
-                    yFrom: card.getY(),
                     xTo: 0 + (index! * CARD_WIDTH),
                     yTo: 0,
                     delay: (index! * 100), 
@@ -151,7 +149,8 @@ export class DrawPhase implements Phase {
             onAllComplete: () => {
                 this.#flipPlayerCardSet();
             }
-        });
+        };
+        this.scene.timeline(moveConfig);
     }
 
     #flipPlayerCardSet() {
@@ -160,7 +159,7 @@ export class DrawPhase implements Phase {
             onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
                 tween!.pause();
                 card.flip({
-                    delay: (index! * 100),
+                    delay: (index! * 200),
                     onComplete: () => {
                         tween!.resume();
                     }
@@ -182,7 +181,7 @@ export class DrawPhase implements Phase {
                 if (cardColor === ORANGE) return;
                 tween!.pause();
                 card.flash({
-                    delay: (index! * 100),
+                    delay: (index! * 300),
                     onStart: () => {
                         this.#playerBoard.addColorPoints(card.getColor(), 1);
                     },
@@ -225,7 +224,7 @@ export class DrawPhase implements Phase {
     }
 
     #closePlayerCardSet(): void {
-        const flipConfig: TimelineConfig<CardUi> = {
+        const closeConfig: TimelineConfig<CardUi> = {
             targets: this.#playerCardset.getCardsUi(),
             onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
                 tween!.pause();
@@ -240,11 +239,11 @@ export class DrawPhase implements Phase {
                 this.changeToLoadPhase();
             }
         };
-        this.scene.timeline(flipConfig);
+        this.scene.timeline(closeConfig);
     }
 
     #closeOpponentCardSet(): void {
-        const flipConfig: TimelineConfig<CardUi> = {
+        const closeConfig: TimelineConfig<CardUi> = {
             targets: this.#opponentCardset.getCardsUi(),
             onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
                 tween!.pause();
@@ -256,7 +255,7 @@ export class DrawPhase implements Phase {
                 });
             },
         };
-        this.scene.timeline(flipConfig);
+        this.scene.timeline(closeConfig);
     }
 
     #flashOpponentCardSet(): void {
@@ -265,14 +264,14 @@ export class DrawPhase implements Phase {
             onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
-                // tween!.pause();
+                tween!.pause();
                 card.flash({
-                    delay: (index! * 100),
+                    delay: (index! * 300),
                     onStart: () => {
                         this.#opponentBoard.addColorPoints(card.getColor(), 1);
                     },
                     onComplete: () => {
-                        // tween!.resume();
+                        tween!.resume();
                     }
                 });
             }

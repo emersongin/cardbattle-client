@@ -24,8 +24,8 @@ export type CloseConfig = {
 export type MoveConfig = {
     xTo: number, 
     yTo: number, 
-    xFrom: number, 
-    yFrom: number, 
+    xFrom?: number, 
+    yFrom?: number, 
     delay?: number, 
     duration?: number,
     onStart?: (card?: Card) => void,
@@ -39,7 +39,7 @@ export default class MovingState implements CardState {
 
     static createFromToMove(config: MoveConfig): Move[] {
         const moves: Move[] = [
-            MovingState.#createMove(config.xFrom, config.yFrom),
+            MovingState.#createMove(config.xFrom || 0, config.yFrom || 0),
             MovingState.#createMove(config.xTo, config.yTo, config.delay, config.duration, config.onStart)
         ];
         return moves;
