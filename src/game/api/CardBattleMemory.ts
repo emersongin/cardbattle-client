@@ -1,5 +1,5 @@
 import { BATTLE, POWER } from '../constants/CardTypes';
-import { BLUE, ORANGE } from '../constants/Colors';
+import { BLUE, GREEN, ORANGE } from '../constants/Colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle } from './CardBattle';
@@ -12,7 +12,7 @@ const cards = [
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
-        color: ORANGE as CardColors,
+        color: GREEN as CardColors,
         imageName: 'card-picture',
         hp: 10,
         ap: 5,

@@ -32,16 +32,16 @@ export class DrawPhase implements Phase {
         const opponentBoardData: BoardWindowData = await this.#cardBattle.getOpponentBoardData();
         this.#createWindows();
         this.#createBoards(playerBoardData, opponentBoardData);
-        this.#createcardSets(playerCards, opponentCards);
+        this.#createCardsets(playerCards, opponentCards);
         this.#openWindows();
     }
 
-    #createcardSets(playerCards: CardData[], opponentCards: CardData[]): void {
-        this.#createPlayerCardSet(playerCards);
-        this.#createOpponentCardSet(opponentCards);
+    #createCardsets(playerCards: CardData[], opponentCards: CardData[]): void {
+        this.#createPlayerCardset(playerCards);
+        this.#createOpponentCardset(opponentCards);
     }
 
-    #createPlayerCardSet(playerCards: CardData[]): void {
+    #createPlayerCardset(playerCards: CardData[]): void {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
         const y = (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10; 
         const cardset = Cardset.create(this.scene, playerCards, x, y);
@@ -50,7 +50,7 @@ export class DrawPhase implements Phase {
         this.#playerCardset = cardset;
     }
 
-    #createOpponentCardSet(opponentCards: CardData[]): void {
+    #createOpponentCardset(opponentCards: CardData[]): void {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
         const y = (this.#opponentBoard.y + (this.#playerBoard.height / 2)) + 10;
         const cardset = Cardset.create(this.scene, opponentCards, x, y);
@@ -130,6 +130,7 @@ export class DrawPhase implements Phase {
     }
 
     #movePlayerCardSetToBoard(): void {
+        const totalCards = this.#playerCardset.getCardsTotal();
         const moveConfig = {
             targets: this.#playerCardset.getCardsUi(),
             onStart: ({ target: { card }, tween, index }: TimelineEvent<CardUi>) => {
@@ -138,7 +139,7 @@ export class DrawPhase implements Phase {
                     xTo: 0 + (index! * CARD_WIDTH),
                     yTo: 0,
                     delay: (index! * 100), 
-                    duration: 300,
+                    duration: (300 / totalCards) * (totalCards - index!),
                     onStart: () => {
                         tween!.resume();
                         this.#playerBoard.addZonePoints(HAND, 1);
@@ -181,7 +182,7 @@ export class DrawPhase implements Phase {
                 if (cardColor === ORANGE) return;
                 tween!.pause();
                 card.flash({
-                    delay: (index! * 300),
+                    delay: (index! * 100),
                     onStart: () => {
                         this.#playerBoard.addColorPoints(card.getColor(), 1);
                     },
@@ -266,7 +267,7 @@ export class DrawPhase implements Phase {
                 if (cardColor === ORANGE) return;
                 tween!.pause();
                 card.flash({
-                    delay: (index! * 300),
+                    delay: (index! * 100),
                     onStart: () => {
                         this.#opponentBoard.addColorPoints(card.getColor(), 1);
                     },
@@ -280,6 +281,7 @@ export class DrawPhase implements Phase {
     }
 
     #moveOpponentCardSetToBoard(): void {
+    const totalCards = this.#opponentCardset.getCardsTotal();
         this.scene.timeline({
             targets: this.#opponentCardset.getCardsUi(),
             x: 0,
@@ -292,7 +294,7 @@ export class DrawPhase implements Phase {
                     xTo: 0 + (index! * CARD_WIDTH),
                     yTo: 0,
                     delay: (index! * 100), 
-                    duration: 300,
+                    duration: (300 / totalCards) * (totalCards - index!),
                     onStart: () => {
                         tween!.resume();
                         this.#opponentBoard.addZonePoints(HAND, 1);
