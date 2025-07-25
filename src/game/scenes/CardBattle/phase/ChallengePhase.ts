@@ -1,11 +1,9 @@
 import { Phase } from "./Phase";
 import { StartPhase } from "./StartPhase";
-import { CommandWindow } from "@game/ui/CommandWindow";
 import { CardsFolderData, OpponentData } from "@game/types";
 import { CardBattlePhase } from "./CardBattlePhase";
 
 export class ChallengePhase extends CardBattlePhase implements Phase {
-    #commandWindow: CommandWindow;
 
     async create(): Promise<void> {
         const opponent: OpponentData = await this.cardBattle.getOpponentData();
@@ -24,13 +22,9 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
                 this.closeTextWindow();
             },
             onClose: () => {
-                this.#openCommandWindow();
+                this.openCommandWindow();
             }
         });
-    }
-
-    #openCommandWindow(): void {
-        this.#commandWindow.open();
     }
 
     #createTextWindow(opponent: OpponentData): void {
@@ -67,7 +61,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
             white: folder3.whitePoints,
             orange: folder3.orangePoints
         };
-        this.#commandWindow = CommandWindow.createCentered(this.scene, 'Choose your folder', [
+        const options = [
             {
                 description: `${folder1.name.padEnd(padValue)} ${Object.entries(folderColorsPoints1).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
@@ -89,7 +83,8 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
                     this.changeToStartPhase();
                 }
             },
-        ]);
+        ];
+        super.createCommandWindow('Choose your folder', options);
     }
 
     #openChallengeWindows(): void {
@@ -134,8 +129,8 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     }
 
     destroy(): void {
-        if (this.#commandWindow) this.#commandWindow.destroy();
         this.destroyTitleWindow();
         this.destroyTextWindow();
+        this.destroyCommandWindow();
     }
 }

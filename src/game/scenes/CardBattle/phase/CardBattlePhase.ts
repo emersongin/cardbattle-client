@@ -2,6 +2,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { CardBattle } from "@game/api/CardBattle";
 import { TextWindow } from '@game/ui/TextWindow';
 import { LEFT, CENTER, RIGHT } from '@/game/constants/Keys';
+import { CommandWindow } from '@/game/ui/CommandWindow';
 
 export type AlignType = 
     | typeof LEFT 
@@ -16,10 +17,16 @@ export type TextWindowConfig = {
     onClose?: () => void;
 }
 
+export type CommandOption = {
+    description: string;
+    onSelect: () => Promise<void>;
+}
+
 export class CardBattlePhase {
     protected cardBattle: CardBattle;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
+    #commandWindow: CommandWindow;
     
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
@@ -32,19 +39,23 @@ export class CardBattlePhase {
     createTitleWindow(title: string, config: TextWindowConfig): void {
         this.#titleWindow = TextWindow.createCentered(this.scene, title, {
             align: config.align || 'center',
-            color: config.color || '#ff3c3c',
+            color: config.color || '#ffffff',
             relativeParent: config.relativeParent,
             onStartClose: config.onStartClose,
             onClose: config.onClose
         });
     }
 
-    openTitleWindow(): void {
-        this.#titleWindow.open();
+    onCloseTitleWindow(onClose: () => void): void {
+        if (this.#titleWindow) this.#titleWindow.setOnClose(onClose);
     }
 
-    closeTextWindow(): void {
-        if (this.#textWindow) this.#textWindow.close();
+    openTitleWindow(): void {
+        if (this.#titleWindow) this.#titleWindow.open();
+    }
+
+    closeTitleWindow(): void {
+        if (this.#titleWindow) this.#titleWindow.close();
     }
 
     destroyTitleWindow(): void {
@@ -62,10 +73,26 @@ export class CardBattlePhase {
     }
 
     openTextWindow(): void {
-        this.#textWindow.open();
+        if (this.#textWindow) this.#textWindow.open();
+    }
+
+    closeTextWindow(): void {
+        if (this.#textWindow) this.#textWindow.close();
     }
 
     destroyTextWindow(): void {
         if (this.#textWindow) this.#textWindow.destroy();
+    }
+
+    createCommandWindow(title: string, options: CommandOption[]): void {
+        this.#commandWindow = CommandWindow.createCentered(this.scene, title, options);
+    }
+
+    openCommandWindow(): void {
+        this.#commandWindow.open();
+    }
+
+    destroyCommandWindow(): void {
+        if (this.#commandWindow) this.#commandWindow.destroy();
     }
 }

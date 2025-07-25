@@ -1,5 +1,4 @@
 import { Phase } from "./Phase";
-import { TextWindow } from '@game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
 import { BoardWindowData, CardData } from "@game/types";
 import { CARD_HEIGHT, CARD_WIDTH } from "@game/ui/Card/Card";
@@ -12,8 +11,6 @@ import { DECK, HAND } from "@/game/constants/Keys";
 import { CardBattlePhase } from "./CardBattlePhase";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
-    #titleWindow: TextWindow;
-    #textWindow: TextWindow;
     #playerBoard: BoardWindow;
     #opponentBoard: BoardWindow;
     #playerCardset: Cardset;
@@ -74,10 +71,10 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #createTitleWindow(): void {
-        this.#titleWindow = TextWindow.createCentered(this.scene, 'Draw Phase', {
+        super.createTitleWindow('Draw Phase', {
             align: 'center',
             onStartClose: () => {
-                this.#textWindow.close();
+                this.closeTextWindow();
             },
             onClose: () => {
                 this.#openBoards();
@@ -87,22 +84,14 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #createTextWindow(): void {
-        this.#textWindow = TextWindow.createCentered(this.scene, '6 cards will be draw.', {
-            relativeParent: this.#titleWindow
+        super.createTextWindow('6 cards will be draw.', {
+            relativeParent: this.getTitleWindow(),
         });
     }
 
     #openWindows(): void {
-        this.#openTitleWindow();
-        this.#openTextWindow();
-    }
-
-    #openTitleWindow(): void {
-        this.#titleWindow.open();
-    }
-
-    #openTextWindow(): void {
-        this.#textWindow.open();
+        this.openTitleWindow();
+        this.openTextWindow();
     }
 
     #openBoards(): void {
@@ -336,7 +325,11 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     destroy(): void {
-        if (this.#titleWindow) this.#titleWindow.destroy();
-        if (this.#textWindow) this.#textWindow.destroy();
+        this.destroyTitleWindow();
+        this.destroyTextWindow();
+        if (this.#playerBoard) this.#playerBoard.destroy();
+        if (this.#opponentBoard) this.#opponentBoard.destroy();
+        if (this.#playerCardset) this.#playerCardset.destroy();
+        if (this.#opponentCardset) this.#opponentCardset.destroy();
     }
 }
