@@ -1,41 +1,27 @@
 import { Phase } from "./Phase";
-import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@game/ui/TextWindow';
 import { StartPhase } from "./StartPhase";
 import { CommandWindow } from "@game/ui/CommandWindow";
 import { CardsFolderData, OpponentData } from "@game/types";
-import { CardBattle } from "@game/api/CardBattle";
+import { CardBattlePhase } from "./CardBattlePhase";
 
-export class ChallengePhase implements Phase {
-    #cardBattle: CardBattle;
-    #titleWindow: TextWindow;
-    #textWindow: TextWindow;
+export class ChallengePhase extends CardBattlePhase implements Phase {
     #commandWindow: CommandWindow;
 
-    constructor(readonly scene: CardBattleScene) {
-        this.#cardBattle = scene.getCardBattle();
-    }
-
     async create(): Promise<void> {
-        const opponent: OpponentData = await this.#cardBattle.getOpponentData();
-        const folders: CardsFolderData[] = await this.#cardBattle.getFolders();
-        this.#createWindows(opponent);
+        const opponent: OpponentData = await this.cardBattle.getOpponentData();
+        const folders: CardsFolderData[] = await this.cardBattle.getFolders();
+        this.#createTitleWindow();
+        this.#createTextWindow(opponent);
         this.#createCommandWindow(folders);
         this.#openChallengeWindows();
     }
 
-    #createWindows(opponent: OpponentData): void {
-        this.#createTitleWindow();
-        const { name, description } = opponent;
-        this.#createTextWindow(name, description);
-    }
-
     #createTitleWindow(): void {
-        this.#titleWindow = TextWindow.createCentered(this.scene, 'CardBattle Challenge!', {
+        super.createTitleWindow('CardBattle Challenge!', {
             align: 'center',
             color: '#ff3c3c',
             onStartClose: () => {
-                this.#textWindow.close();
+                this.closeTextWindow();
             },
             onClose: () => {
                 this.#openCommandWindow();
@@ -47,9 +33,10 @@ export class ChallengePhase implements Phase {
         this.#commandWindow.open();
     }
 
-    #createTextWindow(name: string, description: string): void {
-        this.#textWindow = TextWindow.createCentered(this.scene, `${name}\n${description}`, {
-            relativeParent: this.#titleWindow
+    #createTextWindow(opponent: OpponentData): void {
+        const { name, description } = opponent;
+        super.createTextWindow(`${name}\n${description}`, {
+            relativeParent: this.getTitleWindow(),
         });
     }
 
@@ -84,21 +71,21 @@ export class ChallengePhase implements Phase {
             {
                 description: `${folder1.name.padEnd(padValue)} ${Object.entries(folderColorsPoints1).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
-                    await this.#cardBattle.setFolder(folder1.id);
+                    await this.cardBattle.setFolder(folder1.id);
                     this.changeToStartPhase();
                 }
             },
             {
                 description: `${folder2.name.padEnd(padValue)} ${Object.entries(folderColorsPoints2).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
-                    await this.#cardBattle.setFolder(folder2.id);
+                    await this.cardBattle.setFolder(folder2.id);
                     this.changeToStartPhase();
                 }
             },
             {
                 description: `${folder3.name.padEnd(padValue)} ${Object.entries(folderColorsPoints3).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
                 onSelect: async () => {
-                    await this.#cardBattle.setFolder(folder3.id);
+                    await this.cardBattle.setFolder(folder3.id);
                     this.changeToStartPhase();
                 }
             },
@@ -106,16 +93,8 @@ export class ChallengePhase implements Phase {
     }
 
     #openChallengeWindows(): void {
-        this.#openTitleWindow();
-        this.#openTextWindow();
-    }
-
-    #openTitleWindow(): void {
-        this.#titleWindow.open();
-    }
-
-    #openTextWindow(): void {
-        this.#textWindow.open();
+        this.openTitleWindow();
+        this.openTextWindow();
     }
 
     update(): void {
@@ -155,8 +134,8 @@ export class ChallengePhase implements Phase {
     }
 
     destroy(): void {
-        if (this.#textWindow) this.#textWindow.destroy();
         if (this.#commandWindow) this.#commandWindow.destroy();
-        if (this.#titleWindow) this.#titleWindow.destroy();;
+        this.destroyTitleWindow();
+        this.destroyTextWindow();
     }
 }

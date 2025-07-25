@@ -1,30 +1,24 @@
+import { CardBattlePhase } from "./CardBattlePhase";
 import { Phase } from "./Phase";
-import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@game/ui/TextWindow';
-import { DrawPhase } from "./DrawPhase";
 import { CommandWindow } from "@game/ui/CommandWindow";
-import { CardBattle } from "@game/api/CardBattle";
 import { WHITE, BLACK } from "@game/constants/Colors";
+import { DrawPhase } from "./DrawPhase";
 
-export class StartPhase implements Phase {
-    #cardBattle: CardBattle;
+export class StartPhase extends CardBattlePhase implements Phase {
     #waitingWindow: TextWindow;
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #commandWindow: CommandWindow;
     #resultWindow: TextWindow;
 
-    constructor(readonly scene: CardBattleScene) {
-        this.#cardBattle = scene.getCardBattle();
-    }
-
     async create(): Promise<void> {
-        const iGo = await this.#cardBattle.iGo();
+        const iGo = await this.cardBattle.iGo();
         if (!iGo) {
             this.#createWaitingWindow();
             this.#createResultWindow();
             this.#openWaitingWindow();
-            await this.#cardBattle.listenOpponentChoice((choice) => {
+            await this.cardBattle.listenOpponentChoice((choice) => {
                 const onClose = () => {
                     this.#openResultWindow(choice);
                 }
@@ -85,14 +79,14 @@ export class StartPhase implements Phase {
             {
                 description: WHITE,
                 onSelect: async () => {
-                    await this.#cardBattle.setOpponentChoice(WHITE);
+                    await this.cardBattle.setOpponentChoice(WHITE);
                     this.#openResultWindow(WHITE);
                 }
             },
             {
                 description: BLACK,
                 onSelect: async () => {
-                    await this.#cardBattle.setOpponentChoice(BLACK);
+                    await this.cardBattle.setOpponentChoice(BLACK);
                     this.#openResultWindow(BLACK);
                 }
             },

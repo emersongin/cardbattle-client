@@ -1,8 +1,6 @@
 import { Phase } from "./Phase";
-import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@game/ui/TextWindow';
 import { LoadPhase } from "./LoadPhase";
-import { CardBattle } from "@game/api/CardBattle";
 import { BoardWindowData, CardData } from "@game/types";
 import { CARD_HEIGHT, CARD_WIDTH } from "@game/ui/Card/Card";
 import { Cardset } from "@game/ui/Cardset/Cardset";
@@ -11,25 +9,21 @@ import { CardUi } from "@game/ui/Card/CardUi";
 import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@game/constants/Colors";
 import { DECK, HAND } from "@/game/constants/Keys";
+import { CardBattlePhase } from "./CardBattlePhase";
 
-export class DrawPhase implements Phase {
-    #cardBattle: CardBattle;
+export class DrawPhase extends CardBattlePhase implements Phase {
     #titleWindow: TextWindow;
     #textWindow: TextWindow;
     #playerBoard: BoardWindow;
     #opponentBoard: BoardWindow;
     #playerCardset: Cardset;
     #opponentCardset: Cardset;
-    
-    constructor(readonly scene: CardBattleScene) {
-        this.#cardBattle = scene.getCardBattle();
-    }
 
     async create(): Promise<void> {
-        const playerCards: CardData[] = await this.#cardBattle.drawPlayerCardsData();
-        const opponentCards: CardData[] = await this.#cardBattle.drawOpponentCardsData();
-        const playerBoardData: BoardWindowData = await this.#cardBattle.getPlayerBoardData();
-        const opponentBoardData: BoardWindowData = await this.#cardBattle.getOpponentBoardData();
+        const playerCards: CardData[] = await this.cardBattle.drawPlayerCardsData();
+        const opponentCards: CardData[] = await this.cardBattle.drawOpponentCardsData();
+        const playerBoardData: BoardWindowData = await this.cardBattle.getPlayerBoardData();
+        const opponentBoardData: BoardWindowData = await this.cardBattle.getOpponentBoardData();
         this.#createWindows();
         this.#createBoards(playerBoardData, opponentBoardData);
         this.#createCardsets(playerCards, opponentCards);
