@@ -129,7 +129,6 @@ export default class MovingState implements CardState {
     #createTweens() {
         const moves = this.#movesArray.shift()!.filter((m: Move) => m.canStart ? m.canStart() : true);
         if (!moves || moves.length === 0) return;
-        // console.log(moves);
         const tweens = this.card.scene.tweens.chain({ 
             targets: this.card.getUi(), 
             tweens: moves,

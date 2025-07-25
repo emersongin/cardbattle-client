@@ -4,12 +4,13 @@ import { StaticState, UpdatingState, WindowState } from "./WindowState";
 import { CardColors } from "../Card/Card";
 import { BoardWindowData, MaybePartialBoardWindowData } from "@game/types/BoardWindowData";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@game/constants/Colors";
-import { DECK, HAND, TRASH } from "@/game/constants/Keys";
+import { DECK, HAND, TRASH, WINS } from "@/game/constants/Keys";
 
 export type BoardZones = 
     | typeof HAND 
     | typeof DECK
-    | typeof TRASH;
+    | typeof TRASH
+    | typeof WINS;
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;
@@ -53,6 +54,7 @@ export default class BoardWindow extends Sizer {
         this.data.set('whitePoints', data.whitePoints);
         this.data.set('numberOfCardsInHand', data.numberOfCardsInHand);
         this.data.set('numberOfCardsInDeck', data.numberOfCardsInDeck);
+        this.data.set('numberOfCardsInTrash', data.numberOfCardsInTrash);
         this.data.set('numberOfWins', data.numberOfWins);
         this.data.set('reverse', reverse);
     }
@@ -88,7 +90,8 @@ export default class BoardWindow extends Sizer {
             data.blackPoints,
             data.whitePoints,
             data.numberOfCardsInHand, 
-            data.numberOfCardsInDeck, 
+            data.numberOfCardsInDeck,
+            data.numberOfCardsInTrash, 
             data.numberOfWins
         );
         return this.data.get('reverse') ? `${boardPoints}\n\n${battlePoints}` : `${battlePoints}\n\n${boardPoints}`;
@@ -107,7 +110,8 @@ export default class BoardWindow extends Sizer {
         blackPoints: number,
         whitePoints: number, 
         numberOfCardsInHand: number, 
-        numberOfCardsInDeck: number, 
+        numberOfCardsInDeck: number,
+        numberOfCardsInTrash: number, 
         numberOfWins: number
     ): string {
         const colorsTag = [
@@ -138,8 +142,9 @@ export default class BoardWindow extends Sizer {
         }).join(' ');
         const hand = numberOfCardsInHand.toString().padStart(2, ' ');
         const deck = numberOfCardsInDeck.toString().padStart(2, ' ');
+        const trash = numberOfCardsInTrash.toString().padStart(2, ' ');
         const wins = numberOfWins.toString();
-        const boardPoints = `Hand:${hand} Deck:${deck} Wins:${wins}`;
+        const boardPoints = `Hnd:${hand} Dck:${deck} Trs:${trash} Win:${wins}`;
         return `${colorsPoints}          ${boardPoints}`;
     }
 
@@ -198,6 +203,7 @@ export default class BoardWindow extends Sizer {
             orangePoints: this.data.get('orangePoints'),
             numberOfCardsInHand: this.data.get('numberOfCardsInHand'),
             numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
+            numberOfCardsInTrash: this.data.get('numberOfCardsInTrash'),
             numberOfWins: this.data.get('numberOfWins'),
         };
     }
@@ -209,10 +215,12 @@ export default class BoardWindow extends Sizer {
     addZonePoints(boardZone: BoardZones, value: number): void {
         this.data.set('numberOfCardsInHand', this.data.get('numberOfCardsInHand') + (boardZone === HAND ? value : 0));
         this.data.set('numberOfCardsInDeck', this.data.get('numberOfCardsInDeck') + (boardZone === DECK ? value : 0));
-        this.data.set('numberOfWins', this.data.get('numberOfWins') + (boardZone === TRASH ? value : 0));
+        this.data.set('numberOfCardsInTrash', this.data.get('numberOfCardsInTrash') + (boardZone === TRASH ? value : 0));
+        this.data.set('numberOfWins', this.data.get('numberOfWins') + (boardZone === WINS ? value : 0));
         let boardPoints = {
             numberOfCardsInHand: this.data.get('numberOfCardsInHand'),
             numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
+            numberOfCardsInTrash: this.data.get('numberOfCardsInTrash'),
             numberOfWins: this.data.get('numberOfWins'),
         } as MaybePartialBoardWindowData;
         this.#updating(boardPoints);
@@ -221,10 +229,12 @@ export default class BoardWindow extends Sizer {
     removeZonePoints(boardZone: BoardZones, value: number): void {
         this.data.set('numberOfCardsInHand', this.data.get('numberOfCardsInHand') - (boardZone === HAND ? value : 0));
         this.data.set('numberOfCardsInDeck', this.data.get('numberOfCardsInDeck') - (boardZone === DECK ? value : 0));
-        this.data.set('numberOfWins', this.data.get('numberOfWins') - (boardZone === TRASH ? value : 0));
+        this.data.set('numberOfCardsInTrash', this.data.get('numberOfCardsInTrash') - (boardZone === TRASH ? value : 0));
+        this.data.set('numberOfWins', this.data.get('numberOfWins') - (boardZone === WINS ? value : 0));
         let boardPoints = {
             numberOfCardsInHand: this.data.get('numberOfCardsInHand'),
             numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
+            numberOfCardsInTrash: this.data.get('numberOfCardsInTrash'),
             numberOfWins: this.data.get('numberOfWins'),
         } as MaybePartialBoardWindowData;
         this.#updating(boardPoints);
@@ -275,6 +285,7 @@ export default class BoardWindow extends Sizer {
             orangePoints: toTarget.orangePoints ?? this.data.get('orangePoints'),
             numberOfCardsInHand: toTarget.numberOfCardsInHand ?? this.data.get('numberOfCardsInHand'),
             numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.data.get('numberOfCardsInDeck'),
+            numberOfCardsInTrash: toTarget.numberOfCardsInTrash ?? this.data.get('numberOfCardsInTrash'),
             numberOfWins: toTarget.numberOfWins ?? this.data.get('numberOfWins'),
         };
         if (this.#status instanceof UpdatingState) {

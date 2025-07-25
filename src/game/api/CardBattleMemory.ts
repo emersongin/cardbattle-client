@@ -1,5 +1,5 @@
 import { BATTLE, POWER } from '../constants/CardTypes';
-import { BLUE, GREEN, ORANGE } from '../constants/Colors';
+import { BLUE, GREEN } from '../constants/Colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle } from './CardBattle';
@@ -165,6 +165,7 @@ export default class CardBattleSocketIo implements CardBattle {
                     orangePoints: 0,
                     numberOfCardsInHand: 0,
                     numberOfCardsInDeck: 40,
+                    numberOfCardsInTrash: 0,
                     numberOfWins: 0
                 });
             }, delayMock);
@@ -185,6 +186,7 @@ export default class CardBattleSocketIo implements CardBattle {
                     orangePoints: 0,
                     numberOfCardsInHand: 0,
                     numberOfCardsInDeck: 40,
+                    numberOfCardsInTrash: 0,
                     numberOfWins: 0
                 });
             }, delayMock);

@@ -9,6 +9,7 @@ export type BoardWindowData = {
     orangePoints: number;
     numberOfCardsInHand: number,
     numberOfCardsInDeck: number,
+    numberOfCardsInTrash: number,
     numberOfWins: number,
 };
 export type MaybePartialBoardWindowData = BoardWindowData | Partial<BoardWindowData>;

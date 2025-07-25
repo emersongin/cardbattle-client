@@ -122,7 +122,6 @@ const PhaserMock = {
                 },
                 removeAllListeners: () => {
                     this.input.keyboard.list = [];
-                    console.log("All keyboard listeners removed.");
                 },
             },
         };

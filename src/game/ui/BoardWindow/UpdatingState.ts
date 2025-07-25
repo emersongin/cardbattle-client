@@ -37,7 +37,7 @@ export default class UpdatingState implements WindowState {
     #createUpdatePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints[] {
         const { apPoints, hpPoints } = this.#createUpdateBattlePoints(fromTarget, toTarget);
         const { redPoints, greenPoints, bluePoints, blackPoints, whitePoints } = this.#createUpdateColorsPoints(fromTarget, toTarget);
-        const { numberOfCardsInHand, numberOfCardsInDeck, numberOfWins } = this.#createUpdateBoardPoints(fromTarget, toTarget);
+        const { numberOfCardsInHand, numberOfCardsInDeck, numberOfCardsInTrash, numberOfWins } = this.#createUpdateBoardPoints(fromTarget, toTarget);
         return [
             apPoints, 
             hpPoints, 
@@ -48,6 +48,7 @@ export default class UpdatingState implements WindowState {
             whitePoints,
             numberOfCardsInHand,
             numberOfCardsInDeck,
+            numberOfCardsInTrash,
             numberOfWins
         ];
     }
@@ -120,6 +121,7 @@ export default class UpdatingState implements WindowState {
     #createUpdateBoardPoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
         numberOfCardsInHand: UpdatePoints,
         numberOfCardsInDeck: UpdatePoints,
+        numberOfCardsInTrash: UpdatePoints,
         numberOfWins: UpdatePoints
     } {
         const numberOfCardsInHand = this.#createUpdate(fromTarget, fromTarget.numberOfCardsInHand, toTarget.numberOfCardsInHand,
@@ -136,6 +138,13 @@ export default class UpdatingState implements WindowState {
                 this.window.setText(content);
             }
         );
+        const numberOfCardsInTrash = this.#createUpdate(fromTarget, fromTarget.numberOfCardsInTrash, toTarget.numberOfCardsInTrash,
+            (tween: Phaser.Tweens.Tween) => {
+                fromTarget.numberOfCardsInTrash = Math.round(tween.getValue() ?? 0);
+                const content = this.window.createContent(fromTarget);
+                this.window.setText(content);
+            }
+        );
         const numberOfWins = this.#createUpdate(fromTarget, fromTarget.numberOfWins, toTarget.numberOfWins,
             (tween: Phaser.Tweens.Tween) => {
                 fromTarget.numberOfWins = Math.round(tween.getValue() ?? 0);
@@ -143,7 +152,7 @@ export default class UpdatingState implements WindowState {
                 this.window.setText(content);
             }
         );
-        return { numberOfCardsInHand, numberOfCardsInDeck, numberOfWins };
+        return { numberOfCardsInHand, numberOfCardsInDeck, numberOfCardsInTrash, numberOfWins };
     }
 
     #createUpdate(
