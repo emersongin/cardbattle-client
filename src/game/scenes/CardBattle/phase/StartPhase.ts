@@ -1,4 +1,4 @@
-import { CardBattlePhase, TextWindowConfig } from "./CardBattlePhase";
+import { CardBattlePhase } from "./CardBattlePhase";
 import { Phase } from "./Phase";
 import { WHITE, BLACK } from "@game/constants/Colors";
 import { DrawPhase } from "./DrawPhase";
@@ -8,65 +8,47 @@ export class StartPhase extends CardBattlePhase implements Phase {
     async create(): Promise<void> {
         const iGo = await this.cardBattle.iGo();
         if (!iGo) {
-            this.#createAndOpenWaitingWindow();
+            this.#createWaitingWindow();
+            super.openAllWindows();
             await this.cardBattle.listenOpponentChoice((choice) => {
-                const onClose = () => {
-                    this.#openResultWindow(choice);
-                }
-                super.onCloseTitleWindow(onClose);
-                super.closeTitleWindow();
+                const onClose = () => this.#createResultWindow(choice);
+                super.closeAllWindows(onClose);
             });
             return;
         }
-        this.#createWindows();
-        this.#createCommandWindow();
-        this.#openWindows();
+        this.#createMiniGameWindows();
+        this.#createMiniGameCommandWindow();
+        super.openAllWindows();
     }
 
-    #createAndOpenWaitingWindow(): void {
-        super.createTitleWindow('Waiting for opponent...', {
-            align: 'center',
-        });
-        super.openTitleWindow();
+    #createWaitingWindow(): void {
+        super.createTextWindowCentered('Waiting for opponent...', { textAlign: 'center' });
     }
 
-    #createWindows(): void {
-        this.#createTitleWindow();
-        this.#createTextWindow();
-    }
-
-    #createTitleWindow(): void {
-        super.createTitleWindow('Start Phase', {
-            align: 'center',
-            onStartClose: () => {
-                this.closeTextWindow();
-            },
+    #createMiniGameWindows(): void {
+        super.createTextWindowCentered('Start Phase', {
+            textAlign: 'center',
             onClose: () => {
                 this.openCommandWindow();
             }
         });
+        super.addTextWindow('Draw white card to go first.');
     }
 
-    #createTextWindow(): void {
-        super.createTextWindow('Draw white card to go first.', {
-            relativeParent: this.getTitleWindow(),
-        });
-    }
-
-    #createCommandWindow(): void {
+    #createMiniGameCommandWindow(): void {
         const options = [
             {
-                description: WHITE,
+                description: 'option: Draw white card',
                 onSelect: async () => {
                     await this.cardBattle.setOpponentChoice(WHITE);
-                    this.#openResultWindow(WHITE);
+                    this.#createResultWindow(WHITE);
                 }
             },
             {
-                description: BLACK,
+                description: 'option: Draw black card',
                 onSelect: async () => {
                     await this.cardBattle.setOpponentChoice(BLACK);
-                    this.#openResultWindow(BLACK);
+                    this.#createResultWindow(BLACK);
                 }
             },
         ];
@@ -74,23 +56,14 @@ export class StartPhase extends CardBattlePhase implements Phase {
         super.createCommandWindow('Select a card', options);
     }
 
-    #openWindows(): void {
-        this.openTitleWindow();
-        this.openTextWindow();
-    }
-
-    #openResultWindow(choice: string): void {
-        this.#createResultWindow(choice === WHITE ? 'You go first!' : 'Opponent goes first!', {
-            align: 'center',
+    #createResultWindow(choice: string): void {
+        super.createTextWindowCentered(choice === WHITE ? 'You go first!' : 'Opponent goes first!', {
+            textAlign: 'center',
             onClose: () => {
                 this.changeToDrawPhase();
             }
         });
-        super.openTitleWindow();
-    }
-
-    #createResultWindow(text: string, config: TextWindowConfig): void {
-        super.createTitleWindow(text, config);
+        super.openAllWindows();
     }
 
     update(): void {
@@ -130,9 +103,8 @@ export class StartPhase extends CardBattlePhase implements Phase {
     }
 
     destroy(): void {
-        this.destroyTitleWindow();
-        this.destroyTextWindow();
+        this.destroyAllTextWindows();
         this.destroyCommandWindow();
     }
-    
+
 }
