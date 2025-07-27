@@ -47,7 +47,7 @@ export class TextWindow extends TextBox {
         this.layout();
         this.setScale(1, 0);
         this.setStartClose(startClose);
-        this.setOnClose(onClose);
+        this.#setOnClose(onClose);
         scene.add.existing(this);
     }
 
@@ -56,9 +56,8 @@ export class TextWindow extends TextBox {
         this.#onStartClose = onStartClose;
     }
 
-    setOnClose(onClose?: () => void): void {
-        if (typeof onClose !== 'function') return;
-        this.#onClose = onClose;
+    #setOnClose(onClose?: () => void): void {
+        if (onClose) this.#onClose = onClose;
     }
 
     static createCentered(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
@@ -86,8 +85,9 @@ export class TextWindow extends TextBox {
         });
     }
 
-    close() {
+    close(onClose?: () => void) {
         if (!this.scene?.tweens) return;
+        if (onClose) this.#setOnClose(onClose);
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,
@@ -95,6 +95,7 @@ export class TextWindow extends TextBox {
             ease: 'Back.easeOut',
             onComplete: () => {
                 if (this.#onClose) this.#onClose();
+                this.destroy();
             }
         });
     }

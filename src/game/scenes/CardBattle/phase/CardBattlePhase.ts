@@ -10,8 +10,8 @@ export type AlignType =
     | typeof RIGHT;
 
 export type TextWindowConfig = {
-    align?: AlignType;
-    color?: string;
+    textAlign?: AlignType;
+    textColor?: string;
     relativeParent?: TextWindow;
     onStartClose?: () => void;
     onClose?: () => void;
@@ -24,64 +24,68 @@ export type CommandOption = {
 
 export class CardBattlePhase {
     protected cardBattle: CardBattle;
-    #titleWindow: TextWindow;
-    #textWindow: TextWindow;
+    #textWindows: TextWindow[] = [];
     #commandWindow: CommandWindow;
     
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
     }
 
-    getTitleWindow(): TextWindow {
-        return this.#titleWindow;
+    createTextWindowCentered(title: string, config: TextWindowConfig): void {
+        this.destroyAllTextWindows();
+        this.#textWindows[0] = this.#createTextWindowCentered(title, config);
     }
 
-    createTitleWindow(title: string, config: TextWindowConfig): void {
-        this.#titleWindow = TextWindow.createCentered(this.scene, title, {
-            align: config.align || 'center',
-            color: config.color || '#ffffff',
+    #createTextWindowCentered(title: string, config: TextWindowConfig): TextWindow {
+        const windowConfig = {
+            align: config.textAlign || 'left',
+            color: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
-            onStartClose: config.onStartClose,
+            onStartClose: () => {
+                this.closeAllChildWindows();
+            },
             onClose: config.onClose
-        });
+        };
+        return TextWindow.createCentered(this.scene, title, windowConfig);
     }
 
-    onCloseTitleWindow(onClose: () => void): void {
-        if (this.#titleWindow) this.#titleWindow.setOnClose(onClose);
+    addTextWindow(title: string, config?: TextWindowConfig): void {
+        if (!this.#textWindows.length) {
+            throw new Error('You should create a text window first.');
+        }
+        if (!config) config = {};
+        config.relativeParent = this.getLastTextWindow();
+        config.onStartClose = () => {}; // null
+        this.#textWindows.push(this.#createTextWindowCentered(title, config));
     }
 
-    openTitleWindow(): void {
-        if (this.#titleWindow) this.#titleWindow.open();
+    getLastTextWindow(): TextWindow {
+        return this.#textWindows[this.#textWindows.length - 1];
     }
 
-    closeTitleWindow(): void {
-        if (this.#titleWindow) this.#titleWindow.close();
+    openAllWindows(): void {
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach(window => window.open());
+        }
     }
 
-    destroyTitleWindow(): void {
-        if (this.#textWindow) this.#textWindow.destroy();
+    closeAllWindows(onClose?: () => void): void {
+        if (this.#textWindows[0]) this.#textWindows[0].close(onClose);
     }
 
-    createTextWindow(text: string, config: TextWindowConfig): void {
-        this.#textWindow = TextWindow.createCentered(this.scene, text, {
-            align: config.align || 'left',
-            color: config.color || '#ffffff',
-            relativeParent: config.relativeParent,
-            onStartClose: config.onStartClose,
-            onClose: config.onClose
-        });
+    closeAllChildWindows(): void {
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach((window, index) => {
+                if (index > 0) window.close(() => window.destroy())
+            });
+        }
     }
 
-    openTextWindow(): void {
-        if (this.#textWindow) this.#textWindow.open();
-    }
-
-    closeTextWindow(): void {
-        if (this.#textWindow) this.#textWindow.close();
-    }
-
-    destroyTextWindow(): void {
-        if (this.#textWindow) this.#textWindow.destroy();
+    destroyAllTextWindows(): void {
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach(window => window.destroy());
+            this.#textWindows = [];
+        }
     }
 
     createCommandWindow(title: string, options: CommandOption[]): void {
