@@ -42,11 +42,19 @@ export class CardBattlePhase {
             color: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
             onStartClose: () => {
-                this.closeAllChildWindows();
+                this.#closeAllChildWindows();
             },
             onClose: config.onClose
         };
         return TextWindow.createCentered(this.scene, title, windowConfig);
+    }
+
+    #closeAllChildWindows(): void {
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach((window, index) => {
+                if (index > 0) window.close(() => window.destroy())
+            });
+        }
     }
 
     addTextWindow(title: string, config?: TextWindowConfig): void {
@@ -71,14 +79,6 @@ export class CardBattlePhase {
 
     closeAllWindows(onClose?: () => void): void {
         if (this.#textWindows[0]) this.#textWindows[0].close(onClose);
-    }
-
-    closeAllChildWindows(): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
-                if (index > 0) window.close(() => window.destroy())
-            });
-        }
     }
 
     destroyAllTextWindows(): void {

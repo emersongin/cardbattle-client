@@ -21,10 +21,21 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         const opponentCards: CardData[] = await this.cardBattle.drawOpponentCardsData();
         const playerBoardData: BoardWindowData = await this.cardBattle.getPlayerBoardData();
         const opponentBoardData: BoardWindowData = await this.cardBattle.getOpponentBoardData();
-        this.#createWindows();
+        this.#createDrawPhaseWindows();
         this.#createBoards(playerBoardData, opponentBoardData);
         this.#createCardsets(playerCards, opponentCards);
-        this.#openWindows();
+        this.openAllWindows();
+    }
+
+    #createDrawPhaseWindows(): void {
+        super.createTextWindowCentered('Draw Phase', {
+            textAlign: 'center',
+            onClose: () => {
+                this.#openBoards();
+                this.#moveCardSetsToBoards();
+            }
+        });
+        super.addTextWindow('6 cards will be draw.');
     }
 
     #createCardsets(playerCards: CardData[], opponentCards: CardData[]): void {
@@ -65,34 +76,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         this.#opponentBoard = boardWindow;
     }
 
-    #createWindows(): void {
-        this.#createTitleWindow();
-        this.#createTextWindow();
-    }
 
-    #createTitleWindow(): void {
-        super.createTitleWindow('Draw Phase', {
-            align: 'center',
-            onStartClose: () => {
-                this.closeTextWindow();
-            },
-            onClose: () => {
-                this.#openBoards();
-                this.#moveCardSetsToBoards();
-            }
-        });
-    }
-
-    #createTextWindow(): void {
-        super.createTextWindow('6 cards will be draw.', {
-            relativeParent: this.getTitleWindow(),
-        });
-    }
-
-    #openWindows(): void {
-        this.openTitleWindow();
-        this.openTextWindow();
-    }
 
     #openBoards(): void {
         this.#openPlayerBoard();
@@ -325,8 +309,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     destroy(): void {
-        this.destroyTitleWindow();
-        this.destroyTextWindow();
+        this.destroyAllTextWindows();
         if (this.#playerBoard) this.#playerBoard.destroy();
         if (this.#opponentBoard) this.#opponentBoard.destroy();
         if (this.#playerCardset) this.#playerCardset.destroy();
