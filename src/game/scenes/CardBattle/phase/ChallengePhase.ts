@@ -8,33 +8,24 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     async create(): Promise<void> {
         const opponent: OpponentData = await this.cardBattle.getOpponentData();
         const folders: CardsFolderData[] = await this.cardBattle.getFolders();
-        this.#createTitleWindow();
-        this.#createTextWindow(opponent);
-        this.#createCommandWindow(folders);
-        this.#openChallengeWindows();
+        this.#createChallengeWindows(opponent);
+        this.#createFoldersWindow(folders);
+        this.openAllWindows();
     }
 
-    #createTitleWindow(): void {
-        super.createTitleWindow('CardBattle Challenge!', {
-            align: 'center',
-            color: '#ff3c3c',
-            onStartClose: () => {
-                this.closeTextWindow();
-            },
+    #createChallengeWindows(opponent: OpponentData): void {
+        super.createTextWindowCentered('CardBattle Challenge!', {
+            textAlign: 'center',
+            textColor: '#ff3c3c',
             onClose: () => {
                 this.openCommandWindow();
             }
         });
-    }
-
-    #createTextWindow(opponent: OpponentData): void {
         const { name, description } = opponent;
-        super.createTextWindow(`${name}\n${description}`, {
-            relativeParent: this.getTitleWindow(),
-        });
+        super.addTextWindow(`${name}\n${description}`);
     }
 
-    #createCommandWindow(folders: CardsFolderData[]): void {
+    #createFoldersWindow(folders: CardsFolderData[]): void {
         const [folder1, folder2, folder3] = folders;
         const padValue = 16;
         const folderColorsPoints1 = {
@@ -87,11 +78,6 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         super.createCommandWindow('Choose your folder', options);
     }
 
-    #openChallengeWindows(): void {
-        this.openTitleWindow();
-        this.openTextWindow();
-    }
-
     update(): void {
         console.log("Updating Challenge Phase...");
     }
@@ -129,8 +115,8 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     }
 
     destroy(): void {
-        this.destroyTitleWindow();
-        this.destroyTextWindow();
+        this.destroyAllTextWindows();
         this.destroyCommandWindow();
     }
+
 }
