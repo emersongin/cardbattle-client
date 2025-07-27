@@ -3,6 +3,10 @@ import { CardBattle } from "@game/api/CardBattle";
 import { TextWindow } from '@game/ui/TextWindow';
 import { LEFT, CENTER, RIGHT } from '@/game/constants/Keys';
 import { CommandWindow } from '@/game/ui/CommandWindow';
+import BoardWindow, { BoardZones } from '@/game/ui/BoardWindow/BoardWindow';
+import { BoardWindowData, CardData } from '@/game/types';
+import { CARD_HEIGHT, CARD_WIDTH, CardColors } from '@/game/ui/Card/Card';
+import { Cardset } from '@/game/ui/Cardset/Cardset';
 
 export type AlignType = 
     | typeof LEFT 
@@ -26,6 +30,10 @@ export class CardBattlePhase {
     protected cardBattle: CardBattle;
     #textWindows: TextWindow[] = [];
     #commandWindow: CommandWindow;
+    #playerBoard: BoardWindow;
+    #opponentBoard: BoardWindow;
+    #playerCardset: Cardset;
+    #opponentCardset: Cardset;
     
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
@@ -98,5 +106,103 @@ export class CardBattlePhase {
 
     destroyCommandWindow(): void {
         if (this.#commandWindow) this.#commandWindow.destroy();
+    }
+
+    async createPlayerBoard(): Promise<void> {
+        return new Promise(async (resolve) => {
+            const playerBoardData: BoardWindowData = await this.cardBattle.getPlayerBoardData();
+            const boardWindow = BoardWindow.createBottom(this.scene, playerBoardData);
+            this.#playerBoard = boardWindow;
+            resolve();
+        });
+    }
+
+    addPlayerBoardZonePoints(boardZone: BoardZones, value: number): void {
+        this.#playerBoard.addZonePoints(boardZone, value);
+    }
+
+    removePlayerBoardZonePoints(boardZone: BoardZones, value: number): void {
+        this.#playerBoard.removeZonePoints(boardZone, value);
+    }
+
+    addPlayerBoardColorPoints(cardColor: CardColors, value: number): void {
+        this.#playerBoard.addColorPoints(cardColor, value);
+    }
+
+    openPlayerBoard(): void {
+        this.#playerBoard.open();
+    }
+
+    closePlayerBoard(): void {
+        this.#playerBoard.close();
+    }
+
+    destroyPlayerBoard(): void {
+        if (this.#playerBoard) this.#playerBoard.destroy();
+    }
+
+    async createOpponentBoard(): Promise<void> {
+        return new Promise(async (resolve) => {
+            const opponentBoardData: BoardWindowData = await this.cardBattle.getOpponentBoardData();
+            const boardWindow = BoardWindow.createTopReverse(this.scene, opponentBoardData);
+            this.#opponentBoard = boardWindow;
+            resolve();
+        });
+    }
+
+    addOpponentBoardZonePoints(boardZone: BoardZones, value: number): void {
+        this.#opponentBoard.addZonePoints(boardZone, value);
+    }
+
+    removeOpponentBoardZonePoints(boardZone: BoardZones, value: number): void {
+        this.#opponentBoard.removeZonePoints(boardZone, value);
+    }
+
+    addOpponentBoardColorPoints(cardColor: CardColors, value: number): void {
+        this.#opponentBoard.addColorPoints(cardColor, value);
+    }
+
+    openOpponentBoard(): void {
+        this.#opponentBoard.open();
+    }
+
+    closeOpponentBoard(): void {
+        this.#opponentBoard.close();
+    }
+
+    destroyOpponentBoard(): void {
+        if (this.#opponentBoard) this.#opponentBoard.destroy();
+    }
+
+    createPlayerBattleCardset(playerCards: CardData[]): Cardset {
+        const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
+        const y = (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10; 
+        const cardset = Cardset.create(this.scene, playerCards, x, y);
+        this.#playerCardset = cardset;
+        return cardset;
+    }
+
+    getPlayerBattleCardset(): Cardset {
+        return this.#playerCardset;
+    }
+
+    destroyPlayerBattleCardset(): void {
+        if (this.#playerCardset) this.#playerCardset.destroy();
+    }
+
+    createOpponentBattleCardset(opponentCards: CardData[]): Cardset {
+        const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
+        const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
+        const cardset = Cardset.create(this.scene, opponentCards, x, y);
+        this.#opponentCardset = cardset;
+        return cardset;
+    }
+
+    getOpponentBattleCardset(): Cardset {
+        return this.#opponentCardset;
+    }
+
+    destroyOpponentBattleCardset(): void {
+        if (this.#opponentCardset) this.#opponentCardset.destroy();
     }
 }

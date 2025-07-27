@@ -103,8 +103,8 @@ export class StartPhase extends CardBattlePhase implements Phase {
     }
 
     destroy(): void {
-        this.destroyAllTextWindows();
-        this.destroyCommandWindow();
+        super.destroyAllTextWindows();
+        super.destroyCommandWindow();
     }
 
 }
