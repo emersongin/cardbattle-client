@@ -46,7 +46,10 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 description: 'Yes',
                 onSelect: () => {
                     this.#createZoneCommandWindow();
-                    super.openCommandWindow();
+                    super.closePlayerBoard(() => {
+                        super.openCommandWindow();
+                    });
+                    super.closeOpponentBoard();
                 }
             },
             {

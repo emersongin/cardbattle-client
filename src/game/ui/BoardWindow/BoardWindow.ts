@@ -177,12 +177,15 @@ export default class BoardWindow extends Sizer {
         });
     }
 
-    close() {
+    close(onComplete?: () => void) {
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',
+            onComplete: () => {
+                if (onComplete) onComplete();
+            }
         });
     }
 

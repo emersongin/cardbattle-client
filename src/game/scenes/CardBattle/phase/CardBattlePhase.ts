@@ -137,8 +137,8 @@ export class CardBattlePhase {
         this.#playerBoard.open(onComplete);
     }
 
-    closePlayerBoard(): void {
-        this.#playerBoard.close();
+    closePlayerBoard(onComplete?: () => void): void {
+        this.#playerBoard.close(onComplete);
     }
 
     destroyPlayerBoard(): void {

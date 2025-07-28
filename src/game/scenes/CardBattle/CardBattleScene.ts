@@ -1,9 +1,9 @@
 import { VueScene } from '../VueScene';
 import { Phase } from './phase/Phase';
 import { EventBus } from '@game/EventBus';
-// import { ChallengePhase } from './phase/ChallengePhase';
-// import { StartPhase } from './phase/StartPhase';
-// import { DrawPhase } from './phase/DrawPhase';
+import { ChallengePhase } from './phase/ChallengePhase';
+import { StartPhase } from './phase/StartPhase';
+import { DrawPhase } from './phase/DrawPhase';
 import { LoadPhase } from './phase/LoadPhase';
 
 export class CardBattleScene extends VueScene {
