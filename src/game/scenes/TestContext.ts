@@ -4,7 +4,7 @@ import { VueScene } from './VueScene';
 // import { ColorsPoints } from '../types/ColorsPoints';
 // import { CARD_HEIGHT, CARD_WIDTH, CardColors, CardType } from '../ui/Card/Card';
 // import { CardPoints } from '../ui/Card/types/CardPoints';
-import BoardWindow from '../ui/BoardWindow/BoardWindow';
+// import BoardWindow from '../ui/BoardWindow/BoardWindow';
 import { CardData } from '../types';
 // import { CommandWindow } from '../ui/CommandWindow';
 
@@ -19,22 +19,22 @@ export class TestContext extends VueScene
     }
 
     create () {
-        const startPoints = {
-            ap: 0,
-            hp: 0,
-            redPoints: 0,
-            greenPoints: 0,
-            bluePoints: 0,
-            blackPoints: 0,
-            whitePoints: 0,
-            orangePoints: 0,
-            numberOfCardsInHand: 0,
-            numberOfCardsInDeck: 0,
-            numberOfWins: 0
-        };
-        const boardWindow = BoardWindow.createBottom(this, startPoints);
+        // const startPoints = {
+        //     ap: 0,
+        //     hp: 0,
+        //     redPoints: 0,
+        //     greenPoints: 0,
+        //     bluePoints: 0,
+        //     blackPoints: 0,
+        //     whitePoints: 0,
+        //     orangePoints: 0,
+        //     numberOfCardsInHand: 0,
+        //     numberOfCardsInDeck: 0,
+        //     numberOfWins: 0
+        // };
+        // const boardWindow = BoardWindow.createBottom(this, startPoints);
         // const boardWindow2 = BoardWindow.createTopReverse(this, startPoints);
-        boardWindow.open();
+        // boardWindow.open();
         // boardWindow2.open();
         // const updatePoints = {
         //     cardPoints: {

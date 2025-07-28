@@ -85,7 +85,8 @@ export class CommandWindow extends Sizer {
     }
 
     #createBackground(scene: Phaser.Scene) {
-        const background = scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x222222);
+        const background = scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x000000);
+        background.setAlpha(0.8);
         this.addBackground(background);
     }
 

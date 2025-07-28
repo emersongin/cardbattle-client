@@ -24,6 +24,7 @@ export default class BoardWindow extends Sizer {
         width: number,
         height: number,
         data: BoardWindowData,
+        color: number = 0x222222,
         reverse: boolean = false
     ) {
         const vertical = 1;
@@ -36,7 +37,7 @@ export default class BoardWindow extends Sizer {
         });
         this.#status = new StaticState(this);
         this.#setStartData(data, reverse);
-        this.#createBackground();
+        this.#createBackground(color);
         this.#createContentLabel(data);
         this.layout();
         this.setScale(1, 0);
@@ -59,8 +60,8 @@ export default class BoardWindow extends Sizer {
         this.data.set('reverse', reverse);
     }
 
-    #createBackground() {
-        const background = this.scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x222222);
+    #createBackground(color: number) {
+        const background = this.scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, color);
         this.addBackground(background);
     }
 
@@ -148,20 +149,20 @@ export default class BoardWindow extends Sizer {
         return `${colorsPoints}          ${boardPoints}`;
     }
 
-    static createBottom(scene: Phaser.Scene, config: BoardWindowData): BoardWindow {
+    static createBottom(scene: Phaser.Scene, config: BoardWindowData, color: number): BoardWindow {
         const width = scene.scale.width;
         const height = DisplayUtil.column1of12(scene.scale.height);
         const x = width / 2;
         const y = (scene.scale.height - height);
-        return new BoardWindow(scene, x, y, width, height, config);
+        return new BoardWindow(scene, x, y, width, height, config, color);
     }
 
-    static createTopReverse(scene: Phaser.Scene, config: BoardWindowData): BoardWindow {
+    static createTopReverse(scene: Phaser.Scene, config: BoardWindowData, color: number): BoardWindow {
         const width = scene.scale.width;
         const height = DisplayUtil.column1of12(scene.scale.height);
         const x = width / 2;
         const y = height;
-        return new BoardWindow(scene, x, y, width, height, config, true);
+        return new BoardWindow(scene, x, y, width, height, config, color, true);
     }
 
     open(onComplete?: () => void) {
