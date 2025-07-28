@@ -75,7 +75,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
                 }
             },
         ];
-        super.createCommandWindow('Choose your folder', options);
+        super.createCommandWindowCentered('Choose your folder', options);
     }
 
     update(): void {

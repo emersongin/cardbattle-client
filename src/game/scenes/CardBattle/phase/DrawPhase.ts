@@ -1,11 +1,11 @@
 import { Phase } from "./Phase";
-import { LoadPhase } from "./LoadPhase";
+import { CardBattlePhase } from "./CardBattlePhase";
 import { CARD_WIDTH } from "@game/ui/Card/Card";
+import { LoadPhase } from "./LoadPhase";
 import { CardUi } from "@game/ui/Card/CardUi";
 import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@game/constants/Colors";
 import { DECK, HAND } from "@/game/constants/Keys";
-import { CardBattlePhase } from "./CardBattlePhase";
 import { CardData } from "@/game/types";
 
 export class DrawPhase extends CardBattlePhase implements Phase {

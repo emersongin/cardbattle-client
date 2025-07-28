@@ -23,7 +23,7 @@ export type TextWindowConfig = {
 
 export type CommandOption = {
     description: string;
-    onSelect: () => Promise<void>;
+    onSelect: () => Promise<void> | void;
 }
 
 export class CardBattlePhase {
@@ -96,8 +96,12 @@ export class CardBattlePhase {
         }
     }
 
-    createCommandWindow(title: string, options: CommandOption[]): void {
+    createCommandWindowCentered(title: string, options: CommandOption[]): void {
         this.#commandWindow = CommandWindow.createCentered(this.scene, title, options);
+    }
+
+    createCommandWindowBottom(title: string, options: CommandOption[]): void {
+        this.#commandWindow = CommandWindow.createBottom(this.scene, title, options);
     }
 
     openCommandWindow(): void {
@@ -129,8 +133,8 @@ export class CardBattlePhase {
         this.#playerBoard.addColorPoints(cardColor, value);
     }
 
-    openPlayerBoard(): void {
-        this.#playerBoard.open();
+    openPlayerBoard(onComplete?: () => void): void {
+        this.#playerBoard.open(onComplete);
     }
 
     closePlayerBoard(): void {

@@ -53,7 +53,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
             },
         ];
         options.sort(() => Math.random() - 0.5);
-        super.createCommandWindow('Select a card', options);
+        super.createCommandWindowCentered('Select a card', options);
     }
 
     #createResultWindow(choice: string): void {
