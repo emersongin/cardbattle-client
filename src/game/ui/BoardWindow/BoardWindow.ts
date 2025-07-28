@@ -164,12 +164,15 @@ export default class BoardWindow extends Sizer {
         return new BoardWindow(scene, x, y, width, height, config, true);
     }
 
-    open() {
+    open(onComplete?: () => void) {
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
+            onComplete: () => {
+                if (onComplete) onComplete();
+            }
         });
     }
 

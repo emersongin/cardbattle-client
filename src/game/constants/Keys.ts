@@ -5,3 +5,5 @@ export const WINS = 'WINS';
 export const LEFT = 'left';
 export const CENTER = 'center';
 export const RIGHT = 'right';
+export const LOAD_PHASE = 'LOAD_PHASE';
+export const COMPILE_PHASE = 'COMPILE_PHASE';

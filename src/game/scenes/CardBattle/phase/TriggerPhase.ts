@@ -3,6 +3,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
 import { CompilePhase } from "./CompilePhase";
 import { SummonPhase } from "./SummonPhase";
+import { COMPILE_PHASE, LOAD_PHASE } from "@/game/constants/Keys";
 
 export class TriggerPhase implements Phase {
     #powerActions: any[] = [];
@@ -26,8 +27,8 @@ export class TriggerPhase implements Phase {
     }
 
     changeToLoadPhase(): void {
-        const noTextWindow = true;
-        this.scene.changePhase(new LoadPhase(this.scene, this.#powerActions, noTextWindow));
+        const startPhase = false;
+        this.scene.changePhase(new LoadPhase(this.scene, this.#powerActions, startPhase));
     }
 
     changeToTriggerPhase(): void {
@@ -39,8 +40,8 @@ export class TriggerPhase implements Phase {
     }
 
     changeToCompilePhase(): void {
-        const noTextWindow = true;
-        this.scene.changePhase(new CompilePhase(this.scene, this.#powerActions, noTextWindow));
+        const startPhase = false;
+        this.scene.changePhase(new CompilePhase(this.scene, this.#powerActions, startPhase));
     }
 
     changeToBattlePhase(): void {
@@ -58,10 +59,10 @@ export class TriggerPhase implements Phase {
             return;
         }
         switch (this.#origimPhase) {
-            case 'LOAD':
+            case LOAD_PHASE:
                 this.changeToLoadPhase();
                 break;
-            case 'COMPILE':
+            case COMPILE_PHASE:
                 this.changeToCompilePhase();
                 break;
             default:
