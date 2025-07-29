@@ -12,6 +12,7 @@ const cards = [
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
+        details: 'This card is used for testing purposes.',
         color: GREEN as CardColors,
         imageName: 'card-picture',
         hp: 10,
@@ -25,6 +26,7 @@ const cards = [
         number: 1,
         name: 'Test Power Card',
         description: 'This is a test power card description.',
+        details: 'This card is used for testing power effects.',
         color: BLUE as CardColors,
         imageName: 'card-picture',
         hp: 0,
@@ -189,6 +191,24 @@ export default class CardBattleSocketIo implements CardBattle {
                     numberOfCardsInTrash: 0,
                     numberOfWins: 0
                 });
+            }, delayMock);
+        });
+    }
+
+    getPlayerHandCardsData(): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const playerHandCards = this.duplicate(cards, 3);
+                resolve(playerHandCards);
+            }, delayMock);
+        });
+    }
+
+    getOpponentHandCardsData(): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const opponentHandCards = this.duplicate(cards, 3);
+                resolve(opponentHandCards);
             }, delayMock);
         });
     }

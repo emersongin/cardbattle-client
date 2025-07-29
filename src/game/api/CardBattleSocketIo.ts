@@ -104,4 +104,20 @@ export default class CardBattleSocketIo implements CardBattle {
             });
         });
     }
+
+    getPlayerHandCardsData(timeout?: number): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            this.#socket.emit('getPlayerHandCardsData', timeout, (response: CardData[]) => {
+                resolve(response);
+            });
+        });
+    }
+
+    getOpponentHandCardsData(timeout?: number): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            this.#socket.emit('getOpponentHandCardsData', timeout, (response: CardData[]) => {
+                resolve(response);
+            });
+        });
+    }
 }

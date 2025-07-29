@@ -11,4 +11,6 @@ export interface CardBattle {
     drawOpponentCardsData: () => Promise<CardData[]>;
     getPlayerBoardData: () => Promise<BoardWindowData>;
     getOpponentBoardData: () => Promise<BoardWindowData>;
+    getPlayerHandCardsData: () => Promise<CardData[]>;
+    getOpponentHandCardsData: () => Promise<CardData[]>;
 }
