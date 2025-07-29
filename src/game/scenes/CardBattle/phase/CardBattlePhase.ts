@@ -1,6 +1,6 @@
 import { CardBattleScene } from '../CardBattleScene';
 import { CardBattle } from "@game/api/CardBattle";
-import { TextWindow } from '@game/ui/TextWindow';
+import { TextWindow, TextWindowConfig } from '@game/ui/TextWindow';
 import { LEFT, CENTER, RIGHT } from '@/game/constants/Keys';
 import { CommandWindow } from '@/game/ui/CommandWindow';
 import BoardWindow, { BoardZones } from '@/game/ui/BoardWindow/BoardWindow';
@@ -12,14 +12,6 @@ export type AlignType =
     | typeof LEFT 
     | typeof CENTER 
     | typeof RIGHT;
-
-export type TextWindowConfig = {
-    textAlign?: AlignType;
-    textColor?: string;
-    relativeParent?: TextWindow;
-    onStartClose?: () => void;
-    onClose?: () => void;
-}
 
 export type CommandOption = {
     description: string;
@@ -39,22 +31,41 @@ export class CardBattlePhase {
         this.cardBattle = scene.getCardBattle();
     }
 
-    createTextWindowCentered(title: string, config: TextWindowConfig): void {
+    createTextWindowTop(text: string, config: Partial<TextWindowConfig>): void {
         this.destroyAllTextWindows();
-        this.#textWindows[0] = this.#createTextWindowCentered(title, config);
+        this.#textWindows[0] = this.#createTextWindowTop(text, config);
     }
 
-    #createTextWindowCentered(title: string, config: TextWindowConfig): TextWindow {
+    #createTextWindowTop(text: string, config: Partial<TextWindowConfig>): TextWindow {
         const windowConfig = {
-            align: config.textAlign || 'left',
-            color: config.textColor || '#ffffff',
+            textAlign: config.textAlign || 'left',
+            textColor: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
             onStartClose: () => {
                 this.#closeAllChildWindows();
             },
             onClose: config.onClose
         };
-        return TextWindow.createCentered(this.scene, title, windowConfig);
+        return TextWindow.createTop(this.scene, { ...windowConfig, text });
+    }
+
+    createTextWindowCentered(title: string, config: Partial<TextWindowConfig>): void {
+        this.destroyAllTextWindows();
+        this.#textWindows[0] = this.#createTextWindowCentered(title, config);
+    }
+
+    #createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): TextWindow {
+        const windowConfig = {
+            textAlign: config.textAlign || 'left',
+            textColor: config.textColor || '#ffffff',
+            relativeParent: config.relativeParent,
+            marginTop: config.marginTop || 0,
+            onStartClose: () => {
+                this.#closeAllChildWindows();
+            },
+            onClose: config.onClose
+        };
+        return TextWindow.createCentered(this.scene, { ...windowConfig, text });
     }
 
     #closeAllChildWindows(): void {
@@ -65,7 +76,7 @@ export class CardBattlePhase {
         }
     }
 
-    addTextWindow(title: string, config?: TextWindowConfig): void {
+    addTextWindow(title: string, config?: Partial<TextWindowConfig>): void {
         if (!this.#textWindows.length) {
             throw new Error('You should create a text window first.');
         }
@@ -73,6 +84,16 @@ export class CardBattlePhase {
         config.relativeParent = this.getLastTextWindow();
         config.onStartClose = () => {}; // null
         this.#textWindows.push(this.#createTextWindowCentered(title, config));
+    }
+
+    setTextWindowText(text: string, index: number): void {
+        if (!this.#textWindows.length) {
+            throw new Error('You should create a text window first.');
+        }
+        if (index < 0 || index >= this.#textWindows.length) {
+            throw new Error(`TextWindow: index ${index} is out of bounds.`);
+        }
+        this.#textWindows[index].setText(text);
     }
 
     getLastTextWindow(): TextWindow {
@@ -181,6 +202,14 @@ export class CardBattlePhase {
     createPlayerBattleCardset(playerCards: CardData[]): Cardset {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
         const y = (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10; 
+        const cardset = Cardset.create(this.scene, playerCards, x, y);
+        this.#playerCardset = cardset;
+        return cardset;
+    }
+
+    createPlayerHandCardset(playerCards: CardData[]): Cardset {
+        const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
+        const y = this.scene.cameras.main.centerY; 
         const cardset = Cardset.create(this.scene, playerCards, x, y);
         this.#playerCardset = cardset;
         return cardset;

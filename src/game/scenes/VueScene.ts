@@ -65,9 +65,7 @@ export class VueScene extends Scene {
                         });
                     },
                     onComplete: (tween: Phaser.Tweens.Tween) => {
-                        if (timiline.onComplete) {
-                            timiline.onComplete(target, tween, index);
-                        }
+                        if (timiline.onComplete) timiline.onComplete(target, tween, index);
                         resolve();
                     },
                 };
