@@ -5,6 +5,7 @@ export type CardData = {
     number: number;
     name: string;
     description: string;
+    details: string;
     color: CardColors;
     imageName: string;
     hp: number;
