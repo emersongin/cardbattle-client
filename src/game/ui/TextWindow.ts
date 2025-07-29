@@ -1,11 +1,18 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
+import { DisplayUtil } from '../utils/DisplayUtil';
 
-type TextWindowConfig = {
-    color?: string,
-    align?: 'center' | 'left' | 'right',
+export type TextWindowConfig = {
+    text: string,
+    x: number, 
+    y: number, 
+    width: number, 
+    height: number, 
+    textColor?: string,
+    textAlign?: 'center' | 'left' | 'right',
     onStartClose?: () => void,
     onClose?: () => void,
-    relativeParent?: TextWindow
+    relativeParent?: TextWindow,
+    marginTop?: number
 };
 
 export class TextWindow extends TextBox {
@@ -15,28 +22,20 @@ export class TextWindow extends TextBox {
 
     private constructor(
         readonly scene: Phaser.Scene, 
-        x: number, 
-        y: number, 
-        width: number, 
-        height: number, 
-        text: string,
-        color: string = '#ffffff',
-        align: 'center' | 'left' | 'right' = 'left',
-        startClose?: () => void,
-        onClose?: () => void
+        config: TextWindowConfig
     ) {
         super(scene, {
-            x,
-            y,
-            width,
-            height,
+            x: config.x,
+            y: config.y,
+            width: config.width,
+            height: config.height,
             background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 4, 0x222222),
-            text: scene.add.text(0, 0, text, {
+            text: scene.add.text(0, 0, config.text, {
                 fontSize: '24px',
-                align,
-                color,
+                align: config.textAlign || 'left',
+                color: config.textColor || '#ffffff',
                 wordWrap: { 
-                    width: width - 20, 
+                    width: config.width - 20, 
                 },
             }),
             expandTextWidth: true,
@@ -46,8 +45,8 @@ export class TextWindow extends TextBox {
         });
         this.layout();
         this.setScale(1, 0);
-        this.setStartClose(startClose);
-        this.#setOnClose(onClose);
+        this.setStartClose(config.onStartClose);
+        this.#setOnClose(config.onClose);
         scene.add.existing(this);
     }
 
@@ -60,16 +59,30 @@ export class TextWindow extends TextBox {
         if (onClose) this.#onClose = onClose;
     }
 
-    static createCentered(scene: Phaser.Scene, text: string, config: TextWindowConfig) {
-        const { onStartClose, onClose, relativeParent, color, align } = config;
+    static createTop(scene: Phaser.Scene, config: Partial<TextWindowConfig>) {
+        const { relativeParent } = config;
         const x = scene.cameras.main.centerX;
-        let y = scene.cameras.main.centerY;
+        let y = DisplayUtil.column1of12(scene.scale.height);
         if (relativeParent) {
-            y = relativeParent.y + relativeParent.height + 2;
+            y = relativeParent.y - relativeParent.height - 2 + (config.marginTop || 0);
         }
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);
-        return new TextWindow(scene,  x, y, width, height, text, color, align, onStartClose, onClose);
+        const text = config.text || '';
+        return new TextWindow(scene, { ...config, text, x, y, width, height });
+    }
+
+    static createCentered(scene: Phaser.Scene, config: Partial<TextWindowConfig>) {
+        const { relativeParent } = config;
+        const x = scene.cameras.main.centerX;
+        let y = scene.cameras.main.centerY;
+        if (relativeParent) {
+            y = relativeParent.y + relativeParent.height + 2 + (config.marginTop || 0);
+        }
+        const width = (scene.cameras.main.width / 12) * 11;
+        const height = (scene.cameras.main.height / 12);
+        const text = config.text || '';
+        return new TextWindow(scene, { ...config, text, x, y, width, height });
     }
 
     open() {
