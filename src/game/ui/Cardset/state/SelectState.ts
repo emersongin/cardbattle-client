@@ -5,6 +5,13 @@ import { CardsetState } from "./CardsetState";
 import { ColorsPoints } from "../../../types/ColorsPoints";
 import StaticState from "./StaticState";
 
+export type SelectStateConfig = {
+    events: CardsetEvents;
+    colorPoints?: ColorsPoints | null;
+    selectNumber?: number;
+    startIndex?: number;
+};
+
 export default class SelectState implements CardsetState {
     #index: number;
     #selectNumber: number;
@@ -15,16 +22,11 @@ export default class SelectState implements CardsetState {
 
     constructor(readonly cardset: Cardset) {}
 
-    create(
-        events: CardsetEvents, 
-        colorPoints: ColorsPoints | null = null, 
-        selectNumber: number = 0, 
-        startIndex: number = 0
-    ): void {
-        this.#events = events;
-        this.#colorsPoints = colorPoints;
-        this.#index = startIndex;
-        this.#selectNumber = selectNumber;
+    create(config: SelectStateConfig): void {
+        this.#events = config.events;
+        this.#colorsPoints = config.colorPoints || null;
+        this.#index = config.startIndex || 0;
+        this.#selectNumber = config.selectNumber || 0;
         this.enable();
     }
 
@@ -206,7 +208,13 @@ export default class SelectState implements CardsetState {
 
     #deselectCard(card: Card): void {
         this.cardset.deselectCard(card);
-        card.moveFromTo(card.getX(), card.getY(), card.getX(), 0, 10);
+        card.moveFromTo({
+            xFrom: card.getX(), 
+            yFrom: card.getY(), 
+            xTo: card.getX(), 
+            yTo: 0,
+            duration: 10
+        });
     }
 
     #updateIndex(index: number): void {
@@ -222,7 +230,13 @@ export default class SelectState implements CardsetState {
 
     #selectCard(card: Card): void {
         this.cardset.selectCard(card);
-        card.moveFromTo(card.getX(), card.getY(), card.getX(), -12, 10);
+        card.moveFromTo({
+            xFrom: card.getX(), 
+            yFrom: card.getY(), 
+            xTo: card.getX(), 
+            yTo: -12,
+            duration: 10
+        });
     }
 
     #isIndexSelected(index: number): boolean {
