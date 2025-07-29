@@ -36,12 +36,12 @@ export class Cardset extends Phaser.GameObjects.Container {
         return new Cardset(scene, cards, x, y);
     }
 
-    setCardsPosition(x: number, y: number): void {
+    setCardsInLinePosition(x: number = 0, y: number = 0): void {
         this.getCards().forEach((card: Card, index: number) => {
             let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
             if (padding > card.getWidth()) padding = card.getWidth();
-            card.setX(x + (padding * index));
-            card.setY(y);
+            card.setPosition(x + (padding * index), y);
+            card.updateOrigin();
         });
     }
 
@@ -87,22 +87,20 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     getSelectIndexes(): number[] {
-        if (!(this.#status instanceof SelectState)) return [];
         return this.#status.getSelectIndexes();
     }
 
-    changeState(state: CardsetState): void {
+    changeState(state: CardsetState, ...args: any[]): void {
         this.#lastState = this.#status;
         this.#status = state;
+        if (this.#status.create) this.#status.create(...args);
     }
 
     disableBattleCards(): void {
-        if (!(this.#status instanceof SelectState)) return
         this.#status.disableBattleCards();
     }
 
     disablePowerCards(): void {
-        if (!(this.#status instanceof SelectState)) return
         this.#status.disablePowerCards();
     }
 
@@ -140,6 +138,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    openAllCardsDominoMovement(): void {
+        this.getCards().forEach((card: Card, index: number) => {
+            const delay = (index * 100);
+            const duration = 100;
+            card.open({ delay, duration });
+        });
+    }
+
     closeAllCardsDominoMovement(): void {
         this.getCards().forEach((card: Card, index: number) => {
             const delay = (index * 100);
@@ -151,13 +157,11 @@ export class Cardset extends Phaser.GameObjects.Container {
     restoreSelectState(): void {
         if (!this.#lastState || (this.#lastState instanceof SelectState) === false) return;
         this.changeState(this.#lastState);
-        if ((this.#status instanceof SelectState) === false) return;
         this.#status.removeSelectLastIndex();
         this.#status.enable();
     }
 
     resetCardsState(): void {
-        if (!(this.#status instanceof SelectState)) return;
         this.#status.resetCardsState();
     }
 
@@ -165,20 +169,16 @@ export class Cardset extends Phaser.GameObjects.Container {
         return index >= 0 && index <= this.#cards.length - 1;
     }
 
-    isStaticMode(): boolean {
-        return this.#status instanceof StaticState;
-    }
-
-    isSelectMode(): boolean {
-        return this.#status instanceof SelectState;
-    }
-
     selectModeOne(events: CardsetEvents): void {
-        this.#selectMode(events, null, 1);
+        this.#status.selectMode({ events, selectNumber: 1 });
     }
 
     selectModeMany(events: CardsetEvents, colorPoints: ColorsPoints): void {
-        this.#selectMode(events, colorPoints, 0);
+        this.#status.selectMode({ 
+            events, 
+            colorPoints, 
+            selectNumber: 0 
+        });
     }
 
     #createCards(cardsData: CardData[]): void {
@@ -187,16 +187,6 @@ export class Cardset extends Phaser.GameObjects.Container {
             return card;
         });
         this.#cards = cards;
-    }
-
-    #selectMode(events: CardsetEvents, colorPoints?: ColorsPoints | null, selectNumber: number = 0): void {
-        if (!this.#status) return;
-        if (this.#status instanceof SelectState) return;
-        this.#status.selectMode(events);
-        if (this.#status instanceof StaticState) {
-            throw new Error('Cardset: selectMode called on StaticState, this should not happen');
-        }
-        this.#status.create(events, colorPoints, selectNumber);
     }
 
     preUpdate(): void {
@@ -271,5 +261,11 @@ export class Cardset extends Phaser.GameObjects.Container {
                 })));
             }
         }
+    }
+
+    setCardsClosed(): void {
+        this.getCards().forEach((card: Card) => {
+            card.setClosed();
+        });
     }
 }
