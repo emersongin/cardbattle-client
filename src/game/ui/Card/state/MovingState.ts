@@ -8,14 +8,14 @@ export type FlipConfig = {
 };
 
 export type OpenConfig = {
-    delay: number, 
-    duration: number, 
+    delay?: number, 
+    duration?: number, 
     onCanStart?: () => boolean, 
     onComplete?: (card?: Card) => void
 }
 
 export type CloseConfig = {
-    delay?: number, 
+    delay: number, 
     duration?: number, 
     onCanStart?: () => boolean, 
     onComplete?: (card?: Card) => void
@@ -65,7 +65,7 @@ export default class MovingState implements CardState {
     static createOpenMove(card: Card, config: OpenConfig): Move[] {
         const moves: Move[] = [
             {
-                x: card.getX(),
+                x: card.getOriginX(),
                 scaleX: 1,
                 ease: 'Linear',
                 canStart: () => {

@@ -5,6 +5,9 @@ import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
 import { PowerSlots } from "../abs/PowerSlots";
 import { LOAD_PHASE } from "@/game/constants/Keys";
+import { CardData } from "@/game/types";
+import { TimelineConfig, TimelineEvent } from "../../VueScene";
+import { CardUi } from "@/game/ui/Card/CardUi";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
     #powerSlots: PowerSlots;
@@ -45,11 +48,10 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             {
                 description: 'Yes',
                 onSelect: () => {
-                    this.#createZoneCommandWindow();
-                    super.closePlayerBoard(() => {
-                        super.openCommandWindow();
-                    });
                     super.closeOpponentBoard();
+                    super.closePlayerBoard(async () => {
+                        this.#createPlayerHandZone();
+                    });
                 }
             },
             {
@@ -66,47 +68,124 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.createCommandWindowBottom('Use a Power Card?', options);
     }
 
-    #createZoneCommandWindow(): void {
-        const options = [
-            {
-                description: 'Play Power card',
-                onSelect: () => {
-                    this.#powerSlots.addPowerSlot({
-                        action: 'POWER_1',
-                        params: {
-                            cardId: 'card_1',
-                            zone: 'player'
-                        } 
-                    });
-                    console.log(this.#powerSlots.powerSlotsTotal());
-                    if (this.#powerSlots.isLimitReached()) {
-                        this.changeToTriggerPhase(LOAD_PHASE);
-                        return;
-                    }
-                    this.changeToLoadPhase();
-                }
-            },
-            {
-                description: 'Trash',
-                onSelect: () => {
-                    this.changeToLoadPhase();
-                }
-            },
-            {
-                description: 'Field',
-                onSelect: () => {
-                    this.changeToLoadPhase();
-                }
-            },
-            {
-                description: 'Hand',
-                onSelect: () => {
-                    this.changeToLoadPhase();
-                }
-            }
-        ];
-        super.createCommandWindowBottom('Select your zone', options);
+    #createPlayerHandZone(): void {
+        this.#createPlayerHandDisplayWindows();
+        this.#createPlayerHandCardset();
     }
+
+    #createPlayerHandDisplayWindows(): void {
+        super.createTextWindowTop('Your Hand', {
+            textAlign: 'center',
+        });
+        super.addTextWindow('...', { marginTop: 32 });
+        super.addTextWindow('...');
+        super.addTextWindow('...');
+    }
+
+    async #createPlayerHandCardset(): Promise<void> {
+        const playerCards: CardData[] = await this.cardBattle.getPlayerHandCardsData();
+        const cardset = super.createPlayerHandCardset(playerCards);
+        cardset.setCardsInLinePosition();
+        cardset.setCardsClosed();
+        this.#openAllCardsDominoMovement();
+    }
+
+    #openAllCardsDominoMovement(): void {
+        const cardset = super.getPlayerBattleCardset();
+        const events = {
+            onChangeIndex: (cardIndex: number) => {
+                if (!cardset.isValidIndex(cardIndex)) return;
+                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getName(), 1);
+                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDescription(), 2);
+                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
+            },
+            onMarked: (cardIndex: number) => {
+                if (!cardset.isValidIndex(cardIndex)) return;
+                // console.log(cardset.getCardByIndex(cardIndex).getName());
+            },
+            onCompleted: (cardIndexes: number[]) => {
+                cardset.highlightCardsByIndexes(cardIndexes);
+                super.createCommandWindowBottom('Complete your choice?', [
+                    {
+                        description: 'Yes',
+                        onSelect: () => {
+                            console.log('Selected cards:', cardIndexes);
+                        }
+                    },
+                    {
+                        description: 'No',
+                        onSelect: () => {
+                            cardset.restoreSelectState();
+                        }
+                    },
+                ]);
+                super.openCommandWindow();
+            },
+            onLeave: () => {
+                // cardset.resetCardsState();
+                // cardset.closeAllCardsDominoMovement();
+            },
+        };
+        const openConfig: TimelineConfig<CardUi> = {
+            targets: this.getPlayerBattleCardset().getCardsUi(),
+            onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
+                tween!.pause();
+                card.open({
+                    delay: (index! * 100),
+                    onComplete: () => {
+                        tween!.resume();
+                    }
+                });
+            },
+            onAllComplete: () => {
+                cardset.selectModeOne(events);
+                super.openAllWindows();
+                super.openPlayerBoard();
+            }
+        };
+        this.scene.timeline(openConfig);
+    }
+
+    // #createZoneCommandWindow(): void {
+    //     const options = [
+    //         {
+    //             description: 'Play Power card',
+    //             onSelect: () => {
+    //                 this.#powerSlots.addPowerSlot({
+    //                     action: 'POWER_1',
+    //                     params: {
+    //                         cardId: 'card_1',
+    //                         zone: 'player'
+    //                     } 
+    //                 });
+    //                 if (this.#powerSlots.isLimitReached()) {
+    //                     this.changeToTriggerPhase(LOAD_PHASE);
+    //                     return;
+    //                 }
+    //                 this.changeToLoadPhase();
+    //             }
+    //         },
+    //         {
+    //             description: 'Trash',
+    //             onSelect: () => {
+    //                 this.changeToLoadPhase();
+    //             }
+    //         },
+    //         {
+    //             description: 'Field',
+    //             onSelect: () => {
+    //                 this.changeToLoadPhase();
+    //             }
+    //         },
+    //         {
+    //             description: 'Hand',
+    //             onSelect: () => {
+    //                 this.changeToLoadPhase();
+    //             }
+    //         }
+    //     ];
+    //     super.createCommandWindowBottom('Select your zone', options);
+    // }
 
     update(): void {
         console.log("Updating Load Phase...");

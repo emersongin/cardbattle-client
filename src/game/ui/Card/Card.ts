@@ -41,6 +41,8 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     #setStartData(): void {
         this.setDataEnabled();
+        this.data.set('originX', this.getX());
+        this.data.set('originY', this.getY());
         this.data.set('ap', this.staticData.hp);
         this.data.set('hp', this.staticData.ap);
         this.data.set('faceUp', false);
@@ -111,7 +113,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         const onCanStartOpen = () => {
             return this.data.get('faceUp');
         };
-        this.#open({
+        this.open({
             delay: 100, 
             duration: 100, 
             onCanStart: onCanStartOpen, 
@@ -137,7 +139,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         const onCanStartOpen = () => {
             return !this.data.get('faceUp');
         };
-        this.#open({
+        this.open({
             delay: 100, 
             duration: 100, 
             onCanStart: onCanStartOpen
@@ -165,7 +167,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('closed');
     }
 
-    #open(config: OpenConfig): void {
+    open(config: OpenConfig): void {
         const onOpenedCallback = () => {
             this.data.set('closed', false);
             if (config.onComplete) config.onComplete(this);
@@ -252,6 +254,14 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.staticData.name;
     }
 
+    getDescription(): string {
+        return this.staticData.description;
+    }
+
+    getDetails(): string {
+        return this.staticData.details;
+    }
+
     getColor(): CardColors {
         return this.staticData.color;
     }
@@ -268,25 +278,46 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.staticData.typeId === POWER;
     }
 
-    setPosition(x: number, y: number): void {
-        this.setX(x);
-        this.setY(y);
+    setPosition(x: number = this.#ui.x, y: number = this.#ui.y): void {
+        this.#setX(x);
+        this.#setY(y);
     }
 
-    setX(x: number): void {
+    #setX(x: number): void {
         this.#ui.x = x;
+    }
+
+    #setY(y: number): void {
+        this.#ui.y = y;
+    }
+
+    updateOrigin(x: number = this.#ui.x, y: number = this.#ui.y): void {
+        this.#setOriginX(x);
+        this.#setOriginY(y);
+    }
+
+    #setOriginX(x: number): void {
+        this.data.set('originX', x);
+    }
+
+    #setOriginY(y: number): void {
+        this.data.set('originY', y);
     }
 
     getX(): number {
         return this.#ui.x;
     }
 
-    setY(y: number): void {
-        this.#ui.y = y;
+    getOriginX(): number {
+        return this.data.get('originX');
     }
 
     getY(): number {
         return this.#ui.y;
+    }
+
+    getOriginY(): number {
+        return this.data.get('originY');
     }
 
     getWidth(): number {
@@ -321,5 +352,15 @@ export class Card extends Phaser.GameObjects.GameObject {
         if (!this.#status) return;
         if (!(this.#status instanceof StaticState)) return;
         this.#status.flash(config);
+    }
+
+    setClosed(): void {
+        this.data.set('closed', true);
+        this.#setX(this.getX() + (this.getWidth() / 2));
+        this.setScaleX(0);
+    }
+
+    setScaleX(scaleX: number): void {
+        this.#ui.scaleX = scaleX;
     }
 }
