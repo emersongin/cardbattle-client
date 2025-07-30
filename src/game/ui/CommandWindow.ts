@@ -3,7 +3,7 @@ import { DisplayUtil } from '@utils/DisplayUtil';
 
 type CommandOption = {
     description: string;
-    onSelect: () => void;
+    onSelect: () => Promise<void> | void;
 }
 
 export class CommandWindow extends Sizer {
@@ -64,18 +64,6 @@ export class CommandWindow extends Sizer {
             onComplete: () => {
                 this.#setupKeyboardControls();
                 this.#select(0);
-            }
-        });
-    }
-
-    close(onSelect: () => void) {
-        this.#tween = this.scene.tweens.add({
-            targets: this,
-            scaleY: 0,
-            duration: 300,
-            ease: 'Back.easeIn',
-            onComplete: () => {
-                onSelect();
             }
         });
     }
@@ -145,6 +133,16 @@ export class CommandWindow extends Sizer {
             }
             keyboard.removeAllListeners();
             this.close(this.commands[this.selectedIndex].onSelect);
+        });
+    }
+
+    close(onSelect: () => Promise<void> | void) {
+        this.#tween = this.scene.tweens.add({
+            targets: this,
+            scaleY: 0,
+            duration: 300,
+            ease: 'Back.easeIn',
+            onComplete: async () => await onSelect()
         });
     }
 

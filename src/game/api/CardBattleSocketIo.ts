@@ -1,5 +1,5 @@
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
-import { CardBattle } from './CardBattle';
+import { CardBattle, LoadPhasePlay } from './CardBattle';
 import { io, Socket } from "socket.io-client";
 
 export default class CardBattleSocketIo implements CardBattle {
@@ -57,7 +57,7 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    listenOpponentChoice(callback: (choice: string) => void): Promise<void> {
+    listenOpponentStartPhase(callback: (choice: string) => void): Promise<void> {
         return new Promise((resolve) => {
             this.#socket.on('setOpponentChoice', (choice: string) => {
                 callback(choice);
@@ -66,7 +66,7 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    setOpponentChoice(choice: string): Promise<void> {
+    setPlayerChoice(choice: string): Promise<void> {
         return new Promise((resolve) => {
             this.#socket.emit('setOpponentChoice', choice);
             resolve();
@@ -116,6 +116,47 @@ export default class CardBattleSocketIo implements CardBattle {
     getOpponentHandCardsData(timeout?: number): Promise<CardData[]> {
         return new Promise((resolve) => {
             this.#socket.emit('getOpponentHandCardsData', timeout, (response: CardData[]) => {
+                resolve(response);
+            });
+        });
+    }
+
+    listenOpponentLoadPhase(callback: (play: LoadPhasePlay) => void): Promise<void> {
+        return new Promise((resolve) => {
+            this.#socket.on('opponentLoadPhase', (play: LoadPhasePlay) => {
+                callback(play);
+            });
+            resolve();
+        });
+    }
+
+    allPass(): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.#socket.emit('allPass', (response: boolean) => {
+                resolve(response);
+            });
+        });
+    }
+
+    opponentPassed(): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.#socket.emit('opponentPassed', (response: boolean) => {
+                resolve(response);
+            });
+        });
+    }
+
+    playerPass(): Promise<void> {
+        return new Promise((resolve) => {
+            this.#socket.emit('playerPass', () => {
+                resolve();
+            });
+        });
+    }
+
+    hasPowerCardsInField(): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.#socket.emit('hasPowerCardsInField', (response: boolean) => {
                 resolve(response);
             });
         });

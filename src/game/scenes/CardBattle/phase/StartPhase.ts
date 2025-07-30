@@ -8,9 +8,9 @@ export class StartPhase extends CardBattlePhase implements Phase {
     async create(): Promise<void> {
         const iGo = await this.cardBattle.iGo();
         if (!iGo) {
-            this.#createWaitingWindow();
+            super.createWaitingWindow();
             super.openAllWindows();
-            await this.cardBattle.listenOpponentChoice((choice) => {
+            await this.cardBattle.listenOpponentStartPhase((choice) => {
                 const onClose = () => this.#createResultWindow(choice);
                 super.closeAllWindows(onClose);
             });
@@ -19,10 +19,6 @@ export class StartPhase extends CardBattlePhase implements Phase {
         this.#createMiniGameWindows();
         this.#createMiniGameCommandWindow();
         super.openAllWindows();
-    }
-
-    #createWaitingWindow(): void {
-        super.createTextWindowCentered('Waiting for opponent...', { textAlign: 'center' });
     }
 
     #createMiniGameWindows(): void {
@@ -40,14 +36,14 @@ export class StartPhase extends CardBattlePhase implements Phase {
             {
                 description: 'option: Draw white card',
                 onSelect: async () => {
-                    await this.cardBattle.setOpponentChoice(WHITE);
+                    await this.cardBattle.setPlayerChoice(WHITE);
                     this.#createResultWindow(WHITE);
                 }
             },
             {
                 description: 'option: Draw black card',
                 onSelect: async () => {
-                    await this.cardBattle.setOpponentChoice(BLACK);
+                    await this.cardBattle.setPlayerChoice(BLACK);
                     this.#createResultWindow(BLACK);
                 }
             },

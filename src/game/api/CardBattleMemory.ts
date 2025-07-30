@@ -2,7 +2,7 @@ import { BATTLE, POWER } from '../constants/CardTypes';
 import { BLUE, GREEN } from '../constants/Colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
-import { CardBattle } from './CardBattle';
+import { CardBattle, LoadPhasePlay } from './CardBattle';
 
 const delayMock = 100;
 
@@ -38,6 +38,9 @@ const cards = [
 ];
 
 export default class CardBattleSocketIo implements CardBattle {
+    #playerPass: boolean = false;
+    #opponentPassed: boolean = true;
+
     duplicate(cards: CardData[], number: number) {
         const duplicatedCards: CardData[] = [];
         for (let i = 0; i < number; i++) {
@@ -110,12 +113,13 @@ export default class CardBattleSocketIo implements CardBattle {
     iGo(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(Math.random() < 0.5);
+                // resolve(Math.random() < 0.5);
+                resolve(false);
             }, delayMock);
         });
     }
 
-    listenOpponentChoice(callback: (choice: string) => void): Promise<void> {
+    listenOpponentStartPhase(callback: (choice: string) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const choice = Math.random() < 0.5 ? 'White' : 'Black';
@@ -125,10 +129,10 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    setOpponentChoice(choice: string): Promise<void> {
+    setPlayerChoice(choice: string): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                console.log(`Opponent choice set to: ${choice}`);
+                console.log(`Player choice set to: ${choice}`);
                 resolve();
             }, delayMock);
         });
@@ -209,6 +213,52 @@ export default class CardBattleSocketIo implements CardBattle {
             setTimeout(() => {
                 const opponentHandCards = this.duplicate(cards, 3);
                 resolve(opponentHandCards);
+            }, delayMock);
+        });
+    }
+
+    listenOpponentLoadPhase(callback: (play: LoadPhasePlay) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const play: LoadPhasePlay = {
+                    pass: true,
+                    powerCard: null
+                };
+                callback(play);
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    allPass(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#playerPass && this.#opponentPassed);
+            }, delayMock);
+        });
+    }
+
+    opponentPassed(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#opponentPassed);
+            }, delayMock);
+        });
+    }
+
+    playerPass(): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                this.#playerPass = true;
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    hasPowerCardsInField(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(false);
             }, delayMock);
         });
     }

@@ -238,4 +238,8 @@ export class CardBattlePhase {
     destroyOpponentBattleCardset(): void {
         if (this.#opponentCardset) this.#opponentCardset.destroy();
     }
+
+    createWaitingWindow(): void {
+        this.createTextWindowCentered('Waiting for opponent...', { textAlign: 'center' });
+    }
 }

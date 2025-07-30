@@ -1,12 +1,24 @@
 import { Phase } from "./Phase";
-import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@game/ui/TextWindow';
 import { CompilePhase } from "./CompilePhase";
+import { CardBattlePhase } from "./CardBattlePhase";
 
-export class SummonPhase implements Phase {
+export class SummonPhase extends CardBattlePhase implements Phase {
     #window: TextWindow;
-    
-    constructor(readonly scene: CardBattleScene) {}
+
+    create(): void {
+        super.createTextWindowCentered('Summon Phase started!', {
+            textAlign: 'center',
+            onClose: () => {
+                this.changeToCompilePhase();
+            }
+        });
+        super.openAllWindows();
+    }
+
+    update(): void {
+        console.log("Updating Summon Phase...");
+    }
 
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
@@ -38,19 +50,6 @@ export class SummonPhase implements Phase {
 
     changeToBattlePhase(): void {
         throw new Error("Method not implemented.");
-    }
-
-    create(): void {
-        this.#window = TextWindow.createCentered(this.scene, 'Summon Phase started!', {
-            onClose: () => {
-                this.changeToCompilePhase();
-            }
-        });
-        this.#window.open();
-    }
-
-    update(): void {
-        console.log("Updating Summon Phase...");
     }
 
     destroy(): void {

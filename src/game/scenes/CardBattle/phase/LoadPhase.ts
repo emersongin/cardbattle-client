@@ -8,6 +8,7 @@ import { LOAD_PHASE } from "@/game/constants/Keys";
 import { CardData } from "@/game/types";
 import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { CardUi } from "@/game/ui/Card/CardUi";
+import { LoadPhasePlay } from "@/game/api/CardBattle";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
     #powerSlots: PowerSlots;
@@ -20,27 +21,51 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     async create(): Promise<void> {
-        await super.createPlayerBoard();
-        await super.createOpponentBoard();
-        this.#createCommandWindow();
-        if (this.#isStartPhase === false) {
-            super.openPlayerBoard(() =>  super.openCommandWindow());
-            super.openOpponentBoard();
+        if (this.#isStartPhase) {
+            this.#createLoadPhaseWindow();
+            super.openAllWindows();
             return;
         }
-        this.#createLoadPhaseWindow();
-        super.openAllWindows();
+        this.#createBoardsAndPlayerActions();
     }
 
     #createLoadPhaseWindow(): void {
         super.createTextWindowCentered('Load Phase started!', {
             textAlign: 'center',
             onClose: () => {
-                super.openPlayerBoard(() =>  super.openCommandWindow());
-                super.openOpponentBoard();
+                this.#createBoardsAndPlayerActions();
             }
         });
         super.addTextWindow('Select and use a Power Card');
+    }
+
+    async #createBoardsAndPlayerActions(): Promise<void> {
+        await super.createPlayerBoard();
+        await super.createOpponentBoard();
+        const iGo = await this.cardBattle.iGo();
+        if (!iGo) {
+            super.openPlayerBoard(() =>  this.#createOpponentWaitingWindow());
+            super.openOpponentBoard();
+            return;
+        }
+        super.openPlayerBoard(() => this.#createPlayerCommandWindow());
+        super.openOpponentBoard();
+    }
+
+    async #createOpponentWaitingWindow(): Promise<void> {
+        super.createWaitingWindow();
+        super.openAllWindows();
+        await this.cardBattle.listenOpponentLoadPhase((play: LoadPhasePlay) => {
+            if (play.pass) {
+                super.closeAllWindows(() => this.#allPass());
+                return;
+            }
+        });
+    }
+
+    #createPlayerCommandWindow() {
+        this.#createCommandWindow();
+        super.openCommandWindow()
     }
 
     #createCommandWindow(): void {
@@ -56,17 +81,41 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             },
             {
                 description: 'No',
-                onSelect: () => {
-                    if (this.#powerSlots.hasPower()) {
-                        this.changeToTriggerPhase(LOAD_PHASE);
-                        return;
-                    }
-                    this.changeToSummonPhase();
+                onSelect: async (): Promise<void> => {
+                    await this.cardBattle.playerPass();
+                    this.#allPass();
                 }
             }
         ];
         super.createCommandWindowBottom('Use a Power Card?', options);
     }
+
+    async #allPass() {
+        if(await this.cardBattle.allPass()) {
+            if (await this.cardBattle.hasPowerCardsInField()) {
+                this.changeToTriggerPhase(LOAD_PHASE);
+                // this.#powerSlots.hasPower()
+                return;
+            }
+            this.changeToSummonPhase();
+            return;
+        }
+        if (await this.cardBattle.opponentPassed() === false) {
+            this.#createOpponentWaitingWindow();
+            return;
+        }
+        this.#createPlayerCommandWindow();
+    }
+
+
+
+
+
+
+
+
+
+
 
     #createPlayerHandZone(): void {
         this.#createPlayerHandDisplayWindows();
@@ -213,7 +262,8 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     changeToSummonPhase(): void {
-        this.scene.changePhase(new SummonPhase(this.scene));
+        this.closePlayerBoard(() => this.scene.changePhase(new SummonPhase(this.scene)));
+        this.closeOpponentBoard();
     }
 
     changeToCompilePhase(): void {
