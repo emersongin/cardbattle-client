@@ -136,17 +136,21 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDescription(), 2);
                 super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
             },
-            onMarked: (cardIndex: number) => {
-                if (!cardset.isValidIndex(cardIndex)) return;
-                // console.log(cardset.getCardByIndex(cardIndex).getName());
-            },
             onCompleted: (cardIndexes: number[]) => {
                 cardset.highlightCardsByIndexes(cardIndexes);
                 super.createCommandWindowBottom('Complete your choice?', [
                     {
                         description: 'Yes',
                         onSelect: () => {
-                            console.log('Selected cards:', cardIndexes);
+                            super.closePlayerCardset(() => {
+                                super.openPlayerBoard(() => {
+                                    const cardIndex = cardIndexes.shift() || 0;
+                                    this.#openCardpowerPlay(cardIndex);
+                                });
+                                super.openOpponentBoard();
+                            });
+                            super.closeAllWindows();
+                            super.closePlayerBoard();
                         }
                     },
                     {
@@ -159,7 +163,10 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.openCommandWindow();
             },
             onLeave: () => {
-                super.closePlayerCardset(() => this.#allPass());
+                super.closePlayerCardset(() => {
+                    super.openPlayerBoard(() => this.#allPass());
+                    super.openOpponentBoard();
+                });
                 super.closeAllWindows();
                 super.closePlayerBoard();
             },
@@ -170,6 +177,10 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             super.openPlayerBoard();
         };
         super.openPlayerCardset(onComplete);
+    }
+
+    #openCardpowerPlay(cardIndex: number): void {
+        console.log("Opening Power Card Play for card index:", cardIndex);
     }
 
 
