@@ -51,9 +51,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #movePlayerCardSetToBoard(): void {
-        const totalCards = this.getPlayerBattleCardset().getCardsTotal();
+        const totalCards = this.getPlayerCardset().getCardsTotal();
         const moveConfig = {
-            targets: this.getPlayerBattleCardset().getCardsUi(),
+            targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.moveFromTo({
@@ -77,7 +77,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #flipPlayerCardSet() {
         const flipConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerBattleCardset().getCardsUi(),
+            targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.flip({
@@ -95,7 +95,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #flashPlayerCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerBattleCardset().getCardsUi(),
+            targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
@@ -143,7 +143,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #closePlayerCardSet(): void {
         const closeConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerBattleCardset().getCardsUi(),
+            targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.close({
@@ -160,7 +160,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #closeOpponentCardSet(): void {
         const closeConfig: TimelineConfig<CardUi> = {
-            targets: this.getOpponentBattleCardset().getCardsUi(),
+            targets: this.getOpponentCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.close({
@@ -174,7 +174,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #flashOpponentCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
-            targets: this.getOpponentBattleCardset().getCardsUi(),
+            targets: this.getOpponentCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
@@ -192,9 +192,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #moveOpponentCardSetToBoard(): void {
-        const totalCards = this.getOpponentBattleCardset().getCardsTotal();
+        const totalCards = this.getOpponentCardset().getCardsTotal();
         const moveConfig = {
-            targets: this.getOpponentBattleCardset().getCardsUi(),
+            targets: this.getOpponentCardset().getCardsUi(),
             x: 0,
             eachX: CARD_WIDTH,
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
@@ -257,7 +257,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         super.destroyAllTextWindows();
         super.destroyPlayerBoard();
         super.destroyOpponentBoard();
-        this.destroyPlayerBattleCardset();
-        this.destroyOpponentBattleCardset();
+        this.destroyPlayerCardset();
+        this.destroyOpponentCardset();
     }
 }

@@ -6,8 +6,6 @@ import { TriggerPhase } from "./TriggerPhase";
 import { PowerSlots } from "../abs/PowerSlots";
 import { LOAD_PHASE } from "@/game/constants/Keys";
 import { CardData } from "@/game/types";
-import { TimelineConfig, TimelineEvent } from "../../VueScene";
-import { CardUi } from "@/game/ui/Card/CardUi";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
@@ -107,16 +105,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         this.#createPlayerCommandWindow();
     }
 
-
-
-
-
-
-
-
-
-
-
     #createPlayerHandZone(): void {
         this.#createPlayerHandDisplayWindows();
         this.#createPlayerHandCardset();
@@ -136,11 +124,11 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         const cardset = super.createPlayerHandCardset(playerCards);
         cardset.setCardsInLinePosition();
         cardset.setCardsClosed();
-        this.#openAllCardsDominoMovement();
+        this.#openHandCardset();
     }
 
-    #openAllCardsDominoMovement(): void {
-        const cardset = super.getPlayerBattleCardset();
+    #openHandCardset(): void {
+        const cardset = super.getPlayerCardset();
         const events = {
             onChangeIndex: (cardIndex: number) => {
                 if (!cardset.isValidIndex(cardIndex)) return;
@@ -171,27 +159,28 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.openCommandWindow();
             },
             onLeave: () => {
-                // cardset.resetCardsState();
-                // cardset.closeAllCardsDominoMovement();
+                super.closePlayerCardset(() => this.#allPass());
+                super.closeAllWindows();
+                super.closePlayerBoard();
             },
         };
-        const openConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerBattleCardset().getCardsUi(),
-            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
-                pause();
-                card.open({
-                    delay: (index! * 100),
-                    onComplete: () => resume()
-                });
-            },
-            onAllComplete: () => {
-                cardset.selectModeOne(events);
-                super.openAllWindows();
-                super.openPlayerBoard();
-            }
+        const onComplete = () => {
+            cardset.selectModeOne(events);
+            super.openAllWindows();
+            super.openPlayerBoard();
         };
-        this.scene.timeline(openConfig);
+        super.openPlayerCardset(onComplete);
     }
+
+
+
+
+
+
+
+
+
+
 
     // #createZoneCommandWindow(): void {
     //     const options = [

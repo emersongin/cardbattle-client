@@ -7,6 +7,8 @@ import BoardWindow, { BoardZones } from '@/game/ui/BoardWindow/BoardWindow';
 import { BoardWindowData, CardData } from '@/game/types';
 import { CARD_HEIGHT, CARD_WIDTH, CardColors } from '@/game/ui/Card/Card';
 import { Cardset } from '@/game/ui/Cardset/Cardset';
+import { TimelineConfig, TimelineEvent } from '../../VueScene';
+import { CardUi } from '@/game/ui/Card/CardUi';
 
 export type AlignType = 
     | typeof LEFT 
@@ -107,7 +109,12 @@ export class CardBattlePhase {
     }
 
     closeAllWindows(onClose?: () => void): void {
-        if (this.#textWindows[0]) this.#textWindows[0].close(onClose);
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach((window, index) => {
+                if (!index) return window.close(onClose);
+                window.close();
+            });
+        }
     }
 
     destroyAllTextWindows(): void {
@@ -215,11 +222,45 @@ export class CardBattlePhase {
         return cardset;
     }
 
-    getPlayerBattleCardset(): Cardset {
+    getPlayerCardset(): Cardset {
         return this.#playerCardset;
     }
 
-    destroyPlayerBattleCardset(): void {
+    openPlayerCardset(onComplete?: () => void): void {
+        const openConfig: TimelineConfig<CardUi> = {
+            targets: this.getPlayerCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+                pause();
+                card.open({
+                    delay: (index! * 100),
+                    onComplete: () => resume()
+                });
+            },
+            onAllComplete: () => {
+                if (onComplete) onComplete();
+            }
+        };
+        this.scene.timeline(openConfig);
+    }
+
+    closePlayerCardset(onComplete?: () => void): void {
+        const closeConfig: TimelineConfig<CardUi> = {
+            targets: this.getPlayerCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+                pause();
+                card.close({
+                    delay: (index! * 100),
+                    onComplete: () => resume()
+                });
+            },
+            onAllComplete: () => {
+                if (onComplete) onComplete();
+            }
+        };
+        this.scene.timeline(closeConfig);
+    }
+
+    destroyPlayerCardset(): void {
         if (this.#playerCardset) this.#playerCardset.destroy();
     }
 
@@ -231,11 +272,11 @@ export class CardBattlePhase {
         return cardset;
     }
 
-    getOpponentBattleCardset(): Cardset {
+    getOpponentCardset(): Cardset {
         return this.#opponentCardset;
     }
 
-    destroyOpponentBattleCardset(): void {
+    destroyOpponentCardset(): void {
         if (this.#opponentCardset) this.#opponentCardset.destroy();
     }
 
