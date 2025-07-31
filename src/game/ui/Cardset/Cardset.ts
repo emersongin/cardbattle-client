@@ -155,10 +155,11 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     restoreSelectState(): void {
-        if (!this.#lastState || (this.#lastState instanceof SelectState) === false) return;
-        this.changeState(this.#lastState);
-        this.#status.removeSelectLastIndex();
-        this.#status.enable();
+        if (this.#lastState instanceof SelectState) {
+            this.#status = this.#lastState;
+            this.#status.removeSelectLastIndex();
+            this.#status.enable();
+        }
     }
 
     resetCardsState(): void {

@@ -288,8 +288,7 @@ export default class SelectState implements CardsetState {
     }
 
     #isSelectLimitReached(): boolean {
-        if (this.#selectNumber === 0) return false;
-        return this.#selectIndexes.length >= this.#selectNumber;
+        return (this.#selectNumber > 0) && (this.#selectIndexes.length >= this.#selectNumber);
     }
 
     #isSelectAll(): boolean {

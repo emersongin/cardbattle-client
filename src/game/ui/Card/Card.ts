@@ -77,10 +77,9 @@ export class Card extends Phaser.GameObjects.GameObject {
         if (!this.#status) return;
         if (this.#status instanceof MovingState) {
             this.#status.addTweens(moves);
-            return;
-        };
-        if (!(this.#status instanceof StaticState)) return
-        this.#status.moving(moves);
+        } else if (this.#status instanceof StaticState) {
+            this.#status.moving(moves);
+        }
     }
 
     moveFromTo(config: MoveConfig): void {
@@ -185,10 +184,9 @@ export class Card extends Phaser.GameObjects.GameObject {
         if (!this.#status || !this.data.get('faceUp')) return;
         if (this.#status instanceof UpdatingState) {
             this.#status.addTweens(ap, hp, 2000);
-            return;
+        } else if (this.#status instanceof StaticState) {
+            this.#status.updating(ap, hp);
         }
-        if (!(this.#status instanceof StaticState)) return;
-        this.#status.updating(ap, hp);
     }
 
     disable(): void {
@@ -350,9 +348,9 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     flash(config: FlashConfig): void {
-        if (!this.#status) return;
-        if (!(this.#status instanceof StaticState)) return;
-        this.#status.flash(config);
+        if (this.#status instanceof StaticState) {
+            this.#status.flash(config);
+        }
     }
 
     setClosed(): void {

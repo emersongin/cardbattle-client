@@ -297,8 +297,8 @@ export default class BoardWindow extends Sizer {
         };
         if (this.#status instanceof UpdatingState) {
             this.#status.addTweens(boardWindowData);
-            return;
+        } else if (this.#status instanceof StaticState) {
+            this.#status.updating(boardWindowData);
         }
-        this.#status.updating(boardWindowData);
     }
 }
