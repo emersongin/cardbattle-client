@@ -29,6 +29,7 @@ export type MoveConfig = {
     delay?: number, 
     duration?: number,
     onStart?: (card?: Card) => void,
+    onComplete?: (card?: Card) => void
 }
 
 export default class MovingState implements CardState {
@@ -39,8 +40,20 @@ export default class MovingState implements CardState {
 
     static createFromToMove(config: MoveConfig): Move[] {
         const moves: Move[] = [
-            MovingState.#createMove(config.xFrom || 0, config.yFrom || 0),
-            MovingState.#createMove(config.xTo, config.yTo, config.delay, config.duration, config.onStart)
+            { 
+                x: config.xFrom || 0, 
+                y: config.yFrom || 0, 
+                delay: 0,
+                duration: 0 
+            },
+            {
+                x: config.xTo, 
+                y: config.yTo,
+                delay: config.delay,
+                duration: config.duration,
+                onStart: config.onStart,
+                onComplete: config.onComplete
+            }
         ];
         return moves;
     }
@@ -108,10 +121,6 @@ export default class MovingState implements CardState {
         if (this.#hasMoves()) this.#createTweens();
         if (this.#hasTweens()) return;
         this.static();
-    }
-
-    static #createMove(x: number, y: number, delay: number = 0, duration: number = 0, onStart?: (card?: Card) => void): Move {
-        return { x, y, delay, duration, hold: 0, onStart };
     }
 
     #pushMoves(moves: Move[]) {
