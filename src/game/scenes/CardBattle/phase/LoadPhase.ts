@@ -177,13 +177,11 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         };
         const openConfig: TimelineConfig<CardUi> = {
             targets: this.getPlayerBattleCardset().getCardsUi(),
-            onStart: ({ target: { card }, tween, index  }: TimelineEvent<CardUi>) => {
-                tween!.pause();
+            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+                pause();
                 card.open({
                     delay: (index! * 100),
-                    onComplete: () => {
-                        tween!.resume();
-                    }
+                    onComplete: () => resume()
                 });
             },
             onAllComplete: () => {
@@ -237,7 +235,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     // }
 
     update(): void {
-        console.log("Updating Load Phase...");
+        // console.log("Updating Load Phase...");
     }
 
         changeToChallengePhase(): void {
