@@ -41,8 +41,7 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     #setStartData(): void {
         this.setDataEnabled();
-        this.data.set('originX', this.getX());
-        this.data.set('originY', this.getY());
+        this.updateOrigin();
         this.data.set('ap', this.staticData.hp);
         this.data.set('hp', this.staticData.ap);
         this.data.set('faceUp', false);
@@ -96,6 +95,8 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     flip(config: FlipConfig): void {
+        this.updateOrigin();
+        console.log(this.getX(), this.getY());
         const onCanStartClose = () => {
             return !this.data.get('faceUp');
         };
@@ -291,17 +292,17 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.#ui.y = y;
     }
 
-    updateOrigin(x: number = this.#ui.x, y: number = this.#ui.y): void {
+    updateOrigin(x?: number, y?: number): void {
         this.#setOriginX(x);
         this.#setOriginY(y);
     }
 
-    #setOriginX(x: number): void {
-        this.data.set('originX', x);
+    #setOriginX(value: number = this.#ui.x): void {
+        this.data.set('originX', value);
     }
 
-    #setOriginY(y: number): void {
-        this.data.set('originY', y);
+    #setOriginY(value: number = this.#ui.y): void {
+        this.data.set('originY', value);
     }
 
     getX(): number {
