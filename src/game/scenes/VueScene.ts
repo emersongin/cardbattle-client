@@ -3,6 +3,8 @@ import { EventBus } from '@game/EventBus';
 import { CardBattle } from '../api/CardBattle';
 
 export type TimelineEvent<T extends Phaser.GameObjects.Components.Transform> = {
+    pause: () => void;
+    resume: () => void;
     target: T, 
     tween?: Phaser.Tweens.Tween, 
     index?: number, 
@@ -58,7 +60,14 @@ export class VueScene extends Scene {
                     delay: 0,
                     hold: 0,
                     onStart: (tween: Phaser.Tweens.Tween) => {
+                        const pause = () => tween!.pause();
+                        const resume = () => {
+                            tween!.resume();
+                            resolve();
+                        };
                         if (timiline.onStart) timiline.onStart({
+                            pause,
+                            resume,
                             target, 
                             tween, 
                             index
