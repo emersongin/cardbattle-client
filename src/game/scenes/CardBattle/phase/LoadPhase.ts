@@ -7,6 +7,7 @@ import { PowerSlots } from "../abs/PowerSlots";
 import { LOAD_PHASE } from "@/game/constants/Keys";
 import { CardData } from "@/game/types";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
+import { CARD_WIDTH } from "@/game/ui/Card/Card";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
     #powerSlots: PowerSlots;
@@ -179,8 +180,17 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.openPlayerCardset(onComplete);
     }
 
-    #openCardpowerPlay(cardIndex: number): void {
-        console.log("Opening Power Card Play for card index:", cardIndex);
+    async #openCardpowerPlay(cardIndex: number): Promise<void> {
+        const playerPowerCard = await this.cardBattle.getPlayerPowerCardByIndex(cardIndex);
+        const powerCards: CardData[] = await this.cardBattle.getPowerCardsData();
+        const cardset = super.createFieldCardset([...powerCards, playerPowerCard]);
+        cardset.setCardsInLinePosition();
+        const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
+        cardset.setCardAtPosition(cardset.getCardsLastIndex(), widthEdge);
+        cardset.setCardsClosed();
+        super.openFieldCardset(() => {
+            cardset.selectCard(cardset.getCardByIndex(cardset.getCardsLastIndex()))
+        });
     }
 
 

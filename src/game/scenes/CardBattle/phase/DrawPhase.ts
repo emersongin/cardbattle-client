@@ -22,13 +22,13 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #createPlayerDrawCardset(playerCards: CardData[]) {
-        const cardset = super.createPlayerBattleCardset(playerCards);
+        const cardset = super.createPlayerCardset(playerCards);
         const widthEdge = this.scene.scale.width;
         cardset.setCardsInLinePosition(widthEdge, 0);
     }
 
     #createOpponentDrawCardset(opponentCards: CardData[]) {
-        const cardset = super.createOpponentBattleCardset(opponentCards);
+        const cardset = super.createOpponentCardset(opponentCards);
         const widthEdge = this.scene.scale.width;
         cardset.setCardsInLinePosition(widthEdge, 0);
     }

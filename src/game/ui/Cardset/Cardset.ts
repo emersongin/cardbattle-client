@@ -45,6 +45,15 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    setCardAtPosition(index: number, x: number = 0, y: number = 0): void {
+        if (!this.isValidIndex(index)) {
+            throw new Error(`Cardset: index ${index} is out of bounds.`);
+        }
+        const card = this.getCardByIndex(index);
+        card.setPosition(x, y);
+        card.updateOrigin();
+    }
+
     getCards(): Card[] {
         return this.#cards;
     }
@@ -80,6 +89,10 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     getCardsTotal(): number {
         return this.getCards().length;
+    }
+
+    getCardsLastIndex(): number {
+        return this.getCardsTotal() - 1;
     }
 
     getIndexesToArray(): number[] {
