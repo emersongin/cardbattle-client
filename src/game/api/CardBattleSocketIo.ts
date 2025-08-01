@@ -161,4 +161,20 @@ export default class CardBattleSocketIo implements CardBattle {
             });
         });
     }
+
+    getPowerCardsData(): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            this.#socket.emit('getPowerCardsData', (response: CardData[]) => {
+                resolve(response);
+            });
+        });
+    }
+
+    getPlayerPowerCardByIndex(index: number): Promise<CardData> {
+        return new Promise((resolve) => {
+            this.#socket.emit('getPlayerPowerCardByIndex', index, (response: CardData) => {
+                resolve(response);
+            });
+        });
+    }
 }

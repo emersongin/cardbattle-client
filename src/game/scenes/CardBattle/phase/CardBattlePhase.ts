@@ -28,6 +28,7 @@ export class CardBattlePhase {
     #opponentBoard: BoardWindow;
     #playerCardset: Cardset;
     #opponentCardset: Cardset;
+    #fieldCardset: Cardset;
     
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
@@ -206,10 +207,10 @@ export class CardBattlePhase {
         if (this.#opponentBoard) this.#opponentBoard.destroy();
     }
 
-    createPlayerBattleCardset(playerCards: CardData[]): Cardset {
+    createPlayerCardset(cards: CardData[]): Cardset {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
         const y = (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10; 
-        const cardset = Cardset.create(this.scene, playerCards, x, y);
+        const cardset = Cardset.create(this.scene, cards, x, y);
         this.#playerCardset = cardset;
         return cardset;
     }
@@ -264,10 +265,10 @@ export class CardBattlePhase {
         if (this.#playerCardset) this.#playerCardset.destroy();
     }
 
-    createOpponentBattleCardset(opponentCards: CardData[]): Cardset {
+    createOpponentCardset(cards: CardData[]): Cardset {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
         const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
-        const cardset = Cardset.create(this.scene, opponentCards, x, y);
+        const cardset = Cardset.create(this.scene, cards, x, y);
         this.#opponentCardset = cardset;
         return cardset;
     }
@@ -278,6 +279,39 @@ export class CardBattlePhase {
 
     destroyOpponentCardset(): void {
         if (this.#opponentCardset) this.#opponentCardset.destroy();
+    }
+
+    createFieldCardset(cards: CardData[]): Cardset {
+        const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
+        const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
+        const cardset = Cardset.create(this.scene, cards, x, y);
+        this.#fieldCardset = cardset;
+        return cardset;
+    }
+
+    getFieldCardset(): Cardset {
+        return this.#fieldCardset;
+    }
+
+    openFieldCardset(onComplete?: () => void): void {
+        const openConfig: TimelineConfig<CardUi> = {
+            targets: this.getFieldCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+                pause();
+                card.open({
+                    delay: (index! * 100),
+                    onComplete: () => resume()
+                });
+            },
+            onAllComplete: () => {
+                if (onComplete) onComplete();
+            }
+        };
+        this.scene.timeline(openConfig);
+    }
+
+    destroyFieldCardset(): void {
+        if (this.#fieldCardset) this.#fieldCardset.destroy();
     }
 
     createWaitingWindow(): void {

@@ -23,4 +23,6 @@ export interface CardBattle {
     opponentPassed: () => Promise<boolean>;
     playerPass(): Promise<void>;
     hasPowerCardsInField: () => Promise<boolean>;
+    getPowerCardsData: () => Promise<CardData[]>;
+    getPlayerPowerCardByIndex: (index: number) => Promise<CardData>;
 }

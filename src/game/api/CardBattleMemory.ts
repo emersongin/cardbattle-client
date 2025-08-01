@@ -1,5 +1,5 @@
 import { BATTLE, POWER } from '../constants/CardTypes';
-import { BLUE, GREEN } from '../constants/Colors';
+import { BLACK, BLUE, GREEN, RED } from '../constants/Colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
@@ -28,6 +28,34 @@ const cards = [
         description: 'This is a test power card description.',
         details: 'This card is used for testing power effects.',
         color: BLUE as CardColors,
+        imageName: 'card-picture',
+        hp: 0,
+        ap: 0,
+        typeId: POWER as CardType,
+        powerId: 'power-1',
+        cost: 1
+    },
+    {
+        UUID: '123e4567-e89b-12d3-a456-426614174444',
+        number: 1,
+        name: 'Test Power Card 2',
+        description: 'This is a test power card description.',
+        details: 'This card is used for testing power effects.',
+        color: RED as CardColors,
+        imageName: 'card-picture',
+        hp: 0,
+        ap: 0,
+        typeId: POWER as CardType,
+        powerId: 'power-1',
+        cost: 1
+    },
+    {
+        UUID: '123e4567-e89b-12d3-a456-426614174444',
+        number: 1,
+        name: 'Test Power Card 3',
+        description: 'This is a test power card description.',
+        details: 'This card is used for testing power effects.',
+        color: BLACK as CardColors,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -141,7 +169,7 @@ export default class CardBattleSocketIo implements CardBattle {
     drawPlayerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerCards = this.duplicate(cards, 3);
+                const playerCards = this.duplicate(cards, 3).slice(0, 6);
                 // .reverse();
                 resolve(playerCards);
             }, delayMock);
@@ -151,7 +179,7 @@ export default class CardBattleSocketIo implements CardBattle {
     drawOpponentCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const opponentCards = this.duplicate(cards, 3);
+                const opponentCards = this.duplicate(cards, 3).slice(0, 6);
                 resolve(opponentCards);
             }, delayMock);
         });
@@ -202,7 +230,7 @@ export default class CardBattleSocketIo implements CardBattle {
     getPlayerHandCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerHandCards = this.duplicate(cards, 3);
+                const playerHandCards = this.duplicate(cards, 3).slice(0, 6);
                 resolve(playerHandCards);
             }, delayMock);
         });
@@ -211,7 +239,7 @@ export default class CardBattleSocketIo implements CardBattle {
     getOpponentHandCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const opponentHandCards = this.duplicate(cards, 3);
+                const opponentHandCards = this.duplicate(cards, 3).slice(0, 6);
                 resolve(opponentHandCards);
             }, delayMock);
         });
@@ -259,6 +287,24 @@ export default class CardBattleSocketIo implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(false);
+            }, delayMock);
+        });
+    }
+
+    getPowerCardsData(): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                const powerCards = this.duplicate(cards.filter(card => card.typeId === POWER), 10).slice(0, 2);
+                resolve(powerCards);
+            }, delayMock);
+        });
+    }
+
+    getPlayerPowerCardByIndex(index: number): Promise<CardData> {
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                const cards = await this.getPlayerHandCardsData();
+                resolve(cards[index]);
             }, delayMock);
         });
     }
