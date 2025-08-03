@@ -3,6 +3,7 @@ import { BATTLE, POWER } from '../constants/keys';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
 import { CardType } from '../ui/Card/types/CardType';
+import { MathUtil } from '../utils/MathUtil';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
 
 const delayMock = 100;
@@ -295,7 +296,7 @@ export default class CardBattleSocketIo implements CardBattle {
     getPowerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const powerCards = this.duplicate(cards.filter(card => card.typeId === POWER), 10).slice(0, 2);
+                const powerCards = this.duplicate(cards.filter(card => card.typeId === POWER), 10).slice(0, MathUtil.randomInt(0, 2));
                 resolve(powerCards);
             }, delayMock);
         });

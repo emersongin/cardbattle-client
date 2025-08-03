@@ -100,10 +100,6 @@ export class TextWindow extends TextBox {
         });
     }
 
-    isBusy() {
-        return this.#tween !== null && this.#tween.isPlaying();
-    }
-
     #addOnCompletedListener() {
         const keyboard = this.scene.input.keyboard;
         if (!keyboard) {

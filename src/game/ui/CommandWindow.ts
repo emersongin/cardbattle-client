@@ -68,10 +68,6 @@ export class CommandWindow extends Sizer {
         });
     }
 
-    isBusy() {
-        return this.#tween !== null && this.#tween.isPlaying();
-    }
-
     #createBackground(scene: Phaser.Scene) {
         const background = scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x000000);
         background.setAlpha(0.8);

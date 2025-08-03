@@ -186,10 +186,6 @@ export default class BoardWindow extends Sizer {
         });
     }
 
-    isBusy() {
-        return this.#tween !== null && this.#tween.isPlaying();
-    }
-
     changeState(state: WindowState, ...args: any[]): void {
         this.#status = state;
         this.#status.create(...args);

@@ -9,3 +9,5 @@ export const LOAD_PHASE = 'LOAD_PHASE';
 export const COMPILE_PHASE = 'COMPILE_PHASE';
 export const BATTLE = 'BATTLE';
 export const POWER = 'POWER';
+export const PLAYER = 'PLAYER';
+export const OPPONENT = 'OPPONENT';

@@ -300,7 +300,7 @@ export class CardBattlePhase {
         return this.#fieldCardset;
     }
 
-    openFieldCardset(onComplete?: () => void): void {
+    openFieldCardset(config?: OpenCardsetEvents): void {
         const openConfig: TimelineConfig<CardUi> = {
             targets: this.getFieldCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -311,10 +311,27 @@ export class CardBattlePhase {
                 });
             },
             onAllComplete: () => {
-                if (onComplete) onComplete();
+                if (config?.onComplete) config.onComplete();
             }
         };
         this.scene.timeline(openConfig);
+    }
+
+    closeFieldCardset(config?: CloseCardsetEvents): void {
+        const closeConfig: TimelineConfig<CardUi> = {
+            targets: this.getFieldCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+                pause();
+                card.close({
+                    delay: (index! * 100),
+                    onComplete: () => resume()
+                });
+            },
+            onAllComplete: () => {
+                if (config?.onComplete) config.onComplete();
+            }
+        };
+        this.scene.timeline(closeConfig);
     }
 
     destroyFieldCardset(): void {

@@ -4,10 +4,13 @@ import { CardBattlePhase } from "./CardBattlePhase";
 import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
 import { PowerSlots } from "../abs/PowerSlots";
-import { LOAD_PHASE } from "@/game/constants/keys";
+import { LOAD_PHASE, PLAYER } from "@/game/constants/keys";
 import { CardData } from "@/game/types";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
 import { CARD_WIDTH } from "@/game/constants/default";
+import { PlayerOrigin } from "@/game/types/PlayerOrigin";
+import { CardUi } from "@/game/ui/Card/CardUi";
+import { TimelineEvent } from "../../VueScene";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
     #powerSlots: PowerSlots;
@@ -144,7 +147,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                                     super.openPlayerBoard({
                                         onComplete: () => {
                                             const cardIndex = cardIndexes.shift() || 0;
-                                            this.#openCardpowerPlay(cardIndex);
+                                            this.#playPlayerPowerCard(cardIndex);
                                         }
                                     });
                                     super.openOpponentBoard();
@@ -178,19 +181,71 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         }});
     }
 
-    async #openCardpowerPlay(cardIndex: number): Promise<void> {
+    async #playPlayerPowerCard(cardIndex: number): Promise<void> {
         const playerPowerCard = await this.cardBattle.getPlayerPowerCardByIndex(cardIndex);
+        this.#openPowerfield(playerPowerCard, PLAYER);
+    }
+
+    async #openPowerfield(powerCard: CardData, origin: PlayerOrigin): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getPowerCardsData();
-        const cardset = super.createFieldCardset([...powerCards, playerPowerCard]);
+        const cardset = super.createFieldCardset([...powerCards, powerCard]);
         cardset.setCardsInLinePosition();
         const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
         cardset.setCardAtPosition(cardset.getCardsLastIndex(), widthEdge);
         cardset.setCardsClosed();
-        super.openFieldCardset(() => {
-            const lastIndex = cardset.getCardsLastIndex();
-            const card = cardset.getCardByIndex(lastIndex);
-            cardset.selectCard(card);
+        super.openFieldCardset({
+            onComplete: () => {
+                const lastIndex = cardset.getCardsLastIndex();
+                const card = cardset.getCardByIndex(lastIndex);
+                cardset.selectCard(card);
+                this.#createPowerCardWindows(powerCard, origin);
+            }
         });
+    }
+
+    #createPowerCardWindows(powerCard: CardData, origin: PlayerOrigin): void {
+        super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
+        super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
+        super.createCommandWindowBottom('Use this Power Card?', [
+            {
+                description: 'Yes',
+                onSelect: () => {
+                    super.closeAllWindows();
+                    this.#movePowerCardToField();
+                }
+            },
+            {
+                description: 'No',
+                onSelect: () => {
+                    super.closeAllWindows();
+                    super.closeOpponentBoard();
+                    super.closePlayerBoard();
+                    super.closeFieldCardset({ onComplete: () => this.#createPlayerHandZone() });
+                }
+            }
+        ]);
+        super.openAllWindows();
+        super.openCommandWindow();
+    }
+
+    #movePowerCardToField(): void {
+        const totalCards = this.getFieldCardset().getCardsTotal();
+        const moveConfig = {
+            targets: this.getFieldCardset().getCardsUi(),
+            x: 0,
+            eachX: CARD_WIDTH,
+            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+                pause();
+                card.moveFromTo({
+                    xTo: 0 + (index! * CARD_WIDTH),
+                    yTo: 0,
+                    delay: (index! * 100), 
+                    duration: (300 / totalCards) * (totalCards - index!),
+                    onComplete: () => resume()
+                });
+            },
+        };
+        this.scene.timeline(moveConfig);
     }
 
 

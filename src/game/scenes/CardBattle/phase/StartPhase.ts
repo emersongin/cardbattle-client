@@ -2,6 +2,7 @@ import { CardBattlePhase } from "./CardBattlePhase";
 import { Phase } from "./Phase";
 import { WHITE, BLACK } from "@/game/constants/colors";
 import { DrawPhase } from "./DrawPhase";
+import { ArrayUtil } from "@/game/utils/ArrayUtil";
 
 export class StartPhase extends CardBattlePhase implements Phase {
 
@@ -45,7 +46,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
                 }
             },
         ];
-        options.sort(() => Math.random() - 0.5);
+        ArrayUtil.shuffle(options);
         super.createCommandWindowCentered('Select a card', options);
     }
 
