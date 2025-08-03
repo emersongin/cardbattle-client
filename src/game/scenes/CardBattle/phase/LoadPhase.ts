@@ -172,6 +172,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         };
         super.openPlayerCardset({ onComplete: () => {
             cardset.selectModeOne(events);
+            cardset.disableBattleCards();
             super.openAllWindows();
             super.openPlayerBoard();
         }});

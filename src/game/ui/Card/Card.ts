@@ -40,7 +40,9 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.data.set('hp', this.staticData.ap);
         this.data.set('faceUp', false);
         this.data.set('closed', false);
+        this.data.set('selected', false);
         this.data.set('marked', false);
+        this.data.set('highlight', false);
         this.data.set('disabled', false);
     }
 
@@ -51,14 +53,6 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     getSelectedLayer(): Phaser.GameObjects.Graphics {
         return this.#ui.selectedLayer;
-    }
-
-    getMarkedLayer(): Phaser.GameObjects.Graphics {
-        return this.#ui.markedLayer;
-    }
-
-    getHighlightedLayer(): Phaser.GameObjects.Graphics {
-        return this.#ui.highlightedLayer;
     }
 
     preUpdate() {
@@ -195,23 +189,24 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     select(): void {
-        if (!this.#ui.selectedLayer) return;
-        this.#ui.selectedLayer.setVisible(true);
-    }
-
-    isSelected(): boolean {
-        return this.#ui.selectedLayer && this.#ui.selectedLayer.visible;
+        this.data.set('selected', true);
+        this.#ui.changeSelectedLayerColor(0xffff00);
+        this.#ui.setSelectedLayerVisible(true);
     }
 
     deselect(): void {
-        if (!this.#ui.selectedLayer) return;
-        this.#ui.selectedLayer.setVisible(false);
+        this.data.set('selected', false);
+        this.#ui.setSelectedLayerVisible(false);
+    }
+
+    isSelected(): boolean {
+        return this.data.get('selected');
     }
 
     mark(): void {
         this.data.set('marked', true);
-        if (!this.#ui.markedLayer) return;
-        this.#ui.markedLayer.setVisible(true);
+        this.#ui.changeSelectedLayerColor(0x00ff00);
+        this.#ui.setSelectedLayerVisible(true);
     }
 
     isMarked(): boolean {
@@ -220,22 +215,22 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     unmark(): void {
         this.data.set('marked', false);
-        if (!this.#ui.markedLayer) return;
-        this.#ui.markedLayer.setVisible(false);
+        this.#ui.setSelectedLayerVisible(false);
     }
 
     highlight(): void {
-        if (!this.#ui.highlightedLayer) return;
-        this.#ui.highlightedLayer.setVisible(true);
+        this.data.set('highlight', true);
+        this.#ui.changeSelectedLayerColor(0xff00ff);
+        this.#ui.setSelectedLayerVisible(true);
     }
 
     isHighlighted(): boolean {
-        return this.#ui.highlightedLayer && this.#ui.highlightedLayer.visible;
+        return this.data.get('highlight');
     }
 
     unhighlight(): void {
-        if (!this.#ui.highlightedLayer) return;
-        this.#ui.highlightedLayer.setVisible(false);
+        this.data.set('highlight', false);
+        this.#ui.setSelectedLayerVisible(false);
     }
 
     isDisabled(): boolean {

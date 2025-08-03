@@ -11,8 +11,6 @@ export class CardUi extends Phaser.GameObjects.Container {
     display: Phaser.GameObjects.Text;
     disabledLayer: Phaser.GameObjects.Rectangle;
     selectedLayer: Phaser.GameObjects.Graphics;
-    markedLayer: Phaser.GameObjects.Graphics;
-    highlightedLayer: Phaser.GameObjects.Graphics;
 
     constructor(
         readonly scene: Phaser.Scene,
@@ -29,9 +27,7 @@ export class CardUi extends Phaser.GameObjects.Container {
         this.#createImage();
         this.#createDisplay();
         this.#createDisabledLayer();
-        this.#createSelectedLayer();
-        this.#createMarkedLayer();
-        this.#createHighlightedLayer();
+        this.#createSelectedLayer(); // Default color for selected layer
     }
 
     #createBackground(): void {
@@ -143,11 +139,27 @@ export class CardUi extends Phaser.GameObjects.Container {
         this.add(this.disabledLayer);
     }
 
-    #createSelectedLayer(): void {
-        const selectedLayer = this.#createOutlinedRect(0, 0, this.width, this.height, 0xffff00, 6);
+    #createSelectedLayer(color?: number): void {
+        const selectedLayer = this.#createOutlinedRect(0, 0, this.width, this.height, color || 0xffff00, 6);
         selectedLayer.setVisible(false);
         this.selectedLayer = selectedLayer;
         this.add(this.selectedLayer);
+    }
+
+    setSelectedLayerVisible(visible: boolean): void {
+        if (!this.selectedLayer) {
+            throw new Error('Selected layer is not initialized.');
+        }
+        this.selectedLayer.setVisible(visible || false);
+    }
+
+    changeSelectedLayerColor(color: number): void {
+        if (!this.selectedLayer) {
+            throw new Error('Selected layer is not initialized.');
+        }
+        this.selectedLayer.clear();
+        this.selectedLayer.lineStyle(6, color);
+        this.selectedLayer.strokeRect(0, 0, this.width, this.height);
     }
 
     #createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {
@@ -155,19 +167,5 @@ export class CardUi extends Phaser.GameObjects.Container {
         g.lineStyle(thickness, color);
         g.strokeRect(x, y, w, h);
         return g;
-    }
-
-    #createMarkedLayer(): void {
-        const markedLayer = this.#createOutlinedRect(0, 0, this.width, this.height, 0x00ff00, 6);
-        markedLayer.setVisible(false);
-        this.markedLayer = markedLayer;
-        this.add(this.markedLayer);
-    }
-
-    #createHighlightedLayer(): void {
-        const highlightedLayer = this.#createOutlinedRect(0, 0, this.width, this.height, 0xff00ff, 6);
-        highlightedLayer.setVisible(false);
-        this.highlightedLayer = highlightedLayer;
-        this.add(this.highlightedLayer);
     }
 }

@@ -188,7 +188,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#status.selectMode({ events, selectNumber: 1 });
     }
 
-    selectModeMany(events: CardsetEvents, colorPoints: ColorsPoints): void {
+    selectModeMany(events: CardsetEvents, colorPoints?: ColorsPoints): void {
         this.#status.selectMode({ 
             events, 
             colorPoints, 
@@ -241,7 +241,7 @@ export class Cardset extends Phaser.GameObjects.Container {
             const markedTargets: Phaser.GameObjects.Graphics[] = [];
             this.getCards().forEach((card: Card) => {
                 if (card.isMarked()) {
-                    markedTargets.push(card.getMarkedLayer());
+                    markedTargets.push(card.getSelectedLayer());
                 }
             });
             if (markedTargets.length) {
@@ -262,7 +262,7 @@ export class Cardset extends Phaser.GameObjects.Container {
             const highlightedTargets: Phaser.GameObjects.Graphics[] = [];
             this.getCards().forEach((card: Card) => {
                 if (card.isHighlighted()) {
-                    highlightedTargets.push(card.getHighlightedLayer());
+                    highlightedTargets.push(card.getSelectedLayer());
                 }
             });
             if (highlightedTargets.length) {
