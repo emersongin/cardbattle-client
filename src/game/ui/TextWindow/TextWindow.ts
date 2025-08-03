@@ -1,19 +1,6 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
-import { DisplayUtil } from '../utils/DisplayUtil';
-
-export type TextWindowConfig = {
-    text: string,
-    x: number, 
-    y: number, 
-    width: number, 
-    height: number, 
-    textColor?: string,
-    textAlign?: 'center' | 'left' | 'right',
-    onStartClose?: () => void,
-    onClose?: () => void,
-    relativeParent?: TextWindow,
-    marginTop?: number
-};
+import { DisplayUtil } from '../../utils/DisplayUtil';
+import { TextWindowConfig } from './types/TextWindowConfig';
 
 export class TextWindow extends TextBox {
     #tween: Phaser.Tweens.Tween | null = null;

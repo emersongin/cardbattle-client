@@ -1,21 +1,14 @@
 import { Card } from "../Card";
+import { FlashCardConfig } from "../types/FlashCardConfig";
 import { CardState } from "./CardState";
 import StaticState from "./StaticState";
-
-export type FlashConfig = {
-    color?: number,
-    delay?: number,
-    duration?: number,
-    onStart?: (card: Card) => void,
-    onComplete?: (card: Card) => void
-};
 
 export default class FlashState implements CardState {
     #flashLayer: Phaser.GameObjects.Rectangle;
     
     constructor(readonly card: Card) {}
 
-    create(config: FlashConfig): void {
+    create(config: FlashCardConfig): void {
         const { color, delay, duration, onStart, onComplete } = config;
         this.#createFlashLayer(color);
         this.#flash(delay, duration, onStart, onComplete);

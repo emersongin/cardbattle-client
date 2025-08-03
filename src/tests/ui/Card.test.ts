@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { Card, CardColors, CardType } from "@ui/Card/Card";
 import { Cardset } from "@game/ui/Cardset/Cardset";
-import { BLUE } from "@game/constants/Colors";
+import { BLUE } from "@/game/constants/colors";
 import { BATTLE } from "@game/constants/CardTypes";
 import Phaser from "phaser";
 import PhaserMock from "@mocks/phaser";

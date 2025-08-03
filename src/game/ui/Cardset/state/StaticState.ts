@@ -1,6 +1,6 @@
 import { Cardset } from "../Cardset";
+import { SelectStateConfig } from "../types/SelectStateConfig";
 import { CardsetState, SelectState } from "./CardsetState";
-import { SelectStateConfig } from "./SelectState";
 
 export default class StaticState implements CardsetState {
     constructor(readonly cardset: Cardset) {}
@@ -9,7 +9,7 @@ export default class StaticState implements CardsetState {
         throw new Error('StaticState: staticMode called, this should not happen');
     }
 
-    selectMode(config: SelectStateConfig) {
+    selectMode(config: SelectStateConfig): void {
         this.cardset.changeState(new SelectState(this.cardset), config);
     }
 

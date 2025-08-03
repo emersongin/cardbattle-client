@@ -1,7 +1,7 @@
 import { CardBattleScene } from '../CardBattleScene';
 import { CardBattle } from "@game/api/CardBattle";
-import { TextWindow, TextWindowConfig } from '@game/ui/TextWindow';
-import { LEFT, CENTER, RIGHT } from '@/game/constants/Keys';
+import { TextWindow, TextWindowConfig } from '@/game/ui/TextWindow/TextWindow';
+import { LEFT, CENTER, RIGHT } from '@/game/constants/keys';
 import { CommandWindow } from '@/game/ui/CommandWindow';
 import BoardWindow, { BoardZones } from '@/game/ui/BoardWindow/BoardWindow';
 import { BoardWindowData, CardData } from '@/game/types';

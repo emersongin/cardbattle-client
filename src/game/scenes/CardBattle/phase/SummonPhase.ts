@@ -1,5 +1,5 @@
 import { Phase } from "./Phase";
-import { TextWindow } from '@game/ui/TextWindow';
+import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
 import { CompilePhase } from "./CompilePhase";
 import { CardBattlePhase } from "./CardBattlePhase";
 

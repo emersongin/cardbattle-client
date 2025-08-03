@@ -4,13 +4,7 @@ import { CardsetEvents } from "../types/CardsetEvents";
 import { CardsetState } from "./CardsetState";
 import { ColorsPoints } from "../../../types/ColorsPoints";
 import StaticState from "./StaticState";
-
-export type SelectStateConfig = {
-    events: CardsetEvents;
-    colorPoints?: ColorsPoints | null;
-    selectNumber?: number;
-    startIndex?: number;
-};
+import { SelectStateConfig } from "../types/SelectStateConfig";
 
 export default class SelectState implements CardsetState {
     #index: number;

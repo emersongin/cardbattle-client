@@ -7,3 +7,5 @@ export const CENTER = 'center';
 export const RIGHT = 'right';
 export const LOAD_PHASE = 'LOAD_PHASE';
 export const COMPILE_PHASE = 'COMPILE_PHASE';
+export const BATTLE = 'BATTLE';
+export const POWER = 'POWER';

@@ -3,7 +3,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
 import { CompilePhase } from "./CompilePhase";
 import { SummonPhase } from "./SummonPhase";
-import { COMPILE_PHASE, LOAD_PHASE } from "@/game/constants/Keys";
+import { COMPILE_PHASE, LOAD_PHASE } from "@/game/constants/keys";
 
 export class TriggerPhase implements Phase {
     #powerActions: any[] = [];

@@ -1,3 +1,4 @@
+export * from './BoardZones';
 export * from './BoardWindowData';
 export * from './CardsFolderData';
 export * from './CardData';

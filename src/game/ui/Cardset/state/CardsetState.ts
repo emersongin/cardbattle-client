@@ -1,5 +1,6 @@
 import StaticState from "./StaticState";
-import SelectState, { SelectStateConfig } from "./SelectState";
+import SelectState from "./SelectState";
+import { SelectStateConfig } from "../types/SelectStateConfig";
 
 export interface CardsetState {
     create?(...args: any[]): void;

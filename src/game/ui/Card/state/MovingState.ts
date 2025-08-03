@@ -1,36 +1,9 @@
 import { Card } from "../Card";
 import { CardState, StaticState } from "./CardState";
 import { Move } from "../types/Move";
-
-export type FlipConfig = {
-    delay?: number,
-    onComplete?: (card?: Card) => void
-};
-
-export type OpenConfig = {
-    delay?: number, 
-    duration?: number, 
-    onCanStart?: () => boolean, 
-    onComplete?: (card?: Card) => void
-}
-
-export type CloseConfig = {
-    delay: number, 
-    duration?: number, 
-    onCanStart?: () => boolean, 
-    onComplete?: (card?: Card) => void
-}
-
-export type MoveConfig = {
-    xTo: number, 
-    yTo: number, 
-    xFrom?: number, 
-    yFrom?: number, 
-    delay?: number, 
-    duration?: number,
-    onStart?: (card?: Card) => void,
-    onComplete?: (card?: Card) => void
-}
+import { OpenCardConfig } from "../types/OpenCardConfig";
+import { CloseCardConfig } from "../types/CloseCardConfig";
+import { MoveCardConfig } from "../types/MoveCardConfig";
 
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];
@@ -38,7 +11,7 @@ export default class MovingState implements CardState {
     
     constructor(readonly card: Card) {}
 
-    static createFromToMove(config: MoveConfig): Move[] {
+    static createFromToMove(config: MoveCardConfig): Move[] {
         const moves: Move[] = [
             { 
                 x: config.xFrom || 0, 
@@ -58,7 +31,7 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    static createCloseMove(card: Card, config: CloseConfig): Move[] {
+    static createCloseMove(card: Card, config: CloseCardConfig): Move[] {
         const moves: Move[] = [
             {
                 x: card.getX() + (card.getWidth() / 2),
@@ -75,7 +48,7 @@ export default class MovingState implements CardState {
         return moves;
     }
 
-    static createOpenMove(card: Card, config: OpenConfig): Move[] {
+    static createOpenMove(card: Card, config: OpenCardConfig): Move[] {
         const moves: Move[] = [
             {
                 x: card.getOriginX(),

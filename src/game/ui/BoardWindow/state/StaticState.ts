@@ -1,6 +1,6 @@
 import { BoardWindowData } from "@game/types";
-import BoardWindow from "./BoardWindow";
 import { UpdatingState, WindowState } from "./WindowState";
+import BoardWindow from "../BoardWindow";
 
 export default class StaticState implements WindowState {
     constructor(readonly window: BoardWindow) {}

@@ -1,7 +1,7 @@
 import { BoardWindowData } from "@game/types";
-import BoardWindow from "./BoardWindow";
-import { UpdatePoints } from "./UpdatePoints";
 import { StaticState, WindowState } from "./WindowState";
+import BoardWindow from "../BoardWindow";
+import { UpdatePoints } from "../types/UpdatePoints";
 
 export default class UpdatingState implements WindowState {
     #updates: UpdatePoints[][] = [];

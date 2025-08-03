@@ -5,7 +5,7 @@ import { CardColors, CardType } from "@ui/Card/Card";
 import { ColorsPoints } from "@game/types/ColorsPoints";
 import { VueScene } from "@game/scenes/VueScene";
 import { CardData } from "@game/types";
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/Colors";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
 
 const cards = [
     {

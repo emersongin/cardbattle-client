@@ -1,6 +1,6 @@
 import { CardBattlePhase } from "./CardBattlePhase";
 import { Phase } from "./Phase";
-import { WHITE, BLACK } from "@game/constants/Colors";
+import { WHITE, BLACK } from "@/game/constants/colors";
 import { DrawPhase } from "./DrawPhase";
 
 export class StartPhase extends CardBattlePhase implements Phase {

@@ -1,16 +1,11 @@
 import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 import { DisplayUtil } from "../../utils/DisplayUtil";
-import { StaticState, UpdatingState, WindowState } from "./WindowState";
-import { CardColors } from "../Card/Card";
 import { BoardWindowData, MaybePartialBoardWindowData } from "@game/types/BoardWindowData";
-import { BLACK, BLUE, GREEN, RED, WHITE } from "@game/constants/Colors";
-import { DECK, HAND, TRASH, WINS } from "@/game/constants/Keys";
-
-export type BoardZones = 
-    | typeof HAND 
-    | typeof DECK
-    | typeof TRASH
-    | typeof WINS;
+import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
+import { BoardZones } from "@/game/types/BoardZones";
+import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
+import { StaticState, UpdatingState, WindowState } from "./state/WindowState";
+import { CardColors } from "../Card/types/CardColors";
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;

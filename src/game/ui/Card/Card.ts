@@ -1,23 +1,17 @@
 import { CardPoints } from "./types/CardPoints";
-import { CardState, StaticState, MovingState, UpdatingState, FlashConfig } from "./state/CardState";
+import { CardState, StaticState, MovingState, UpdatingState } from "./state/CardState";
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
-import { CloseConfig, FlipConfig, MoveConfig, OpenConfig } from "./state/MovingState";
-import { RED, GREEN, BLUE, BLACK, WHITE, ORANGE } from "@game/constants/Colors";
-import { BATTLE, POWER } from "@game/constants/CardTypes";
-
-export const CARD_WIDTH = 100;
-export const CARD_HEIGHT = 150;
-export type CardType = | typeof BATTLE | typeof POWER;
-export type CardColors = 
-    | typeof RED 
-    | typeof GREEN 
-    | typeof BLUE 
-    | typeof BLACK 
-    | typeof WHITE 
-    | typeof ORANGE;
+import { MoveCardConfig } from "./types/MoveCardConfig";
+import { FlipCardConfig } from "./types/FlipCardConfig";
+import { CloseCardConfig } from "./types/CloseCardConfig";
+import { OpenCardConfig } from "./types/OpenCardConfig";
+import { FlashCardConfig } from "./types/FlashCardConfig";
+import { CardColors } from "./types/CardColors";
+import { BATTLE, POWER } from "@/game/constants/keys";
+import { CardType } from "./types/CardType";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
@@ -82,7 +76,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         }
     }
 
-    moveFromTo(config: MoveConfig): void {
+    moveFromTo(config: MoveCardConfig): void {
         const defaultConfig = {
             xFrom: this.getX(),
             yFrom: this.getY(),
@@ -93,7 +87,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         })));
     }
 
-    flip(config: FlipConfig): void {
+    flip(config: FlipCardConfig): void {
         this.updateOrigin();
         console.log(this.getX(), this.getY());
         const onCanStartClose = () => {
@@ -146,7 +140,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         });
     }
 
-    close(config: CloseConfig): void {
+    close(config: CloseCardConfig): void {
         const onCompleteCallback = () => {
             this.data.set('closed', true);
             if (config?.onComplete) config.onComplete();
@@ -167,7 +161,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('closed');
     }
 
-    open(config: OpenConfig): void {
+    open(config: OpenCardConfig): void {
         const onOpenedCallback = () => {
             this.data.set('closed', false);
             if (config.onComplete) config.onComplete(this);
@@ -270,11 +264,11 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     isBattleCard(): boolean {
-        return this.staticData.typeId === BATTLE;
+        return this.staticData.typeId === BATTLE as CardType;
     }
 
     isPowerCard(): boolean {
-        return this.staticData.typeId === POWER;
+        return this.staticData.typeId === POWER as CardType;
     }
 
     setPosition(x: number = this.#ui.x, y: number = this.#ui.y): void {
@@ -347,7 +341,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.data.set('hp', hp);
     }
 
-    flash(config: FlashConfig): void {
+    flash(config: FlashCardConfig): void {
         if (this.#status instanceof StaticState) {
             this.#status.flash(config);
         }

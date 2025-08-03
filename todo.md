@@ -1,0 +1,6 @@
+- refatorar codigo de observer
+- refatorar types de configuração com nomes descritivos mesmo que campos repetitivos mas com assinaturas destintas
+- class abstrata de CArdBattlePhase para compartilhas ações entre load e compile fases:
+- msg descrição de ação para Powercard e janela de confirmação para tipos de ações de configuração de card PowerCard
+- movimentos de cartão ao acionar afeito
+- executar PowerCards sem efeito mas deixando momento para executar ações dinamicas...

@@ -1,5 +1,5 @@
 import { BATTLE, POWER } from '../constants/CardTypes';
-import { BLACK, BLUE, GREEN, RED } from '../constants/Colors';
+import { BLACK, BLUE, GREEN, RED } from '../constants/colors';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors, CardType } from '../ui/Card/Card';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
