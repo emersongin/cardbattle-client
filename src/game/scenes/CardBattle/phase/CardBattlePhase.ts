@@ -1,14 +1,21 @@
 import { CardBattleScene } from '../CardBattleScene';
 import { CardBattle } from "@game/api/CardBattle";
-import { TextWindow, TextWindowConfig } from '@/game/ui/TextWindow/TextWindow';
+import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
 import { LEFT, CENTER, RIGHT } from '@/game/constants/keys';
 import { CommandWindow } from '@/game/ui/CommandWindow';
-import BoardWindow, { BoardZones } from '@/game/ui/BoardWindow/BoardWindow';
-import { BoardWindowData, CardData } from '@/game/types';
-import { CARD_HEIGHT, CARD_WIDTH, CardColors } from '@/game/ui/Card/Card';
+import BoardWindow from '@/game/ui/BoardWindow/BoardWindow';
+import { BoardWindowData, BoardZones, CardData } from '@/game/types';
 import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { TimelineConfig, TimelineEvent } from '../../VueScene';
 import { CardUi } from '@/game/ui/Card/CardUi';
+import { TextWindowConfig } from '@/game/ui/TextWindow/types/TextWindowConfig';
+import { CardColors } from '@/game/ui/Card/types/CardColors';
+import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
+import { OpenBoardEvents } from '@/game/ui/BoardWindow/types/OpenBoardEvents';
+import { CloseCardsetEvents } from '@/game/ui/Cardset/types/CloseCardsetEvents';
+import { CloseWindowConfig } from '@/game/ui/TextWindow/types/CloseWindowConfig';
+import { CloseBoardEvents } from '@/game/ui/BoardWindow/types/CloseBoardEvents';
+import { OpenCardsetEvents } from '@/game/ui/Cardset/types/OpenCardsetEvents';
 
 export type AlignType = 
     | typeof LEFT 
@@ -74,7 +81,7 @@ export class CardBattlePhase {
     #closeAllChildWindows(): void {
         if (this.#textWindows.length) {
             this.#textWindows.forEach((window, index) => {
-                if (index > 0) window.close(() => window.destroy())
+                if (index > 0) window.close({ onComplete: () => window.destroy()})
             });
         }
     }
@@ -109,10 +116,10 @@ export class CardBattlePhase {
         }
     }
 
-    closeAllWindows(onClose?: () => void): void {
+    closeAllWindows(config?: CloseWindowConfig): void {
         if (this.#textWindows.length) {
             this.#textWindows.forEach((window, index) => {
-                if (!index) return window.close(onClose);
+                if (!index) return window.close(config);
                 window.close();
             });
         }
@@ -162,12 +169,12 @@ export class CardBattlePhase {
         this.#playerBoard.addColorPoints(cardColor, value);
     }
 
-    openPlayerBoard(onComplete?: () => void): void {
-        this.#playerBoard.open(onComplete);
+    openPlayerBoard(config?: OpenBoardEvents): void {
+        this.#playerBoard.open(config);
     }
 
-    closePlayerBoard(onComplete?: () => void): void {
-        this.#playerBoard.close(onComplete);
+    closePlayerBoard(config?: CloseBoardEvents): void {
+        this.#playerBoard.close(config);
     }
 
     destroyPlayerBoard(): void {
@@ -227,7 +234,7 @@ export class CardBattlePhase {
         return this.#playerCardset;
     }
 
-    openPlayerCardset(onComplete?: () => void): void {
+    openPlayerCardset(config?: OpenCardsetEvents): void {
         const openConfig: TimelineConfig<CardUi> = {
             targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -238,13 +245,13 @@ export class CardBattlePhase {
                 });
             },
             onAllComplete: () => {
-                if (onComplete) onComplete();
+                if (config?.onComplete) config.onComplete();
             }
         };
         this.scene.timeline(openConfig);
     }
 
-    closePlayerCardset(onComplete?: () => void): void {
+    closePlayerCardset(config: CloseCardsetEvents): void {
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -255,7 +262,7 @@ export class CardBattlePhase {
                 });
             },
             onAllComplete: () => {
-                if (onComplete) onComplete();
+                if (config.onComplete) config.onComplete();
             }
         };
         this.scene.timeline(closeConfig);

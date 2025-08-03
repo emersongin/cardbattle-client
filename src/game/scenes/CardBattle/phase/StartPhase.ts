@@ -11,8 +11,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
             super.createWaitingWindow();
             super.openAllWindows();
             await this.cardBattle.listenOpponentStartPhase((choice) => {
-                const onClose = () => this.#createResultWindow(choice);
-                super.closeAllWindows(onClose);
+                super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice) });
             });
             return;
         }
@@ -24,9 +23,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
     #createMiniGameWindows(): void {
         super.createTextWindowCentered('Start Phase', {
             textAlign: 'center',
-            onClose: () => {
-                this.openCommandWindow();
-            }
+            onClose: () => this.openCommandWindow()
         });
         super.addTextWindow('Draw white card to go first.');
     }
@@ -55,9 +52,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
     #createResultWindow(choice: string): void {
         super.createTextWindowCentered(choice === WHITE ? 'You go first!' : 'Opponent goes first!', {
             textAlign: 'center',
-            onClose: () => {
-                this.changeToDrawPhase();
-            }
+            onClose: () => this.changeToDrawPhase()
         });
         super.openAllWindows();
     }

@@ -1,12 +1,12 @@
 import { Phase } from "./Phase";
 import { CardBattlePhase } from "./CardBattlePhase";
-import { CARD_WIDTH } from "@game/ui/Card/Card";
 import { LoadPhase } from "./LoadPhase";
 import { CardUi } from "@game/ui/Card/CardUi";
 import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@/game/constants/colors";
 import { DECK, HAND } from "@/game/constants/keys";
 import { CardData } from "@/game/types";
+import { CARD_WIDTH } from "@/game/constants/default";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 
@@ -68,9 +68,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     onComplete: () => resume()
                 });
             },
-            onAllComplete: () => {
-                this.#flipPlayerCardSet();
-            }
+            onAllComplete: () => this.#flipPlayerCardSet()
         };
         this.scene.timeline(moveConfig);
     }
@@ -102,15 +100,11 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 pause();
                 card.flash({
                     delay: (index! * 100),
-                    onStart: () => {
-                        this.addPlayerBoardColorPoints(card.getColor(), 1);
-                    },
+                    onStart: () => this.addPlayerBoardColorPoints(card.getColor(), 1),
                     onComplete: () => resume()
                 });
             },
-            onAllComplete: () => {
-                this.#addOnCompletedListener();
-            }
+            onAllComplete: () => this.#addOnCompletedListener()
         };
         this.scene.timeline(flashConfig);
     }
@@ -151,9 +145,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     onComplete: () => resume()
                 });
             },
-            onAllComplete: () => {
-                this.changeToLoadPhase();
-            }
+            onAllComplete: () => this.changeToLoadPhase()
         };
         this.scene.timeline(closeConfig);
     }
@@ -181,9 +173,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 pause();
                 card.flash({
                     delay: (index! * 100),
-                    onStart: () => {
-                        this.addOpponentBoardColorPoints(card.getColor(), 1);
-                    },
+                    onStart: () => this.addOpponentBoardColorPoints(card.getColor(), 1),
                     onComplete: () => resume()
                 });
             }

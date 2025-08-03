@@ -7,7 +7,7 @@ import { PowerSlots } from "../abs/PowerSlots";
 import { LOAD_PHASE } from "@/game/constants/keys";
 import { CardData } from "@/game/types";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
-import { CARD_WIDTH } from "@/game/ui/Card/Card";
+import { CARD_WIDTH } from "@/game/constants/default";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
     #powerSlots: PowerSlots;
@@ -31,9 +31,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     #createLoadPhaseWindow(): void {
         super.createTextWindowCentered('Load Phase started!', {
             textAlign: 'center',
-            onClose: () => {
-                this.#createBoardsAndPlayerActions();
-            }
+            onClose: () => this.#createBoardsAndPlayerActions()
         });
         super.addTextWindow('Select and use a Power Card');
     }
@@ -43,11 +41,11 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         await super.createOpponentBoard();
         const iGo = await this.cardBattle.iGo();
         if (!iGo) {
-            super.openPlayerBoard(() =>  this.#createOpponentWaitingWindow());
+            super.openPlayerBoard({ onComplete: () =>  this.#createOpponentWaitingWindow() });
             super.openOpponentBoard();
             return;
         }
-        super.openPlayerBoard(() => this.#createPlayerCommandWindow());
+        super.openPlayerBoard({ onComplete: () => this.#createPlayerCommandWindow() });
         super.openOpponentBoard();
     }
 
@@ -56,7 +54,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.openAllWindows();
         await this.cardBattle.listenOpponentLoadPhase((play: LoadPhasePlay) => {
             if (play.pass) {
-                super.closeAllWindows(() => this.#allPass());
+                super.closeAllWindows({ onComplete: () => this.#allPass() });
                 return;
             }
         });
@@ -73,9 +71,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 description: 'Yes',
                 onSelect: () => {
                     super.closeOpponentBoard();
-                    super.closePlayerBoard(async () => {
-                        this.#createPlayerHandZone();
-                    });
+                    super.closePlayerBoard({ onComplete: () => this.#createPlayerHandZone() });
                 }
             },
             {
@@ -143,12 +139,16 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                     {
                         description: 'Yes',
                         onSelect: () => {
-                            super.closePlayerCardset(() => {
-                                super.openPlayerBoard(() => {
-                                    const cardIndex = cardIndexes.shift() || 0;
-                                    this.#openCardpowerPlay(cardIndex);
-                                });
-                                super.openOpponentBoard();
+                            super.closePlayerCardset({
+                                onComplete: () => {
+                                    super.openPlayerBoard({
+                                        onComplete: () => {
+                                            const cardIndex = cardIndexes.shift() || 0;
+                                            this.#openCardpowerPlay(cardIndex);
+                                        }
+                                    });
+                                    super.openOpponentBoard();
+                                }
                             });
                             super.closeAllWindows();
                             super.closePlayerBoard();
@@ -156,28 +156,25 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                     },
                     {
                         description: 'No',
-                        onSelect: () => {
-                            cardset.restoreSelectState();
-                        }
+                        onSelect: () => cardset.restoreSelectState()
                     },
                 ]);
                 super.openCommandWindow();
             },
             onLeave: () => {
-                super.closePlayerCardset(() => {
-                    super.openPlayerBoard(() => this.#allPass());
+                super.closePlayerCardset({ onComplete: () => {
+                    super.openPlayerBoard({ onComplete: () => this.#allPass() });
                     super.openOpponentBoard();
-                });
+                }});
                 super.closeAllWindows();
                 super.closePlayerBoard();
             },
         };
-        const onComplete = () => {
+        super.openPlayerCardset({ onComplete: () => {
             cardset.selectModeOne(events);
             super.openAllWindows();
             super.openPlayerBoard();
-        };
-        super.openPlayerCardset(onComplete);
+        }});
     }
 
     async #openCardpowerPlay(cardIndex: number): Promise<void> {
@@ -189,7 +186,9 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         cardset.setCardAtPosition(cardset.getCardsLastIndex(), widthEdge);
         cardset.setCardsClosed();
         super.openFieldCardset(() => {
-            cardset.selectCard(cardset.getCardByIndex(cardset.getCardsLastIndex()))
+            const lastIndex = cardset.getCardsLastIndex();
+            const card = cardset.getCardByIndex(lastIndex);
+            cardset.selectCard(card);
         });
     }
 
@@ -270,7 +269,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     changeToSummonPhase(): void {
-        this.closePlayerBoard(() => this.scene.changePhase(new SummonPhase(this.scene)));
+        this.closePlayerBoard({ onComplete: () => this.scene.changePhase(new SummonPhase(this.scene)) });
         this.closeOpponentBoard();
     }
 

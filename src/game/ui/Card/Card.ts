@@ -89,7 +89,6 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     flip(config: FlipCardConfig): void {
         this.updateOrigin();
-        console.log(this.getX(), this.getY());
         const onCanStartClose = () => {
             return !this.data.get('faceUp');
         };

@@ -6,6 +6,8 @@ import { BoardZones } from "@/game/types/BoardZones";
 import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
 import { StaticState, UpdatingState, WindowState } from "./state/WindowState";
 import { CardColors } from "../Card/types/CardColors";
+import { OpenBoardEvents } from "./types/OpenBoardEvents";
+import { CloseBoardEvents } from "./types/CloseBoardEvents";
 
 export default class BoardWindow extends Sizer {
     #tween: Phaser.Tweens.Tween | null = null;
@@ -160,26 +162,26 @@ export default class BoardWindow extends Sizer {
         return new BoardWindow(scene, x, y, width, height, config, color, true);
     }
 
-    open(onComplete?: () => void) {
+    open(config?: OpenBoardEvents) {
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                if (onComplete) onComplete();
+                if (config?.onComplete) config.onComplete();
             }
         });
     }
 
-    close(onComplete?: () => void) {
+    close(config?: CloseBoardEvents) {
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',
             onComplete: () => {
-                if (onComplete) onComplete();
+                if (config?.onComplete) config.onComplete();
             }
         });
     }

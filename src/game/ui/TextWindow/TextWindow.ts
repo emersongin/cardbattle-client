@@ -1,6 +1,7 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { DisplayUtil } from '../../utils/DisplayUtil';
 import { TextWindowConfig } from './types/TextWindowConfig';
+import { CloseWindowConfig } from './types/CloseWindowConfig';
 
 export class TextWindow extends TextBox {
     #tween: Phaser.Tweens.Tween | null = null;
@@ -85,16 +86,15 @@ export class TextWindow extends TextBox {
         });
     }
 
-    close(onClose?: () => void) {
+    close(config?: CloseWindowConfig) {
         if (!this.scene?.tweens) return;
-        if (onClose) this.#setOnClose(onClose);
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                if (this.#onClose) this.#onClose();
+                if (config?.onComplete) config.onComplete();
                 this.destroy();
             }
         });
@@ -114,7 +114,7 @@ export class TextWindow extends TextBox {
                 throw new Error('Keyboard input is not available in this scene.');
             }
             keyboard.removeAllListeners();
-            this.close();
+            this.close({ onComplete: this.#onClose });
             if (this.#onStartClose) this.#onStartClose();
         };
         keyboard.once('keydown-ENTER', onKeyDown, this);

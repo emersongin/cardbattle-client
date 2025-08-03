@@ -1,7 +1,8 @@
-import { BATTLE, POWER } from '../constants/CardTypes';
 import { BLACK, BLUE, GREEN, RED } from '../constants/colors';
+import { BATTLE, POWER } from '../constants/keys';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
-import { CardColors, CardType } from '../ui/Card/Card';
+import { CardColors } from '../ui/Card/types/CardColors';
+import { CardType } from '../ui/Card/types/CardType';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
 
 const delayMock = 100;

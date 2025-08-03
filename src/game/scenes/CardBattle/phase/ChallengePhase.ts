@@ -17,9 +17,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         super.createTextWindowCentered('CardBattle Challenge!', {
             textAlign: 'center',
             textColor: '#ff3c3c',
-            onClose: () => {
-                this.openCommandWindow();
-            }
+            onClose: () => super.openCommandWindow()
         });
         const { name, description } = opponent;
         super.addTextWindow(`${name}\n${description}`);
