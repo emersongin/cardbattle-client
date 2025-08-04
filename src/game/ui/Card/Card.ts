@@ -51,7 +51,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         if (this.#status.create) this.#status.create(...args);
     }
 
-    getSelectedLayer(): Phaser.GameObjects.Graphics {
+    getSelectedLayer(): Phaser.GameObjects.Container {
         return this.#ui.selectedLayer;
     }
 

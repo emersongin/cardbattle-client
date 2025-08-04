@@ -104,12 +104,12 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     onComplete: () => resume()
                 });
             },
-            onAllComplete: () => this.#addOnCompletedListener()
+            onAllComplete: () => this.#addOnCompleteListener()
         };
         this.scene.timeline(flashConfig);
     }
 
-    #addOnCompletedListener() {
+    #addOnCompleteListener() {
         const keyboard = this.scene.input.keyboard;
         if (!keyboard) {
             throw new Error('Keyboard input is not available in this scene.');

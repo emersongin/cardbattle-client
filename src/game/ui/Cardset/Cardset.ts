@@ -12,8 +12,8 @@ export class Cardset extends Phaser.GameObjects.Container {
     #lastState: CardsetState | null = null;
     #cards: Card[] = [];
     #selectedTweens: Phaser.Tweens.Tween[];
-    #markedTweens: Phaser.Tweens.Tween[];
-    #highlightedTweens: Phaser.Tweens.Tween[];
+    // #markedTweens: Phaser.Tweens.Tween[];
+    // #highlightedTweens: Phaser.Tweens.Tween[];
 
     constructor(
         readonly scene: Scene, 
@@ -133,30 +133,37 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    #stopSelectedTweens(): void {
+        if (this.#selectedTweens) {
+            this.#selectedTweens?.forEach(tween => tween.stop());
+            this.#selectedTweens = [];
+        }
+    }
+
     selectCard(card: Card): void {
         card.select();
         this.bringToTop(card.getUi());
-        if (this.#selectedTweens) this.#selectedTweens.forEach(tween => tween.stop());
+        this.#stopSelectedTweens();
     }
 
     deselectCard(card: Card): void {
         card.deselect();
-        if (this.#selectedTweens) this.#selectedTweens?.forEach(tween => tween.stop());
+        this.#stopSelectedTweens();
     }
 
     markCard(card: Card): void {
         card.mark();
-        if (this.#markedTweens) this.#markedTweens.forEach(tween => tween.stop());
+        this.#stopSelectedTweens();
     }
 
     unmarkCard(card: Card): void {
         card.unmark();
-        if (this.#markedTweens) this.#markedTweens.forEach(tween => tween.stop());
+        this.#stopSelectedTweens();
     }
 
     unhighlightCard(card: Card): void {
         card.unhighlight();
-        if (this.#highlightedTweens) this.#highlightedTweens.forEach(tween => tween.stop());
+        this.#stopSelectedTweens();
     }
 
     highlightCardsByIndexes(cardIndexes: number[]): void {
@@ -222,8 +229,8 @@ export class Cardset extends Phaser.GameObjects.Container {
     preUpdate(): void {
         this.#preUpdateCards();
         this.#preUpdateSelectedTweens();
-        this.#preUpdateMarkedTweens();
-        this.#preUpdateHighlightedTweens();
+        // this.#preUpdateMarkedTweens();
+        // this.#preUpdateHighlightedTweens();
     }
 
     #preUpdateCards(): void {
@@ -234,57 +241,16 @@ export class Cardset extends Phaser.GameObjects.Container {
         if (!this.#selectedTweens || !this.#selectedTweens?.some(tween => tween.isPlaying())) {
             const selectedTargets: Phaser.GameObjects.Graphics[] = [];
             this.getCards().forEach((card: Card) => {
-                if (card.isSelected()) {
-                    selectedTargets.push(card.getSelectedLayer());
+                if (card.isSelected() || card.isMarked() || card.isHighlighted()) {
+                    const colorLayer = card.getSelectedLayer().list[1] as Phaser.GameObjects.Graphics;
+                    selectedTargets.push(colorLayer);
                 }
             });
             if (selectedTargets.length) {
                 this.#selectedTweens = this.scene.tweens.addMultiple(selectedTargets.map((target: Phaser.GameObjects.Graphics) => ({
                     targets: target,
-                    alpha: { from: 0.4, to: 0.9 },
-                    duration: 500,
-                    ease: 'Linear',
-                    yoyo: true,
-                    repeat: -1,
-                })));
-            }
-        }
-    }
-
-    #preUpdateMarkedTweens(): void {
-        if (!this.#markedTweens || !this.#markedTweens?.some(tween => tween.isPlaying())) {
-            const markedTargets: Phaser.GameObjects.Graphics[] = [];
-            this.getCards().forEach((card: Card) => {
-                if (card.isMarked()) {
-                    markedTargets.push(card.getSelectedLayer());
-                }
-            });
-            if (markedTargets.length) {
-                this.#markedTweens = this.scene.tweens.addMultiple(markedTargets.map((target: Phaser.GameObjects.Graphics) => ({
-                    targets: target,
-                    alpha: { from: 0.7, to: 0.9 },
-                    duration: 500,
-                    ease: 'Linear',
-                    yoyo: true,
-                    repeat: -1,
-                })));
-            }
-        }
-    }
-
-    #preUpdateHighlightedTweens(): void {
-        if (!this.#highlightedTweens || !this.#highlightedTweens?.some(tween => tween.isPlaying())) {
-            const highlightedTargets: Phaser.GameObjects.Graphics[] = [];
-            this.getCards().forEach((card: Card) => {
-                if (card.isHighlighted()) {
-                    highlightedTargets.push(card.getSelectedLayer());
-                }
-            });
-            if (highlightedTargets.length) {
-                this.#highlightedTweens = this.scene.tweens.addMultiple(highlightedTargets.map((target: Phaser.GameObjects.Graphics) => ({
-                    targets: target,
-                    alpha: { from: 0.4, to: 0.9 },
-                    duration: 500,
+                    alpha: { from: 0.5, to: 1 },
+                    duration: 300,
                     ease: 'Linear',
                     yoyo: true,
                     repeat: -1,
@@ -297,5 +263,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.getCards().forEach((card: Card) => {
             card.setClosed();
         });
+    }
+
+    isStaticMode(): boolean {
+        return this.#status instanceof StaticState;
+    }
+
+    isSelectMode(): boolean {
+        return this.#status instanceof SelectState;
     }
 }

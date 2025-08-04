@@ -142,7 +142,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDescription(), 2);
                 super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
             },
-            onCompleted: (cardIndexes: number[]) => {
+            onComplete: (cardIndexes: number[]) => {
                 cardset.highlightCardsByIndexes(cardIndexes);
                 super.createCommandWindowBottom('Complete your choice?', [
                     {

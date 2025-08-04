@@ -44,13 +44,6 @@ export default class SelectState implements CardsetState {
         this.#removeDisabledIndex(lastIndex);
     }
 
-    resetCardsState(): void {
-        this.#sendCardsToBack(this.cardset.getCardsTotal() - 1);
-        this.#deselectAll();
-        this.#unmarkAll();
-        this.#unhighlightAll();
-    }
-
     selectMode() {
         throw new Error('SelectState: selectMode should not be called directly.');
     }
@@ -109,7 +102,7 @@ export default class SelectState implements CardsetState {
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
                 this.#disable();
                 this.staticMode();
-                if (this.#events.onCompleted) this.#events.onCompleted(this.getSelectIndexes());
+                if (this.#events.onComplete) this.#events.onComplete(this.getSelectIndexes());
             }
         };
         keyboard.on('keydown-ENTER', onKeydownEnter);
@@ -121,12 +114,18 @@ export default class SelectState implements CardsetState {
             this.#disable();
             this.staticMode();
             if (this.getSelectIndexes().length > 0) {
-                if (this.#events.onCompleted) this.#events.onCompleted(this.getSelectIndexes());
+                if (this.#events.onComplete) this.#events.onComplete(this.getSelectIndexes());
                 return;
             }
             if (this.#events.onLeave) this.#events.onLeave();
         }
         keyboard.on('keydown-ESC', onKeydownEsc);
+    }
+
+    resetCardsState(): void {
+        this.#deselectAll();
+        this.#unmarkAll();
+        this.#unhighlightAll();
     }
 
     #updateCardsState(): void {

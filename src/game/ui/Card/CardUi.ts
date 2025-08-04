@@ -10,7 +10,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     image: Phaser.GameObjects.Image;
     display: Phaser.GameObjects.Text;
     disabledLayer: Phaser.GameObjects.Rectangle;
-    selectedLayer: Phaser.GameObjects.Graphics;
+    selectedLayer: Phaser.GameObjects.Container;
 
     constructor(
         readonly scene: Phaser.Scene,
@@ -139,8 +139,8 @@ export class CardUi extends Phaser.GameObjects.Container {
         this.add(this.disabledLayer);
     }
 
-    #createSelectedLayer(color?: number): void {
-        const selectedLayer = this.#createOutlinedRect(0, 0, this.width, this.height, color || 0xffff00, 6);
+    #createSelectedLayer(): void {
+        const selectedLayer = this.scene.add.container(0, 0);
         selectedLayer.setVisible(false);
         this.selectedLayer = selectedLayer;
         this.add(this.selectedLayer);
@@ -157,9 +157,9 @@ export class CardUi extends Phaser.GameObjects.Container {
         if (!this.selectedLayer) {
             throw new Error('Selected layer is not initialized.');
         }
-        this.selectedLayer.clear();
-        this.selectedLayer.lineStyle(6, color);
-        this.selectedLayer.strokeRect(0, 0, this.width, this.height);
+        this.selectedLayer.removeAll(true);
+        this.selectedLayer.add(this.#createOutlinedRect(0, 0, this.width, this.height, 0x000000, 6));
+        this.selectedLayer.add(this.#createOutlinedRect(0, 0, this.width, this.height, color || 0xffff00, 6));
     }
 
     #createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {

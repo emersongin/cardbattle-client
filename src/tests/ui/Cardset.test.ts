@@ -1,36 +1,40 @@
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import Phaser from "@mocks/phaser";
 import { Cardset } from "@ui/Cardset/Cardset";
-import { CardColors, CardType } from "@ui/Card/Card";
 import { ColorsPoints } from "@game/types/ColorsPoints";
 import { VueScene } from "@game/scenes/VueScene";
 import { CardData } from "@game/types";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
+import { CardColors } from "@/game/ui/Card/types/CardColors";
+import { CardType } from "@/game/ui/Card/types/CardType";
+import { BATTLE, POWER } from "@/game/constants/keys";
 
 const cards = [
     {
-        UUID: '123e4567-e89b-12d3-a456-426614174000',
+        id: '123e4567-e89b-12d3-a456-426614174000',
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
+        details: 'This is a test card details.',
         color: BLUE as CardColors,
         imageName: 'card-picture',
         hp: 10,
         ap: 5,
-        typeId: 'battle' as CardType,
+        typeId: BATTLE as CardType,
         powerId: 'none',
         cost: 1
     },
     {
-        UUID: '123e4567-e89b-12d3-a456-426614174444',
+        id: '123e4567-e89b-12d3-a456-426614174444',
         number: 1,
         name: 'Test Power Card',
         description: 'This is a test power card description.',
+        details: 'This is a test power card details.',
         color: RED as CardColors,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: 'power' as CardType,
+        typeId: POWER as CardType,
         powerId: 'power-1',
         cost: 1
     },
@@ -38,7 +42,7 @@ const cards = [
 const eventsMock = {
     onChangeIndex: vi.fn(),
     onMarked: vi.fn(),
-    onCompleted: vi.fn(),
+    onComplete: vi.fn(),
     onLeave: vi.fn(),
 };
 const colorPoints: ColorsPoints = {
@@ -113,7 +117,7 @@ describe("MockScene", () => {
                 indexTest = cardIndex;
             },
             onMarked: vi.fn(),
-            onCompleted: vi.fn(),
+            onComplete: vi.fn(),
             onLeave: vi.fn(),
         };
         const keyboard = getKeyboard(scene);
@@ -132,7 +136,7 @@ describe("MockScene", () => {
         const events = {
             onChangeIndex: vi.fn(),
             onMarked: vi.fn(),
-            onCompleted: (cardIndexes: number[]) => {
+            onComplete: (cardIndexes: number[]) => {
                 markedCards = cardIndexes;
             },
             onLeave: vi.fn(),
@@ -152,7 +156,7 @@ describe("MockScene", () => {
         const events = {
             onChangeIndex: vi.fn(),
             onMarked: vi.fn(),
-            onCompleted: (cardIndexes: number[]) => {
+            onComplete: (cardIndexes: number[]) => {
                 markedCards = cardIndexes;
                 // cardset.#highlightSelectedCards();
                 cardset.restoreSelectState();
