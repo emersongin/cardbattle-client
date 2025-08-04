@@ -10,8 +10,6 @@ export interface CardsetState {
     removeSelectLastIndex(): void;
     resetCardsState(): void;
     enable(): void;
-    disableBattleCards(): void;
-    disablePowerCards(): void;
 }
 
 export { StaticState, SelectState };

@@ -177,4 +177,20 @@ export default class CardBattleSocketIo implements CardBattle {
             });
         });
     }
+
+    playerMakePowerCardPlay(powerCardId: string): Promise<void> {
+        return new Promise((resolve) => {
+            this.#socket.emit('playerMakePowerCardPlay', powerCardId, () => {
+                resolve();
+            });
+        });
+    }
+
+    isPowerfieldLimitReached(): Promise<boolean> {
+        return new Promise((resolve) => {
+            this.#socket.emit('isPowerfieldLimitReached', (response: boolean) => {
+                resolve(response);
+            });
+        });
+    }
 }

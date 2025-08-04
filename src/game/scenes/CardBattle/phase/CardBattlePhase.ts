@@ -318,6 +318,7 @@ export class CardBattlePhase {
     }
 
     closeFieldCardset(config?: CloseCardsetEvents): void {
+        if (!this.#fieldCardset) return;
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getFieldCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {

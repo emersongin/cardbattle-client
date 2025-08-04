@@ -111,11 +111,26 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     disableBattleCards(): void {
-        this.#status.disableBattleCards();
+        const cards = this.getCards();
+        cards.forEach((card: Card, index: number) => {
+            if (card.isBattleCard()) {
+                this.disableCardByIndex(index);
+            }
+        });
+    }
+
+    disableCardByIndex(index: number): void {
+        const card = this.getCardByIndex(index);
+        card.disable();
     }
 
     disablePowerCards(): void {
-        this.#status.disablePowerCards();
+        const cards = this.getCards();
+        cards.forEach((card: Card, index: number) => {
+            if (card.isPowerCard()) {
+                this.disableCardByIndex(index);
+            }
+        });
     }
 
     selectCard(card: Card): void {

@@ -10,7 +10,7 @@ const delayMock = 100;
 
 const cards = [
     {
-        UUID: '123e4567-e89b-12d3-a456-426614174000',
+        id: '123e4567-e89b-12d3-a456-426614174000',
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
@@ -24,7 +24,7 @@ const cards = [
         cost: 1
     },
     {
-        UUID: '123e4567-e89b-12d3-a456-426614174444',
+        id: '123e4567-e89b-12d3-a456-426614174444',
         number: 1,
         name: 'Test Power Card',
         description: 'This is a test power card description.',
@@ -38,7 +38,7 @@ const cards = [
         cost: 1
     },
     {
-        UUID: '123e4567-e89b-12d3-a456-426614174444',
+        id: '123e4567-e89b-12d3-a456-426614174444',
         number: 1,
         name: 'Test Power Card 2',
         description: 'This is a test power card description.',
@@ -52,7 +52,7 @@ const cards = [
         cost: 1
     },
     {
-        UUID: '123e4567-e89b-12d3-a456-426614174444',
+        id: '123e4567-e89b-12d3-a456-426614174444',
         number: 1,
         name: 'Test Power Card 3',
         description: 'This is a test power card description.',
@@ -67,7 +67,7 @@ const cards = [
     },
 ];
 
-export default class CardBattleSocketIo implements CardBattle {
+export default class CardBattleMemory implements CardBattle {
     #playerPass: boolean = false;
     #opponentPassed: boolean = true;
 
@@ -307,6 +307,23 @@ export default class CardBattleSocketIo implements CardBattle {
             setTimeout(async () => {
                 const cards = await this.getPlayerHandCardsData();
                 resolve(cards[index]);
+            }, delayMock);
+        });
+    }
+
+    playerMakePowerCardPlay(powerCardId: string): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                console.log(`Player made power card play with ID: ${powerCardId}`);
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    isPowerfieldLimitReached(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(false);
             }, delayMock);
         });
     }

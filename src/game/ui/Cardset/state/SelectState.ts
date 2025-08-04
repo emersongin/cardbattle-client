@@ -21,31 +21,18 @@ export default class SelectState implements CardsetState {
         this.#colorsPoints = config.colorPoints || null;
         this.#index = config.startIndex || 0;
         this.#selectNumber = config.selectNumber || 0;
+        this.#setDisabledIndexes();
         this.enable();
+    }
+
+    #setDisabledIndexes(): void {
+        this.cardset.getCards().forEach((card: Card, index: number) => {
+            if (card.isDisabled()) this.#disabledIndexes.push(index);
+        });
     }
 
     getSelectIndexes(): number[] {
         return this.#selectIndexes.slice();
-    }
-
-    disableBattleCards(): void {
-        const cards = this.cardset.getCards();
-        cards.forEach((card: Card, index: number) => {
-            if (card.isBattleCard()) {
-                this.#disableCardByIndex(index);
-                this.#disabledIndexes.push(index);
-            }
-        });
-    }
-
-    disablePowerCards(): void {
-        const cards = this.cardset.getCards();
-        cards.forEach((card: Card, index: number) => {
-            if (card.isPowerCard()) {
-                this.#disableCardByIndex(index);
-                this.#disabledIndexes.push(index);
-            }
-        });
     }
 
     removeSelectLastIndex(): void {
@@ -62,7 +49,6 @@ export default class SelectState implements CardsetState {
         this.#deselectAll();
         this.#unmarkAll();
         this.#unhighlightAll();
-        this.#enableAll();
     }
 
     selectMode() {
@@ -149,7 +135,7 @@ export default class SelectState implements CardsetState {
                 this.#disabledIndexes.push(index);
             }
             if (this.#disabledIndexes.includes(index)) {
-                this.#disableCardByIndex(index);
+                this.cardset.disableCardByIndex(index);
             }
             if (this.#selectIndexes.includes(index)) {
                 this.#markCard(this.#getCardByIndex(index));
@@ -260,7 +246,6 @@ export default class SelectState implements CardsetState {
 
     #unmarkCard(card: Card): void {
         this.cardset.unmarkCard(card);
-        card.enable();
     }
 
     #selectIndex(index: number): void {
@@ -331,16 +316,5 @@ export default class SelectState implements CardsetState {
 
     #unhighlightCard(card: Card): void {
         this.cardset.unhighlightCard(card);
-    }
-
-    #enableAll(): void {
-        this.cardset.getCards().forEach((card: Card) => {
-            card.enable();
-        });
-    }
-
-    #disableCardByIndex(index: number): void {
-        const card = this.#getCardByIndex(index);
-        card.disable();
     }
 }

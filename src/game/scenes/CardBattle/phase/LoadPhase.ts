@@ -73,6 +73,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             {
                 description: 'Yes',
                 onSelect: () => {
+                    super.closeFieldCardset();
                     super.closeOpponentBoard();
                     super.closePlayerBoard({ onComplete: () => this.#createPlayerHandZone() });
                 }
@@ -89,6 +90,10 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     async #allPass() {
+        if (await this.cardBattle.isPowerfieldLimitReached()) {
+            this.changeToTriggerPhase(LOAD_PHASE);
+            return;
+        }
         if(await this.cardBattle.allPass()) {
             if (await this.cardBattle.hasPowerCardsInField()) {
                 this.changeToTriggerPhase(LOAD_PHASE);
@@ -129,6 +134,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
 
     #openHandCardset(): void {
         const cardset = super.getPlayerCardset();
+        cardset.disableBattleCards();
         const events = {
             onChangeIndex: (cardIndex: number) => {
                 if (!cardset.isValidIndex(cardIndex)) return;
@@ -175,7 +181,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         };
         super.openPlayerCardset({ onComplete: () => {
             cardset.selectModeOne(events);
-            cardset.disableBattleCards();
             super.openAllWindows();
             super.openPlayerBoard();
         }});
@@ -209,8 +214,13 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.createCommandWindowBottom('Use this Power Card?', [
             {
                 description: 'Yes',
-                onSelect: () => {
+                onSelect: async () => {
+                    await this.cardBattle.playerMakePowerCardPlay(powerCard.id);
                     super.closeAllWindows();
+                    const cardset = super.getFieldCardset();
+                    const lastIndex = cardset.getCardsLastIndex();
+                    const card = cardset.getCardByIndex(lastIndex);
+                    cardset.deselectCard(card);
                     this.#movePowerCardToField();
                 }
             },
@@ -244,6 +254,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                     onComplete: () => resume()
                 });
             },
+            onAllComplete: () => this.#allPass(),
         };
         this.scene.timeline(moveConfig);
     }
