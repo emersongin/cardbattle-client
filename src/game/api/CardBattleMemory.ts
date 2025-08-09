@@ -1,4 +1,4 @@
-import { BLACK, BLUE, GREEN, RED } from '../constants/colors';
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
 import { BATTLE, POWER } from '../constants/keys';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
@@ -8,39 +8,98 @@ import { CardBattle, LoadPhasePlay } from './CardBattle';
 
 const delayMock = 100;
 
-const cards = [
+const battleCards = [
     {
-        id: '123e4567-e89b-12d3-a456-426614174000',
+        id: 'B1',
         number: 1,
-        name: 'Test Card',
-        description: 'This is a test card description.',
-        details: 'This card is used for testing purposes.',
-        color: GREEN as CardColors,
+        name: 'Battle Card n° 1',
+        description: 'This is a battle card description.',
+        details: 'This card is used for battle purposes.',
+        color: RED as CardColors,
         imageName: 'card-picture',
-        hp: 10,
+        hp: 5,
         ap: 5,
         typeId: BATTLE as CardType,
         powerId: 'none',
         cost: 1
     },
     {
-        id: '123e4567-e89b-12d3-a456-426614174444',
-        number: 1,
-        name: 'Test Power Card',
-        description: 'This is a test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: BLUE as CardColors,
+        id: 'B2',
+        number: 2,
+        name: 'Battle Card n° 2',
+        description: 'This is another battle card description.',
+        details: 'This card is used for battle purposes.',
+        color: GREEN as CardColors,
         imageName: 'card-picture',
-        hp: 0,
-        ap: 0,
-        typeId: POWER as CardType,
-        powerId: 'power-1',
+        hp: 6,
+        ap: 4,
+        typeId: BATTLE as CardType,
+        powerId: 'none',
         cost: 1
     },
     {
-        id: '123e4567-e89b-12d3-a456-426614174444',
-        number: 1,
-        name: 'Test Power Card 2',
+        id: 'B3',
+        number: 3,
+        name: 'Battle Card n° 3',
+        description: 'This is yet another battle card description.',
+        details: 'This card is used for battle purposes.',
+        color: BLUE as CardColors,
+        imageName: 'card-picture',
+        hp: 4,
+        ap: 6,
+        typeId: BATTLE as CardType,
+        powerId: 'none',
+        cost: 1
+    },
+    {
+        id: 'B4',
+        number: 4,
+        name: 'Battle Card n° 4',
+        description: 'This is a different battle card description.',
+        details: 'This card is used for battle purposes.',
+        color: BLACK as CardColors,
+        imageName: 'card-picture',
+        hp: 7,
+        ap: 3,
+        typeId: BATTLE as CardType,
+        powerId: 'none',
+        cost: 1
+    },
+    {
+        id: 'B5',
+        number: 5,
+        name: 'Battle Card n° 5',
+        description: 'This is a unique battle card description.',
+        details: 'This card is used for battle purposes.',
+        color: WHITE as CardColors,
+        imageName: 'card-picture',
+        hp: 3,
+        ap: 7,
+        typeId: BATTLE as CardType,
+        powerId: 'none',
+        cost: 1
+    },
+    {
+        id: 'B6',
+        number: 6,
+        name: 'Battle Card n° 6',
+        description: 'This is a special battle card description.',
+        details: 'This card is used for battle purposes.',
+        color: ORANGE as CardColors,
+        imageName: 'card-picture',
+        hp: 8,
+        ap: 2,
+        typeId: BATTLE as CardType,
+        powerId: 'none',
+        cost: 1
+    }
+];
+
+const powerCards = [
+    {
+        id: 'P1',
+        number: 7,
+        name: 'Power Card n° 1',
         description: 'This is a test power card description.',
         details: 'This card is used for testing power effects.',
         color: RED as CardColors,
@@ -52,32 +111,121 @@ const cards = [
         cost: 1
     },
     {
-        id: '123e4567-e89b-12d3-a456-426614174444',
-        number: 1,
-        name: 'Test Power Card 3',
-        description: 'This is a test power card description.',
+        id: 'P2',
+        number: 8,
+        name: 'Power Card n° 2',
+        description: 'This is another test power card description.',
+        details: 'This card is used for testing power effects.',
+        color: GREEN as CardColors,
+        imageName: 'card-picture',
+        hp: 0,
+        ap: 0,
+        typeId: POWER as CardType,
+        powerId: 'power-2',
+        cost: 1
+    },
+    {
+        id: 'P3',
+        number: 9,
+        name: 'Power Card n° 3',
+        description: 'This is yet another test power card description.',
+        details: 'This card is used for testing power effects.',
+        color: BLUE as CardColors,
+        imageName: 'card-picture',
+        hp: 0,
+        ap: 0,
+        typeId: POWER as CardType,
+        powerId: 'power-3',
+        cost: 1
+    },
+    {
+        id: 'P4',
+        number: 10,
+        name: 'Power Card n° 4',
+        description: 'This is a different test power card description.',
         details: 'This card is used for testing power effects.',
         color: BLACK as CardColors,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-1',
+        powerId: 'power-4',
         cost: 1
     },
+    {
+        id: 'P5',
+        number: 11,
+        name: 'Power Card n° 5',
+        description: 'This is a unique test power card description.',
+        details: 'This card is used for testing power effects.',
+        color: WHITE as CardColors,
+        imageName: 'card-picture',
+        hp: 0,
+        ap: 0,
+        typeId: POWER as CardType,
+        powerId: 'power-5',
+        cost: 1
+    },
+    {
+        id: 'P6',
+        number: 12,
+        name: 'Power Card n° 6',
+        description: 'This is a special test power card description.',
+        details: 'This card is used for testing power effects.',
+        color: ORANGE as CardColors,
+        imageName: 'card-picture',
+        hp: 0,
+        ap: 0,
+        typeId: POWER as CardType,
+        powerId: 'power-6',
+        cost: 1
+    }
+];
+
+const redDeck = createDeck([...battleCards, ...powerCards], 40);
+const greenDeck = createDeck([...battleCards, ...powerCards], 40);
+const blueDeck = createDeck([...battleCards, ...powerCards], 40);
+
+function createDeck(cards: CardData[], number: number) {
+    const deck: CardData[] = [];
+    for (let i = 0; i < number; i++) {
+        const randomIndex = Math.floor(Math.random() * cards.length);
+        const clone = { ...cards[randomIndex] };
+        const randomNumber = MathUtil.randomInt(1, 1000);
+        const cardId = `${clone.id}-${randomNumber}`;
+        clone.id = cardId;
+        deck.push(clone);
+    }
+    console.log(deck);
+    return deck;
+}
+
+const folders = [
+    {
+        id: 'f1',
+        deck: redDeck
+    },
+    {
+        id: 'f2',
+        deck: greenDeck
+    },
+    {
+        id: 'f3',
+        deck: blueDeck
+    }
 ];
 
 export default class CardBattleMemory implements CardBattle {
+    #playerId: string = 'player-1';
+    #opponentId: string = 'opponent-1';
+    #playerDeck: CardData[] = folders[0].deck;
+    #playerHand: CardData[] = [];
+    #opponentDeck: CardData[] = folders[1].deck;
+    #opponentHand: CardData[] = [];
+    #firstPlayer: string = Math.random() < 0.5 ? this.#playerId : this.#opponentId;
     #playerPass: boolean = false;
     #opponentPassed: boolean = true;
-
-    duplicate(cards: CardData[], number: number) {
-        const duplicatedCards: CardData[] = [];
-        for (let i = 0; i < number; i++) {
-            duplicatedCards.push(...cards);
-        }
-        return duplicatedCards;
-    }
+    #powerCardsInField: CardData[] = [];
 
     getOpponentData(): Promise<OpponentData> {
         return new Promise((resolve) => {
@@ -98,7 +246,7 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 resolve([
                     {
-                        id: 'folder-1',
+                        id: 'f1',
                         name: 'Folder 1',
                         redPoints: 50,
                         greenPoints: 30,
@@ -108,7 +256,7 @@ export default class CardBattleMemory implements CardBattle {
                         orangePoints: 15
                     },
                     {
-                        id: 'folder-2',
+                        id: 'f2',
                         name: 'Folder 2',
                         redPoints: 50,
                         greenPoints: 30,
@@ -118,7 +266,7 @@ export default class CardBattleMemory implements CardBattle {
                         orangePoints: 15
                     },
                     {
-                        id: 'folder-3',
+                        id: 'f3',
                         name: 'Folder 3',
                         redPoints: 50,
                         greenPoints: 30,
@@ -132,10 +280,13 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    setFolder(folderId: string): Promise<string> {
+    setFolder(folderId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(folderId);
+                const folderIndex = folders.findIndex((f) => f.id === folderId);
+                const deck = folders[folderIndex].deck || [];
+                this.#playerDeck = deck;
+                resolve(true);
             }, delayMock);
         });
     }
@@ -143,8 +294,7 @@ export default class CardBattleMemory implements CardBattle {
     iGo(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                // resolve(Math.random() < 0.5);
-                resolve(false);
+                resolve(this.#firstPlayer === this.#playerId);
             }, delayMock);
         });
     }
@@ -153,6 +303,7 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const choice = Math.random() < 0.5 ? 'White' : 'Black';
+                this.#firstPlayer = choice !== 'White' ? this.#playerId : this.#opponentId;
                 callback(choice);
                 resolve();
             }, 1000);
@@ -162,7 +313,7 @@ export default class CardBattleMemory implements CardBattle {
     setPlayerChoice(choice: string): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                console.log(`Player choice set to: ${choice}`);
+                this.#firstPlayer = choice === 'White' ? this.#playerId : this.#opponentId;
                 resolve();
             }, delayMock);
         });
@@ -171,8 +322,8 @@ export default class CardBattleMemory implements CardBattle {
     drawPlayerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerCards = this.duplicate(cards, 3).slice(0, 6);
-                // .reverse();
+                const playerCards = this.#playerDeck.splice(0, 6);
+                this.#playerHand.push(...playerCards);
                 resolve(playerCards);
             }, delayMock);
         });
@@ -181,7 +332,8 @@ export default class CardBattleMemory implements CardBattle {
     drawOpponentCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const opponentCards = this.duplicate(cards, 3).slice(0, 6);
+                const opponentCards = this.#opponentDeck.splice(0, 6);
+                this.#opponentHand.push(...opponentCards);
                 resolve(opponentCards);
             }, delayMock);
         });
@@ -199,8 +351,8 @@ export default class CardBattleMemory implements CardBattle {
                     blackPoints: 0,
                     whitePoints: 0,
                     orangePoints: 0,
-                    numberOfCardsInHand: 0,
-                    numberOfCardsInDeck: 40,
+                    numberOfCardsInHand: this.#playerHand.length,
+                    numberOfCardsInDeck: this.#playerDeck.length,
                     numberOfCardsInTrash: 0,
                     numberOfWins: 0
                 });
@@ -220,8 +372,8 @@ export default class CardBattleMemory implements CardBattle {
                     blackPoints: 0,
                     whitePoints: 0,
                     orangePoints: 0,
-                    numberOfCardsInHand: 0,
-                    numberOfCardsInDeck: 40,
+                    numberOfCardsInHand: this.#opponentHand.length,
+                    numberOfCardsInDeck: this.#opponentDeck.length,
                     numberOfCardsInTrash: 0,
                     numberOfWins: 0
                 });
@@ -232,8 +384,7 @@ export default class CardBattleMemory implements CardBattle {
     getPlayerHandCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const playerHandCards = this.duplicate(cards, 3).slice(0, 6);
-                resolve(playerHandCards);
+                resolve(this.#playerHand);
             }, delayMock);
         });
     }
@@ -241,8 +392,7 @@ export default class CardBattleMemory implements CardBattle {
     getOpponentHandCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const opponentHandCards = this.duplicate(cards, 3).slice(0, 6);
-                resolve(opponentHandCards);
+                resolve(this.#opponentHand);
             }, delayMock);
         });
     }
@@ -250,6 +400,7 @@ export default class CardBattleMemory implements CardBattle {
     listenOpponentLoadPhase(callback: (play: LoadPhasePlay) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
+                this.#opponentPassed = true;
                 const play: LoadPhasePlay = {
                     pass: true,
                     powerCard: null
@@ -268,7 +419,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    opponentPassed(): Promise<boolean> {
+    isOpponentPassed(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(this.#opponentPassed);
@@ -288,7 +439,7 @@ export default class CardBattleMemory implements CardBattle {
     hasPowerCardsInField(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(false);
+                resolve(this.#powerCardsInField.length > 0);
             }, delayMock);
         });
     }
@@ -296,8 +447,7 @@ export default class CardBattleMemory implements CardBattle {
     getPowerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const powerCards = this.duplicate(cards.filter(card => card.typeId === POWER), 10).slice(0, MathUtil.randomInt(0, 2));
-                resolve(powerCards);
+                resolve(this.#powerCardsInField);
             }, delayMock);
         });
     }
@@ -306,15 +456,22 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 const cards = await this.getPlayerHandCardsData();
-                resolve(cards[index]);
+                const card = cards[index];
+                resolve(card);
             }, delayMock);
         });
     }
 
     playerMakePowerCardPlay(powerCardId: string): Promise<void> {
         return new Promise((resolve) => {
-            setTimeout(() => {
-                console.log(`Player made power card play with ID: ${powerCardId}`);
+            setTimeout(async () => {
+                const cards = await this.getPlayerHandCardsData();
+                cards.find((card) => card.id === powerCardId);
+                const powercard = cards.find((card) => card.id === powerCardId);
+                if (powercard) {
+                    this.#powerCardsInField.push(powercard);
+                    this.#playerHand = this.#playerHand.filter((card) => card.id !== powerCardId);
+                };
                 resolve();
             }, delayMock);
         });
@@ -323,7 +480,7 @@ export default class CardBattleMemory implements CardBattle {
     isPowerfieldLimitReached(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(false);
+                resolve(this.#powerCardsInField.length >= 3);
             }, delayMock);
         });
     }

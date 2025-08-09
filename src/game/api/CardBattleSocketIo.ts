@@ -33,9 +33,9 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    setFolder(folderId: string, timeout?: number): Promise<string> {
+    setFolder(folderId: string, timeout?: number): Promise<boolean> {
         return new Promise((resolve, reject) => {
-            this.#socket.emit('setFolder', folderId, timeout, (response: string) => {
+            this.#socket.emit('setFolder', folderId, timeout, (response: boolean) => {
                 if (response) {
                     resolve(response);
                 } else {
@@ -138,7 +138,7 @@ export default class CardBattleSocketIo implements CardBattle {
         });
     }
 
-    opponentPassed(): Promise<boolean> {
+    isOpponentPassed(): Promise<boolean> {
         return new Promise((resolve) => {
             this.#socket.emit('opponentPassed', (response: boolean) => {
                 resolve(response);

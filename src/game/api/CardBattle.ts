@@ -8,7 +8,7 @@ export type LoadPhasePlay = {
 export interface CardBattle {
     getOpponentData: () => Promise<OpponentData>;
     getFolders: () => Promise<CardsFolderData[]>;
-    setFolder: (folderId: string) => Promise<string>;
+    setFolder: (folderId: string) => Promise<boolean>;
     iGo: () => Promise<boolean>;
     listenOpponentStartPhase: (callback: (choice: string) => void) => Promise<void>;
     setPlayerChoice: (choice: string) => Promise<void>;
@@ -20,7 +20,7 @@ export interface CardBattle {
     getOpponentHandCardsData: () => Promise<CardData[]>;
     listenOpponentLoadPhase: (callback: (play: LoadPhasePlay) => void) => Promise<void>;
     allPass: () => Promise<boolean>;
-    opponentPassed: () => Promise<boolean>;
+    isOpponentPassed: () => Promise<boolean>;
     playerPass(): Promise<void>;
     hasPowerCardsInField: () => Promise<boolean>;
     getPowerCardsData: () => Promise<CardData[]>;
