@@ -3,32 +3,39 @@ import { CardBattleScene } from "../CardBattleScene";
 import { CardBattlePhase } from "./CardBattlePhase";
 import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
-import { PowerSlots } from "../abs/PowerSlots";
 import { LOAD_PHASE, PLAYER } from "@/game/constants/keys";
 import { CardData } from "@/game/types";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
 import { CARD_WIDTH } from "@/game/constants/default";
-import { PlayerOrigin } from "@/game/types/PlayerOrigin";
+import { Player } from "@/game/types/Player";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineEvent } from "../../VueScene";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
-    #powerSlots: PowerSlots;
     #isStartPhase: boolean;
     
-    constructor(readonly scene: CardBattleScene, powerSlots: any[] = [], startPhase: boolean = true) {
+    constructor(readonly scene: CardBattleScene, startPhase: boolean = true) {
         super(scene);
-        this.#powerSlots = new PowerSlots(powerSlots);
         this.#isStartPhase = startPhase;
     }
 
     async create(): Promise<void> {
+        await this.#loadMocks();
+
         if (this.#isStartPhase) {
             this.#createLoadPhaseWindow();
             super.openAllWindows();
             return;
         }
         this.#createBoardsAndPlayerActions();
+    }
+
+    async #loadMocks(): Promise<void> {
+        return new Promise<void>(async (resolve) => {
+            await this.cardBattle.drawPlayerCardsData();
+            await this.cardBattle.drawOpponentCardsData();
+            resolve();
+        });
     }
 
     #createLoadPhaseWindow(): void {
@@ -97,13 +104,12 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         if(await this.cardBattle.allPass()) {
             if (await this.cardBattle.hasPowerCardsInField()) {
                 this.changeToTriggerPhase(LOAD_PHASE);
-                // this.#powerSlots.hasPower()
                 return;
             }
             this.changeToSummonPhase();
             return;
         }
-        if (await this.cardBattle.opponentPassed() === false) {
+        if (await this.cardBattle.isOpponentPassed() === false) {
             this.#createOpponentWaitingWindow();
             return;
         }
@@ -191,7 +197,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         this.#openPowerfield(playerPowerCard, PLAYER);
     }
 
-    async #openPowerfield(powerCard: CardData, origin: PlayerOrigin): Promise<void> {
+    async #openPowerfield(powerCard: CardData, origin: Player): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getPowerCardsData();
         const cardset = super.createFieldCardset([...powerCards, powerCard]);
         cardset.setCardsInLinePosition();
@@ -208,7 +214,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         });
     }
 
-    #createPowerCardWindows(powerCard: CardData, origin: PlayerOrigin): void {
+    #createPowerCardWindows(powerCard: CardData, origin: Player): void {
         super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
         super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
         super.createCommandWindowBottom('Use this Power Card?', [
@@ -328,11 +334,11 @@ export class LoadPhase extends CardBattlePhase implements Phase {
 
     changeToLoadPhase(): void {
         const startPhase = false;
-        this.scene.changePhase(new LoadPhase(this.scene, this.#powerSlots.getPowerSlots(), startPhase));
+        this.scene.changePhase(new LoadPhase(this.scene, startPhase));
     }
 
     changeToTriggerPhase(origin: string): void {
-        this.scene.changePhase(new TriggerPhase(this.scene, this.#powerSlots.getPowerSlots(), origin));
+        this.scene.changePhase(new TriggerPhase(this.scene, origin));
     }
 
     changeToSummonPhase(): void {

@@ -1,16 +1,14 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
-import { CompilePhase } from "./CompilePhase";
+// import { CompilePhase } from "./CompilePhase";
 import { SummonPhase } from "./SummonPhase";
 import { COMPILE_PHASE, LOAD_PHASE } from "@/game/constants/keys";
 
 export class TriggerPhase implements Phase {
-    #powerActions: any[] = [];
     #origimPhase: string;
 
-    constructor(readonly scene: CardBattleScene, actions: any[], origimPhase: string) {
-        this.#powerActions = actions;
+    constructor(readonly scene: CardBattleScene, origimPhase: string) {
         this.#origimPhase = origimPhase;
     }
 
@@ -28,7 +26,7 @@ export class TriggerPhase implements Phase {
 
     changeToLoadPhase(): void {
         const startPhase = false;
-        this.scene.changePhase(new LoadPhase(this.scene, this.#powerActions, startPhase));
+        this.scene.changePhase(new LoadPhase(this.scene, startPhase));
     }
 
     changeToTriggerPhase(): void {
@@ -40,8 +38,8 @@ export class TriggerPhase implements Phase {
     }
 
     changeToCompilePhase(): void {
-        const startPhase = false;
-        this.scene.changePhase(new CompilePhase(this.scene, this.#powerActions, startPhase));
+        // const startPhase = false;
+        // this.scene.changePhase(new CompilePhase(this.scene, startPhase));
     }
 
     changeToBattlePhase(): void {
@@ -53,11 +51,11 @@ export class TriggerPhase implements Phase {
     }
 
     update(): void {
-        if (this.#powerActions.length) {
-            const action = this.#powerActions.shift();
-            console.log("Executing action:", action);
-            return;
-        }
+        // if (this.#powerActions.length) {
+        //     const action = this.#powerActions.shift();
+        //     console.log("Executing action:", action);
+        //     return;
+        // }
         switch (this.#origimPhase) {
             case LOAD_PHASE:
                 this.changeToLoadPhase();
