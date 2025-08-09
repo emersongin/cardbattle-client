@@ -12,6 +12,7 @@ import { FlashCardConfig } from "./types/FlashCardConfig";
 import { CardColors } from "./types/CardColors";
 import { BATTLE, POWER } from "@/game/constants/keys";
 import { CardType } from "./types/CardType";
+import { ExpandCardConfig } from "./types/ExpandCardConfig";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
@@ -81,7 +82,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         })));
     }
 
-    flip(config: FlipCardConfig): void {
+    flip(config?: FlipCardConfig): void {
         this.updateOrigin();
         const onCanStartClose = () => {
             return !this.data.get('faceUp');
@@ -164,6 +165,22 @@ export class Card extends Phaser.GameObjects.GameObject {
             duration: config?.duration || 100, 
             onCanStart: config?.onCanStart, 
             onComplete: onOpenedCallback
+        }));
+    }
+
+    expand(config?: ExpandCardConfig): void {
+        this.move(MovingState.createExpandMove(this, {
+            delay: config?.delay || 200, 
+            duration: config?.duration || 200,
+            onComplete: config?.onComplete
+        }));
+    }
+
+    shrink(config?: ExpandCardConfig): void {
+        this.move(MovingState.createShrinkMove(this, {
+            delay: config?.delay || 200, 
+            duration: config?.duration || 200,
+            onComplete: config?.onComplete
         }));
     }
 

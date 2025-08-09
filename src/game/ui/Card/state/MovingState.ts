@@ -4,6 +4,7 @@ import { Move } from "../types/Move";
 import { OpenCardConfig } from "../types/OpenCardConfig";
 import { CloseCardConfig } from "../types/CloseCardConfig";
 import { MoveCardConfig } from "../types/MoveCardConfig";
+import { ExpandCardConfig } from "../types/ExpandCardConfig";
 
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];
@@ -60,6 +61,42 @@ export default class MovingState implements CardState {
                 onComplete: config.onComplete, 
                 delay: config.delay,
                 duration: config.duration,
+            }
+        ];
+        return moves;
+    }
+
+    static createExpandMove(card: Card, config?: ExpandCardConfig): Move[] {
+        const moves: Move[] = [
+            {
+                x: card.getOriginX() - (card.getWidth() * 0.25),
+                y: card.getOriginY() - (card.getHeight() * 0.25),
+                scaleX: 1.5,
+                scaleY: 1.5,
+                ease: 'Linear',
+                onComplete: () => {
+                    if (config?.onComplete) config.onComplete(card);
+                },
+                delay: config?.delay || 100,
+                duration: config?.duration || 100,
+            }
+        ];
+        return moves;
+    }
+
+    static createShrinkMove(card: Card, config?: ExpandCardConfig): Move[] {
+        const moves: Move[] = [
+            {
+                x: card.getOriginX() + (card.getWidth() / 2),
+                y: card.getOriginY() + (card.getHeight() / 2),
+                scaleX: 0,
+                scaleY: 0,
+                ease: 'Linear',
+                onComplete: () => {
+                    if (config?.onComplete) config.onComplete(card);
+                },
+                delay: config?.delay || 100,
+                duration: config?.duration || 100,
             }
         ];
         return moves;
