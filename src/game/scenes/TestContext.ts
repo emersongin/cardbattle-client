@@ -6,6 +6,12 @@ import { VueScene } from './VueScene';
 // import { CardPoints } from '../ui/Card/types/CardPoints';
 // import BoardWindow from '../ui/BoardWindow/BoardWindow';
 import { CardData } from '../types';
+import { CardColors } from '../ui/Card/types/CardColors';
+import { CardType } from '../ui/Card/types/CardType';
+import { Cardset } from '../ui/Cardset/Cardset';
+import { BLUE, RED } from '../constants/colors';
+import { BATTLE, POWER } from '../constants/keys';
+import { Card } from '../ui/Card/Card';
 // import { CommandWindow } from '../ui/CommandWindow';
 
 export class TestContext extends VueScene
@@ -58,40 +64,42 @@ export class TestContext extends VueScene
         // boardWindow.close();
         // boardWindow2.close();
 
-        // const cards = [
-        //     {
-        //         UUID: '123e4567-e89b-12d3-a456-426614174000',
-        //         number: 1,
-        //         name: 'Test Card',
-        //         description: 'This is a test card description.',
-        //         color: 'red' as CardColors,
-        //         imageName: 'card-picture',
-        //         hp: 10,
-        //         ap: 5,
-        //         typeId: 'battle' as CardType,
-        //         powerId: 'none',
-        //         cost: 1
-        //     },
-        //     {
-        //         UUID: '123e4567-e89b-12d3-a456-426614174444',
-        //         number: 1,
-        //         name: 'Test Power Card',
-        //         description: 'This is a test power card description.',
-        //         color: 'green' as CardColors,
-        //         imageName: 'card-picture',
-        //         hp: 0,
-        //         ap: 0,
-        //         typeId: 'power' as CardType,
-        //         powerId: 'power-1',
-        //         cost: 1
-        //     },
-        // ];
+        const cards: CardData[] = [
+            {
+                id: '123e4567-e89b-12d3-a456-426614174000',
+                number: 1,
+                name: 'Test Card',
+                description: 'This is a test card description.',
+                details: 'This is a test card details.',
+                color: RED as CardColors,
+                imageName: 'card-picture',
+                hp: 10,
+                ap: 5,
+                typeId: BATTLE as CardType,
+                powerId: 'none',
+                cost: 1
+            },
+            {
+                id: '123e4567-e89b-12d3-a456-426614174444',
+                number: 1,
+                name: 'Test Power Card',
+                description: 'This is a test power card description.',
+                details: 'This is a test card details.',
+                color: BLUE as CardColors,
+                imageName: 'card-picture',
+                hp: 0,
+                ap: 0,
+                typeId: POWER as CardType,
+                powerId: 'power-1',
+                cost: 1
+            },
+        ];
         // const cardsData: CardData[] = this.duplicate(cards, 3); // 40
         // const dimensions = { 
         //     x: this.cameras.main.centerX / 2, 
         //     y: this.cameras.main.centerY - 75, 
         // };
-        // const cardset = new Cardset(this, dimensions, cardsData);
+        // const cardset = new Cardset(this, cardsData);
 
         // const events = {
         //     onChangeIndex: (cardIndex: number) => {
@@ -139,7 +147,15 @@ export class TestContext extends VueScene
         // cardset.disablePowerCards();
         // cardset.disableBattleCards();
 
-        // const card = new Card(this, cards[0]);
+        const cardset = new Cardset(this, [cards[0]], 200, 200);
+        const card = cardset.getCardByIndex(0);
+        // card.expand({ onComplete: (card?: Card) => {
+        //     if (card) card.shrink(); 
+        // }});
+        card.shrink({ onComplete: (card?: Card) => {
+            if (card) card.expand(); 
+        }});
+
         // card.flash({
         //     color: 0xff0000,
         //     delay: 500,
