@@ -7,18 +7,20 @@ import { ArrayUtil } from "@/game/utils/ArrayUtil";
 export class StartPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        const iGo = await this.cardBattle.iGo();
-        if (!iGo) {
-            super.createWaitingWindow();
+        if (await this.cardBattle.isStartMiniGame(this.scene.room.playerId)) {
+            this.#createMiniGameWindows();
+            this.#createMiniGameCommandWindow();
             super.openAllWindows();
-            await this.cardBattle.listenOpponentStartPhase((choice) => {
-                super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice) });
-            });
             return;
         }
-        this.#createMiniGameWindows();
-        this.#createMiniGameCommandWindow();
-        super.openAllWindows();
+        super.createWaitingWindow();
+        super.openAllWindows({
+            onComplete: async () => {
+                await this.cardBattle.listenOpponentMiniGame(
+                    (choice) => super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice) })
+                );
+            }
+        });
     }
 
     #createMiniGameWindows(): void {
@@ -34,14 +36,14 @@ export class StartPhase extends CardBattlePhase implements Phase {
             {
                 description: 'option: Draw white card',
                 onSelect: async () => {
-                    await this.cardBattle.setPlayerChoice(WHITE);
+                    await this.cardBattle.setMiniGameChoice(this.scene.room.playerId, WHITE);
                     this.#createResultWindow(WHITE);
                 }
             },
             {
                 description: 'option: Draw black card',
                 onSelect: async () => {
-                    await this.cardBattle.setPlayerChoice(BLACK);
+                    await this.cardBattle.setMiniGameChoice(this.scene.room.playerId, BLACK);
                     this.#createResultWindow(BLACK);
                 }
             },
@@ -98,5 +100,4 @@ export class StartPhase extends CardBattlePhase implements Phase {
         super.destroyAllTextWindows();
         super.destroyCommandWindow();
     }
-
 }

@@ -1,10 +1,13 @@
+import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
 import { BATTLE, POWER } from '../constants/keys';
-import { BoardWindowData, CardData, CardsFolderData, OpponentData } from '../types';
+import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerCardUpdates } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
 import { CardType } from '../ui/Card/types/CardType';
 import { MathUtil } from '../utils/MathUtil';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
+import { RoomData } from '../types/RoomData';
+import { PowerCardAction } from '../types/PowerCardAction';
 
 const delayMock = 100;
 
@@ -196,7 +199,6 @@ function createDeck(cards: CardData[], number: number) {
         clone.id = cardId;
         deck.push(clone);
     }
-    console.log(deck);
     return deck;
 }
 
@@ -216,27 +218,78 @@ const folders = [
 ];
 
 export default class CardBattleMemory implements CardBattle {
-    #playerId: string = 'player-1';
-    #opponentId: string = 'opponent-1';
+    #roomId: string = '';
+    #whoPlayMiniGame: string = '';
+    #firstPlayer: string = '';
+    #powerCardsInField: PowerCardUpdates[] = [];
+    // player is the room creator
+    #playerId: string = '';
+    #playerState: string = 'NONE';
+    #playerPass: boolean = false;
     #playerDeck: CardData[] = folders[0].deck;
     #playerHand: CardData[] = [];
+    // opponent is the one who joins the room
+    #opponentId: string = '';
+    #opponentState: string = 'NONE';
+    #opponentPassed: boolean = true;
     #opponentDeck: CardData[] = folders[1].deck;
     #opponentHand: CardData[] = [];
-    #firstPlayer: string = Math.random() < 0.5 ? this.#playerId : this.#opponentId;
-    #playerPass: boolean = false;
-    #opponentPassed: boolean = true;
-    #powerCardsInField: CardData[] = [];
 
-    getOpponentData(): Promise<OpponentData> {
+    createRoom(): Promise<RoomData> {
+        return new Promise((resolve) => {
+            const roomId = uuidv4();
+            const playerId = uuidv4();
+            this.#roomId = roomId;
+            this.#playerId = playerId;
+            this.#playerState = 'IN_LOBBY';
+            setTimeout(() => {
+                resolve({ roomId, playerId });
+            }, delayMock);
+        });
+    }
+
+    joinRoom(roomId: string): Promise<RoomData> {
+        return new Promise((resolve) => {
+            if (this.#roomId === roomId) {
+                const opponentId = uuidv4();
+                this.#opponentId = opponentId;
+                this.#opponentState = 'IN_LOBBY';
+                this.#whoPlayMiniGame = Math.random() < 0.5 ? this.#playerId : this.#opponentId;
+            }
+            setTimeout(() => {
+                resolve({ roomId, playerId: this.#opponentId });
+            }, delayMock);
+        });
+    }
+
+    isOpponentJoined(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve({
-                    id: 'opponent-1',
-                    name: 'First Opponent',
-                    description: 'Complete the first opponent to proceed.',
-                    completed: false,
-                    reward: 100,
+                resolve(this.#opponentState === 'IN_LOBBY');
+            }, delayMock);
+        });
+    }
+
+    getOpponentData(callback: (opponent: OpponentData) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                callback({
+                    name: 'Player',
+                    description: 'This is the player\'s description.'
                 });
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    listenWaitingForOpponentData(callback: (opponent: OpponentData) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                callback({
+                    name: 'Opponent',
+                    description: 'This is the opponent\'s description.'
+                });
+                resolve();
             }, delayMock);
         });
     }
@@ -244,80 +297,106 @@ export default class CardBattleMemory implements CardBattle {
     getFolders(): Promise<CardsFolderData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve([
-                    {
-                        id: 'f1',
-                        name: 'Folder 1',
-                        redPoints: 50,
-                        greenPoints: 30,
-                        bluePoints: 20,
-                        blackPoints: 10,
-                        whitePoints: 5,
-                        orangePoints: 15
-                    },
-                    {
-                        id: 'f2',
-                        name: 'Folder 2',
-                        redPoints: 50,
-                        greenPoints: 30,
-                        bluePoints: 20,
-                        blackPoints: 10,
-                        whitePoints: 5,
-                        orangePoints: 15
-                    },
-                    {
-                        id: 'f3',
-                        name: 'Folder 3',
-                        redPoints: 50,
-                        greenPoints: 30,
-                        bluePoints: 20,
-                        blackPoints: 10,
-                        whitePoints: 5,
-                        orangePoints: 15
+                const foldersData: CardsFolderData[] = folders.map(folder => ({
+                    id: folder.id,
+                    name: `Folder ${folder.id}`,
+                    colorsPoints: {
+                        RED: folder.deck.filter(card => card.color === RED).length,
+                        GREEN: folder.deck.filter(card => card.color === GREEN).length,
+                        BLUE: folder.deck.filter(card => card.color === BLUE).length,
+                        BLACK: folder.deck.filter(card => card.color === BLACK).length,
+                        WHITE: folder.deck.filter(card => card.color === WHITE).length,
+                        ORANGE: folder.deck.filter(card => card.color === ORANGE).length
                     }
-                ]);
+                }));
+                resolve(foldersData);
             }, delayMock);
         });
     }
 
-    setFolder(folderId: string): Promise<boolean> {
+    setFolder(playerId: string, folderId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const folderIndex = folders.findIndex((f) => f.id === folderId);
                 const deck = folders[folderIndex].deck || [];
-                this.#playerDeck = deck;
+                if (this.#playerId !== playerId) {
+                    this.#playerDeck = deck;
+                    this.#playerState = 'SET_DECK';
+                    //mock
+                    this.#opponentDeck = folders[0].deck;
+                    this.#opponentState = 'SET_DECK';
+                };
+                if (this.#opponentId !== playerId) {
+                    this.#opponentDeck = deck;
+                    this.#opponentState = 'SET_DECK';
+                };
                 resolve(true);
             }, delayMock);
         });
     }
 
-    iGo(): Promise<boolean> {
+    isStartMiniGame (playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#firstPlayer === this.#playerId);
+                resolve(this.#whoPlayMiniGame === playerId);
             }, delayMock);
         });
     }
 
-    listenOpponentStartPhase(callback: (choice: string) => void): Promise<void> {
+    setMiniGameChoice(playerId: string, choice: string): Promise<void> {
         return new Promise((resolve) => {
+            const player = (playerId === this.#playerId);
+            const isWhite = (choice === WHITE);
             setTimeout(() => {
-                const choice = Math.random() < 0.5 ? 'White' : 'Black';
-                this.#firstPlayer = choice !== 'White' ? this.#playerId : this.#opponentId;
-                callback(choice);
+                this.#firstPlayer = player 
+                    ? (isWhite ? this.#playerId : this.#opponentId) 
+                    : (isWhite ? this.#opponentId : this.#playerId);
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    listenOpponentMiniGame(callback: (choice: string) => void): Promise<void> {
+        return new Promise(async (resolve) => {
+            this.#firstPlayer = this.#playerId; //mock
+            setTimeout(() => {
+                callback(BLACK);
                 resolve();
             }, 1000);
         });
     }
 
-    setPlayerChoice(choice: string): Promise<void> {
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    iGo(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                this.#firstPlayer = choice === 'White' ? this.#playerId : this.#opponentId;
-                resolve();
+                resolve(this.#whoPlayMiniGame === this.#playerId);
             }, delayMock);
         });
     }
+
+
+
+
 
     drawPlayerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
@@ -447,7 +526,7 @@ export default class CardBattleMemory implements CardBattle {
     getPowerCardsData(): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#powerCardsInField);
+                // resolve(this.#powerCardsInField);
             }, delayMock);
         });
     }
@@ -462,16 +541,19 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    playerMakePowerCardPlay(powerCardId: string): Promise<void> {
+    playerMakePowerCardPlay(powerAction: PowerCardAction): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
-                const cards = await this.getPlayerHandCardsData();
-                cards.find((card) => card.id === powerCardId);
-                const powercard = cards.find((card) => card.id === powerCardId);
-                if (powercard) {
-                    this.#powerCardsInField.push(powercard);
-                    this.#playerHand = this.#playerHand.filter((card) => card.id !== powerCardId);
-                };
+                // const cards = await this.getPlayerHandCardsData();
+                // cards.find((card) => card.id === powerCardId);
+                // const powercard = cards.find((card) => card.id === powerCardId);
+                // if (powercard) {
+                //     this.#powerCardsInField.push({
+                //         playerId: string;
+                //         powerCard: CardData;
+                //     });
+                //     this.#playerHand = this.#playerHand.filter((card) => card.id !== powerCardId);
+                // };
                 resolve();
             }, delayMock);
         });
@@ -481,6 +563,27 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(this.#powerCardsInField.length >= 3);
+            }, delayMock);
+        });
+    }
+
+    listenNextPowerCard(callback: (playerId: string) => void): Promise<PowerCardUpdates> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // const playerId = this.#firstPlayer;
+                // callback(playerId);
+                // resolve({ powerCardId: 'next-power-card-id' });
+            }, delayMock);
+        });
+    }
+
+    setPowerActionCompleted(playerId: string, powerCardId: string): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // if (playerId === this.#playerId) {
+                //     this.#powerCardsInField = this.#powerCardsInField.filter(card => card.id !== powerCardId);
+                // }
+                resolve();
             }, delayMock);
         });
     }

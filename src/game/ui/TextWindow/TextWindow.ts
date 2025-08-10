@@ -2,6 +2,7 @@ import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { DisplayUtil } from '../../utils/DisplayUtil';
 import { TextWindowConfig } from './types/TextWindowConfig';
 import { CloseWindowConfig } from './types/CloseWindowConfig';
+import { OpenWindowConfig } from './types/OpenWindowConfig';
 
 export class TextWindow extends TextBox {
     #tween: Phaser.Tweens.Tween | null = null;
@@ -73,14 +74,16 @@ export class TextWindow extends TextBox {
         return new TextWindow(scene, { ...config, text, x, y, width, height });
     }
 
-    open() {
+    open(config?: OpenWindowConfig) {
         if (!this.scene?.tweens) return;
+        if (config?.onClose) this.#setOnClose(config.onClose);
         this.#tween = this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
+                if (config?.onComplete) config.onComplete();
                 if (this.#onClose) this.#addOnCompletedListener();
             }
         });

@@ -4,75 +4,54 @@ import { CardsFolderData, OpponentData } from "@game/types";
 import { CardBattlePhase } from "./CardBattlePhase";
 
 export class ChallengePhase extends CardBattlePhase implements Phase {
-
     async create(): Promise<void> {
-        const opponent: OpponentData = await this.cardBattle.getOpponentData();
-        const folders: CardsFolderData[] = await this.cardBattle.getFolders();
-        this.#createChallengeWindows(opponent);
-        this.#createFoldersWindow(folders);
-        this.openAllWindows();
+        if (await this.cardBattle.isOpponentJoined()) {
+            await this.cardBattle.getOpponentData((opponent: OpponentData) => this.#createAndOpenChallengeWindows(opponent));
+            return;
+        }
+        super.createWaitingWindow();
+        super.openAllWindows({
+            onComplete: async () => {
+                await this.cardBattle.listenWaitingForOpponentData((opponent: OpponentData) => 
+                    super.closeAllWindows({ onComplete: () => this.#createAndOpenChallengeWindows(opponent) })
+                );
+            }
+        });
     }
 
-    #createChallengeWindows(opponent: OpponentData): void {
-        super.createTextWindowCentered('CardBattle Challenge!', {
-            textAlign: 'center',
-            textColor: '#ff3c3c',
-            onClose: () => super.openCommandWindow()
-        });
+    #createAndOpenChallengeWindows(opponent: OpponentData): void {
+        this.#createChallengeWindows(opponent);
+        super.openAllWindows({ onClose: () => this.#createAndOpenFoldersWindow() });
+    }
+
+    #createChallengeWindows(opponent: OpponentData) {
+        super.createTextWindowCentered('CardBattle Challenge!', { textAlign: 'center', textColor: '#ff3c3c' });
         const { name, description } = opponent;
         super.addTextWindow(`${name}\n${description}`);
     }
 
-    #createFoldersWindow(folders: CardsFolderData[]): void {
-        const [folder1, folder2, folder3] = folders;
+    async #createAndOpenFoldersWindow(): Promise<void> {
+        const folders: CardsFolderData[] = await this.cardBattle.getFolders();
+        this.#createFoldersCommandWindow(folders);
+        super.openCommandWindow();
+    }
+
+    #createFoldersCommandWindow(folders: CardsFolderData[]): void {
         const padValue = 16;
-        const folderColorsPoints1 = {
-            red: folder1.redPoints,
-            green: folder1.greenPoints,
-            blue: folder1.bluePoints,
-            black: folder1.blackPoints,
-            white: folder1.whitePoints,
-            orange: folder1.orangePoints
-        };
-        const folderColorsPoints2 = {
-            red: folder2.redPoints,
-            green: folder2.greenPoints,
-            blue: folder2.bluePoints,
-            black: folder2.blackPoints,
-            white: folder2.whitePoints,
-            orange: folder2.orangePoints
-        };
-        const folderColorsPoints3 = {
-            red: folder3.redPoints,
-            green: folder3.greenPoints,
-            blue: folder3.bluePoints,
-            black: folder3.blackPoints,
-            white: folder3.whitePoints,
-            orange: folder3.orangePoints
-        };
-        const options = [
-            {
-                description: `${folder1.name.padEnd(padValue)} ${Object.entries(folderColorsPoints1).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
-                onSelect: async () => {
-                    await this.cardBattle.setFolder(folder1.id);
-                    this.changeToStartPhase();
-                }
-            },
-            {
-                description: `${folder2.name.padEnd(padValue)} ${Object.entries(folderColorsPoints2).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
-                onSelect: async () => {
-                    await this.cardBattle.setFolder(folder2.id);
-                    this.changeToStartPhase();
-                }
-            },
-            {
-                description: `${folder3.name.padEnd(padValue)} ${Object.entries(folderColorsPoints3).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`,
-                onSelect: async () => {
-                    await this.cardBattle.setFolder(folder3.id);
-                    this.changeToStartPhase();
-                }
-            },
-        ];
+        const folderDescriptions = folders.map(folder => {
+            return {
+                id: folder.id,
+                name: folder.name.padEnd(padValue),
+                description: `${Object.entries(folder.colorsPoints).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`
+            };
+        });
+        const options = folderDescriptions.map(folder => ({
+            description: `${folder.name} ${folder.description}`,
+            onSelect: async () => {
+                await this.cardBattle.setFolder(this.scene.room.playerId, folder.id);
+                this.changeToStartPhase();
+            }
+        }));
         super.createCommandWindowCentered('Choose your folder', options);
     }
 
@@ -116,5 +95,4 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         super.destroyAllTextWindows();
         super.destroyCommandWindow();
     }
-
 }

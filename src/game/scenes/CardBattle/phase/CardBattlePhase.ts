@@ -16,6 +16,7 @@ import { CloseCardsetEvents } from '@/game/ui/Cardset/types/CloseCardsetEvents';
 import { CloseWindowConfig } from '@/game/ui/TextWindow/types/CloseWindowConfig';
 import { CloseBoardEvents } from '@/game/ui/BoardWindow/types/CloseBoardEvents';
 import { OpenCardsetEvents } from '@/game/ui/Cardset/types/OpenCardsetEvents';
+import { OpenWindowConfig } from '@/game/ui/TextWindow/types/OpenWindowConfig';
 
 export type AlignType = 
     | typeof LEFT 
@@ -110,9 +111,12 @@ export class CardBattlePhase {
         return this.#textWindows[this.#textWindows.length - 1];
     }
 
-    openAllWindows(): void {
+    openAllWindows(config?: OpenWindowConfig): void {
         if (this.#textWindows.length) {
-            this.#textWindows.forEach(window => window.open());
+            this.#textWindows.forEach((window, index) => {
+                if (!index) return window.open(config);
+                window.open();
+            });
         }
     }
 
