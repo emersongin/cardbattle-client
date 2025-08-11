@@ -152,13 +152,9 @@ export class CardBattlePhase {
         if (this.#commandWindow) this.#commandWindow.destroy();
     }
 
-    async createPlayerBoard(): Promise<void> {
-        return new Promise(async (resolve) => {
-            const playerBoardData: BoardWindowData = await this.cardBattle.getBoardData(this.scene.room.playerId);
-            const boardWindow = BoardWindow.createBottom(this.scene, playerBoardData, 0x3C64DE);
-            this.#playerBoard = boardWindow;
-            resolve();
-        });
+    createPlayerBoard(playerBoardData: BoardWindowData): void {
+        const boardWindow = BoardWindow.createBottom(this.scene, playerBoardData, 0x3C64DE);
+        this.#playerBoard = boardWindow;
     }
 
     addPlayerBoardZonePoints(boardZone: BoardZones, value: number): void {
@@ -185,13 +181,9 @@ export class CardBattlePhase {
         if (this.#playerBoard) this.#playerBoard.destroy();
     }
 
-    async createOpponentBoard(): Promise<void> {
-        return new Promise(async (resolve) => {
-            const opponentBoardData: BoardWindowData = await this.cardBattle.getOpponentBoardData(this.scene.room.playerId);
-            const boardWindow = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
-            this.#opponentBoard = boardWindow;
-            resolve();
-        });
+    createOpponentBoard(opponentBoardData: BoardWindowData): void {
+        const boardWindow = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
+        this.#opponentBoard = boardWindow;
     }
 
     addOpponentBoardZonePoints(boardZone: BoardZones, value: number): void {

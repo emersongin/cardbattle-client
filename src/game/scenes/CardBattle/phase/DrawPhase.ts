@@ -10,14 +10,16 @@ import { CARD_WIDTH } from "@/game/constants/default";
 export class DrawPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
+        const playerBoardData = await this.cardBattle.getBoardData(this.scene.room.playerId);
+        const opponentBoardData = await this.cardBattle.getOpponentBoardData(this.scene.room.playerId);
         await this.cardBattle.drawCards(this.scene.room.playerId);
         if (await this.cardBattle.isOpponentDrawCards(this.scene.room.playerId)) {
             this.#createDrawPhaseWindows();
             super.openAllWindows({
                 onComplete: async () => {
                     Promise.all([
-                        super.createOpponentBoard(),
-                        super.createPlayerBoard(),
+                        super.createOpponentBoard(opponentBoardData),
+                        super.createPlayerBoard(playerBoardData),
                         this.#createOpponentDrawCardset(),
                         this.#createPlayerDrawCardset()
                     ]);
@@ -32,17 +34,19 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     this.scene.room.playerId, 
                     async (isDrawCards: boolean) => {
                         if (!isDrawCards) return;
-                        this.#createDrawPhaseWindows();
-                        super.openAllWindows({
-                            onComplete: async () => {
-                                Promise.all([
-                                    super.createOpponentBoard(),
-                                    super.createPlayerBoard(),
-                                    this.#createOpponentDrawCardset(),
-                                    this.#createPlayerDrawCardset()
-                                ]);
-                            }
-                        });
+                        super.closeAllWindows({ onComplete: () => {
+                            this.#createDrawPhaseWindows();
+                            super.openAllWindows({
+                                onComplete: async () => {
+                                    Promise.all([
+                                        super.createOpponentBoard(opponentBoardData),
+                                        super.createPlayerBoard(playerBoardData),
+                                        this.#createOpponentDrawCardset(),
+                                        this.#createPlayerDrawCardset()
+                                    ]);
+                                }
+                            });
+                        }});
                     }
                 );
             }
