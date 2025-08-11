@@ -154,7 +154,7 @@ export class CardBattlePhase {
 
     async createPlayerBoard(): Promise<void> {
         return new Promise(async (resolve) => {
-            const playerBoardData: BoardWindowData = await this.cardBattle.getPlayerBoardData();
+            const playerBoardData: BoardWindowData = await this.cardBattle.getBoardData(this.scene.room.playerId);
             const boardWindow = BoardWindow.createBottom(this.scene, playerBoardData, 0x3C64DE);
             this.#playerBoard = boardWindow;
             resolve();
@@ -187,7 +187,7 @@ export class CardBattlePhase {
 
     async createOpponentBoard(): Promise<void> {
         return new Promise(async (resolve) => {
-            const opponentBoardData: BoardWindowData = await this.cardBattle.getOpponentBoardData();
+            const opponentBoardData: BoardWindowData = await this.cardBattle.getOpponentBoardData(this.scene.room.playerId);
             const boardWindow = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
             this.#opponentBoard = boardWindow;
             resolve();

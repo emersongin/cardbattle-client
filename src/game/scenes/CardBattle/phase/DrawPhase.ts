@@ -5,32 +5,48 @@ import { CardUi } from "@game/ui/Card/CardUi";
 import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@/game/constants/colors";
 import { DECK, HAND } from "@/game/constants/keys";
-import { CardData } from "@/game/types";
 import { CARD_WIDTH } from "@/game/constants/default";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        await super.createPlayerBoard();
-        await super.createOpponentBoard();
-        const playerCards: CardData[] = await this.cardBattle.drawPlayerCardsData();
-        const opponentCards: CardData[] = await this.cardBattle.drawOpponentCardsData();
-        this.#createPlayerDrawCardset(playerCards);
-        this.#createOpponentDrawCardset(opponentCards);
-        this.#createDrawPhaseWindows();
-        super.openAllWindows();
-    }
-
-    #createPlayerDrawCardset(playerCards: CardData[]) {
-        const cardset = super.createPlayerCardset(playerCards);
-        const widthEdge = this.scene.scale.width;
-        cardset.setCardsInLinePosition(widthEdge, 0);
-    }
-
-    #createOpponentDrawCardset(opponentCards: CardData[]) {
-        const cardset = super.createOpponentCardset(opponentCards);
-        const widthEdge = this.scene.scale.width;
-        cardset.setCardsInLinePosition(widthEdge, 0);
+        await this.cardBattle.drawCards(this.scene.room.playerId);
+        if (await this.cardBattle.isOpponentDrawCards(this.scene.room.playerId)) {
+            this.#createDrawPhaseWindows();
+            super.openAllWindows({
+                onComplete: async () => {
+                    Promise.all([
+                        super.createOpponentBoard(),
+                        super.createPlayerBoard(),
+                        this.#createOpponentDrawCardset(),
+                        this.#createPlayerDrawCardset()
+                    ]);
+                }
+            });
+            return;
+        }
+        super.createWaitingWindow();
+        super.openAllWindows({
+            onComplete: async () => {
+                await this.cardBattle.listenWaitingForOpponentDrawCards(
+                    this.scene.room.playerId, 
+                    async (isDrawCards: boolean) => {
+                        if (!isDrawCards) return;
+                        this.#createDrawPhaseWindows();
+                        super.openAllWindows({
+                            onComplete: async () => {
+                                Promise.all([
+                                    super.createOpponentBoard(),
+                                    super.createPlayerBoard(),
+                                    this.#createOpponentDrawCardset(),
+                                    this.#createPlayerDrawCardset()
+                                ]);
+                            }
+                        });
+                    }
+                );
+            }
+        });
     }
 
     #createDrawPhaseWindows(): void {
@@ -43,6 +59,26 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             }
         });
         super.addTextWindow('6 cards will be draw.');
+    }
+
+    #createPlayerDrawCardset(): Promise<void> {
+        return new Promise<void>(async (resolve) => {
+            const playerCards = await this.cardBattle.getHandCardsData(this.scene.room.playerId);
+            const cardset = super.createPlayerCardset(playerCards);
+            const widthEdge = this.scene.scale.width;
+            cardset.setCardsInLinePosition(widthEdge, 0);
+            resolve();
+        });
+    }
+
+    #createOpponentDrawCardset(): Promise<void> {
+        return new Promise<void>(async (resolve) => {
+            const opponentCards = await this.cardBattle.getOpponentHandCardsData(this.scene.room.playerId);
+            const cardset = super.createOpponentCardset(opponentCards);
+            const widthEdge = this.scene.scale.width;
+            cardset.setCardsInLinePosition(widthEdge, 0);
+            resolve();
+        });
     }
 
     #moveCardSetsToBoards(): void {

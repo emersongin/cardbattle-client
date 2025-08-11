@@ -6,13 +6,14 @@ import { CardBattlePhase } from "./CardBattlePhase";
 export class ChallengePhase extends CardBattlePhase implements Phase {
     async create(): Promise<void> {
         if (await this.cardBattle.isOpponentJoined()) {
-            await this.cardBattle.getOpponentData((opponent: OpponentData) => this.#createAndOpenChallengeWindows(opponent));
+            await this.cardBattle.getOpponentData(
+                (opponent: OpponentData) => this.#createAndOpenChallengeWindows(opponent));
             return;
         }
         super.createWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenWaitingForOpponentData((opponent: OpponentData) => 
+                await this.cardBattle.listenWaitingForOpponent((opponent: OpponentData) => 
                     super.closeAllWindows({ onComplete: () => this.#createAndOpenChallengeWindows(opponent) })
                 );
             }

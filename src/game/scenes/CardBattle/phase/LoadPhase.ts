@@ -20,22 +20,12 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     async create(): Promise<void> {
-        await this.#loadMocks();
-
         if (this.#isStartPhase) {
             this.#createLoadPhaseWindow();
             super.openAllWindows();
             return;
         }
         this.#createBoardsAndPlayerActions();
-    }
-
-    async #loadMocks(): Promise<void> {
-        return new Promise<void>(async (resolve) => {
-            await this.cardBattle.drawPlayerCardsData();
-            await this.cardBattle.drawOpponentCardsData();
-            resolve();
-        });
     }
 
     #createLoadPhaseWindow(): void {

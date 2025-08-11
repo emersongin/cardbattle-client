@@ -82,8 +82,12 @@ export class TextWindow extends TextBox {
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
-            onComplete: () => {
-                if (config?.onComplete) config.onComplete();
+            onComplete: async () => {
+                if (config?.onComplete) {
+                    await config.onComplete();
+                    if (this.#onClose) this.#addOnCompletedListener();
+                    return;
+                }
                 if (this.#onClose) this.#addOnCompletedListener();
             }
         });

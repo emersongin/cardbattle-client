@@ -12,20 +12,22 @@ export interface CardBattle {
     joinRoom: (roomId: string) => Promise<RoomData>;
     isOpponentJoined(): Promise<boolean>;
     getOpponentData: (callback: (opponent: OpponentData) => void) => Promise<void>;
-    listenWaitingForOpponentData: (callback: (opponent: OpponentData) => void) => Promise<void>;
+    listenWaitingForOpponent: (callback: (opponent: OpponentData) => void) => Promise<void>;
     getFolders: () => Promise<CardsFolderData[]>;
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isStartMiniGame: (playerId: string) => Promise<boolean>;
     setMiniGameChoice: (playerId: string, choice: string) => Promise<void>;
     listenOpponentMiniGame: (callback: (choice: string) => void) => Promise<void>;
+    getBoardData: (playerId: string) => Promise<BoardWindowData>;
+    getOpponentBoardData: (playerId: string) => Promise<BoardWindowData>;
+    isOpponentDrawCards: (playerId: string) => Promise<boolean>;
+    listenWaitingForOpponentDrawCards: (playerId: string, callback: (isDrawCards: boolean) => void) => Promise<void>;
+    drawCards: (playerId: string) => Promise<void>;
+    getHandCardsData: (playerId: string) => Promise<CardData[]>;
+    getOpponentHandCardsData: (playerId: string) => Promise<CardData[]>;
 
-    iGo: () => Promise<boolean>;
-    drawPlayerCardsData: () => Promise<CardData[]>;
-    drawOpponentCardsData: () => Promise<CardData[]>;
-    getPlayerBoardData: () => Promise<BoardWindowData>;
-    getOpponentBoardData: () => Promise<BoardWindowData>;
-    getPlayerHandCardsData: () => Promise<CardData[]>;
-    getOpponentHandCardsData: () => Promise<CardData[]>;
+    isGoFirst: () => Promise<boolean>;
+
     listenOpponentLoadPhase: (callback: (play: LoadPhasePlay) => void) => Promise<void>;
     allPass: () => Promise<boolean>;
     isOpponentPassed: () => Promise<boolean>;

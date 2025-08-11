@@ -1,4 +1,4 @@
 export type OpenWindowConfig = {
-    onComplete?: () => void;
+    onComplete?: () => Promise<void> | void;
     onClose?: () => void;
 };

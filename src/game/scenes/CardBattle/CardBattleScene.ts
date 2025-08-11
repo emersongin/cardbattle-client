@@ -4,7 +4,8 @@ import { EventBus } from '@game/EventBus';
 import { RoomData } from '@/game/types/RoomData';
 import { ChallengePhase } from './phase/ChallengePhase';
 import { StartPhase } from './phase/StartPhase';
-// import { DrawPhase } from './phase/DrawPhase';
+import { DrawPhase } from './phase/DrawPhase';
+import { WHITE } from '@/game/constants/colors';
 // import { LoadPhase } from './phase/LoadPhase';
 
 export class CardBattleScene extends VueScene {
@@ -21,7 +22,7 @@ export class CardBattleScene extends VueScene {
 
     async create () {
         this.room = await this.getCardBattle().createRoom();
-        this.changePhase(new StartPhase(this));
+        this.changePhase(new DrawPhase(this));
 
         if (this.phase instanceof ChallengePhase) {
             await this.getCardBattle().joinRoom(this.room.roomId);
@@ -30,6 +31,12 @@ export class CardBattleScene extends VueScene {
         if (this.phase instanceof StartPhase) {
             await this.getCardBattle().joinRoom(this.room.roomId);
             await this.getCardBattle().setFolder(this.room.playerId, 'f3');
+        }
+
+        if (this.phase instanceof DrawPhase) {
+            await this.getCardBattle().joinRoom(this.room.roomId);
+            await this.getCardBattle().setFolder(this.room.playerId, 'f3');
+            await this.getCardBattle().setMiniGameChoice(this.room.playerId, WHITE);
         }
 
     }
