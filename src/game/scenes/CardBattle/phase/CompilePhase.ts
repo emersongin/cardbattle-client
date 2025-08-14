@@ -143,10 +143,6 @@ export class CompilePhase extends PowerSlots implements Phase {
     openZoneCommandWindow(): void {
         this.#zoneCommandWindow.open();
     }
-
-    update(): void {
-        console.log("Updating Compile Phase...");
-    }
     
     destroy(): void {
         if (this.#textWindow) this.#textWindow.destroy();

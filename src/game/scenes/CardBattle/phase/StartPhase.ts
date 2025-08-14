@@ -60,10 +60,6 @@ export class StartPhase extends CardBattlePhase implements Phase {
         super.openAllWindows();
     }
 
-    update(): void {
-        console.log("Updating Start Phase...");
-    }
-
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }

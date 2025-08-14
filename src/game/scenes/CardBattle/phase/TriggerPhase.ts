@@ -50,24 +50,24 @@ export class TriggerPhase implements Phase {
         console.log("Trigger Phase started!");
     }
 
-    update(): void {
-        // if (this.#powerActions.length) {
-        //     const action = this.#powerActions.shift();
-        //     console.log("Executing action:", action);
-        //     return;
-        // }
-        switch (this.#origimPhase) {
-            case LOAD_PHASE:
-                this.changeToLoadPhase();
-                break;
-            case COMPILE_PHASE:
-                this.changeToCompilePhase();
-                break;
-            default:
-                console.error("Unknown original phase:", this.#origimPhase);
-                break;
-        }
-    }
+    // update(): void {
+    //     // if (this.#powerActions.length) {
+    //     //     const action = this.#powerActions.shift();
+    //     //     console.log("Executing action:", action);
+    //     //     return;
+    //     // }
+    //     switch (this.#origimPhase) {
+    //         case LOAD_PHASE:
+    //             this.changeToLoadPhase();
+    //             break;
+    //         case COMPILE_PHASE:
+    //             this.changeToCompilePhase();
+    //             break;
+    //         default:
+    //             console.error("Unknown original phase:", this.#origimPhase);
+    //             break;
+    //     }
+    // }
 
     destroy(): void {
         console.log("Trigger Phase destroyed.");

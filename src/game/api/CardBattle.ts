@@ -9,10 +9,15 @@ export type LoadPhasePlay = {
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
-    joinRoom: (roomId: string) => Promise<RoomData>;
     isOpponentJoined(): Promise<boolean>;
+    listenOpponentJoined: (callback: (opponent: OpponentData) => void) => Promise<void>;
+    joinRoom: (roomId: string) => Promise<RoomData>;
+    
+    
+    
+    
     getOpponentData: (callback: (opponent: OpponentData) => void) => Promise<void>;
-    listenWaitingForOpponent: (callback: (opponent: OpponentData) => void) => Promise<void>;
+
     getFolders: () => Promise<CardsFolderData[]>;
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isStartMiniGame: (playerId: string) => Promise<boolean>;
@@ -27,7 +32,6 @@ export interface CardBattle {
     getOpponentHandCardsData: (playerId: string) => Promise<CardData[]>;
 
     isGoFirst: () => Promise<boolean>;
-
     listenOpponentLoadPhase: (callback: (play: LoadPhasePlay) => void) => Promise<void>;
     allPass: () => Promise<boolean>;
     isOpponentPassed: () => Promise<boolean>;

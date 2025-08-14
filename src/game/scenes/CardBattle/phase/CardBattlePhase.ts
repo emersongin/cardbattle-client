@@ -335,7 +335,7 @@ export class CardBattlePhase {
         if (this.#fieldCardset) this.#fieldCardset.destroy();
     }
 
-    createWaitingWindow(): void {
-        this.createTextWindowCentered('Waiting for opponent...', { textAlign: 'center' });
+    createWaitingWindow(text: string = 'Waiting for opponent...'): void {
+        this.createTextWindowCentered(text, { textAlign: 'center' });
     }
 }

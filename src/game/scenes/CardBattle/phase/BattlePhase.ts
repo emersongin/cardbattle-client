@@ -49,10 +49,6 @@ export class BattlePhase implements Phase {
         this.#window.open();
     }
 
-    update(): void {
-        console.log("Updating Battle Phase...");
-    }
-
     destroy(): void {
         if (this.#window) this.#window.destroy();
     }

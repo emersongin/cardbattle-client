@@ -306,11 +306,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     //     super.createCommandWindowBottom('Select your zone', options);
     // }
 
-    update(): void {
-        // console.log("Updating Load Phase...");
-    }
-
-        changeToChallengePhase(): void {
+    changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }
     

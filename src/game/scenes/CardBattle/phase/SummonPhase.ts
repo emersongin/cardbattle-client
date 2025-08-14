@@ -16,10 +16,6 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.openAllWindows();
     }
 
-    update(): void {
-        console.log("Updating Summon Phase...");
-    }
-
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }

@@ -38,7 +38,7 @@ export class CardBattleScene extends VueScene {
         this.phase.create();
     }
 
-    update() {
-        if (this.phase) this.phase.update();
-    }
+    // update() {
+    //     if (this.phase) this.phase.update();
+    // }
 }

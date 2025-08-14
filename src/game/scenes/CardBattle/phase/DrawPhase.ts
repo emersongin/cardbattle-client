@@ -247,10 +247,6 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         this.scene.timeline(moveConfig);
     }
 
-    update(): void {
-        // No specific update logic for DrawPhase
-    }
-
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }

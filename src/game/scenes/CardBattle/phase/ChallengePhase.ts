@@ -4,37 +4,38 @@ import { CardsFolderData, OpponentData } from "@game/types";
 import { CardBattlePhase } from "./CardBattlePhase";
 
 export class ChallengePhase extends CardBattlePhase implements Phase {
+
     async create(): Promise<void> {
         if (await this.cardBattle.isOpponentJoined()) {
-            await this.cardBattle.getOpponentData(
-                (opponent: OpponentData) => this.#createAndOpenChallengeWindows(opponent));
+            await this.cardBattle.getOpponentData((opponent: OpponentData) => this.#createChallengeView(opponent));
             return;
         }
-        super.createWaitingWindow();
+        this.#createOpponentWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenWaitingForOpponent((opponent: OpponentData) => 
-                    super.closeAllWindows({ onComplete: () => this.#createAndOpenChallengeWindows(opponent) })
+                await this.cardBattle.listenOpponentJoined((opponent: OpponentData) => 
+                    super.closeAllWindows({ onComplete: () => this.#createChallengeView(opponent) })
                 );
             }
         });
     }
 
-    #createAndOpenChallengeWindows(opponent: OpponentData): void {
+    #createOpponentWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to join the room...');
+    }
+
+    #createChallengeView(opponent: OpponentData): void {
         this.#createChallengeWindows(opponent);
-        super.openAllWindows({ onClose: () => this.#createAndOpenFoldersWindow() });
+        super.openAllWindows({ onClose: async () => {
+            this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
+            super.openCommandWindow();
+        } });
     }
 
     #createChallengeWindows(opponent: OpponentData) {
         super.createTextWindowCentered('CardBattle Challenge!', { textAlign: 'center', textColor: '#ff3c3c' });
         const { name, description } = opponent;
         super.addTextWindow(`${name}\n${description}`);
-    }
-
-    async #createAndOpenFoldersWindow(): Promise<void> {
-        const folders: CardsFolderData[] = await this.cardBattle.getFolders();
-        this.#createFoldersCommandWindow(folders);
-        super.openCommandWindow();
     }
 
     #createFoldersCommandWindow(folders: CardsFolderData[]): void {
@@ -54,10 +55,6 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
             }
         }));
         super.createCommandWindowCentered('Choose your folder', options);
-    }
-
-    update(): void {
-        console.log("Updating Challenge Phase...");
     }
 
     changeToChallengePhase(): void {
