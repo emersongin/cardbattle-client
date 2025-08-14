@@ -12,17 +12,18 @@ export interface CardBattle {
     isOpponentJoined(): Promise<boolean>;
     listenOpponentJoined: (callback: (opponent: OpponentData) => void) => Promise<void>;
     joinRoom: (roomId: string) => Promise<RoomData>;
-    
-    
-    
-    
     getOpponentData: (callback: (opponent: OpponentData) => void) => Promise<void>;
-
     getFolders: () => Promise<CardsFolderData[]>;
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
-    isStartMiniGame: (playerId: string) => Promise<boolean>;
+    isOpponentDeckSet: (playerId: string) => Promise<boolean>;
+    listenOpponentDeckSet: (callback: (isDeckSet: boolean) => void) => Promise<void>;
+    isPlayMiniGame: (playerId: string) => Promise<boolean>;
     setMiniGameChoice: (playerId: string, choice: string) => Promise<void>;
-    listenOpponentMiniGame: (callback: (choice: string) => void) => Promise<void>;
+    listenOpponentEndMiniGame: (callback: (choice: string) => void) => Promise<void>;
+    
+    
+    
+
     getBoardData: (playerId: string) => Promise<BoardWindowData>;
     getOpponentBoardData: (playerId: string) => Promise<BoardWindowData>;
     isOpponentDrawCards: (playerId: string) => Promise<boolean>;

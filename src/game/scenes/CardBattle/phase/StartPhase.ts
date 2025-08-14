@@ -7,20 +7,47 @@ import { ArrayUtil } from "@/game/utils/ArrayUtil";
 export class StartPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        if (await this.cardBattle.isStartMiniGame(this.scene.room.playerId)) {
+        if (await this.cardBattle.isOpponentDeckSet(this.scene.room.playerId)) {
+            this.#goMiniGame();
+            return;
+        }
+        this.#createOpponentDeckSetWaitingWindow();
+        super.openAllWindows({
+            onComplete: async () => {
+                await this.cardBattle.listenOpponentDeckSet(async (isDeckSet: boolean) => {
+                    super.closeAllWindows({ 
+                        onComplete: () => this.#goMiniGame() 
+                    });
+                });
+            }
+        });
+    }
+
+    #createOpponentDeckSetWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to set their deck...');
+    }
+
+    async #goMiniGame(): Promise<void> {
+        if (await this.cardBattle.isPlayMiniGame(this.scene.room.playerId)) {
             this.#createMiniGameWindows();
             this.#createMiniGameCommandWindow();
             super.openAllWindows();
             return;
         }
-        super.createWaitingWindow();
+        this.#createOpponentMiniGameEndWaitingWindow();
         super.openAllWindows({
-            onComplete: async () => {
-                await this.cardBattle.listenOpponentMiniGame(
-                    (choice) => super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice) })
+            onComplete: async() => {
+                await this.cardBattle.listenOpponentEndMiniGame(
+                    (choice: string) => super.closeAllWindows({ 
+                        onComplete: () => this.#createResultWindow(choice) 
+                    })
                 );
             }
         });
+    }
+
+    #createOpponentMiniGameEndWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to finish the mini-game...');
     }
 
     #createMiniGameWindows(): void {
