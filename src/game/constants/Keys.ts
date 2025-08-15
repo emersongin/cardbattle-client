@@ -11,3 +11,7 @@ export const BATTLE = 'BATTLE';
 export const POWER = 'POWER';
 export const PLAYER = 'PLAYER';
 export const OPPONENT = 'OPPONENT';
+export const IN_LOBBY = 'IN_LOBBY';
+export const SET_DECK = 'SET_DECK';
+export const END_MINI_GAME = 'END_MINI_GAME';
+export const DRAW_CARDS = 'DRAW_CARDS';

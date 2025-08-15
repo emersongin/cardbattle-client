@@ -9,29 +9,27 @@ export type LoadPhasePlay = {
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
-    isOpponentJoined(): Promise<boolean>;
-    listenOpponentJoined: (callback: (opponent: OpponentData) => void) => Promise<void>;
+    isOpponentJoined(playerId: string): Promise<boolean>;
+    listenOpponentJoined: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
     joinRoom: (roomId: string) => Promise<RoomData>;
-    getOpponentData: (callback: (opponent: OpponentData) => void) => Promise<void>;
+    getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
     getFolders: () => Promise<CardsFolderData[]>;
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;
-    listenOpponentDeckSet: (callback: (isDeckSet: boolean) => void) => Promise<void>;
+    listenOpponentDeckSet: (playerId: string, callback: (isDeckSet?: boolean) => void) => Promise<void>;
     isPlayMiniGame: (playerId: string) => Promise<boolean>;
     setMiniGameChoice: (playerId: string, choice: string) => Promise<void>;
-    listenOpponentEndMiniGame: (callback: (choice: string) => void) => Promise<void>;
-    
-    
-    
-
-    getBoardData: (playerId: string) => Promise<BoardWindowData>;
-    getOpponentBoardData: (playerId: string) => Promise<BoardWindowData>;
-    isOpponentDrawCards: (playerId: string) => Promise<boolean>;
-    listenWaitingForOpponentDrawCards: (playerId: string, callback: (isDrawCards: boolean) => void) => Promise<void>;
+    listenOpponentEndMiniGame: (playerId: string, callback: (choice: string) => void) => Promise<void>;
+    isOpponentReadyDrawCards: (playerId: string) => Promise<boolean>;
+    setReadyDrawCards: (playerId: string) => Promise<void>;
+    listenOpponentDrawCards(playerId: string, callback: (isReady: boolean) => void): Promise<void>;
     drawCards: (playerId: string) => Promise<void>;
-    getHandCardsData: (playerId: string) => Promise<CardData[]>;
-    getOpponentHandCardsData: (playerId: string) => Promise<CardData[]>;
-
+    getBoard: (playerId: string) => Promise<BoardWindowData>;
+    getOpponentBoard: (playerId: string) => Promise<BoardWindowData>;
+    getHandCards: (playerId: string) => Promise<CardData[]>;
+    getOpponentHandCards: (playerId: string) => Promise<CardData[]>;
+    
+    
     isGoFirst: () => Promise<boolean>;
     listenOpponentLoadPhase: (callback: (play: LoadPhasePlay) => void) => Promise<void>;
     allPass: () => Promise<boolean>;

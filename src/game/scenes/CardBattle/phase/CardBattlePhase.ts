@@ -152,9 +152,8 @@ export class CardBattlePhase {
         if (this.#commandWindow) this.#commandWindow.destroy();
     }
 
-    createPlayerBoard(playerBoardData: BoardWindowData): void {
-        const boardWindow = BoardWindow.createBottom(this.scene, playerBoardData, 0x3C64DE);
-        this.#playerBoard = boardWindow;
+    createBoard(playerBoardData: BoardWindowData): void {
+        this.#playerBoard = BoardWindow.createBottom(this.scene, playerBoardData, 0x3C64DE);
     }
 
     addPlayerBoardZonePoints(boardZone: BoardZones, value: number): void {
@@ -182,8 +181,7 @@ export class CardBattlePhase {
     }
 
     createOpponentBoard(opponentBoardData: BoardWindowData): void {
-        const boardWindow = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
-        this.#opponentBoard = boardWindow;
+        this.#opponentBoard = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
     }
 
     addOpponentBoardZonePoints(boardZone: BoardZones, value: number): void {

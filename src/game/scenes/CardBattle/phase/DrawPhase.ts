@@ -6,49 +6,43 @@ import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@/game/constants/colors";
 import { DECK, HAND } from "@/game/constants/keys";
 import { CARD_WIDTH } from "@/game/constants/default";
+import { BoardWindowData } from "@/game/types";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        const playerBoardData = await this.cardBattle.getBoardData(this.scene.room.playerId);
-        const opponentBoardData = await this.cardBattle.getOpponentBoardData(this.scene.room.playerId);
-        await this.cardBattle.drawCards(this.scene.room.playerId);
-        if (await this.cardBattle.isOpponentDrawCards(this.scene.room.playerId)) {
-            this.#createDrawPhaseWindows();
-            super.openAllWindows({
-                onComplete: async () => {
-                    Promise.all([
-                        super.createOpponentBoard(opponentBoardData),
-                        super.createPlayerBoard(playerBoardData),
-                        this.#createOpponentDrawCardset(),
-                        this.#createPlayerDrawCardset()
-                    ]);
-                }
-            });
+        const opponentBoardData = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+        const playerBoardData = await this.cardBattle.getBoard(this.scene.room.playerId);
+        if (await this.cardBattle.isOpponentReadyDrawCards(this.scene.room.playerId)) {
+            await this.cardBattle.drawCards(this.scene.room.playerId);
+            this.#goDrawCards(playerBoardData, opponentBoardData);
             return;
         }
-        super.createWaitingWindow();
+        this.#createOpponentDrawCardsWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenWaitingForOpponentDrawCards(
-                    this.scene.room.playerId, 
-                    async (isDrawCards: boolean) => {
-                        if (!isDrawCards) return;
-                        super.closeAllWindows({ onComplete: () => {
-                            this.#createDrawPhaseWindows();
-                            super.openAllWindows({
-                                onComplete: async () => {
-                                    Promise.all([
-                                        super.createOpponentBoard(opponentBoardData),
-                                        super.createPlayerBoard(playerBoardData),
-                                        this.#createOpponentDrawCardset(),
-                                        this.#createPlayerDrawCardset()
-                                    ]);
-                                }
-                            });
-                        }});
-                    }
-                );
+                await this.cardBattle.setReadyDrawCards(this.scene.room.playerId);
+                await this.cardBattle.listenOpponentDrawCards(this.scene.room.playerId, async () => {
+                    super.closeAllWindows({ onComplete: () => this.#goDrawCards(playerBoardData, opponentBoardData) });
+                });
+            }
+        });
+    }
+
+    #createOpponentDrawCardsWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to draw cards...');
+    }
+
+    #goDrawCards(playerBoardData: BoardWindowData, opponentBoardData: BoardWindowData): void {
+        this.#createDrawPhaseWindows();
+        super.openAllWindows({
+            onComplete: async () => {
+                Promise.all([
+                    super.createOpponentBoard(opponentBoardData),
+                    super.createBoard(playerBoardData),
+                    this.#createOpponentDrawCardset(),
+                    this.#createPlayerDrawCardset()
+                ]);
             }
         });
     }
@@ -67,7 +61,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #createPlayerDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            const playerCards = await this.cardBattle.getHandCardsData(this.scene.room.playerId);
+            const playerCards = await this.cardBattle.getHandCards(this.scene.room.playerId);
             const cardset = super.createPlayerCardset(playerCards);
             const widthEdge = this.scene.scale.width;
             cardset.setCardsInLinePosition(widthEdge, 0);
@@ -77,7 +71,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #createOpponentDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            const opponentCards = await this.cardBattle.getOpponentHandCardsData(this.scene.room.playerId);
+            const opponentCards = await this.cardBattle.getOpponentHandCards(this.scene.room.playerId);
             const cardset = super.createOpponentCardset(opponentCards);
             const widthEdge = this.scene.scale.width;
             cardset.setCardsInLinePosition(widthEdge, 0);

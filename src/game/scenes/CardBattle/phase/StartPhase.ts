@@ -14,7 +14,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
         this.#createOpponentDeckSetWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenOpponentDeckSet(async (isDeckSet: boolean) => {
+                await this.cardBattle.listenOpponentDeckSet(this.scene.room.playerId, async () => {
                     super.closeAllWindows({ 
                         onComplete: () => this.#goMiniGame() 
                     });
@@ -38,6 +38,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
         super.openAllWindows({
             onComplete: async() => {
                 await this.cardBattle.listenOpponentEndMiniGame(
+                    this.scene.room.playerId,
                     (choice: string) => super.closeAllWindows({ 
                         onComplete: () => this.#createResultWindow(choice) 
                     })

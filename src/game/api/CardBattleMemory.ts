@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
-import { BATTLE, POWER } from '../constants/keys';
+import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, POWER, SET_DECK } from '../constants/keys';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerCardUpdates } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
 import { CardType } from '../ui/Card/types/CardType';
@@ -242,48 +242,77 @@ export default class CardBattleMemory implements CardBattle {
             const playerId = uuidv4();
             this.#roomId = roomId;
             this.#playerId = playerId;
-            this.#playerState = 'IN_LOBBY';
+            this.#playerState = IN_LOBBY;
             setTimeout(() => resolve({ roomId, playerId }), delayMock);
         });
     }
 
-    joinRoom(roomId: string): Promise<RoomData> {
-        return new Promise((resolve) => {
-            if (this.#roomId === roomId) {
-                const opponentId = uuidv4();
-                this.#opponentId = opponentId;
-                this.#opponentState = 'IN_LOBBY';
-                this.#whoPlayMiniGame = Math.random() < 0.5 ? this.#playerId : this.#opponentId;
-            }
-            setTimeout(() => resolve({ roomId, playerId: this.#opponentId }), delayMock);
-        });
-    }
-
-    isOpponentJoined(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => resolve(this.#opponentState === 'IN_LOBBY'), delayMock);
-        });
-    }
-
-    getOpponentData(callback: (opponent: OpponentData) => void): Promise<void> {
+    isOpponentJoined(playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                callback({
-                    name: 'Player',
-                    description: 'This is the player\'s description.'
-                });
+                if (this.#playerId === playerId) {
+                    resolve(this.#opponentState === IN_LOBBY);
+                };
+                if (this.#opponentId === playerId) {
+                    resolve(this.#playerState === IN_LOBBY);
+                };
+            }, delayMock);
+        });
+    }
+
+    listenOpponentJoined(playerId: string, callback: (opponent: OpponentData) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#playerId === playerId) {
+                    //mock
+                    this.#opponentState = IN_LOBBY;
+                    callback({
+                        name: 'Opponent',
+                        description: 'This is the opponent\'s description.'
+                    });
+                };
+                if (this.#opponentId === playerId) {
+                    //mock
+                    this.#playerState = IN_LOBBY;
+                    callback({
+                        name: 'Player',
+                        description: 'This is the player\'s description.'
+                    });
+                };
                 resolve();
             }, delayMock);
         });
     }
 
-    listenWaitingForOpponent(callback: (opponent: OpponentData) => void): Promise<void> {
+    joinRoom(roomId: string): Promise<RoomData> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                callback({
-                    name: 'Opponent',
-                    description: 'This is the opponent\'s description.'
-                });
+                if (this.#roomId === roomId) {
+                    const opponentId = uuidv4();
+                    this.#opponentId = opponentId;
+                    this.#opponentState = IN_LOBBY;
+                    this.#whoPlayMiniGame = Math.random() < 0.5 ? this.#playerId : this.#opponentId;
+                }
+                resolve({ roomId, playerId: this.#opponentId });
+            }, delayMock);
+        });
+    }
+
+    getOpponentData(playerId: string, callback: (opponent: OpponentData) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#playerId === playerId) {
+                    callback({
+                        name: 'Opponent',
+                        description: 'This is the opponent\'s description.'
+                    });
+                };
+                if (this.#opponentId === playerId) {
+                    callback({
+                        name: 'Player',
+                        description: 'This is the player\'s description.'
+                    });
+                };
                 resolve();
             }, delayMock);
         });
@@ -291,19 +320,21 @@ export default class CardBattleMemory implements CardBattle {
 
     getFolders(): Promise<CardsFolderData[]> {
         return new Promise((resolve) => {
-            const foldersData: CardsFolderData[] = folders.map(folder => ({
-                id: folder.id,
-                name: `Folder ${folder.id}`,
-                colorsPoints: {
-                    RED: folder.deck.filter(card => card.color === RED).length,
-                    GREEN: folder.deck.filter(card => card.color === GREEN).length,
-                    BLUE: folder.deck.filter(card => card.color === BLUE).length,
-                    BLACK: folder.deck.filter(card => card.color === BLACK).length,
-                    WHITE: folder.deck.filter(card => card.color === WHITE).length,
-                    ORANGE: folder.deck.filter(card => card.color === ORANGE).length
-                }
-            }));
-            setTimeout(() => resolve(foldersData), delayMock);
+            setTimeout(() => {
+                const foldersData: CardsFolderData[] = folders.map(folder => ({
+                    id: folder.id,
+                    name: `Folder ${folder.id}`,
+                    colorsPoints: {
+                        RED: folder.deck.filter(card => card.color === RED).length,
+                        GREEN: folder.deck.filter(card => card.color === GREEN).length,
+                        BLUE: folder.deck.filter(card => card.color === BLUE).length,
+                        BLACK: folder.deck.filter(card => card.color === BLACK).length,
+                        WHITE: folder.deck.filter(card => card.color === WHITE).length,
+                        ORANGE: folder.deck.filter(card => card.color === ORANGE).length
+                    }
+                }));
+                resolve(foldersData);
+            }, delayMock);
         });
     }
 
@@ -313,23 +344,57 @@ export default class CardBattleMemory implements CardBattle {
             const deck = folders[folderIndex].deck || [];
             if (this.#playerId === playerId) {
                 this.#playerDeck = deck;
-                this.#playerState = 'SET_DECK';
+                this.#playerState = SET_DECK;
                 //mock
                 this.#opponentDeck = folders[0].deck;
-                this.#opponentState = 'SET_DECK';
+                this.#opponentState = SET_DECK;
             };
             if (this.#opponentId === playerId) {
                 this.#opponentDeck = deck;
-                this.#opponentState = 'SET_DECK';
+                this.#opponentState = SET_DECK;
             };
             setTimeout(() => resolve(true), delayMock);
         });
     }
 
-    isStartMiniGame (playerId: string): Promise<boolean> {
+    isOpponentDeckSet(playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#whoPlayMiniGame === playerId);
+                if (this.#playerId === playerId) {
+                    resolve(this.#opponentState === SET_DECK);
+                };
+                if (this.#opponentId === playerId) {
+                    resolve(this.#playerState === SET_DECK);
+                };
+            }, delayMock);
+        });
+    }
+
+    listenOpponentDeckSet(playerId: string, callback: (isDeckSet?: boolean) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#playerId === playerId) {
+                    this.#opponentState = SET_DECK
+                    callback(this.#opponentState === SET_DECK);
+                };
+                if (this.#opponentId === playerId) {
+                    this.#playerState = SET_DECK
+                    callback(this.#playerState === SET_DECK);
+                };
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    isPlayMiniGame(playerId: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#playerId === playerId) {
+                    resolve(this.#whoPlayMiniGame === this.#playerId);
+                };
+                if (this.#opponentId === playerId) {
+                    resolve(this.#whoPlayMiniGame === this.#opponentId);
+                };
             }, delayMock);
         });
     }
@@ -337,10 +402,10 @@ export default class CardBattleMemory implements CardBattle {
     setMiniGameChoice(playerId: string, choice: string): Promise<void> {
         return new Promise(async (resolve) => {
             if (this.#playerId === playerId) {
-                this.#playerState = 'SET_FIRST_PLAYER';
+                this.#playerState = END_MINI_GAME;
             };
             if (this.#opponentId === playerId) {
-                this.#opponentState = 'SET_FIRST_PLAYER';
+                this.#opponentState = END_MINI_GAME;
             };
             const player = (playerId === this.#playerId);
             const isWhite = (choice === WHITE);
@@ -351,15 +416,17 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenOpponentMiniGame(callback: (choice: string) => void): Promise<void> {
+    listenOpponentEndMiniGame(playerId: string, callback: (choice: string) => void): Promise<void> {
         return new Promise((resolve) => {
-            if (this.#playerId === this.#whoPlayMiniGame) {
+            if (this.#playerId === this.#whoPlayMiniGame && this.#playerId !== playerId) {
+                //mock
                 this.#firstPlayer = this.#opponentId;
-                this.#opponentState = 'SET_FIRST_PLAYER';
+                this.#opponentState = END_MINI_GAME;
             };
-            if (this.#opponentId === this.#whoPlayMiniGame) {
+            if (this.#opponentId === this.#whoPlayMiniGame && this.#opponentId !== playerId) {
+                //mock
                 this.#firstPlayer = this.#playerId;
-                this.#playerState = 'SET_FIRST_PLAYER';
+                this.#playerState = END_MINI_GAME;
             };
             setTimeout(() => {
                 callback(BLACK);
@@ -368,27 +435,41 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    isOpponentDrawCards(playerId: string): Promise<boolean> {
+    isOpponentReadyDrawCards(playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#playerId === playerId) {
-                    resolve(this.#opponentState === 'DRAW_CARDS')
+                    resolve(this.#opponentState === DRAW_CARDS);
                 };
                 if (this.#opponentId === playerId) {
-                    resolve(this.#playerState === 'DRAW_CARDS')
+                    resolve(this.#playerState === DRAW_CARDS);
                 };
             }, delayMock);
         });
     }
 
-    listenWaitingForOpponentDrawCards(playerId: string, callback: (isDrawCards: boolean) => void): Promise<void> {
+    setReadyDrawCards(playerId: string): Promise<void> {
+        return new Promise((resolve) => {
+            if (this.#playerId === playerId) {
+                this.#playerState = DRAW_CARDS;
+            };
+            if (this.#opponentId === playerId) {
+                this.#opponentState = DRAW_CARDS;
+            };
+            setTimeout(() => resolve(), delayMock);
+        });
+    }
+
+    listenOpponentDrawCards(playerId: string, callback: (isDrawCards: boolean) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#playerId === playerId) {
+                    //mock
                     await this.drawCards(this.#opponentId);
                     callback(this.#opponentState === 'DRAW_CARDS');
                 };
                 if (this.#opponentId === playerId) {
+                    //mock
                     await this.drawCards(this.#playerId);
                     callback(this.#playerState === 'DRAW_CARDS');
                 };
@@ -399,21 +480,17 @@ export default class CardBattleMemory implements CardBattle {
 
     drawCards(playerId: string): Promise<void> {
         return new Promise((resolve) => {
-            if (this.#playerId === playerId) {
-                this.#playerDeck = ArrayUtil.shuffle(this.#playerDeck);
-                this.#playerHand = this.#playerDeck.splice(0, 6);
-                this.#playerState = 'DRAW_CARDS';
-            };
-            if (this.#opponentId === playerId) {
-                this.#opponentDeck = ArrayUtil.shuffle(this.#opponentDeck);
-                this.#opponentHand = this.#opponentDeck.splice(0, 6);
-                this.#opponentState = 'DRAW_CARDS';
-            };
+            this.#playerDeck = ArrayUtil.shuffle(this.#playerDeck);
+            this.#playerHand = this.#playerDeck.splice(0, 6);
+            this.#playerState = 'DRAW_CARDS';
+            this.#opponentDeck = ArrayUtil.shuffle(this.#opponentDeck);
+            this.#opponentHand = this.#opponentDeck.splice(0, 6);
+            this.#opponentState = 'DRAW_CARDS';
             setTimeout(() => resolve(), delayMock);
         });
     }
 
-    getBoardData(playerId: string): Promise<BoardWindowData> {
+    getBoard(playerId: string): Promise<BoardWindowData> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#playerId === playerId) {
@@ -452,7 +529,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
     
-    getOpponentBoardData(playerId: string): Promise<BoardWindowData> {
+    getOpponentBoard(playerId: string): Promise<BoardWindowData> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#opponentId === playerId) {
@@ -491,7 +568,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getHandCardsData(playerId: string): Promise<CardData[]> {
+    getHandCards(playerId: string): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#playerId === playerId) {
@@ -504,7 +581,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getOpponentHandCardsData(playerId: string): Promise<CardData[]> {
+    getOpponentHandCards(playerId: string): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#opponentId === playerId) {
