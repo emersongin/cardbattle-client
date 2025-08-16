@@ -13,7 +13,7 @@ export interface CardBattle {
     listenOpponentJoined: (playerId: string, callback: (isOpponentJoined?: boolean) => void) => Promise<void>;
     joinRoom: (roomId: string) => Promise<RoomData>;
     getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
-    getFolders: (playerId: string) => Promise<CardsFolderData[]>;
+    getFolders: (playerId?: string) => Promise<CardsFolderData[]>;
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;
     listenOpponentDeckSet: (playerId: string, callback: (isDeckSet?: boolean) => void) => Promise<void>;

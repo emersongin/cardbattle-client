@@ -384,7 +384,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getFolders(playerId: string): Promise<CardsFolderData[]> {
+    getFolders(): Promise<CardsFolderData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const foldersData: CardsFolderData[] = folders.map(folder => ({
@@ -687,7 +687,7 @@ export default class CardBattleMemory implements CardBattle {
     isStartPlaying(playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#isWhoPlayMiniGameId(playerId));
+                resolve(this.#isPlayFirst(playerId));
             }, delayMock);
         });
     }
