@@ -24,11 +24,12 @@ export class CardBattleScene extends VueScene {
         this.room = await this.getCardBattle().createRoom();
 
         // CHALLENGE PHASE
-        // await this.getCardBattle().joinRoom(this.room.roomId);
+        const opponent = await this.getCardBattle().joinRoom(this.room.roomId);
         // // START PHASE
         // await this.getCardBattle().setFolder(this.room.playerId, 'f3');
         // // // DRAW PHASE
         // await this.getCardBattle().setMiniGameChoice(this.room.playerId, WHITE);
+        // await this.getCardBattle().setReadyDrawCards(opponent.playerId);
 
         this.changePhase(new ChallengePhase(this));
     }

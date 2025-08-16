@@ -13,15 +13,14 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     async create(): Promise<void> {
         const opponentBoardData = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const playerBoardData = await this.cardBattle.getBoard(this.scene.room.playerId);
+        await this.cardBattle.setReadyDrawCards(this.scene.room.playerId);
         if (await this.cardBattle.isOpponentReadyDrawCards(this.scene.room.playerId)) {
-            await this.cardBattle.drawCards(this.scene.room.playerId);
             this.#goDrawCards(playerBoardData, opponentBoardData);
             return;
         }
         this.#createOpponentDrawCardsWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.setReadyDrawCards(this.scene.room.playerId);
                 await this.cardBattle.listenOpponentDrawCards(this.scene.room.playerId, async () => {
                     super.closeAllWindows({ onComplete: () => this.#goDrawCards(playerBoardData, opponentBoardData) });
                 });

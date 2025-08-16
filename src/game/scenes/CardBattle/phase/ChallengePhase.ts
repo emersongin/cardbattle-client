@@ -7,7 +7,10 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
         if (await this.cardBattle.isOpponentJoined(this.scene.room.playerId)) {
-            await this.cardBattle.getOpponentData(this.scene.room.playerId, (opponent: OpponentData) => this.#createChallengeView(opponent));
+            await this.cardBattle.getOpponentData(
+                this.scene.room.playerId, 
+                (opponent: OpponentData) => this.#createChallengeView(opponent)
+            );
             return;
         }
         this.#createOpponentWaitingWindow();

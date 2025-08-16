@@ -23,7 +23,6 @@ export interface CardBattle {
     isOpponentReadyDrawCards: (playerId: string) => Promise<boolean>;
     setReadyDrawCards: (playerId: string) => Promise<void>;
     listenOpponentDrawCards(playerId: string, callback: (isReady: boolean) => void): Promise<void>;
-    drawCards: (playerId: string) => Promise<void>;
     getBoard: (playerId: string) => Promise<BoardWindowData>;
     getOpponentBoard: (playerId: string) => Promise<BoardWindowData>;
     getHandCards: (playerId: string) => Promise<CardData[]>;
