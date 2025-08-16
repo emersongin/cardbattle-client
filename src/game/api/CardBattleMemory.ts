@@ -313,6 +313,10 @@ export default class CardBattleMemory implements CardBattle {
         return this.#whoPlayMiniGame === playerId;
     }
 
+    #isPlayFirst(playerId: string): boolean {
+        return this.#firstPlayer === playerId;
+    }
+
     isOpponentJoined(playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
