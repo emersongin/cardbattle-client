@@ -10,7 +10,7 @@ export type LoadPhasePlay = {
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
     isOpponentJoined(playerId: string): Promise<boolean>;
-    listenOpponentJoined: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
+    listenOpponentJoined: (playerId: string, callback: (isOpponentJoined?: boolean) => void) => Promise<void>;
     joinRoom: (roomId: string) => Promise<RoomData>;
     getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
     getFolders: () => Promise<CardsFolderData[]>;

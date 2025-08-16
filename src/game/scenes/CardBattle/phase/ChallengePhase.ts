@@ -7,17 +7,14 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
         if (await this.cardBattle.isOpponentJoined(this.scene.room.playerId)) {
-            await this.cardBattle.getOpponentData(
-                this.scene.room.playerId, 
-                (opponent: OpponentData) => this.#createChallengeView(opponent)
-            );
+            this.#createChallengeView();
             return;
         }
         this.#createOpponentWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenOpponentJoined(this.scene.room.playerId, (opponent: OpponentData) => 
-                    super.closeAllWindows({ onComplete: () => this.#createChallengeView(opponent) })
+                await this.cardBattle.listenOpponentJoined(this.scene.room.playerId, () => 
+                    super.closeAllWindows({ onComplete: () => this.#createChallengeView() })
                 );
             }
         });
@@ -27,12 +24,17 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         super.createWaitingWindow('Waiting for opponent to join the room...');
     }
 
-    #createChallengeView(opponent: OpponentData): void {
-        this.#createChallengeWindows(opponent);
-        super.openAllWindows({ onClose: async () => {
-            this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
-            super.openCommandWindow();
-        } });
+    async #createChallengeView(): Promise<void> {
+        await this.cardBattle.getOpponentData(
+            this.scene.room.playerId, 
+            (opponent: OpponentData) => {
+                this.#createChallengeWindows(opponent);
+                super.openAllWindows({ onClose: async () => {
+                    this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
+                    super.openCommandWindow();
+                } });
+            }
+        );
     }
 
     #createChallengeWindows(opponent: OpponentData) {

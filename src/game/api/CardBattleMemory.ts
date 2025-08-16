@@ -328,25 +328,19 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenOpponentJoined(playerId: string, callback: (opponent: OpponentData) => void): Promise<void> {
+    listenOpponentJoined(playerId: string, callback: (isOpponentJoined: boolean) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     //mock
                     this.#setOpponentStep(IN_LOBBY);
-                    callback({
-                        name: 'Opponent',
-                        description: 'This is the opponent\'s description.'
-                    });
+                    callback(this.#isOpponentStep(IN_LOBBY));
                     // mock
                 };
                 if (this.#isOpponent(playerId)) {
                     //mock
                     this.#setPlayerStep(IN_LOBBY);
-                    callback({
-                        name: 'Player',
-                        description: 'This is the player\'s description.'
-                    });
+                    callback(this.#isPlayerStep(IN_LOBBY));
                     // mock
                 };
                 resolve();
