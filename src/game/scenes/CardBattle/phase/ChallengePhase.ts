@@ -7,14 +7,14 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
         if (await this.cardBattle.isOpponentJoined(this.scene.room.playerId)) {
-            this.#createChallengeView();
+            this.#loadChallengePhase();
             return;
         }
         this.#createOpponentWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
                 await this.cardBattle.listenOpponentJoined(this.scene.room.playerId, () => 
-                    super.closeAllWindows({ onComplete: () => this.#createChallengeView() })
+                    super.closeAllWindows({ onComplete: () => this.#loadChallengePhase() })
                 );
             }
         });
@@ -24,21 +24,23 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         super.createWaitingWindow('Waiting for opponent to join the room...');
     }
 
-    async #createChallengeView(): Promise<void> {
+    async #loadChallengePhase(): Promise<void> {
         await this.cardBattle.getOpponentData(
             this.scene.room.playerId, 
             (opponent: OpponentData) => {
-                this.#createChallengeWindows(opponent);
-                super.openAllWindows({ onClose: async () => {
-                    this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
-                    super.openCommandWindow();
-                } });
+                this.#createChallengePhaseWindows(opponent);
+                super.openAllWindows({ 
+                    onClose: async () => {
+                        this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
+                        super.openCommandWindow();
+                    } 
+                });
             }
         );
     }
 
-    #createChallengeWindows(opponent: OpponentData) {
-        super.createTextWindowCentered('CardBattle Challenge!', { textAlign: 'center', textColor: '#ff3c3c' });
+    #createChallengePhaseWindows(opponent: OpponentData) {
+        super.createTextWindowCentered('Challenge Phase!', { textAlign: 'center', textColor: '#ff3c3c' });
         const { name, description } = opponent;
         super.addTextWindow(`${name}\n${description}`);
     }

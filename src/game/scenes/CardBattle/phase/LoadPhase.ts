@@ -1,5 +1,4 @@
 import { Phase } from "./Phase";
-import { CardBattleScene } from "../CardBattleScene";
 import { CardBattlePhase } from "./CardBattlePhase";
 import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
@@ -10,54 +9,63 @@ import { CARD_WIDTH } from "@/game/constants/default";
 import { Player } from "@/game/types/Player";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineEvent } from "../../VueScene";
+import { CardsetEvents } from "@/game/ui/Cardset/types/CardsetEvents";
+import { PowerCardAction } from "@/game/types/PowerAction";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
-    #isStartPhase: boolean;
-    
-    constructor(readonly scene: CardBattleScene, startPhase: boolean = true) {
-        super(scene);
-        this.#isStartPhase = startPhase;
-    }
 
     async create(): Promise<void> {
-        if (this.#isStartPhase) {
-            this.#createLoadPhaseWindow();
-            super.openAllWindows();
-            return;
-        }
-        this.#createBoardsAndPlayerActions();
+        this.#createLoadPhaseWindows();
+        super.openAllWindows();
     }
 
-    #createLoadPhaseWindow(): void {
+    #createLoadPhaseWindows(): void {
         super.createTextWindowCentered('Load Phase started!', {
             textAlign: 'center',
-            onClose: () => this.#createBoardsAndPlayerActions()
+            onClose: () => this.#loadLoadPhase()
         });
         super.addTextWindow('Select and use a Power Card');
     }
 
-    async #createBoardsAndPlayerActions(): Promise<void> {
-        await super.createPlayerBoard();
-        await super.createOpponentBoard();
-        const iGo = await this.cardBattle.iGo();
-        if (!iGo) {
-            super.openPlayerBoard({ onComplete: () =>  this.#createOpponentWaitingWindow() });
-            super.openOpponentBoard();
+    async #loadLoadPhase(): Promise<void> {
+        await this.#createAndOpenBoards();
+        if (await this.cardBattle.isStartPlaying(this.scene.room.playerId)) {
+            this.#playFirst();
             return;
         }
-        super.openPlayerBoard({ onComplete: () => this.#createPlayerCommandWindow() });
+        this.#createOpponentPlayingWaitingWindow();
+        // maybe stay in next play
+        super.openAllWindows({
+            onComplete: async () => {
+                await this.cardBattle.listenOpponentPlay(
+                    this.scene.room.playerId, 
+                    (opponentPlay: LoadPhasePlay) => super.closeAllWindows({ 
+                        onComplete: () => {
+                            super.closeAllWindows({ 
+                                onComplete: () => {
+                                    if (opponentPlay.pass) {
+                                        // this.#opponentPass();
+                                        return;
+                                    }
+                                    this.#loadPlay()
+                                } 
+                            });
+                        }
+                    })
+                );
+            }
+        });
+    }
+
+    async #createAndOpenBoards(): Promise<void> {
+        super.createBoard(await this.cardBattle.getBoard(this.scene.room.playerId));
+        super.createOpponentBoard(await this.cardBattle.getOpponentBoard(this.scene.room.playerId));
+        super.openPlayerBoard();
         super.openOpponentBoard();
     }
 
-    async #createOpponentWaitingWindow(): Promise<void> {
-        super.createWaitingWindow();
-        super.openAllWindows();
-        await this.cardBattle.listenOpponentLoadPhase((play: LoadPhasePlay) => {
-            if (play.pass) {
-                super.closeAllWindows({ onComplete: () => this.#allPass() });
-                return;
-            }
-        });
+    #playFirst(): void {
+        this.#createPlayerCommandWindow();
     }
 
     #createPlayerCommandWindow() {
@@ -78,12 +86,180 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             {
                 description: 'No',
                 onSelect: async (): Promise<void> => {
-                    await this.cardBattle.playerPass();
+                    await this.cardBattle.pass(this.scene.room.playerId);
                     this.#allPass();
                 }
             }
         ];
         super.createCommandWindowBottom('Use a Power Card?', options);
+    }
+
+    #createPlayerHandZone(): void {
+        this.#createPlayerHandDisplayWindows();
+        this.#createPlayerHandCardset();
+    }
+
+    #createPlayerHandDisplayWindows(): void {
+        super.createTextWindowTop('Your Hand', {
+            textAlign: 'center',
+        });
+        super.addTextWindow('...', { marginTop: 32 });
+        super.addTextWindow('...');
+        super.addTextWindow('...');
+    }
+
+    async #createPlayerHandCardset(): Promise<void> {
+        const playerCards: CardData[] = await this.cardBattle.getHandCards(this.scene.room.playerId);
+        const cardset = super.createPlayerHandCardset(playerCards);
+        cardset.setCardsInLinePosition();
+        cardset.setCardsClosed();
+        this.#openHandCardset();
+    }
+
+    #openHandCardset(): void {
+        const cardset = super.getPlayerCardset();
+        cardset.disableBattleCards();
+        super.openPlayerCardset({ onComplete: () => {
+            super.openAllWindows();
+            super.openPlayerBoard();
+            cardset.selectModeOne(this.#getCardsetEvents());
+        }});
+    }
+
+    #getCardsetEvents(): CardsetEvents {
+        const cardset = super.getPlayerCardset();
+        return {
+            onChangeIndex: (cardIndex: number) => {
+                if (!cardset.isValidIndex(cardIndex)) return;
+                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getName(), 1);
+                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDescription(), 2);
+                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
+            },
+            onComplete: (cardIndexes: number[]) => {
+                cardset.highlightCardsByIndexes(cardIndexes);
+                super.createCommandWindowBottom('Complete your choice?', [
+                    {
+                        description: 'Yes',
+                        onSelect: () => {
+                            super.closeAllWindows();
+                            super.closePlayerBoard();
+                            super.closePlayerCardset({
+                                onComplete: () => {
+                                    super.openPlayerBoard({
+                                        onComplete: () => {
+                                            const cardIndex = cardIndexes.shift() || 0;
+                                            this.#playPowerCard(cardIndex);
+                                        }
+                                    });
+                                    super.openOpponentBoard();
+                                }
+                            });
+                        }
+                    },
+                    {
+                        description: 'No',
+                        onSelect: () => cardset.restoreSelectState()
+                    },
+                ]);
+                super.openCommandWindow();
+            },
+            onLeave: () => {
+                super.closePlayerCardset({ onComplete: () => {
+                    super.openPlayerBoard({ onComplete: () => this.#allPass() });
+                    super.openOpponentBoard();
+                }});
+                super.closeAllWindows();
+                super.closePlayerBoard();
+            },
+        };
+    }
+
+    async #playPowerCard(cardIndex: number): Promise<void> {
+        const powerCard = await this.cardBattle.getPowerCardByIndex(this.scene.room.playerId, cardIndex);
+        const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
+        const cardset = super.createFieldCardset([...powerCards, powerCard]);
+        this.#openPowerfield(() => {
+            const lastIndex = cardset.getCardsLastIndex();
+            const card = cardset.getCardByIndex(lastIndex);
+            cardset.selectCard(card);
+            this.#createPowerCardWindows(powerCard);
+        });
+    }
+
+    async #openPowerfield(onComplete: () => void): Promise<void> {
+
+        cardset.setCardsInLinePosition();
+        const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
+        cardset.setCardAtPosition(cardset.getCardsLastIndex(), widthEdge);
+        cardset.setCardsClosed();
+        super.openFieldCardset({ onComplete });
+    }
+
+    #createPowerCardWindows(powerCard: CardData): void {
+        super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
+        super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
+        super.createCommandWindowBottom('Use this Power Card?', [
+            {
+                description: 'Yes',
+                onSelect: async () => {
+                    const powerAction = {
+                        playerId: this.scene.room.playerId,
+                        powerCard
+                    };
+                    await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
+                    this.#loadPlay();
+                }
+            },
+            {
+                description: 'No',
+                onSelect: () => {
+                    super.closeAllWindows();
+                    super.closeOpponentBoard();
+                    super.closePlayerBoard();
+                    super.closeFieldCardset({ onComplete: () => this.#createPlayerHandZone() });
+                }
+            }
+        ]);
+        super.openAllWindows();
+        super.openCommandWindow();
+    }
+
+    #createOpponentPlayingWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to play...');
+    }
+
+    #loadPlay(): void {
+        super.closeAllWindows();
+        const cardset = super.getFieldCardset();
+        const lastIndex = cardset.getCardsLastIndex();
+        const card = cardset.getCardByIndex(lastIndex);
+        cardset.deselectCard(card);
+        this.#movePowerCardToField();
+    }
+
+    #movePowerCardToField(): void {
+        const totalCards = this.getFieldCardset().getCardsTotal();
+        const moveConfig = {
+            targets: this.getFieldCardset().getCardsUi(),
+            x: 0,
+            eachX: CARD_WIDTH,
+            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+                pause();
+                card.moveFromTo({
+                    xTo: 0 + (index! * CARD_WIDTH),
+                    yTo: 0,
+                    delay: (index! * 100), 
+                    duration: (300 / totalCards) * (totalCards - index!),
+                    onComplete: () => resume()
+                });
+            },
+            onAllComplete: () => this.#nextPlay(),
+        };
+        this.scene.timeline(moveConfig);
+    }
+
+    #nextPlay(): void {
+
     }
 
     async #allPass() {
@@ -106,154 +282,23 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         this.#createPlayerCommandWindow();
     }
 
-    #createPlayerHandZone(): void {
-        this.#createPlayerHandDisplayWindows();
-        this.#createPlayerHandCardset();
-    }
 
-    #createPlayerHandDisplayWindows(): void {
-        super.createTextWindowTop('Your Hand', {
-            textAlign: 'center',
-        });
-        super.addTextWindow('...', { marginTop: 32 });
-        super.addTextWindow('...');
-        super.addTextWindow('...');
-    }
 
-    async #createPlayerHandCardset(): Promise<void> {
-        const playerCards: CardData[] = await this.cardBattle.getPlayerHandCardsData();
-        const cardset = super.createPlayerHandCardset(playerCards);
-        cardset.setCardsInLinePosition();
-        cardset.setCardsClosed();
-        this.#openHandCardset();
-    }
 
-    #openHandCardset(): void {
-        const cardset = super.getPlayerCardset();
-        cardset.disableBattleCards();
-        const events = {
-            onChangeIndex: (cardIndex: number) => {
-                if (!cardset.isValidIndex(cardIndex)) return;
-                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getName(), 1);
-                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDescription(), 2);
-                super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
-            },
-            onComplete: (cardIndexes: number[]) => {
-                cardset.highlightCardsByIndexes(cardIndexes);
-                super.createCommandWindowBottom('Complete your choice?', [
-                    {
-                        description: 'Yes',
-                        onSelect: () => {
-                            super.closePlayerCardset({
-                                onComplete: () => {
-                                    super.openPlayerBoard({
-                                        onComplete: () => {
-                                            const cardIndex = cardIndexes.shift() || 0;
-                                            this.#playPlayerPowerCard(cardIndex);
-                                        }
-                                    });
-                                    super.openOpponentBoard();
-                                }
-                            });
-                            super.closeAllWindows();
-                            super.closePlayerBoard();
-                        }
-                    },
-                    {
-                        description: 'No',
-                        onSelect: () => cardset.restoreSelectState()
-                    },
-                ]);
-                super.openCommandWindow();
-            },
-            onLeave: () => {
-                super.closePlayerCardset({ onComplete: () => {
-                    super.openPlayerBoard({ onComplete: () => this.#allPass() });
-                    super.openOpponentBoard();
-                }});
-                super.closeAllWindows();
-                super.closePlayerBoard();
-            },
-        };
-        super.openPlayerCardset({ onComplete: () => {
-            cardset.selectModeOne(events);
-            super.openAllWindows();
-            super.openPlayerBoard();
-        }});
-    }
 
-    async #playPlayerPowerCard(cardIndex: number): Promise<void> {
-        const playerPowerCard = await this.cardBattle.getPlayerPowerCardByIndex(cardIndex);
-        this.#openPowerfield(playerPowerCard, PLAYER);
-    }
 
-    async #openPowerfield(powerCard: CardData, origin: Player): Promise<void> {
-        const powerCards: CardData[] = await this.cardBattle.getPowerCardsData();
-        const cardset = super.createFieldCardset([...powerCards, powerCard]);
-        cardset.setCardsInLinePosition();
-        const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
-        cardset.setCardAtPosition(cardset.getCardsLastIndex(), widthEdge);
-        cardset.setCardsClosed();
-        super.openFieldCardset({
-            onComplete: () => {
-                const lastIndex = cardset.getCardsLastIndex();
-                const card = cardset.getCardByIndex(lastIndex);
-                cardset.selectCard(card);
-                this.#createPowerCardWindows(powerCard, origin);
-            }
-        });
-    }
 
-    #createPowerCardWindows(powerCard: CardData, origin: Player): void {
-        super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
-        super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
-        super.createCommandWindowBottom('Use this Power Card?', [
-            {
-                description: 'Yes',
-                onSelect: async () => {
-                    await this.cardBattle.playerMakePowerCardPlay(powerCard.id);
-                    super.closeAllWindows();
-                    const cardset = super.getFieldCardset();
-                    const lastIndex = cardset.getCardsLastIndex();
-                    const card = cardset.getCardByIndex(lastIndex);
-                    cardset.deselectCard(card);
-                    this.#movePowerCardToField();
-                }
-            },
-            {
-                description: 'No',
-                onSelect: () => {
-                    super.closeAllWindows();
-                    super.closeOpponentBoard();
-                    super.closePlayerBoard();
-                    super.closeFieldCardset({ onComplete: () => this.#createPlayerHandZone() });
-                }
-            }
-        ]);
-        super.openAllWindows();
-        super.openCommandWindow();
-    }
 
-    #movePowerCardToField(): void {
-        const totalCards = this.getFieldCardset().getCardsTotal();
-        const moveConfig = {
-            targets: this.getFieldCardset().getCardsUi(),
-            x: 0,
-            eachX: CARD_WIDTH,
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
-                pause();
-                card.moveFromTo({
-                    xTo: 0 + (index! * CARD_WIDTH),
-                    yTo: 0,
-                    delay: (index! * 100), 
-                    duration: (300 / totalCards) * (totalCards - index!),
-                    onComplete: () => resume()
-                });
-            },
-            onAllComplete: () => this.#allPass(),
-        };
-        this.scene.timeline(moveConfig);
-    }
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -1,10 +1,10 @@
-import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerCardUpdates } from "../types";
-import { PowerCardAction } from "../types/PowerCardAction";
+import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerActionUpdates } from "../types";
+import { PowerAction } from "../types/PowerAction";
 import { RoomData } from "../types/RoomData";
 
 export type LoadPhasePlay = {
     pass: boolean;
-    powerCard: CardData | null;
+    powerAction: PowerAction | null;
 }
 
 export interface CardBattle {
@@ -13,7 +13,7 @@ export interface CardBattle {
     listenOpponentJoined: (playerId: string, callback: (isOpponentJoined?: boolean) => void) => Promise<void>;
     joinRoom: (roomId: string) => Promise<RoomData>;
     getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
-    getFolders: () => Promise<CardsFolderData[]>;
+    getFolders: (playerId: string) => Promise<CardsFolderData[]>;
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;
     listenOpponentDeckSet: (playerId: string, callback: (isDeckSet?: boolean) => void) => Promise<void>;
@@ -27,18 +27,18 @@ export interface CardBattle {
     getOpponentBoard: (playerId: string) => Promise<BoardWindowData>;
     getHandCards: (playerId: string) => Promise<CardData[]>;
     getOpponentHandCards: (playerId: string) => Promise<CardData[]>;
+    isStartPlaying: (playerId: string) => Promise<boolean>;
+    listenOpponentPlay: (playerId: string, callback: (play: LoadPhasePlay) => void) => Promise<void>;
+    pass(playerId: string): Promise<void>;
+    getPowerCardByIndex: (playerId: string, index: number) => Promise<CardData>;
+    getFieldPowerCards: () => Promise<CardData[]>;
+    makePowerCardPlay: (playerId: string, powerAction: PowerAction) => Promise<void>;
     
-    
-    isGoFirst: () => Promise<boolean>;
-    listenOpponentLoadPhase: (callback: (play: LoadPhasePlay) => void) => Promise<void>;
     allPass: () => Promise<boolean>;
     isOpponentPassed: () => Promise<boolean>;
-    playerPass(): Promise<void>;
     hasPowerCardsInField: () => Promise<boolean>;
-    getPowerCardsData: () => Promise<CardData[]>;
-    getPlayerPowerCardByIndex: (index: number) => Promise<CardData>;
-    playerMakePowerCardPlay: (powerAction: PowerCardAction) => Promise<void>;
+    
     isPowerfieldLimitReached: () => Promise<boolean>;
-    listenNextPowerCard: (callback: (playerId: string) => void) => Promise<PowerCardUpdates>;
+    listenNextPowerCard: (callback: (playerId: string) => void) => Promise<PowerActionUpdates>;
     setPowerActionCompleted: (playerId: string, powerCardId: string) => Promise<void>;
 }

@@ -15,14 +15,14 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         const playerBoardData = await this.cardBattle.getBoard(this.scene.room.playerId);
         await this.cardBattle.setReadyDrawCards(this.scene.room.playerId);
         if (await this.cardBattle.isOpponentReadyDrawCards(this.scene.room.playerId)) {
-            this.#goDrawCards(playerBoardData, opponentBoardData);
+            this.#loadDrawPhase(playerBoardData, opponentBoardData);
             return;
         }
         this.#createOpponentDrawCardsWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
                 await this.cardBattle.listenOpponentDrawCards(this.scene.room.playerId, async () => {
-                    super.closeAllWindows({ onComplete: () => this.#goDrawCards(playerBoardData, opponentBoardData) });
+                    super.closeAllWindows({ onComplete: () => this.#loadDrawPhase(playerBoardData, opponentBoardData) });
                 });
             }
         });
@@ -32,29 +32,23 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         super.createWaitingWindow('Waiting for opponent to draw cards...');
     }
 
-    #goDrawCards(playerBoardData: BoardWindowData, opponentBoardData: BoardWindowData): void {
-        this.#createDrawPhaseWindows();
-        super.openAllWindows({
-            onComplete: async () => {
-                Promise.all([
-                    super.createOpponentBoard(opponentBoardData),
-                    super.createBoard(playerBoardData),
-                    this.#createOpponentDrawCardset(),
-                    this.#createPlayerDrawCardset()
-                ]);
-            }
+    #loadDrawPhase(playerBoardData: BoardWindowData, opponentBoardData: BoardWindowData): void {
+        this.#createDrawPhaseWindows(async () => {
+            await Promise.all([
+                super.createOpponentBoard(opponentBoardData),
+                super.createBoard(playerBoardData),
+                this.#createOpponentDrawCardset(),
+                this.#createPlayerDrawCardset()
+            ]);
+            super.openPlayerBoard();
+            super.openOpponentBoard();
+            this.#moveCardSetsToBoards();
         });
+        super.openAllWindows();
     }
 
-    #createDrawPhaseWindows(): void {
-        super.createTextWindowCentered('Draw Phase', {
-            textAlign: 'center',
-            onClose: () => {
-                super.openPlayerBoard();
-                super.openOpponentBoard();
-                this.#moveCardSetsToBoards();
-            }
-        });
+    #createDrawPhaseWindows(onClose: () => void): void {
+        super.createTextWindowCentered('Draw Phase', { textAlign: 'center', onClose });
         super.addTextWindow('6 cards will be draw.');
     }
 

@@ -1,13 +1,13 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
-import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, POWER, SET_DECK } from '../constants/keys';
-import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerCardUpdates } from '../types';
+import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, PASS, POWER, SET_DECK } from '../constants/keys';
+import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerActionUpdates } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
 import { CardType } from '../ui/Card/types/CardType';
 import { MathUtil } from '../utils/MathUtil';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
 import { RoomData } from '../types/RoomData';
-import { PowerCardAction } from '../types/PowerCardAction';
+import { PowerAction } from '../types/PowerAction';
 import { ArrayUtil } from '../utils/ArrayUtil';
 
 const delayMock = 100;
@@ -222,17 +222,15 @@ export default class CardBattleMemory implements CardBattle {
     #roomId: string = '';
     #whoPlayMiniGame: string = '';
     #firstPlayer: string = '';
-    #powerCardsInField: PowerCardUpdates[] = [];
+    #powerActionUpdates: PowerActionUpdates[] = [];
     // player is the room creator
     #playerId: string = '';
     #playerStep: string = 'NONE';
-    #playerPass: boolean = false;
     #playerDeck: CardData[] = [];
     #playerHand: CardData[] = [];
     // opponent is the one who joins the room
     #opponentId: string = '';
     #opponentStep: string = 'NONE';
-    #opponentPassed: boolean = true;
     #opponentDeck: CardData[] = [];
     #opponentHand: CardData[] = [];
 
@@ -382,7 +380,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getFolders(): Promise<CardsFolderData[]> {
+    getFolders(playerId: string): Promise<CardsFolderData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const foldersData: CardsFolderData[] = folders.map(folder => ({
@@ -682,97 +680,67 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    isGoFirst(): Promise<boolean> {
+    isStartPlaying(playerId: string): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#whoPlayMiniGame === this.#playerId);
+                resolve(this.#isWhoPlayMiniGameId(playerId));
             }, delayMock);
         });
     }
 
-
-
-    listenOpponentLoadPhase(callback: (play: LoadPhasePlay) => void): Promise<void> {
+    listenOpponentPlay(playerId: string, callback: (play: LoadPhasePlay) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                this.#opponentPassed = true;
-                const play: LoadPhasePlay = {
-                    pass: true,
-                    powerCard: null
+                if (this.#isPlayer(playerId)) {
+                    // mock
+                    this.#isOpponentStep(PASS);
+                    callback({
+                        pass: true,
+                        powerAction: null
+                    });
+                    // mock
                 };
-                callback(play);
+                if (this.#isOpponent(playerId)) {
+                    // mock
+                    this.#isPlayerStep(PASS);
+                    callback({
+                        pass: true,
+                        powerAction: null
+                    });
+                    // mock
+                };
                 resolve();
             }, delayMock);
         });
     }
 
-    allPass(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.#playerPass && this.#opponentPassed);
-            }, delayMock);
-        });
-    }
-
-    isOpponentPassed(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.#opponentPassed);
-            }, delayMock);
-        });
-    }
-
-    playerPass(): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                this.#playerPass = true;
-                resolve();
-            }, delayMock);
-        });
-    }
-
-    hasPowerCardsInField(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.#powerCardsInField.length > 0);
-            }, delayMock);
-        });
-    }
-
-    getPowerCardsData(): Promise<CardData[]> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // resolve(this.#powerCardsInField);
-            }, delayMock);
-        });
-    }
-
-    getPlayerPowerCardByIndex(index: number): Promise<CardData> {
+    getPowerCardByIndex(playerId: string, index: number): Promise<CardData> {
         return new Promise((resolve) => {
             setTimeout(async () => {
-                resolve(this.#playerHand[index]);
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#opponentHand[index]);
+                };
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#playerHand[index]);
+                };
             }, delayMock);
         });
     }
 
-    playerMakePowerCardPlay(powerAction: PowerCardAction): Promise<void> {
+    makePowerCardPlay(playerId: string, powerAction: PowerAction): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
+                if (this.#isOpponent(playerId)) {
+                    this.#setPlayerStep(PASS);
+                };
+                if (this.#isPlayer(playerId)) {
+                    this.#setOpponentStep(PASS);
+                };
+                this.#powerActionUpdates.push({
+                    powerAction,
+                    playerSincronized: false,
+                    opponentSincronized: false,
+                });
                 // const cards = await this.getPlayerHandCardsData();
                 // cards.find((card) => card.id === powerCardId);
                 // const powercard = cards.find((card) => card.id === powerCardId);
@@ -788,15 +756,71 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    isPowerfieldLimitReached(): Promise<boolean> {
+
+
+
+
+
+
+
+
+
+
+
+
+
+    allPass(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#powerCardsInField.length >= 3);
+                // resolve(this.#playerPass && this.#opponentPassed);
             }, delayMock);
         });
     }
 
-    listenNextPowerCard(callback: (playerId: string) => void): Promise<PowerCardUpdates> {
+    isOpponentPassed(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // resolve(this.#opponentPassed);
+            }, delayMock);
+        });
+    }
+
+    playerPass(): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // this.#playerPass = true;
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    hasPowerCardsInField(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#powerActionUpdates.length > 0);
+            }, delayMock);
+        });
+    }
+
+    getFieldPowerCards(): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                // resolve(this.#powerCardsInField);
+            }, delayMock);
+        });
+    }
+
+
+
+    isPowerfieldLimitReached(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#powerActionUpdates.length >= 3);
+            }, delayMock);
+        });
+    }
+
+    listenNextPowerCard(callback: (playerId: string) => void): Promise<PowerActionUpdates> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 // const playerId = this.#firstPlayer;

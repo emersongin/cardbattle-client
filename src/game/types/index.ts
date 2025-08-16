@@ -5,4 +5,4 @@ export * from './CardData';
 export * from './ColorsPoints';
 export * from './OpponentData';
 export * from './Player';
-export * from './PowerCardUpdates';
+export * from './PowerActionUpdates';
