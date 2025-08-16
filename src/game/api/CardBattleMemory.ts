@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
-import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, PASS, POWER, SET_DECK } from '../constants/keys';
+import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK } from '../constants/keys';
 import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerActionUpdates } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
 import { CardType } from '../ui/Card/types/CardType';
@@ -688,6 +688,126 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
+    setPlaying(playerId: string): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    this.#setPlayerStep(IN_PLAY);
+                };
+                if (this.#isOpponent(playerId)) {
+                    this.#setOpponentStep(IN_PLAY);
+                };
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    pass(playerId: string): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    this.#setPlayerStep(PASS);
+                };
+                if (this.#isOpponent(playerId)) {
+                    this.#setOpponentStep(PASS);
+                };
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    getPowerCardByIndex(playerId: string, index: number): Promise<CardData> {
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#playerHand[index]);
+                };
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#opponentHand[index]);
+                };
+            }, delayMock);
+        });
+    }
+
+    getFieldPowerCards(): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#powerActionUpdates.map((update) => update.powerAction.powerCard));
+            }, delayMock);
+        });
+    }
+
+    makePowerCardPlay(playerId: string, powerAction: PowerAction): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                const powerCardId = powerAction.powerCard.id;
+                this.#powerActionUpdates.push({
+                    powerAction,
+                    playerSincronized: false,
+                    opponentSincronized: false,
+                });
+                if (this.#isPlayer(playerId)) {
+                    await this.#removePowerCardById(this.#playerId, powerCardId);
+                    this.#setOpponentStep(PASS);
+                };
+                if (this.#isOpponent(playerId)) {
+                    await this.#removePowerCardById(this.#playerId, powerCardId);
+                    this.#setPlayerStep(PASS);
+                };
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    #removePowerCardById(playerId: string, powerCardId: string): Promise<void> {
+        return new Promise((resolve) => {
+            if (this.#isPlayer(playerId)) {
+                this.#playerHand = this.#playerHand.filter((card) => card.id !== powerCardId);
+            };
+            if (this.#isOpponent(playerId)) {
+                this.#opponentHand = this.#opponentHand.filter((card) => card.id !== powerCardId);
+            };
+            setTimeout(() => resolve(), delayMock);
+        });
+    }
+
+    isPowerfieldLimitReached(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#powerActionUpdates.length >= 3);
+            }, delayMock);
+        });
+    }
+
+    hasPowerCardsInField(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#powerActionUpdates.length > 0);
+            }, delayMock);
+        });
+    }
+
+    allPass(): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve(this.#isPlayerStep(PASS) && this.#isOpponentStep(PASS));
+            }, delayMock);
+        });
+    }
+
+    isOpponentPassed(playerId: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#isPlayerStep(PASS));
+                };
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#isOpponentStep(PASS));
+                };
+            }, delayMock);
+        });
+    }
+
     listenOpponentPlay(playerId: string, callback: (play: LoadPhasePlay) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -714,47 +834,6 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getPowerCardByIndex(playerId: string, index: number): Promise<CardData> {
-        return new Promise((resolve) => {
-            setTimeout(async () => {
-                if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand[index]);
-                };
-                if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand[index]);
-                };
-            }, delayMock);
-        });
-    }
-
-    makePowerCardPlay(playerId: string, powerAction: PowerAction): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(async () => {
-                if (this.#isOpponent(playerId)) {
-                    this.#setPlayerStep(PASS);
-                };
-                if (this.#isPlayer(playerId)) {
-                    this.#setOpponentStep(PASS);
-                };
-                this.#powerActionUpdates.push({
-                    powerAction,
-                    playerSincronized: false,
-                    opponentSincronized: false,
-                });
-                // const cards = await this.getPlayerHandCardsData();
-                // cards.find((card) => card.id === powerCardId);
-                // const powercard = cards.find((card) => card.id === powerCardId);
-                // if (powercard) {
-                //     this.#powerCardsInField.push({
-                //         playerId: string;
-                //         powerCard: CardData;
-                //     });
-                //     this.#playerHand = this.#playerHand.filter((card) => card.id !== powerCardId);
-                // };
-                resolve();
-            }, delayMock);
-        });
-    }
 
 
 
@@ -769,56 +848,24 @@ export default class CardBattleMemory implements CardBattle {
 
 
 
-    allPass(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // resolve(this.#playerPass && this.#opponentPassed);
-            }, delayMock);
-        });
-    }
-
-    isOpponentPassed(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // resolve(this.#opponentPassed);
-            }, delayMock);
-        });
-    }
-
-    playerPass(): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // this.#playerPass = true;
-                resolve();
-            }, delayMock);
-        });
-    }
-
-    hasPowerCardsInField(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.#powerActionUpdates.length > 0);
-            }, delayMock);
-        });
-    }
-
-    getFieldPowerCards(): Promise<CardData[]> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                // resolve(this.#powerCardsInField);
-            }, delayMock);
-        });
-    }
 
 
 
-    isPowerfieldLimitReached(): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                resolve(this.#powerActionUpdates.length >= 3);
-            }, delayMock);
-        });
-    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     listenNextPowerCard(callback: (playerId: string) => void): Promise<PowerActionUpdates> {
         return new Promise((resolve) => {

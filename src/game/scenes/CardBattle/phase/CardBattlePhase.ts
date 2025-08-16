@@ -168,11 +168,11 @@ export class CardBattlePhase {
         this.#playerBoard.addColorPoints(cardColor, value);
     }
 
-    openPlayerBoard(config?: OpenBoardEvents): void {
+    openBoard(config?: OpenBoardEvents): void {
         this.#playerBoard.open(config);
     }
 
-    closePlayerBoard(config?: CloseBoardEvents): void {
+    closeBoard(config?: CloseBoardEvents): void {
         this.#playerBoard.close(config);
     }
 
@@ -245,7 +245,7 @@ export class CardBattlePhase {
         this.scene.timeline(openConfig);
     }
 
-    closePlayerCardset(config: CloseCardsetEvents): void {
+    closeCardset(config: CloseCardsetEvents): void {
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getPlayerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {

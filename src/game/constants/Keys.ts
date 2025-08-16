@@ -17,3 +17,4 @@ export const END_MINI_GAME = 'END_MINI_GAME';
 export const DRAW_CARDS = 'DRAW_CARDS';
 export const WAITING_TO_PLAY = 'WAITING_TO_PLAY';
 export const PASS = 'PASS';
+export const IN_PLAY = 'IN_PLAY';
