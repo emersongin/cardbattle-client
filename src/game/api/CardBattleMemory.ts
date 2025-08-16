@@ -877,6 +877,28 @@ export default class CardBattleMemory implements CardBattle {
                 // const playerId = this.#firstPlayer;
                 // callback(playerId);
                 // resolve({ powerCardId: 'next-power-card-id' });
+                // callback('next-player-id');
+                // resolve({
+                //     powerAction: {
+                //         powerCard: {
+                //             id: 'next-power-card-id',
+                //             number: 0,
+                //             name: 'Next Power Card',
+                //             description: 'This is the next power card.',
+                //             details: 'This card is used for the next power action.',
+                //             color: RED as CardColors,
+                //             imageName: 'card-picture',
+                //             hp: 0,
+                //             ap: 0,
+                //             typeId: POWER as CardType,
+                //             powerId: 'next-power',
+                //             cost: 1
+                //         },
+                //         actionType: 'next'
+                //     },
+                //     playerSincronized: false,
+                //     opponentSincronized: false
+                // });
             }, delayMock);
         });
     }
