@@ -26,7 +26,7 @@ export default class MovingState implements CardState {
                 delay: config.delay,
                 duration: config.duration,
                 onStart: config.onStart,
-                onComplete: config.onComplete
+                onComplete: config.onComplete,
             }
         ];
         return moves;

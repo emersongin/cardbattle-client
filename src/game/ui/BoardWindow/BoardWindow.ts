@@ -10,7 +10,6 @@ import { OpenBoardEvents } from "./types/OpenBoardEvents";
 import { CloseBoardEvents } from "./types/CloseBoardEvents";
 
 export default class BoardWindow extends Sizer {
-    #tween: Phaser.Tweens.Tween | null = null;
     #status: WindowState;
     #contentLabel: Label;
 
@@ -43,18 +42,19 @@ export default class BoardWindow extends Sizer {
 
     #setStartData(data: BoardWindowData, reverse: boolean = false) {
         this.setDataEnabled();
-        this.data.set('ap', data.ap);
-        this.data.set('hp', data.hp);
-        this.data.set('redPoints', data.redPoints);
-        this.data.set('greenPoints', data.greenPoints);
-        this.data.set('bluePoints', data.bluePoints);
-        this.data.set('blackPoints', data.blackPoints);
-        this.data.set('whitePoints', data.whitePoints);
-        this.data.set('numberOfCardsInHand', data.numberOfCardsInHand);
-        this.data.set('numberOfCardsInDeck', data.numberOfCardsInDeck);
-        this.data.set('numberOfCardsInTrash', data.numberOfCardsInTrash);
-        this.data.set('numberOfWins', data.numberOfWins);
-        this.data.set('reverse', reverse);
+        this.data.set('ap', data.ap ?? 0);
+        this.data.set('hp', data.hp ?? 0);
+        this.data.set('redPoints', data.redPoints ?? 0);
+        this.data.set('greenPoints', data.greenPoints ?? 0);
+        this.data.set('bluePoints', data.bluePoints ?? 0);
+        this.data.set('blackPoints', data.blackPoints ?? 0);
+        this.data.set('whitePoints', data.whitePoints ?? 0);
+        this.data.set('numberOfCardsInHand', data.numberOfCardsInHand ?? 0);
+        this.data.set('numberOfCardsInDeck', data.numberOfCardsInDeck ?? 0);
+        this.data.set('numberOfCardsInTrash', data.numberOfCardsInTrash ?? 0);
+        this.data.set('numberOfWins', data.numberOfWins ?? 0);
+        this.data.set('reverse', reverse ?? false);
+        this.data.set('pass', data.pass ?? false);
     }
 
     #createBackground(color: number) {
@@ -80,7 +80,7 @@ export default class BoardWindow extends Sizer {
     }
 
     createContent(data: BoardWindowData): string {
-        const battlePoints = this.#createBattlePoints(data.ap, data.hp);
+        const battlePoints = this.#createBattlePoints(data.ap, data.hp, data.pass);
         const boardPoints = this.#createBoardPoints(
             data.redPoints,
             data.greenPoints,
@@ -95,10 +95,11 @@ export default class BoardWindow extends Sizer {
         return this.data.get('reverse') ? `${boardPoints}\n\n${battlePoints}` : `${battlePoints}\n\n${boardPoints}`;
     }
 
-    #createBattlePoints(ap: number, hp: number): string {
+    #createBattlePoints(ap: number, hp: number, pass: boolean): string {
         const apText = ap.toString().padStart(3, ' ');
         const hpText = hp.toString().padStart(3, ' ');
-        return `Ap:${apText} Hp:${hpText}`;
+        const passText = pass ? ' '.repeat(50).concat('PASS') : '';
+        return `Ap:${apText} Hp:${hpText} ${passText}`;
     }
 
     #createBoardPoints(
@@ -163,7 +164,7 @@ export default class BoardWindow extends Sizer {
     }
 
     open(config?: OpenBoardEvents) {
-        this.#tween = this.scene.tweens.add({
+        this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
@@ -175,7 +176,7 @@ export default class BoardWindow extends Sizer {
     }
 
     close(config?: CloseBoardEvents) {
-        this.#tween = this.scene.tweens.add({
+        this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
@@ -205,6 +206,7 @@ export default class BoardWindow extends Sizer {
             numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
             numberOfCardsInTrash: this.data.get('numberOfCardsInTrash'),
             numberOfWins: this.data.get('numberOfWins'),
+            pass: this.data.get('pass'),
         };
     }
 
@@ -272,6 +274,14 @@ export default class BoardWindow extends Sizer {
         this.#updating(colorsPoints);
     }
 
+    setPass(pass: boolean): void {
+        this.data.set('pass', pass);
+        let boardWindowData = {
+            pass: this.data.get('pass')
+        } as MaybePartialBoardWindowData;
+        this.#updating(boardWindowData);
+    }
+
     #updating(toTarget: MaybePartialBoardWindowData): void {
         if (!this.#status) return
         const boardWindowData = {
@@ -287,6 +297,7 @@ export default class BoardWindow extends Sizer {
             numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.data.get('numberOfCardsInDeck'),
             numberOfCardsInTrash: toTarget.numberOfCardsInTrash ?? this.data.get('numberOfCardsInTrash'),
             numberOfWins: toTarget.numberOfWins ?? this.data.get('numberOfWins'),
+            pass: toTarget.pass ?? this.data.get('pass'),
         };
         if (this.#status instanceof UpdatingState) {
             this.#status.addTweens(boardWindowData);

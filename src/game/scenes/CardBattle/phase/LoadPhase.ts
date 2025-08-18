@@ -37,16 +37,14 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     async #createAndOpenBoards(): Promise<void> {
         super.createBoard(await this.cardBattle.getBoard(this.scene.room.playerId));
         super.createOpponentBoard(await this.cardBattle.getOpponentBoard(this.scene.room.playerId));
+        super.createFieldCardset(await this.cardBattle.getFieldPowerCards());
         super.openBoard();
         super.openOpponentBoard();
+        super.openFieldCardset();
     }
 
     async #goPlay(): Promise<void> {
-        await this.cardBattle.setPlaying(this.scene.room.playerId);
-        this.#createPlayerCommandWindow();
-    }
-
-    #createPlayerCommandWindow() {
+        await this.#resetPlay();
         this.#createCommandWindow();
         super.openCommandWindow()
     }
@@ -64,12 +62,20 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             {
                 description: 'No',
                 onSelect: async (): Promise<void> => {
-                    await this.cardBattle.pass(this.scene.room.playerId);
+                    await this.#passPlay();
                     this.#nextPlay();
                 }
             }
         ];
         super.createCommandWindowBottom('Use a Power Card?', options);
+    }
+
+    #passPlay(): Promise<void> {
+        return new Promise<void>(async (resolve) => {
+            await this.cardBattle.pass(this.scene.room.playerId);
+            super.addBoardPass();
+            resolve();
+        });
     }
 
     #createPlayerHandZone(): void {
@@ -126,13 +132,21 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                                     super.openOpponentBoard();
                                     super.openBoard({
                                         onComplete: async () => {
-                                            // PlayerPass
                                             const powerCard = await this.cardBattle.getPowerCardByIndex(
                                                 this.scene.room.playerId, 
                                                 cardIndexes.shift() || 0
                                             );
-                                            this.#playPowerCard(powerCard, () => {
+                                            this.#playPowerCard(powerCard, async () => {
                                                 console.log('Set power card play!');
+                                                const powerAction = {
+                                                    powerCard,
+                                                    // action:{} config...
+                                                }
+                                                await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
+                                                await this.#passPlay();
+                                                if (!await this.cardBattle.isPowerfieldLimitReached()) {
+                                                    super.removeOpponentBoardPass();
+                                                }
                                                 this.#loadPlayAndMovePowerCardToField();
                                             });
                                         }
@@ -149,19 +163,21 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.openCommandWindow();
             },
             onLeave: () => {
-                super.closeCardset({ onComplete: () => {
-                    super.openBoard({ onComplete: () => this.#nextPlay() });
-                    super.openOpponentBoard();
-                }});
                 super.closeAllWindows();
                 super.closeBoard();
+                super.closeCardset({ onComplete: () => {
+                    super.openBoard();
+                    super.openOpponentBoard();
+                    super.openFieldCardset({ onComplete: () => this.#goPlay() });
+                }});
             },
         };
     }
 
     async #playPowerCard(powerCard: CardData, onComplete: () => void): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
-        const cardset = super.createFieldCardset([...powerCards, powerCard]);
+        const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
+        const cardset = super.createFieldCardset([...powerCardsFiltered, powerCard]);
         cardset.setCardsInLinePosition();
         const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
         cardset.setCardAtPosition(cardset.getCardsLastIndex(), widthEdge);
@@ -267,10 +283,14 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                     (opponentPlay: LoadPhasePlay) => super.closeAllWindows({ 
                         onComplete: () => {
                             super.closeAllWindows({ 
-                                onComplete: () => {
+                                onComplete: async () => {
+                                    super.addOpponentBoardPass();
                                     if (opponentPlay.pass) {
-                                        // this.#opponentPass();
+                                        this.#nextPlay();
                                         return;
+                                    }
+                                    if (!await this.cardBattle.isPowerfieldLimitReached()) {
+                                        await this.#resetPlay();
                                     }
                                     this.#playPowerCard(opponentPlay.powerAction!.powerCard, () => {
                                         console.log('Maybe Set power card play!');
@@ -285,7 +305,13 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         });
     }
 
-
+    #resetPlay(): Promise<void> {
+        return new Promise<void>(async (resolve) => {
+            await this.cardBattle.setPlaying(this.scene.room.playerId);
+            super.removeBoardPass();
+            resolve();
+        });
+    }
 
 
 

@@ -76,9 +76,14 @@ export class Card extends Phaser.GameObjects.GameObject {
             xFrom: this.getX(),
             yFrom: this.getY(),
         };
+        const onComplete = () => {
+            if (config.onComplete) config.onComplete();
+            this.updateOrigin(this.getX(), this.getY());
+        }
         this.move(MovingState.createFromToMove(({
             ...defaultConfig,
-            ...config
+            ...config,
+            onComplete
         })));
     }
 

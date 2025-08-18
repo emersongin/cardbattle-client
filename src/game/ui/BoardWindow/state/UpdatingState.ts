@@ -36,11 +36,13 @@ export default class UpdatingState implements WindowState {
 
     #createUpdatePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints[] {
         const { apPoints, hpPoints } = this.#createUpdateBattlePoints(fromTarget, toTarget);
+        const passUpdates = this.#createUpdatePass(fromTarget, toTarget);
         const { redPoints, greenPoints, bluePoints, blackPoints, whitePoints } = this.#createUpdateColorsPoints(fromTarget, toTarget);
         const { numberOfCardsInHand, numberOfCardsInDeck, numberOfCardsInTrash, numberOfWins } = this.#createUpdateBoardPoints(fromTarget, toTarget);
         return [
             apPoints, 
             hpPoints, 
+            passUpdates,
             redPoints, 
             greenPoints, 
             bluePoints, 
@@ -49,7 +51,7 @@ export default class UpdatingState implements WindowState {
             numberOfCardsInHand,
             numberOfCardsInDeck,
             numberOfCardsInTrash,
-            numberOfWins
+            numberOfWins,
         ];
     }
 
@@ -71,6 +73,17 @@ export default class UpdatingState implements WindowState {
             }
         );
         return { apPoints, hpPoints };
+    }
+
+    #createUpdatePass(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints {
+        const pass = this.#createUpdate(fromTarget, fromTarget.pass ? 1 : 0, toTarget.pass ? 1 : 0,
+            (tween: Phaser.Tweens.Tween) => {
+                fromTarget.pass = tween.getValue() === 1;
+                const content = this.window.createContent(fromTarget);
+                this.window.setText(content);
+            }
+        );
+        return pass;
     }
 
     #createUpdateColorsPoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {

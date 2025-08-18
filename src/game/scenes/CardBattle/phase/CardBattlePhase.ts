@@ -168,6 +168,14 @@ export class CardBattlePhase {
         this.#playerBoard.addColorPoints(cardColor, value);
     }
 
+    addBoardPass(): void {
+        this.#playerBoard.setPass(true);
+    }
+
+    removeBoardPass(): void {
+        this.#playerBoard.setPass(false);
+    }
+
     openBoard(config?: OpenBoardEvents): void {
         this.#playerBoard.open(config);
     }
@@ -194,6 +202,14 @@ export class CardBattlePhase {
 
     addOpponentBoardColorPoints(cardColor: CardColors, value: number): void {
         this.#opponentBoard.addColorPoints(cardColor, value);
+    }
+
+    addOpponentBoardPass(): void {
+        this.#opponentBoard.setPass(true);
+    }
+
+    removeOpponentBoardPass(): void {
+        this.#opponentBoard.setPass(false);
     }
 
     openOpponentBoard(): void {
@@ -283,6 +299,7 @@ export class CardBattlePhase {
     }
 
     createFieldCardset(cards: CardData[]): Cardset {
+        this.destroyFieldCardset();
         const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
         const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
         const cardset = Cardset.create(this.scene, cards, x, y);
@@ -295,6 +312,7 @@ export class CardBattlePhase {
     }
 
     openFieldCardset(config?: OpenCardsetEvents): void {
+        if (this.getFieldCardset().isOpened()) return;
         const openConfig: TimelineConfig<CardUi> = {
             targets: this.getFieldCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -312,7 +330,6 @@ export class CardBattlePhase {
     }
 
     closeFieldCardset(config?: CloseCardsetEvents): void {
-        if (!this.#fieldCardset) return;
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getFieldCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {

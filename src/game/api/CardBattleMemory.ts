@@ -218,6 +218,8 @@ const folders = [
     }
 ];
 
+let counter = 0;
+
 export default class CardBattleMemory implements CardBattle {
     #roomId: string = '';
     #whoPlayMiniGame: string = '';
@@ -478,7 +480,7 @@ export default class CardBattleMemory implements CardBattle {
             const firstPlay = this.#isPlayer(playerId) 
                 ? (isWhite ? this.#playerId : this.#opponentId) 
                 : (isWhite ? this.#opponentId : this.#playerId);
-                this.#setFirstPlayer(firstPlay);
+            this.#setFirstPlayer(this.#playerId);
             setTimeout(() => resolve(), delayMock);
         });
     }
@@ -596,7 +598,8 @@ export default class CardBattleMemory implements CardBattle {
                         numberOfCardsInHand: this.#playerHand.length,
                         numberOfCardsInDeck: this.#playerDeck.length,
                         numberOfCardsInTrash: 0,
-                        numberOfWins: 0
+                        numberOfWins: 0,
+                        pass: false
                     });
                 };
                 if (this.#isOpponent(playerId)) {
@@ -612,7 +615,8 @@ export default class CardBattleMemory implements CardBattle {
                         numberOfCardsInHand: this.#opponentHand.length,
                         numberOfCardsInDeck: this.#opponentDeck.length,
                         numberOfCardsInTrash: 0,
-                        numberOfWins: 0
+                        numberOfWins: 0,
+                        pass: false
                     });
                 };
             }, delayMock);
@@ -635,7 +639,8 @@ export default class CardBattleMemory implements CardBattle {
                         numberOfCardsInHand: this.#playerHand.length,
                         numberOfCardsInDeck: this.#playerDeck.length,
                         numberOfCardsInTrash: 0,
-                        numberOfWins: 0
+                        numberOfWins: 0,
+                        pass: false
                     });
                 };
                 if (this.#isPlayer(playerId)) {
@@ -651,7 +656,8 @@ export default class CardBattleMemory implements CardBattle {
                         numberOfCardsInHand: this.#opponentHand.length,
                         numberOfCardsInDeck: this.#opponentDeck.length,
                         numberOfCardsInTrash: 0,
-                        numberOfWins: 0
+                        numberOfWins: 0,
+                        pass: false
                     });
                 };
             }, delayMock);
@@ -751,19 +757,25 @@ export default class CardBattleMemory implements CardBattle {
                     opponentSincronized: false,
                 });
                 if (this.#isPlayer(playerId)) {
-                    await this.#removePowerCardById(this.#playerId, powerCardId);
-                    this.#setOpponentStep(PASS);
+                    await this.#removePowerCardInHandById(this.#playerId, powerCardId);
+                    this.#setPlayerStep(PASS);
+                    if (!await this.isPowerfieldLimitReached()) {
+                        this.#setOpponentStep(IN_PLAY);
+                    }
                 };
                 if (this.#isOpponent(playerId)) {
-                    await this.#removePowerCardById(this.#playerId, powerCardId);
-                    this.#setPlayerStep(PASS);
+                    await this.#removePowerCardInHandById(this.#opponentId, powerCardId);
+                    this.#setOpponentStep(PASS);
+                    if (!await this.isPowerfieldLimitReached()) {
+                        this.#setPlayerStep(IN_PLAY);
+                    }
                 };
                 resolve();
             }, delayMock);
         });
     }
 
-    #removePowerCardById(playerId: string, powerCardId: string): Promise<void> {
+    #removePowerCardInHandById(playerId: string, powerCardId: string): Promise<void> {
         return new Promise((resolve) => {
             if (this.#isPlayer(playerId)) {
                 this.#playerHand = this.#playerHand.filter((card) => card.id !== powerCardId);
@@ -803,10 +815,10 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#isPlayerStep(PASS));
+                    resolve(this.#isOpponentStep(PASS));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#isOpponentStep(PASS));
+                    resolve(this.#isPlayerStep(PASS));
                 };
             }, delayMock);
         });
@@ -817,16 +829,27 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    this.#isOpponentStep(PASS);
-                    callback({
-                        pass: true,
-                        powerAction: null
-                    });
+                    const powerCard = this.#opponentHand.find(card => card.typeId === POWER);
+                    if (counter === 0 && powerCard) {
+                        counter++;
+                        const powerAction = { powerCard } as PowerAction;
+                        this.makePowerCardPlay(this.#opponentId, powerAction);
+                        callback({
+                            pass: false,
+                            powerAction
+                        });
+                    } else {
+                        this.#setOpponentStep(PASS);
+                        callback({
+                            pass: true,
+                            powerAction: null
+                        });
+                    }
                     // mock
                 };
                 if (this.#isOpponent(playerId)) {
                     // mock
-                    this.#isPlayerStep(PASS);
+                    this.#setPlayerStep(PASS);
                     callback({
                         pass: true,
                         powerAction: null

@@ -272,4 +272,8 @@ export class Cardset extends Phaser.GameObjects.Container {
     isSelectMode(): boolean {
         return this.#status instanceof SelectState;
     }
+
+    isOpened(): boolean {
+        return this.getCards().some((card: Card) => card.isOpened());
+    }
 }

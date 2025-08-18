@@ -11,6 +11,7 @@ export type BoardWindowData = {
     numberOfCardsInDeck: number,
     numberOfCardsInTrash: number,
     numberOfWins: number,
+    pass: boolean;
 };
 
 export type MaybePartialBoardWindowData = BoardWindowData | Partial<BoardWindowData>;
