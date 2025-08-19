@@ -40,7 +40,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 this.#createOpponentDrawCardset(),
                 this.#createPlayerDrawCardset()
             ]);
-            super.openPlayerBoard();
+            super.openBoard();
             super.openOpponentBoard();
             this.#moveCardSetsToBoards();
         });
@@ -55,7 +55,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     #createPlayerDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
             const playerCards = await this.cardBattle.getHandCards(this.scene.room.playerId);
-            const cardset = super.createPlayerCardset(playerCards);
+            const cardset = super.createCardset(playerCards);
             const widthEdge = this.scene.scale.width;
             cardset.setCardsInLinePosition(widthEdge, 0);
             resolve();
@@ -78,9 +78,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #movePlayerCardSetToBoard(): void {
-        const totalCards = this.getPlayerCardset().getCardsTotal();
+        const totalCards = this.getCardset().getCardsTotal();
         const moveConfig = {
-            targets: this.getPlayerCardset().getCardsUi(),
+            targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.moveFromTo({
@@ -89,8 +89,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     delay: (index! * 100), 
                     duration: (300 / totalCards) * (totalCards - index!),
                     onStart: () => {
-                        this.addPlayerBoardZonePoints(HAND, 1);
-                        this.removePlayerBoardZonePoints(DECK, 1);
+                        this.addBoardZonePoints(HAND, 1);
+                        this.removeBoardZonePoints(DECK, 1);
                     },
                     onComplete: () => resume()
                 });
@@ -102,7 +102,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #flipPlayerCardSet() {
         const flipConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerCardset().getCardsUi(),
+            targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.flip({
@@ -120,14 +120,14 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #flashPlayerCardSet(): void {
         const flashConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerCardset().getCardsUi(),
+            targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
                 pause();
                 card.flash({
                     delay: (index! * 100),
-                    onStart: () => this.addPlayerBoardColorPoints(card.getColor(), 1),
+                    onStart: () => this.addBoardColorPoints(card.getColor(), 1),
                     onComplete: () => resume()
                 });
             },
@@ -153,7 +153,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     }
 
     #closeWindows(): void {
-        this.closePlayerBoard();
+        this.closeBoard();
         this.closeOpponentBoard();
     }
 
@@ -164,7 +164,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #closePlayerCardSet(): void {
         const closeConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerCardset().getCardsUi(),
+            targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 card.close({
@@ -268,9 +268,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     destroy(): void {
         super.destroyAllTextWindows();
-        super.destroyPlayerBoard();
+        super.destroyBoard();
         super.destroyOpponentBoard();
-        this.destroyPlayerCardset();
+        this.destroyCardset();
         this.destroyOpponentCardset();
     }
 }

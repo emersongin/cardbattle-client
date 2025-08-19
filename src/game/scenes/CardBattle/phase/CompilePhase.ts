@@ -2,7 +2,7 @@ import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
 import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
 import { BattlePhase } from "./BattlePhase";
-import { CommandWindow } from "@/game/ui/CommandWindow";
+import { CommandWindow } from "@/game/ui/CommandWindow/CommandWindow";
 import { TriggerPhase } from "./TriggerPhase";
 import { PowerSlots } from "../abs/PowerSlots";
 

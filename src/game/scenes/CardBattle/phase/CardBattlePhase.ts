@@ -2,7 +2,7 @@ import { CardBattleScene } from '../CardBattleScene';
 import { CardBattle } from "@game/api/CardBattle";
 import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
 import { LEFT, CENTER, RIGHT } from '@/game/constants/keys';
-import { CommandWindow } from '@/game/ui/CommandWindow';
+import { CommandWindow } from '@/game/ui/CommandWindow/CommandWindow';
 import BoardWindow from '@/game/ui/BoardWindow/BoardWindow';
 import { BoardWindowData, BoardZones, CardData } from '@/game/types';
 import { Cardset } from '@/game/ui/Cardset/Cardset';
@@ -17,24 +17,20 @@ import { CloseWindowConfig } from '@/game/ui/TextWindow/types/CloseWindowConfig'
 import { CloseBoardEvents } from '@/game/ui/BoardWindow/types/CloseBoardEvents';
 import { OpenCardsetEvents } from '@/game/ui/Cardset/types/OpenCardsetEvents';
 import { OpenWindowConfig } from '@/game/ui/TextWindow/types/OpenWindowConfig';
+import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
 
 export type AlignType = 
     | typeof LEFT 
     | typeof CENTER 
     | typeof RIGHT;
 
-export type CommandOption = {
-    description: string;
-    onSelect: () => Promise<void> | void;
-}
-
 export class CardBattlePhase {
     protected cardBattle: CardBattle;
     #textWindows: TextWindow[] = [];
     #commandWindow: CommandWindow;
-    #playerBoard: BoardWindow;
+    #board: BoardWindow;
     #opponentBoard: BoardWindow;
-    #playerCardset: Cardset;
+    #cardset: Cardset;
     #opponentCardset: Cardset;
     #fieldCardset: Cardset;
     
@@ -152,40 +148,40 @@ export class CardBattlePhase {
         if (this.#commandWindow) this.#commandWindow.destroy();
     }
 
-    createBoard(playerBoardData: BoardWindowData): void {
-        this.#playerBoard = BoardWindow.createBottom(this.scene, playerBoardData, 0x3C64DE);
+    createBoard(boardData: BoardWindowData): void {
+        this.#board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
     }
 
-    addPlayerBoardZonePoints(boardZone: BoardZones, value: number): void {
-        this.#playerBoard.addZonePoints(boardZone, value);
+    addBoardZonePoints(boardZone: BoardZones, value: number): void {
+        this.#board.addZonePoints(boardZone, value);
     }
 
-    removePlayerBoardZonePoints(boardZone: BoardZones, value: number): void {
-        this.#playerBoard.removeZonePoints(boardZone, value);
+    removeBoardZonePoints(boardZone: BoardZones, value: number): void {
+        this.#board.removeZonePoints(boardZone, value);
     }
 
-    addPlayerBoardColorPoints(cardColor: CardColors, value: number): void {
-        this.#playerBoard.addColorPoints(cardColor, value);
+    addBoardColorPoints(cardColor: CardColors, value: number): void {
+        this.#board.addColorPoints(cardColor, value);
     }
 
     addBoardPass(): void {
-        this.#playerBoard.setPass(true);
+        this.#board.setPass(true);
     }
 
     removeBoardPass(): void {
-        this.#playerBoard.setPass(false);
+        this.#board.setPass(false);
     }
 
     openBoard(config?: OpenBoardEvents): void {
-        this.#playerBoard.open(config);
+        this.#board.open(config);
     }
 
     closeBoard(config?: CloseBoardEvents): void {
-        this.#playerBoard.close(config);
+        this.#board.close(config);
     }
 
-    destroyPlayerBoard(): void {
-        if (this.#playerBoard) this.#playerBoard.destroy();
+    destroyBoard(): void {
+        if (this.#board) this.#board.destroy();
     }
 
     createOpponentBoard(opponentBoardData: BoardWindowData): void {
@@ -224,29 +220,29 @@ export class CardBattlePhase {
         if (this.#opponentBoard) this.#opponentBoard.destroy();
     }
 
-    createPlayerCardset(cards: CardData[]): Cardset {
+    createCardset(cards: CardData[]): Cardset {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
-        const y = (this.#playerBoard.y - (this.#playerBoard.height / 2)) - CARD_HEIGHT - 10; 
+        const y = (this.#board.y - (this.#board.height / 2)) - CARD_HEIGHT - 10; 
         const cardset = Cardset.create(this.scene, cards, x, y);
-        this.#playerCardset = cardset;
+        this.#cardset = cardset;
         return cardset;
     }
 
-    createPlayerHandCardset(playerCards: CardData[]): Cardset {
+    createHandCardset(cards: CardData[]): Cardset {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
         const y = this.scene.cameras.main.centerY; 
-        const cardset = Cardset.create(this.scene, playerCards, x, y);
-        this.#playerCardset = cardset;
+        const cardset = Cardset.create(this.scene, cards, x, y);
+        this.#cardset = cardset;
         return cardset;
     }
 
-    getPlayerCardset(): Cardset {
-        return this.#playerCardset;
+    getCardset(): Cardset {
+        return this.#cardset;
     }
 
-    openPlayerCardset(config?: OpenCardsetEvents): void {
+    openCardset(config?: OpenCardsetEvents): void {
         const openConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerCardset().getCardsUi(),
+            targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
                 card.open({
@@ -263,7 +259,7 @@ export class CardBattlePhase {
 
     closeCardset(config: CloseCardsetEvents): void {
         const closeConfig: TimelineConfig<CardUi> = {
-            targets: this.getPlayerCardset().getCardsUi(),
+            targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
                 card.close({
@@ -278,8 +274,8 @@ export class CardBattlePhase {
         this.scene.timeline(closeConfig);
     }
 
-    destroyPlayerCardset(): void {
-        if (this.#playerCardset) this.#playerCardset.destroy();
+    destroyCardset(): void {
+        if (this.#cardset) this.#cardset.destroy();
     }
 
     createOpponentCardset(cards: CardData[]): Cardset {
@@ -312,13 +308,22 @@ export class CardBattlePhase {
     }
 
     openFieldCardset(config?: OpenCardsetEvents): void {
-        if (this.getFieldCardset().isOpened()) return;
+        if (this.getFieldCardset().isOpened()) {
+            if (config?.onComplete) config.onComplete();
+            return;
+        }
+        const cardsUi = this.getFieldCardset().getCardsUi();
+        const openConfig = { delay: 100 };
+        this.#openCardset(cardsUi, { ...config, ...openConfig });
+    }
+
+    #openCardset(cardsUi: CardUi[], config?: OpenCardsetEvents): void {
         const openConfig: TimelineConfig<CardUi> = {
-            targets: this.getFieldCardset().getCardsUi(),
+            targets: cardsUi,
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
                 card.open({
-                    delay: (index! * 100),
+                    delay: (index! * (config?.delay || 0)),
                     onComplete: () => resume()
                 });
             },
@@ -327,6 +332,15 @@ export class CardBattlePhase {
             }
         };
         this.scene.timeline(openConfig);
+    }
+
+    openFieldCardsetCardByIndex(index: number, config?: OpenCardsetEvents): void {
+        if (!this.getFieldCardset().isValidIndex(index)) {
+            throw new Error(`Cardset: index ${index} is out of bounds.`);
+        }
+        const card = this.getFieldCardset().getCardByIndex(index);
+        const cardsUi = [card.getUi()];
+        this.#openCardset(cardsUi, config);
     }
 
     closeFieldCardset(config?: CloseCardsetEvents): void {

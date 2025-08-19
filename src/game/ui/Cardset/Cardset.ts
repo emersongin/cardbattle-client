@@ -265,6 +265,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    setCardClosedByIndex(index: number): void {
+        if (!this.isValidIndex(index)) {
+            throw new Error(`Cardset: index ${index} is out of bounds.`);
+        }
+        const card = this.getCardByIndex(index);
+        card.setClosed();
+    }
+
     isStaticMode(): boolean {
         return this.#status instanceof StaticState;
     }

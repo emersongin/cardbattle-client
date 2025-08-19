@@ -5,7 +5,6 @@ import { CloseWindowConfig } from './types/CloseWindowConfig';
 import { OpenWindowConfig } from './types/OpenWindowConfig';
 
 export class TextWindow extends TextBox {
-    #tween: Phaser.Tweens.Tween | null = null;
     #onStartClose?: () => void;
     #onClose?: () => void;
 
@@ -77,7 +76,7 @@ export class TextWindow extends TextBox {
     open(config?: OpenWindowConfig) {
         if (!this.scene?.tweens) return;
         if (config?.onClose) this.#setOnClose(config.onClose);
-        this.#tween = this.scene.tweens.add({
+        this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
@@ -95,7 +94,7 @@ export class TextWindow extends TextBox {
 
     close(config?: CloseWindowConfig) {
         if (!this.scene?.tweens) return;
-        this.#tween = this.scene.tweens.add({
+        this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,

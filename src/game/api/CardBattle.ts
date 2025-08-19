@@ -38,6 +38,7 @@ export interface CardBattle {
     allPass: () => Promise<boolean>;
     isOpponentPassed: (playerId: string) => Promise<boolean>;
     listenOpponentPlay: (playerId: string, callback: (play: LoadPhasePlay) => void) => Promise<void>;
+    hasPowerCardInHand: (playerId: string) => Promise<boolean>;
 
     
     listenNextPowerCard: (callback: (playerId: string) => void) => Promise<PowerActionUpdates>;
