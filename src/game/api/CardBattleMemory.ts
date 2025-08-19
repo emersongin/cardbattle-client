@@ -480,7 +480,7 @@ export default class CardBattleMemory implements CardBattle {
             const firstPlay = this.#isPlayer(playerId) 
                 ? (isWhite ? this.#playerId : this.#opponentId) 
                 : (isWhite ? this.#opponentId : this.#playerId);
-            this.#setFirstPlayer(this.#playerId);
+            this.#setFirstPlayer(firstPlay);
             setTimeout(() => resolve(), delayMock);
         });
     }
@@ -830,7 +830,8 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     // mock
                     const powerCard = this.#opponentHand.find(card => card.typeId === POWER);
-                    if (counter === 0 && powerCard) {
+                    //counter === 0 && powerCard
+                    if (powerCard) {
                         counter++;
                         const powerAction = { powerCard } as PowerAction;
                         this.makePowerCardPlay(this.#opponentId, powerAction);
@@ -857,6 +858,19 @@ export default class CardBattleMemory implements CardBattle {
                     // mock
                 };
                 resolve();
+            }, delayMock);
+        });
+    }
+
+    hasPowerCardInHand(playerId: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#playerHand.some(card => card.typeId === POWER));
+                };
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#opponentHand.some(card => card.typeId === POWER));
+                };
             }, delayMock);
         });
     }
