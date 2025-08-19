@@ -1,13 +1,8 @@
 import { Sizer, Label } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { DisplayUtil } from '@utils/DisplayUtil';
-
-type CommandOption = {
-    description: string;
-    onSelect: () => Promise<void> | void;
-}
+import { CommandOption } from './types/CommandOption';
 
 export class CommandWindow extends Sizer {
-    #tween: Phaser.Tweens.Tween | null = null;
     private selectedIndex: number = 0;
     private options: Label[];
 
@@ -56,7 +51,7 @@ export class CommandWindow extends Sizer {
     }
 
     open() {
-        this.#tween = this.scene.tweens.add({
+        this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
@@ -87,18 +82,18 @@ export class CommandWindow extends Sizer {
     
     #createOptions(scene: Phaser.Scene, width: number, commands: CommandOption[]) {
         this.options = commands.map(cmd => {
-            const option = CommandWindow.#createOption(scene, cmd.description, width - 20);
+            const option = CommandWindow.#createOption(scene, cmd.description, width - 20, cmd.disabled);
             this.add(option, { align: 'center', expand: true });
             return option;
         });
     }
 
-    static #createOption(scene: Phaser.Scene, label: string, width: number): Label {
+    static #createOption(scene: Phaser.Scene, label: string, width: number, disabled: boolean = false): Label {
         return scene.rexUI.add.label({
             background: scene.rexUI.add.roundRectangle(0, 0, width, 40, 4, 0x444444),
             text: scene.add.text(0, 0, label, {
                 fontSize: '20px',
-                color: '#ffffff'
+                color: disabled ? '#222' : '#fff'
             }),
             space: {
                 left: 10,
@@ -127,13 +122,16 @@ export class CommandWindow extends Sizer {
             if (!keyboard) {
                 throw new Error('Keyboard input not available');
             }
+            if (this.commands[this.selectedIndex].disabled) {
+                return console.log('Sound disabled command');
+            }
             keyboard.removeAllListeners();
             this.close(this.commands[this.selectedIndex].onSelect);
         });
     }
 
     close(onSelect: () => Promise<void> | void) {
-        this.#tween = this.scene.tweens.add({
+        this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
@@ -155,9 +153,9 @@ export class CommandWindow extends Sizer {
     }
 
     #updateOptions() {
-        this.options.forEach((opt: Label, i: number) => {
+        this.options.forEach((opt: Label, index: number) => {
             const bg = opt.getElement('background') as Phaser.GameObjects.Shape;
-            if (bg) bg.setFillStyle(i === this.selectedIndex ? 0x8888ff : 0x444444);
+            if (bg) bg.setFillStyle(index === this.selectedIndex ? 0x8888ff : 0x444444);
         });
     }
 }
