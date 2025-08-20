@@ -259,6 +259,10 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('disabled');
     }
 
+    getId(): string {
+        return this.staticData.id;
+    }
+
     getName(): string {
         return this.staticData.name;
     }

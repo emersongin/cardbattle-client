@@ -36,12 +36,9 @@ export class CardBattleScene extends VueScene {
         this.changePhase(new LoadPhase(this));
     }
 
-    changePhase(phase: Phase) {
+    changePhase(phase: Phase, ...params: any[]): void {
         this.phase = phase;
-        this.phase.create();
+        this.phase.create(...(params || []));
     }
 
-    // update() {
-    //     if (this.phase) this.phase.update();
-    // }
 }

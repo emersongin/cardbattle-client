@@ -1,15 +1,48 @@
 import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
-// import { CompilePhase } from "./CompilePhase";
-import { SummonPhase } from "./SummonPhase";
-import { COMPILE_PHASE, LOAD_PHASE } from "@/game/constants/keys";
+import { CardBattlePhase } from "./CardBattlePhase";
+import { PowerAction } from "@/game/types/PowerAction";
 
-export class TriggerPhase implements Phase {
-    #origimPhase: string;
+export class TriggerPhase extends CardBattlePhase implements Phase {
 
-    constructor(readonly scene: CardBattleScene, origimPhase: string) {
-        this.#origimPhase = origimPhase;
+    constructor(
+        scene: CardBattleScene, 
+        readonly originPhase: LoadPhase
+    ) {
+        super(scene);
+    }
+
+    async create(): Promise<void> {
+        await this.cardBattle.listenNextPowerCard(
+            this.scene.room.playerId,
+            (powerAction: PowerAction) => {
+                const powerCardId = powerAction.powerCard.id;
+                const powerCard = this.originPhase.getFieldCardById(powerCardId);
+                powerCard.shrink({ onComplete: async () => {
+                    await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
+                    this.originPhase.removeFieldCardById(powerCardId);
+                    this.#next();
+                }});
+                console.log("Power action completed:", powerCardId);
+            }
+        );
+    }
+
+    async #next(): Promise<void> {
+        if (await this.cardBattle.hasPowerCardUpdates(this.scene.room.playerId)) {
+            this.create();
+            return;
+        }
+        this.#end();
+    }
+
+    #end(): void {
+        if (this.originPhase instanceof LoadPhase) {
+            this.changeToLoadPhase();
+            return;
+        }
+        throw new Error("Origin phase not recognized.");
     }
 
     changeToChallengePhase(): void {
@@ -25,8 +58,7 @@ export class TriggerPhase implements Phase {
     }
 
     changeToLoadPhase(): void {
-        const startPhase = false;
-        this.scene.changePhase(new LoadPhase(this.scene, startPhase));
+        this.scene.changePhase(this.originPhase, true);
     }
 
     changeToTriggerPhase(): void {
@@ -34,43 +66,18 @@ export class TriggerPhase implements Phase {
     }
 
     changeToSummonPhase(): void {
-        this.scene.changePhase(new SummonPhase(this.scene));
+        throw new Error("Method not implemented.");
     }
 
     changeToCompilePhase(): void {
-        // const startPhase = false;
-        // this.scene.changePhase(new CompilePhase(this.scene, startPhase));
+        throw new Error("Method not implemented.");
     }
 
     changeToBattlePhase(): void {
         throw new Error("Method not implemented.");
     }
 
-    create(): void {
-        console.log("Trigger Phase started!");
-    }
-
-    // update(): void {
-    //     // if (this.#powerActions.length) {
-    //     //     const action = this.#powerActions.shift();
-    //     //     console.log("Executing action:", action);
-    //     //     return;
-    //     // }
-    //     switch (this.#origimPhase) {
-    //         case LOAD_PHASE:
-    //             this.changeToLoadPhase();
-    //             break;
-    //         case COMPILE_PHASE:
-    //             this.changeToCompilePhase();
-    //             break;
-    //         default:
-    //             console.error("Unknown original phase:", this.#origimPhase);
-    //             break;
-    //     }
-    // }
-
     destroy(): void {
         console.log("Trigger Phase destroyed.");
     }
-
 }

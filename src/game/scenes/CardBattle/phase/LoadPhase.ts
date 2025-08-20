@@ -2,7 +2,7 @@ import { Phase } from "./Phase";
 import { CardBattlePhase } from "./CardBattlePhase";
 import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
-import { HAND, LOAD_PHASE } from "@/game/constants/keys";
+import { HAND } from "@/game/constants/keys";
 import { CardData } from "@/game/types";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
 import { CARD_WIDTH } from "@/game/constants/default";
@@ -13,7 +13,12 @@ import { OpenCardsetEvents } from "@/game/ui/Cardset/types/OpenCardsetEvents";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
 
-    async create(): Promise<void> {
+    async create(goToPlays: boolean = false): Promise<void> {
+        if (goToPlays) {
+            this.#loadLoadPhase();
+            return;
+        }
+        await this.#createGameBoard();
         this.#createLoadPhaseWindows();
         super.openAllWindows();
     }
@@ -27,7 +32,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     async #loadLoadPhase(): Promise<void> {
-        await this.#createGameBoard();
         this.#openGameBoard();
         if (await this.cardBattle.isStartPlaying(this.scene.room.playerId)) {
             this.#goPlay();
@@ -43,7 +47,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.createOpponentBoard(opponentBoard);
         super.createBoard(board);
         super.createFieldCardset(powerCards);
-
     }
 
     #openGameBoard(config?: OpenCardsetEvents): void {
@@ -287,12 +290,12 @@ export class LoadPhase extends CardBattlePhase implements Phase {
 
     async #nextPlay(): Promise<void> {
         if (await this.cardBattle.isPowerfieldLimitReached()) {
-            this.changeToTriggerPhase(LOAD_PHASE);
+            this.changeToTriggerPhase();
             return;
         }
         if (await this.cardBattle.allPass()) {
             if (await this.cardBattle.hasPowerCardsInField()) {
-                this.changeToTriggerPhase(LOAD_PHASE);
+                this.changeToTriggerPhase();
                 return;
             }
             this.changeToSummonPhase();
@@ -335,74 +338,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         }})
     }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // #createZoneCommandWindow(): void {
-    //     const options = [
-    //         {
-    //             description: 'Play Power card',
-    //             onSelect: () => {
-    //                 this.#powerSlots.addPowerSlot({
-    //                     action: 'POWER_1',
-    //                     params: {
-    //                         cardId: 'card_1',
-    //                         zone: 'player'
-    //                     } 
-    //                 });
-    //                 if (this.#powerSlots.isLimitReached()) {
-    //                     this.changeToTriggerPhase(LOAD_PHASE);
-    //                     return;
-    //                 }
-    //                 this.changeToLoadPhase();
-    //             }
-    //         },
-    //         {
-    //             description: 'Trash',
-    //             onSelect: () => {
-    //                 this.changeToLoadPhase();
-    //             }
-    //         },
-    //         {
-    //             description: 'Field',
-    //             onSelect: () => {
-    //                 this.changeToLoadPhase();
-    //             }
-    //         },
-    //         {
-    //             description: 'Hand',
-    //             onSelect: () => {
-    //                 this.changeToLoadPhase();
-    //             }
-    //         }
-    //     ];
-    //     super.createCommandWindowBottom('Select your zone', options);
-    // }
-
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }
@@ -419,8 +354,8 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         throw new Error("Method not implemented.");
     }
 
-    changeToTriggerPhase(origin: string): void {
-        this.scene.changePhase(new TriggerPhase(this.scene, origin));
+    changeToTriggerPhase(): void {
+        this.scene.changePhase(new TriggerPhase(this.scene, this));
     }
 
     changeToSummonPhase(): void {

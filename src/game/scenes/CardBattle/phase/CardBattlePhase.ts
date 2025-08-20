@@ -18,6 +18,7 @@ import { CloseBoardEvents } from '@/game/ui/BoardWindow/types/CloseBoardEvents';
 import { OpenCardsetEvents } from '@/game/ui/Cardset/types/OpenCardsetEvents';
 import { OpenWindowConfig } from '@/game/ui/TextWindow/types/OpenWindowConfig';
 import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
+import { Card } from '@/game/ui/Card/Card';
 
 export type AlignType = 
     | typeof LEFT 
@@ -305,6 +306,14 @@ export class CardBattlePhase {
 
     getFieldCardset(): Cardset {
         return this.#fieldCardset;
+    }
+
+    getFieldCardById(cardId: string): Card {
+        return this.getFieldCardset().getCardById(cardId);
+    }
+
+    removeFieldCardById(cardId: string): void {
+        this.getFieldCardset().removeCardById(cardId);
     }
 
     openFieldCardset(config?: OpenCardsetEvents): void {
