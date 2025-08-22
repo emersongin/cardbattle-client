@@ -362,9 +362,7 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     flash(config: FlashCardConfig): void {
-        if (this.#status instanceof StaticState) {
-            this.#status.flash(config);
-        }
+        this.#status.flash(config);
     }
 
     setClosed(): void {

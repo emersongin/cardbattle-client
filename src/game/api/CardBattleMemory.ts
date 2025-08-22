@@ -878,19 +878,25 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenNextPowerCard(playerId: string, callback: (powerAction: PowerAction) => void): Promise<void> {
+    listenNextPowerCard(playerId: string, callback: (powerAction: PowerAction, belongToPlayer: boolean) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    const lastPowerAction = this.#powerActionUpdates.reverse().find(update => !update.playerSincronized);
-                    if (lastPowerAction) {
-                        callback(lastPowerAction.powerAction);
+                    const powerUpdates = this.#powerActionUpdates.filter(update => !update.playerSincronized);
+                    if (powerUpdates.length > 0) {
+                        const lastPowerUpdates = powerUpdates.pop();
+                        if (lastPowerUpdates) {
+                            callback(lastPowerUpdates.powerAction, this.#isPlayer(lastPowerUpdates.playerId));
+                        }
                     }
                 };
                 if (this.#isOpponent(playerId)) {
-                    const lastPowerAction = this.#powerActionUpdates.reverse().find(update => !update.opponentSincronized);
-                    if (lastPowerAction) {
-                        callback(lastPowerAction.powerAction);
+                    const powerUpdates = this.#powerActionUpdates.filter(update => !update.opponentSincronized);
+                    if (powerUpdates.length > 0) {
+                        const lastPowerUpdates = powerUpdates.pop();
+                        if (lastPowerUpdates) {
+                            callback(lastPowerUpdates.powerAction, this.#isOpponent(lastPowerUpdates.playerId));
+                        }
                     }
                 };
                 resolve();
@@ -904,6 +910,8 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.id === powerCardId);
                     if (update) update.playerSincronized = true;
+                    // mock
+                    if (update) update.opponentSincronized = true;
                 };
                 if (this.#isOpponent(playerId)) {
                     const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.id === powerCardId);
@@ -920,11 +928,14 @@ export default class CardBattleMemory implements CardBattle {
             if (update.playerSincronized && update.opponentSincronized) {
                 if (this.#isPlayer(update.playerId)) {
                     this.#playerTrash.push(update.powerAction.powerCard);
+                    return;
                 };
                 if (this.#isOpponent(update.playerId)) {
                     this.#opponentTrash.push(update.powerAction.powerCard);
+                    return;
                 };
             }
+            return !update.playerSincronized || !update.opponentSincronized;
         });
     }
 
@@ -932,11 +943,27 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#powerActionUpdates.some(update => !update.playerSincronized));
+                    resolve(this.#powerActionUpdates.some(update => update.playerSincronized === false));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#powerActionUpdates.some(update => !update.opponentSincronized));
+                    resolve(this.#powerActionUpdates.some(update => update.opponentSincronized === false));
                 };
+            }, delayMock);
+        });
+    }
+
+    listenOpponentPowerActionUpdates(playerId: string, callback: (isEnd: boolean) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    const powerCards = this.#powerActionUpdates.filter(update => update.opponentSincronized === false);
+                    callback(powerCards.length === 0);
+                };
+                if (this.#isOpponent(playerId)) {
+                    const powerCards = this.#powerActionUpdates.filter(update => update.playerSincronized === false);
+                    callback(powerCards.length === 0);
+                };
+                resolve();
             }, delayMock);
         });
     }
