@@ -3,8 +3,8 @@ import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
 import { CardBattlePhase } from "./CardBattlePhase";
 import { PowerAction } from "@/game/types/PowerAction";
-import { TRASH } from "@/game/constants/keys";
 import { Card } from "@/game/ui/Card/Card";
+import { TRASH } from "@/game/constants/keys";
 
 export class TriggerPhase extends CardBattlePhase implements Phase {
 
@@ -25,10 +25,10 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
             (powerAction: PowerAction, belongToPlayer: boolean) => {
                 const powerCardId = powerAction.powerCard.id;
                 const powerCard = this.originPhase.getFieldCardById(powerCardId);
-                powerCard.expand({ 
-                    onComplete: (card: Card) => {
-                        console.log(card);
-                        card.flash({
+                powerCard
+                    ._expand()
+                    ._flash()
+                    ._shrink({
                             onComplete: (card: Card) => {
                                 card.shrink({ onComplete: async () => {
                                     await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
@@ -41,30 +41,8 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
                                     this.#next();
                                 }});
                             }
-                        });
-                    }
-                });
-                // powerCard.moves({
-                //     expand: {
-                //         onComplete
-                //     },
-                //     flash: {
-
-                //     },
-                //     shrink: {
-
-                //     },
-                // });
-                // powerCard.shrink({ onComplete: async () => {
-                //     await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
-                //     this.originPhase.removeFieldCardById(powerCardId);
-                //     if (belongToPlayer) {
-                //         this.originPhase.addBoardZonePoints(TRASH, 1);
-                //     } else {
-                //         this.originPhase.addOpponentBoardZonePoints(TRASH, 1);
-                //     }
-                //     this.#next();
-                // }});
+                        })
+                    .play();
             }
         );
     }

@@ -1,5 +1,5 @@
 import { CardPoints } from "./types/CardPoints";
-import { CardState, StaticState, MovingState, UpdatingState } from "./state/CardState";
+import { CardState, StaticState, MovingState, UpdatingState, FlashState } from "./state/CardState";
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@game/types";
@@ -13,10 +13,17 @@ import { CardColors } from "./types/CardColors";
 import { BATTLE, POWER } from "@/game/constants/keys";
 import { CardType } from "./types/CardType";
 import { ExpandCardConfig } from "./types/ExpandCardConfig";
+import { CardMove } from "./types/CardMove";
+import { ExpandMove } from "./ExpandMove";
+import { FlashAnimation } from "./FlashAnimation";
+import { ShrinkMove } from "./ShrinkMove";
+import { CardAnimation } from "./types/CardAnimation";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
     #status: CardState;
+    #moveState: ExpandMove | FlashAnimation | ShrinkMove;
+    #moves: (CardMove | CardAnimation)[] = [];
 
     constructor(
         readonly scene: Phaser.Scene, 
@@ -362,7 +369,7 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     flash(config: FlashCardConfig): void {
-        this.#status.flash(config);
+        // this.#status.flash(config);
     }
 
     setClosed(): void {
@@ -374,4 +381,56 @@ export class Card extends Phaser.GameObjects.GameObject {
     setScaleX(scaleX: number): void {
         this.#ui.scaleX = scaleX;
     }
+
+    _expand(config: ExpandCardConfig = {}): Card {
+        this.#addMove([ExpandMove.name, config]);
+        return this;
+    }
+
+    _flash(config: FlashCardConfig = {}): Card {
+        this.#addMove([FlashAnimation.name, config]);
+        return this;
+    }
+
+    _shrink(config: FlashCardConfig = {}): Card {
+        this.#addMove([ShrinkMove.name, config]);
+        return this;
+    }
+
+    #addMove(moveOrAnimation: CardMove | CardAnimation): void {
+        if (this.#moves.length > 0) {
+            const [name, config] = this.#moves[this.#moves.length - 1] as CardMove | CardAnimation;
+            const onCompleteCopy = config?.onComplete;
+            const onComplete = () => {
+                if (onCompleteCopy) onCompleteCopy(this);
+                this.play(moveOrAnimation)
+            };
+            config.onComplete = onComplete;
+            this.#moves[this.#moves.length - 1] = [name, config];
+            this.#moves.push(moveOrAnimation);
+            return;
+        }
+        this.#moves.push(moveOrAnimation);
+    }
+
+    play(moveOrAnimation?: CardMove | CardAnimation): void {
+        if (this.#moves.length > 0 && !moveOrAnimation) {
+            moveOrAnimation = this.#moves[0];
+        }
+        const [name, config] = moveOrAnimation as CardMove | CardAnimation;
+        switch (name) {
+            case ExpandMove.name:
+                this.#moveState = new ExpandMove(this, config as ExpandCardConfig);
+                break;
+            case FlashAnimation.name:
+                this.#moveState = new FlashAnimation(this, config as FlashCardConfig);
+                break;
+            case ShrinkMove.name:
+                this.#moveState = new ShrinkMove(this, config as ExpandCardConfig);
+                break;
+            default:
+                throw new Error(`Unknown move or animation: ${name}`);
+        }
+    }
+
 }

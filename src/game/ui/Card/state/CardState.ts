@@ -9,10 +9,10 @@ export interface CardState {
     create?(...args: any[]): void;
     addTweens?(...args: any[]): void;
     preUpdate?(): void;
-    static(): void;
-    moving(moves: Move[]): void;
-    updating(ap: number, hp: number): void;
-    flash(config: FlashCardConfig): void;
+    static?(): void;
+    moving?(moves: Move[]): void;
+    updating?(ap: number, hp: number): void;
+    flash?(config: FlashCardConfig): void;
 }
 
 export { StaticState, MovingState, UpdatingState, FlashState };
