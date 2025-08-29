@@ -3,7 +3,7 @@ import MovingState from "./MovingState";
 import UpdatingState from "./UpdatingState";
 import { Move } from "../types/Move";
 import FlashState from "./FlashState";
-import { FlashCardConfig } from "../types/FlashCardConfig";
+import { FlashCardConfig } from "../animations/types/FlashCardConfig";
 
 export interface CardState {
     create?(...args: any[]): void;

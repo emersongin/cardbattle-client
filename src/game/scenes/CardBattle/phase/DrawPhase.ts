@@ -7,6 +7,7 @@ import { ORANGE } from "@/game/constants/colors";
 import { DECK, HAND } from "@/game/constants/keys";
 import { CARD_WIDTH } from "@/game/constants/default";
 import { BoardWindowData } from "@/game/types";
+import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 
@@ -83,17 +84,20 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
-                card.moveFromTo({
-                    xTo: (index! * CARD_WIDTH),
-                    yTo: 0,
-                    delay: (index! * 100), 
-                    duration: (300 / totalCards) * (totalCards - index!),
-                    onStart: () => {
-                        this.addBoardZonePoints(HAND, 1);
-                        this.removeBoardZonePoints(DECK, 1);
-                    },
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .move({
+                        xTo: (index! * CARD_WIDTH),
+                        yTo: 0,
+                        delay: (index! * 100), 
+                        duration: (300 / totalCards) * (totalCards - index!),
+                        onStart: () => {
+                            this.addBoardZonePoints(HAND, 1);
+                            this.removeBoardZonePoints(DECK, 1);
+                        },
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => this.#flipPlayerCardSet()
         };
@@ -105,10 +109,12 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
-                card.flip({
-                    delay: (index! * 200),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .close({ delay: (index! * 200) })
+                    .faceUp()
+                    .open({ onComplete: () => resume() })
+                    .play();
             },
             onAllComplete: () => {
                 this.#flashPlayerCardSet();
@@ -125,11 +131,14 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
                 pause();
-                card.flash({
-                    delay: (index! * 100),
-                    onStart: () => this.addBoardColorPoints(card.getColor(), 1),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .flash({
+                        delay: (index! * 100),
+                        onStart: () => this.addBoardColorPoints(card.getColor(), 1),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => this.#addOnCompleteListener()
         };
@@ -167,10 +176,13 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
-                card.close({
-                    delay: (index! * 100),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .close({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => this.changeToLoadPhase()
         };
@@ -182,10 +194,13 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             targets: this.getOpponentCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
-                card.close({
-                    delay: (index! * 100),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .close({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
         };
         this.scene.timeline(closeConfig);
@@ -198,11 +213,13 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 const cardColor = card.getColor();
                 if (cardColor === ORANGE) return;
                 pause();
-                card.flash({
-                    delay: (index! * 100),
-                    onStart: () => this.addOpponentBoardColorPoints(card.getColor(), 1),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .flash({
+                        delay: (index! * 100),
+                        onStart: () => this.addOpponentBoardColorPoints(card.getColor(), 1),
+                        onComplete: () => resume()
+                    });
             }
         };
         this.scene.timeline(flashConfig);
@@ -216,19 +233,22 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             eachX: CARD_WIDTH,
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
-                card.moveFromTo({
-                    xFrom: card.getX(),
-                    yFrom: card.getY(),
-                    xTo: 0 + (index! * CARD_WIDTH),
-                    yTo: 0,
-                    delay: (index! * 100), 
-                    duration: (300 / totalCards) * (totalCards - index!),
-                    onStart: () => {
-                        this.addOpponentBoardZonePoints(HAND, 1);
-                        this.removeOpponentBoardZonePoints(DECK, 1);
-                    },
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .move({
+                        xFrom: card.getX(),
+                        yFrom: card.getY(),
+                        xTo: 0 + (index! * CARD_WIDTH),
+                        yTo: 0,
+                        delay: (index! * 100), 
+                        duration: (300 / totalCards) * (totalCards - index!),
+                        onStart: () => {
+                            this.addOpponentBoardZonePoints(HAND, 1);
+                            this.removeOpponentBoardZonePoints(DECK, 1);
+                        },
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
         };
         this.scene.timeline(moveConfig);

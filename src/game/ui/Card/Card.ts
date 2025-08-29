@@ -1,29 +1,18 @@
 import { CardPoints } from "./types/CardPoints";
-import { CardState, StaticState, MovingState, UpdatingState, FlashState } from "./state/CardState";
+import { CardState, StaticState, MovingState, UpdatingState } from "./state/CardState";
 import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
-import { MoveCardConfig } from "./types/MoveCardConfig";
-import { FlipCardConfig } from "./types/FlipCardConfig";
-import { CloseCardConfig } from "./types/CloseCardConfig";
-import { OpenCardConfig } from "./types/OpenCardConfig";
-import { FlashCardConfig } from "./types/FlashCardConfig";
+import { FlashCardConfig } from "./animations/types/FlashCardConfig";
 import { CardColors } from "./types/CardColors";
 import { BATTLE, POWER } from "@/game/constants/keys";
 import { CardType } from "./types/CardType";
-import { ExpandCardConfig } from "./types/ExpandCardConfig";
-import { CardMove } from "./types/CardMove";
-import { ExpandMove } from "./ExpandMove";
-import { FlashAnimation } from "./FlashAnimation";
-import { ShrinkMove } from "./ShrinkMove";
-import { CardAnimation } from "./types/CardAnimation";
+import { ExpandCardConfig } from "./moves/types/ExpandCardConfig";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
     #status: CardState;
-    #moveState: ExpandMove | FlashAnimation | ShrinkMove;
-    #moves: (CardMove | CardAnimation)[] = [];
 
     constructor(
         readonly scene: Phaser.Scene, 
@@ -78,48 +67,48 @@ export class Card extends Phaser.GameObjects.GameObject {
         }
     }
 
-    moveFromTo(config: MoveCardConfig): void {
-        const defaultConfig = {
-            xFrom: this.getX(),
-            yFrom: this.getY(),
-        };
-        const onComplete = () => {
-            if (config.onComplete) config.onComplete();
-            this.updateOrigin(this.getX(), this.getY());
-        }
-        this.move(MovingState.createFromToMove(({
-            ...defaultConfig,
-            ...config,
-            onComplete
-        })));
-    }
+    // moveFromTo(config: MoveCardConfig): void {
+    //     const defaultConfig = {
+    //         xFrom: this.getX(),
+    //         yFrom: this.getY(),
+    //     };
+    //     const onComplete = () => {
+    //         if (config.onComplete) config.onComplete();
+    //         this.updateOrigin(this.getX(), this.getY());
+    //     }
+    //     this.move(MovingState.createFromToMove(({
+    //         ...defaultConfig,
+    //         ...config,
+    //         onComplete
+    //     })));
+    // }
 
-    flip(config?: FlipCardConfig): void {
-        this.updateOrigin();
-        const onCanStartClose = () => {
-            return !this.data.get('faceUp');
-        };
-        const onComplete = () => {
-            this.data.set('faceUp', true);
-            this.#ui.setImage(this.data.get('faceUp'));
-            this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
-        };
-        this.close({
-            delay: config?.delay || 100, 
-            duration: 100, 
-            onCanStart: onCanStartClose, 
-            onComplete
-        });
-        const onCanStartOpen = () => {
-            return this.data.get('faceUp');
-        };
-        this.open({
-            delay: 100, 
-            duration: 100, 
-            onCanStart: onCanStartOpen, 
-            onComplete: config?.onComplete
-        });
-    }
+    // flip(config?: FlipCardConfig): void {
+    //     this.updateOrigin();
+    //     const onCanStartClose = () => {
+    //         return !this.data.get('faceUp');
+    //     };
+    //     const onComplete = () => {
+    //         this.data.set('faceUp', true);
+    //         this.#ui.setImage(this.data.get('faceUp'));
+    //         this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
+    //     };
+    //     this.close({
+    //         delay: config?.delay || 100, 
+    //         duration: 100, 
+    //         onCanStart: onCanStartClose, 
+    //         onComplete
+    //     });
+    //     const onCanStartOpen = () => {
+    //         return this.data.get('faceUp');
+    //     };
+    //     this.open({
+    //         delay: 100, 
+    //         duration: 100, 
+    //         onCanStart: onCanStartOpen, 
+    //         onComplete: config?.onComplete
+    //     });
+    // }
 
     turnDown(): void {
         const onCanStartClose = () => {
@@ -130,34 +119,34 @@ export class Card extends Phaser.GameObjects.GameObject {
             this.#ui.setImage(this.data.get('faceUp'));
             this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
         };
-        this.close({
-            delay: 100, 
-            duration: 100, 
-            onCanStart: onCanStartClose, 
-            onComplete
-        });
+        // this.close({
+        //     delay: 100, 
+        //     duration: 100, 
+        //     onCanStart: onCanStartClose, 
+        //     onComplete
+        // });
         const onCanStartOpen = () => {
             return !this.data.get('faceUp');
         };
-        this.open({
-            delay: 100, 
-            duration: 100, 
-            onCanStart: onCanStartOpen
-        });
+        // this.open({
+        //     delay: 100, 
+        //     duration: 100, 
+        //     onCanStart: onCanStartOpen
+        // });
     }
 
-    close(config: CloseCardConfig): void {
-        const onCompleteCallback = () => {
-            this.data.set('closed', true);
-            if (config?.onComplete) config.onComplete();
-        };
-        this.move(MovingState.createCloseMove(this, {
-            delay: config?.delay || 100, 
-            duration: config?.duration || 100, 
-            onCanStart: config?.onCanStart, 
-            onComplete: onCompleteCallback
-        }));
-    }
+    // close(config: CloseCardConfig): void {
+    //     const onCompleteCallback = () => {
+    //         this.data.set('closed', true);
+    //         if (config?.onComplete) config.onComplete();
+    //     };
+    //     this.move(MovingState.createCloseMove(this, {
+    //         delay: config?.delay || 100, 
+    //         duration: config?.duration || 100, 
+    //         onCanStart: config?.onCanStart, 
+    //         onComplete: onCompleteCallback
+    //     }));
+    // }
 
     isOpened(): boolean {
         return !this.data.get('closed');
@@ -167,18 +156,18 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('closed');
     }
 
-    open(config: OpenCardConfig): void {
-        const onOpenedCallback = () => {
-            this.data.set('closed', false);
-            if (config.onComplete) config.onComplete(this);
-        };
-        this.move(MovingState.createOpenMove(this, {
-            delay: config?.delay || 100, 
-            duration: config?.duration || 100, 
-            onCanStart: config?.onCanStart, 
-            onComplete: onOpenedCallback
-        }));
-    }
+    // open(config: OpenCardConfig): void {
+    //     const onOpenedCallback = () => {
+    //         this.data.set('closed', false);
+    //         if (config.onComplete) config.onComplete(this);
+    //     };
+    //     this.move(MovingState.createOpenMove(this, {
+    //         delay: config?.delay || 100, 
+    //         duration: config?.duration || 100, 
+    //         onCanStart: config?.onCanStart, 
+    //         onComplete: onOpenedCallback
+    //     }));
+    // }
 
     expand(config?: ExpandCardConfig): void {
         this.move(MovingState.createExpandMove(this, {
@@ -368,9 +357,9 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.data.set('hp', hp);
     }
 
-    flash(config: FlashCardConfig): void {
-        // this.#status.flash(config);
-    }
+    // flash(_config: FlashCardConfig): void {
+    //     // this.#status.flash(config);
+    // }
 
     setClosed(): void {
         this.data.set('closed', true);
@@ -381,56 +370,4 @@ export class Card extends Phaser.GameObjects.GameObject {
     setScaleX(scaleX: number): void {
         this.#ui.scaleX = scaleX;
     }
-
-    _expand(config: ExpandCardConfig = {}): Card {
-        this.#addMove([ExpandMove.name, config]);
-        return this;
-    }
-
-    _flash(config: FlashCardConfig = {}): Card {
-        this.#addMove([FlashAnimation.name, config]);
-        return this;
-    }
-
-    _shrink(config: FlashCardConfig = {}): Card {
-        this.#addMove([ShrinkMove.name, config]);
-        return this;
-    }
-
-    #addMove(moveOrAnimation: CardMove | CardAnimation): void {
-        if (this.#moves.length > 0) {
-            const [name, config] = this.#moves[this.#moves.length - 1] as CardMove | CardAnimation;
-            const onCompleteCopy = config?.onComplete;
-            const onComplete = () => {
-                if (onCompleteCopy) onCompleteCopy(this);
-                this.play(moveOrAnimation)
-            };
-            config.onComplete = onComplete;
-            this.#moves[this.#moves.length - 1] = [name, config];
-            this.#moves.push(moveOrAnimation);
-            return;
-        }
-        this.#moves.push(moveOrAnimation);
-    }
-
-    play(moveOrAnimation?: CardMove | CardAnimation): void {
-        if (this.#moves.length > 0 && !moveOrAnimation) {
-            moveOrAnimation = this.#moves[0];
-        }
-        const [name, config] = moveOrAnimation as CardMove | CardAnimation;
-        switch (name) {
-            case ExpandMove.name:
-                this.#moveState = new ExpandMove(this, config as ExpandCardConfig);
-                break;
-            case FlashAnimation.name:
-                this.#moveState = new FlashAnimation(this, config as FlashCardConfig);
-                break;
-            case ShrinkMove.name:
-                this.#moveState = new ShrinkMove(this, config as ExpandCardConfig);
-                break;
-            default:
-                throw new Error(`Unknown move or animation: ${name}`);
-        }
-    }
-
 }

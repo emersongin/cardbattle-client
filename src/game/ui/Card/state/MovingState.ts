@@ -1,10 +1,7 @@
 import { Card } from "../Card";
 import { CardState, StaticState } from "./CardState";
 import { Move } from "../types/Move";
-import { OpenCardConfig } from "../types/OpenCardConfig";
-import { CloseCardConfig } from "../types/CloseCardConfig";
-import { MoveCardConfig } from "../types/MoveCardConfig";
-import { ExpandCardConfig } from "../types/ExpandCardConfig";
+import { ExpandCardConfig } from "../moves/types/ExpandCardConfig";
 
 export default class MovingState implements CardState {
     #movesArray: Move[][] = [];

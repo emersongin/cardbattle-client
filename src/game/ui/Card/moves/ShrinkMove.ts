@@ -1,9 +1,9 @@
-import { Card } from "./Card";
+import { Card } from "../Card";
 import { ExpandCardConfig } from "./types/ExpandCardConfig";
 
 export class ShrinkMove {
     
-    constructor(readonly card: Card, config?: ExpandCardConfig) {
+    constructor(readonly card: Card, config: ExpandCardConfig) {
         this.card.scene.tweens.add({
             targets: this.card.getUi(), 
             x: card.getOriginX() + (card.getWidth() / 2),

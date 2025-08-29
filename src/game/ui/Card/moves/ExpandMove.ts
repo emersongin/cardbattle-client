@@ -1,10 +1,10 @@
 
-import { Card } from "./Card";
+import { Card } from "../Card";
 import { ExpandCardConfig } from "./types/ExpandCardConfig";
 
 export class ExpandMove {
 
-    constructor(readonly card: Card, config?: ExpandCardConfig) {
+    constructor(readonly card: Card, config: ExpandCardConfig) {
         this.card.scene.tweens.add({
             targets: this.card.getUi(),
             x: card.getOriginX() - (card.getWidth() * 0.25),
@@ -15,7 +15,6 @@ export class ExpandMove {
             delay: config?.delay || 200,
             duration: config?.duration || 200,
             onComplete: () => {
-                console.log(this.card);
                 if (config?.onComplete) config.onComplete(card);
             },
         });

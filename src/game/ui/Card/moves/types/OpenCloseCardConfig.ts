@@ -1,6 +1,7 @@
-import { Card } from "../Card"
+import { Card } from "../../Card"
 
-export type OpenCardConfig = {
+export type OpenCloseCardConfig = {
+    open?: boolean,
     delay?: number, 
     duration?: number, 
     onCanStart?: () => boolean, 

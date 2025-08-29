@@ -1,5 +1,5 @@
 import { Card } from "../Card";
-import { FlashCardConfig } from "../types/FlashCardConfig";
+import { FlashCardConfig } from "../animations/types/FlashCardConfig";
 import { CardState } from "./CardState";
 import StaticState from "./StaticState";
 

@@ -1,6 +1,6 @@
-import { Card } from "../Card"
+import { Card } from "../../Card"
 
-export type MoveCardConfig = {
+export type PositionCardConfig = {
     xTo: number, 
     yTo: number, 
     xFrom?: number, 

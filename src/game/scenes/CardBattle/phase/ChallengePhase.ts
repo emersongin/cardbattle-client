@@ -40,7 +40,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     }
 
     #createChallengePhaseWindows(opponent: OpponentData) {
-        super.createTextWindowCentered('Challenge Phase!', { textAlign: 'center', textColor: '#ff3c3c' });
+        super.createTextWindowCentered('Challenge Phase!', { textAlign: 'center', textColor: '#fff' });
         const { name, description } = opponent;
         super.addTextWindow(`${name}\n${description}`);
     }
