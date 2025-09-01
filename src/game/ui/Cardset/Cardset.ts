@@ -6,6 +6,7 @@ import { CardData } from "@game/types";
 import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@/game/constants/default";
+import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #status: CardsetState;
@@ -186,7 +187,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.getCards().forEach((card: Card, index: number) => {
             const delay = (index * 100);
             const duration = 100;
-            card.open({ delay, duration });
+            CardActionsBuilder
+                .create(card)
+                .open({ delay, duration })
+                .play();
         });
     }
 
@@ -194,7 +198,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.getCards().forEach((card: Card, index: number) => {
             const delay = (index * 100);
             const duration = 100;
-            card.close({ delay, duration });
+            CardActionsBuilder
+                .create(card)
+                .close({ delay, duration })
+                .play();
         });
     }
 
@@ -235,13 +242,13 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     preUpdate(): void {
-        this.#preUpdateCards();
+        // this.#preUpdateCards();
         this.#preUpdateSelectedTweens();
     }
 
-    #preUpdateCards(): void {
-        this.getCards().forEach((card: Card) => card.preUpdate());
-    }
+    // #preUpdateCards(): void {
+    //     this.getCards().forEach((card: Card) => card.preUpdate());
+    // }
 
     #preUpdateSelectedTweens(): void {
         if (!this.#selectedTweens || !this.#selectedTweens?.some(tween => tween.isPlaying())) {

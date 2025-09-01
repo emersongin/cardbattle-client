@@ -110,12 +110,6 @@ export class CardActionsBuilder {
     #addOnCompleteToLastMove(onComplete: (card: Card) => void): void {
         if (this.#moves.length === 0) return;
         const [name, config] = this.#getLastMove();
-
-        // const onCompleteCopy = ;
-        // config.onComplete = () => {
-        //     if (onCompleteCopy) onCompleteCopy(this.card);
-        //     onComplete(this.card);
-        // };
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
         this.#moves[this.#moves.length - 1] = [name, config];
     }
