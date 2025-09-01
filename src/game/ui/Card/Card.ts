@@ -4,11 +4,9 @@ import { CardUi } from "./CardUi";
 import { Move } from "./types/Move";
 import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
-import { FlashCardConfig } from "./animations/types/FlashCardConfig";
 import { CardColors } from "./types/CardColors";
 import { BATTLE, POWER } from "@/game/constants/keys";
 import { CardType } from "./types/CardType";
-import { ExpandCardConfig } from "./moves/types/ExpandCardConfig";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
@@ -110,30 +108,30 @@ export class Card extends Phaser.GameObjects.GameObject {
     //     });
     // }
 
-    turnDown(): void {
-        const onCanStartClose = () => {
-            return this.data.get('faceUp');
-        };
-        const onComplete = () => {
-            this.data.set('faceUp', false);
-            this.#ui.setImage(this.data.get('faceUp'));
-            this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
-        };
-        // this.close({
-        //     delay: 100, 
-        //     duration: 100, 
-        //     onCanStart: onCanStartClose, 
-        //     onComplete
-        // });
-        const onCanStartOpen = () => {
-            return !this.data.get('faceUp');
-        };
-        // this.open({
-        //     delay: 100, 
-        //     duration: 100, 
-        //     onCanStart: onCanStartOpen
-        // });
-    }
+    // turnDown(): void {
+    //     const onCanStartClose = () => {
+    //         return this.data.get('faceUp');
+    //     };
+    //     const onComplete = () => {
+    //         this.data.set('faceUp', false);
+    //         this.#ui.setImage(this.data.get('faceUp'));
+    //         this.#ui.setDisplay(this.data.get('ap'), this.data.get('hp'), this.data.get('faceUp'));
+    //     };
+    //     // this.close({
+    //     //     delay: 100, 
+    //     //     duration: 100, 
+    //     //     onCanStart: onCanStartClose, 
+    //     //     onComplete
+    //     // });
+    //     const onCanStartOpen = () => {
+    //         return !this.data.get('faceUp');
+    //     };
+    //     // this.open({
+    //     //     delay: 100, 
+    //     //     duration: 100, 
+    //     //     onCanStart: onCanStartOpen
+    //     // });
+    // }
 
     // close(config: CloseCardConfig): void {
     //     const onCompleteCallback = () => {
@@ -169,21 +167,21 @@ export class Card extends Phaser.GameObjects.GameObject {
     //     }));
     // }
 
-    expand(config?: ExpandCardConfig): void {
-        this.move(MovingState.createExpandMove(this, {
-            delay: config?.delay || 200, 
-            duration: config?.duration || 200,
-            onComplete: config?.onComplete
-        }));
-    }
+    // expand(config?: ExpandCardConfig): void {
+    //     this.move(MovingState.createExpandMove(this, {
+    //         delay: config?.delay || 200, 
+    //         duration: config?.duration || 200,
+    //         onComplete: config?.onComplete
+    //     }));
+    // }
 
-    shrink(config?: ExpandCardConfig): void {
-        this.move(MovingState.createShrinkMove(this, {
-            delay: config?.delay || 200, 
-            duration: config?.duration || 200,
-            onComplete: config?.onComplete
-        }));
-    }
+    // shrink(config?: ExpandCardConfig): void {
+    //     this.move(MovingState.createShrinkMove(this, {
+    //         delay: config?.delay || 200, 
+    //         duration: config?.duration || 200,
+    //         onComplete: config?.onComplete
+    //     }));
+    // }
 
     changeDisplayPoints(ap: number, hp: number): void {
         if (!this.#status || !this.data.get('faceUp')) return;

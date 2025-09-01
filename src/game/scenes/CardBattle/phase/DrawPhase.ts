@@ -219,7 +219,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                         delay: (index! * 100),
                         onStart: () => this.addOpponentBoardColorPoints(card.getColor(), 1),
                         onComplete: () => resume()
-                    });
+                    })
+                    .play();
             }
         };
         this.scene.timeline(flashConfig);

@@ -1,6 +1,6 @@
 import { Card } from "../../Card"
 
-export type OpenCloseCardConfig = {
+export type CardScaleMoveConfig = {
     open?: boolean,
     delay?: number, 
     duration?: number, 

@@ -1,10 +1,10 @@
 
 import { Card } from "../Card";
-import { OpenCloseCardConfig } from "./types/OpenCloseCardConfig";
+import { CardScaleMoveConfig } from "./types/CardScaleMoveConfig";
 
-export class OpenCloseMove {
+export class ScaleMove {
 
-    constructor(readonly card: Card, config: OpenCloseCardConfig) {
+    constructor(readonly card: Card, config: CardScaleMoveConfig) {
         // this.card.updateOrigin();
         if (config?.open) {
             this.card.scene.tweens.add({ 
@@ -18,8 +18,8 @@ export class OpenCloseMove {
                 onComplete: () => {
                     if (config.onComplete) config.onComplete(this.card);
                 },
-                delay: config.delay || 100,
-                duration: config.duration,
+                delay: config.delay || 0,
+                duration: config.duration || 100,
             });
             return;
         }

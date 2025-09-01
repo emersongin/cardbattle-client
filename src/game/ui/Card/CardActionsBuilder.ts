@@ -8,8 +8,8 @@ import { FlashCardConfig } from "./animations/types/FlashCardConfig";
 import { CardMove } from "./moves/types/CardMove";
 import { PositionCardConfig } from "./moves/types/PositionCardConfig";
 import { PositionMove } from "./moves/PositionMove";
-import { OpenCloseMove } from "./moves/OpenCloseMove";
-import { OpenCloseCardConfig } from "./moves/types/OpenCloseCardConfig";
+import { ScaleMove } from "./moves/ScaleMove";
+import { CardScaleMoveConfig } from "./moves/types/CardScaleMoveConfig";
 
 export class CardActionsBuilder {
     #moves: (CardMove | CardAnimation)[] = [];
@@ -25,24 +25,30 @@ export class CardActionsBuilder {
         return this;
     }
 
-    open(config: OpenCloseCardConfig = {}): CardActionsBuilder {
+    open(config: CardScaleMoveConfig = {}): CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', false);
+        config.open = true;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
-        this.#addMove([OpenCloseMove.name, config]);
+        this.#addMove([ScaleMove.name, config]);
         return this;
     }
 
-    close(config: OpenCloseCardConfig = {}): CardActionsBuilder {
+    close(config: CardScaleMoveConfig = {}): CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', true);
+        config.open = false;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
-        this.#addMove([OpenCloseMove.name, config]);
+        this.#addMove([ScaleMove.name, config]);
         return this;
     }
 
     faceUp(): CardActionsBuilder {
-        this.card.data.set('faceUp', true);
-        this.card.getUi().setImage(true);
-        this.card.getUi().setDisplay(this.card.data.get('ap'), this.card.data.get('hp'), true);
+        const onComplete = () => {
+            this.card.data.set('faceUp', true);
+            this.card.getUi().setImage(true);
+            this.card.getUi().setDisplay(this.card.data.get('ap'), this.card.data.get('hp'), true);
+        };
+        const config = { onComplete };
+        this.#addMove(['faceup', config]);
         return this;
     }
 
@@ -81,8 +87,8 @@ export class CardActionsBuilder {
             case PositionMove.name:
                 new PositionMove(this.card, config as PositionCardConfig);
                 break;
-            case OpenCloseMove.name:
-                new OpenCloseMove(this.card, config as OpenCloseCardConfig);
+            case ScaleMove.name:
+                new ScaleMove(this.card, config as CardScaleMoveConfig);
                 break;
             case ExpandMove.name:
                 new ExpandMove(this.card, config as ExpandCardConfig);
@@ -93,6 +99,9 @@ export class CardActionsBuilder {
             case FlashAnimation.name:
                 new FlashAnimation(this.card, config as FlashCardConfig);
                 break;
+            case 'faceup':
+                if (config?.onComplete) config.onComplete(this.card);
+                break;
             default:
                 throw new Error(`Unknown move or animation: ${name}`);
         }
@@ -100,7 +109,8 @@ export class CardActionsBuilder {
 
     #addOnCompleteToLastMove(onComplete: (card: Card) => void): void {
         if (this.#moves.length === 0) return;
-        const [name, config] = this.#moves[this.#moves.length - 1] as CardMove | CardAnimation;
+        const [name, config] = this.#getLastMove();
+
         // const onCompleteCopy = ;
         // config.onComplete = () => {
         //     if (onCompleteCopy) onCompleteCopy(this.card);
@@ -108,6 +118,10 @@ export class CardActionsBuilder {
         // };
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
         this.#moves[this.#moves.length - 1] = [name, config];
+    }
+
+    #getLastMove(): CardMove | CardAnimation {
+        return this.#moves[this.#moves.length - 1];
     }
 
     #mergeOnComplete(onComplete: (card: Card) => void, original?: (card: Card) => void): () => void {
