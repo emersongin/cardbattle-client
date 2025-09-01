@@ -10,6 +10,7 @@ import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineEvent } from "../../VueScene";
 import { CloseCardsetEvents } from "@/game/ui/Cardset/types/CloseCardsetEvents";
 import { OpenCardsetEvents } from "@/game/ui/Cardset/types/OpenCardsetEvents";
+import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
 
@@ -275,13 +276,16 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             eachX: CARD_WIDTH,
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
-                card.moveFromTo({
-                    xTo: 0 + (index! * CARD_WIDTH),
-                    yTo: 0,
-                    delay: (index! * 100), 
-                    duration: (300 / totalCards) * (totalCards - index!),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .move({
+                        xTo: 0 + (index! * CARD_WIDTH),
+                        yTo: 0,
+                        delay: (index! * 100), 
+                        duration: (300 / totalCards) * (totalCards - index!),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => this.#nextPlay(),
         };

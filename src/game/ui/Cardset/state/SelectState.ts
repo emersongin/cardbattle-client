@@ -5,6 +5,7 @@ import { CardsetState } from "./CardsetState";
 import { ColorsPoints } from "../../../types/ColorsPoints";
 import StaticState from "./StaticState";
 import { SelectStateConfig } from "../types/SelectStateConfig";
+import { CardActionsBuilder } from "../../Card/CardActionsBuilder";
 
 export default class SelectState implements CardsetState {
     #index: number;
@@ -187,13 +188,16 @@ export default class SelectState implements CardsetState {
 
     #deselectCard(card: Card): void {
         this.cardset.deselectCard(card);
-        card.moveFromTo({
-            xFrom: card.getX(), 
-            yFrom: card.getY(), 
-            xTo: card.getX(), 
-            yTo: 0,
-            duration: 10
-        });
+        CardActionsBuilder
+            .create(card)
+            .move({
+                xFrom: card.getX(), 
+                yFrom: card.getY(), 
+                xTo: card.getX(), 
+                yTo: 0,
+                duration: 10
+            })
+            .play();
     }
 
     #updateIndex(index: number): void {
@@ -209,13 +213,16 @@ export default class SelectState implements CardsetState {
 
     #selectCard(card: Card): void {
         this.cardset.selectCard(card);
-        card.moveFromTo({
-            xFrom: card.getX(), 
-            yFrom: card.getY(), 
-            xTo: card.getX(), 
-            yTo: -12,
-            duration: 10
-        });
+        CardActionsBuilder
+            .create(card)
+            .move({
+                xFrom: card.getX(), 
+                yFrom: card.getY(), 
+                xTo: card.getX(), 
+                yTo: -12,
+                duration: 10
+            })
+            .play();
     }
 
     #isIndexSelected(index: number): boolean {

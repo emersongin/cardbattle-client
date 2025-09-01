@@ -32,16 +32,19 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
                     .shrink()
                     .play({
                         onComplete: (card: Card) => {
-                            card.shrink({ onComplete: async () => {
-                                await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
-                                this.originPhase.removeFieldCardById(powerCardId);
-                                if (belongToPlayer) {
-                                    this.originPhase.addBoardZonePoints(TRASH, 1);
-                                } else {
-                                    this.originPhase.addOpponentBoardZonePoints(TRASH, 1);
-                                }
-                                this.#next();
-                            }});
+                            CardActionsBuilder
+                                .create(card)
+                                .shrink({ onComplete: async () => {
+                                    await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
+                                    this.originPhase.removeFieldCardById(powerCardId);
+                                    if (belongToPlayer) {
+                                        this.originPhase.addBoardZonePoints(TRASH, 1);
+                                    } else {
+                                        this.originPhase.addOpponentBoardZonePoints(TRASH, 1);
+                                    }
+                                    this.#next();
+                                }})
+                                .play();
                         }
                     });
             }

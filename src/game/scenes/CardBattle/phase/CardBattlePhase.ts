@@ -19,6 +19,7 @@ import { OpenCardsetEvents } from '@/game/ui/Cardset/types/OpenCardsetEvents';
 import { OpenWindowConfig } from '@/game/ui/TextWindow/types/OpenWindowConfig';
 import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
+import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
 
 export type AlignType = 
     | typeof LEFT 
@@ -246,10 +247,13 @@ export class CardBattlePhase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                card.open({
-                    delay: (index! * 100),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .open({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
@@ -263,10 +267,13 @@ export class CardBattlePhase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                card.close({
-                    delay: (index! * 100),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .close({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => {
                 if (config.onComplete) config.onComplete();
@@ -331,10 +338,13 @@ export class CardBattlePhase {
             targets: cardsUi,
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                card.open({
-                    delay: (index! * (config?.delay || 0)),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .open({
+                        delay: (index! * (config?.delay || 0)),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
@@ -357,10 +367,13 @@ export class CardBattlePhase {
             targets: this.getFieldCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                card.close({
-                    delay: (index! * 100),
-                    onComplete: () => resume()
-                });
+                CardActionsBuilder
+                    .create(card)
+                    .close({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
