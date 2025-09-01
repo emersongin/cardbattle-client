@@ -4,7 +4,7 @@ import { ColorsPoints } from "../../types/ColorsPoints";
 import { CardData } from "@game/types";
 import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
-import { CARD_HEIGHT, CARD_WIDTH } from "@/game/constants/default";
+import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 import SelectMode from "./SelectMode";
 
@@ -20,6 +20,8 @@ export class Cardset extends Phaser.GameObjects.Container {
         y: number = 0,
     ) {
         super(scene, x, y);
+        this.setDataEnabled();
+        this.data.set('selectModeEnabled', false);
         this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.#selectMode = new SelectMode(this);
         this.#createCards(cards);
@@ -280,5 +282,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         }
         this.remove(this.#cards[cardIndex].getUi(), true);
         this.#cards.splice(cardIndex, 1);
+    }
+
+    isSelectModeEnabled(): boolean {
+        return this.data.get('selectModeEnabled') === true;
+    }
+
+    isSelectModeDisabled(): boolean {
+        return this.data.get('selectModeEnabled') === false;
     }
 }

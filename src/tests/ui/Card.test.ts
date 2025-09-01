@@ -1,11 +1,13 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { Card, CardColors, CardType } from "@ui/Card/Card";
 import { Cardset } from "@game/ui/Cardset/Cardset";
-import { BLUE } from "@/game/constants/colors";
-import { BATTLE } from "@game/constants/CardTypes";
 import Phaser from "phaser";
 import PhaserMock from "@mocks/phaser";
 import CardBattleMock from "@mocks/cardset";
+import { Card } from "@game/ui/Card/Card";
+import { BLUE } from "@game/constants/colors";
+import { CardColors } from "@game/ui/Card/types/CardColors";
+import { BATTLE } from "@game/constants/keys";
+import { CardType } from "@game/ui/Card/types/CardType";
 
 describe("MockScene", () => {
     let scene: Phaser.Scene;
@@ -22,10 +24,11 @@ describe("MockScene", () => {
 
     it("deve criar uma cena mock com tweens", () => {
         const card = new Card(scene, cardset, {
-            UUID: '123e4567-e89b-12d3-a456-426614174000',
+            id: '123e4567-e89b-12d3-a456-426614174000',
             number: 1,
             name: 'Test Card',
             description: 'This is a test card description.',
+            details: 'This is a test card details.',
             color: BLUE as CardColors,
             imageName: 'card-picture',
             hp: 10,

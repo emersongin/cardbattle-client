@@ -43,15 +43,12 @@ export default class SelectMode {
         this.#removeDisabledIndex(lastIndex);
     }
 
-    selectMode() {
-        throw new Error('SelectState: selectMode should not be called directly.');
-    }
-
     enable() {
         this.#addAllKeyboardListeners();
         this.reset();
         this.#updateCardsState();
         this.#updateCursor(this.#getCurrentIndex());
+        this.cardset.data.set('selectModeEnabled', true);
     }
 
     #addAllKeyboardListeners() {
@@ -157,6 +154,7 @@ export default class SelectMode {
     #disable() {
         this.#removeAllKeyboardListeners();
         this.reset();
+        this.cardset.data.set('selectModeEnabled', false);
     }
 
     #isAvaliableCardByIndex(index: number): boolean {

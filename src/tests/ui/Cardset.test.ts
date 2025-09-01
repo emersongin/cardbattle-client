@@ -4,10 +4,10 @@ import { Cardset } from "@ui/Cardset/Cardset";
 import { ColorsPoints } from "@game/types/ColorsPoints";
 import { VueScene } from "@game/scenes/VueScene";
 import { CardData } from "@game/types";
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
-import { CardColors } from "@/game/ui/Card/types/CardColors";
-import { CardType } from "@/game/ui/Card/types/CardType";
-import { BATTLE, POWER } from "@/game/constants/keys";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/colors";
+import { CardColors } from "@game/ui/Card/types/CardColors";
+import { CardType } from "@game/ui/Card/types/CardType";
+import { BATTLE, POWER } from "@game/constants/keys";
 
 const cards = [
     {
@@ -95,19 +95,19 @@ describe("MockScene", () => {
     it("Deve criar um conjunto de cartões estático.", () => {
         expect(cardset).toBeDefined();
         expect(cardset.getCards().length).toBe(6);
-        expect(cardset.isStaticMode()).toBe(true);
+        expect(cardset.isSelectModeDisabled()).toBe(true);
     });
 
     it("Deve criar um conjunto de cartões em modo seleção única.", () => {
         cardset.selectModeOne(eventsMock);
         expect(cardset).toBeDefined();
-        expect(cardset.isSelectMode()).toBe(true);
+        expect(cardset.isSelectModeEnabled()).toBe(true);
     });
 
     it("Deve criar um conjunto de cartões em modo seleção multipla com gerênciamento de pontos de cores.", () => {
         cardset.selectModeMany(eventsMock, colorPoints);
         expect(cardset).toBeDefined();
-        expect(cardset.isSelectMode()).toBe(true);
+        expect(cardset.isSelectModeEnabled()).toBe(true);
     });
 
     it("Deve mover o indice do cursor ao pressionar as teclas para esquerda ou direita respeitando os limites em modo seleção.", () => {

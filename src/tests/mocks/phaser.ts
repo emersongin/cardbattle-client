@@ -30,7 +30,7 @@ class MockGraphics extends MockGameObject {
 }
 
 class MockContainer extends MockGameObject {
-    constructor(readonly scene: Phaser.Scene, readonly x: number = 0, readonly y: number = 0) {
+    constructor(readonly scene: any, readonly x: number = 0, readonly y: number = 0) {
         super();
     };
     add = vi.fn();
@@ -69,16 +69,19 @@ const PhaserMock = {
         TweenManager: class {
             add = vi.fn(() => new MockTween());
             addCounter = vi.fn(() => new MockTween());
+            chain = vi.fn();
         },
     },
     Scene: class {
-        tweens: Phaser.Tweens.TweenManager;
+        tweens = {
+            chain: vi.fn()
+        };
         add = {
             image: vi.fn(() => new MockGameObject()),
             rectangle: vi.fn(() => new MockGameObject()),
             text: vi.fn(() => new MockText()),
             graphics: vi.fn(() => new MockGraphics()),
-            container: Phaser.GameObjects.Container,
+            container: vi.fn((x: number, y: number) => new MockContainer(this, x, y)),
             existing: vi.fn((obj: any) => obj),
         };
         children = {

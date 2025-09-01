@@ -3,7 +3,7 @@ import { CardUi } from "./CardUi";
 import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
 import { CardColors } from "./types/CardColors";
-import { BATTLE, POWER } from "@/game/constants/keys";
+import { BATTLE, POWER } from "@game/constants/keys";
 import { CardType } from "./types/CardType";
 
 export class Card extends Phaser.GameObjects.GameObject {

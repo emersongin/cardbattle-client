@@ -1,8 +1,9 @@
+import Phaser from "phaser";
 import { CardData } from "@game/types";
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/colors";
 import { Card } from "./Card";
-import { CARD_HEIGHT, CARD_WIDTH } from "@/game/constants/default";
-import { BATTLE, POWER } from "@/game/constants/keys";
+import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
+import { BATTLE, POWER } from "@game/constants/keys";
 import { CardType } from "./types/CardType";
 
 export class CardUi extends Phaser.GameObjects.Container {
