@@ -1,13 +1,11 @@
-import { Card } from "../../Card/Card";
-import { Cardset } from "../Cardset";
-import { CardsetEvents } from "../types/CardsetEvents";
-import { CardsetState } from "./CardsetState";
-import { ColorsPoints } from "../../../types/ColorsPoints";
-import StaticState from "./StaticState";
-import { SelectStateConfig } from "../types/SelectStateConfig";
-import { CardActionsBuilder } from "../../Card/CardActionsBuilder";
+import { Card } from "../Card/Card";
+import { Cardset } from "./Cardset";
+import { CardsetEvents } from "./types/CardsetEvents";
+import { ColorsPoints } from "../../types/ColorsPoints";
+import { SelectStateConfig } from "./types/SelectStateConfig";
+import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 
-export default class SelectState implements CardsetState {
+export default class SelectMode {
     #index: number;
     #selectNumber: number;
     #events: CardsetEvents;
@@ -36,7 +34,7 @@ export default class SelectState implements CardsetState {
         return this.#selectIndexes.slice();
     }
 
-    removeSelectLastIndex(): void {
+    removeLastSeletedIndex(): void {
         if (this.#selectIndexes.length === 0) return;
         const lastIndex = this.#selectIndexes.pop();
         if (lastIndex === undefined) return;
@@ -49,13 +47,9 @@ export default class SelectState implements CardsetState {
         throw new Error('SelectState: selectMode should not be called directly.');
     }
 
-    staticMode() {
-        this.cardset.changeState(new StaticState(this.cardset));
-    }
-
     enable() {
         this.#addAllKeyboardListeners();
-        this.resetCardsState();
+        this.reset();
         this.#updateCardsState();
         this.#updateCursor(this.#getCurrentIndex());
     }
@@ -102,7 +96,6 @@ export default class SelectState implements CardsetState {
             if (this.#events.onMarked) this.#events.onMarked(currentIndex);
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
                 this.#disable();
-                this.staticMode();
                 if (this.#events.onComplete) this.#events.onComplete(this.getSelectIndexes());
             }
         };
@@ -113,7 +106,6 @@ export default class SelectState implements CardsetState {
         const keyboard = this.#getKeyboard();
         const onKeydownEsc = () => {
             this.#disable();
-            this.staticMode();
             if (this.getSelectIndexes().length > 0) {
                 if (this.#events.onComplete) this.#events.onComplete(this.getSelectIndexes());
                 return;
@@ -123,7 +115,7 @@ export default class SelectState implements CardsetState {
         keyboard.on('keydown-ESC', onKeydownEsc);
     }
 
-    resetCardsState(): void {
+    reset(): void {
         this.#deselectAll();
         this.#unmarkAll();
         this.#unhighlightAll();
@@ -164,7 +156,7 @@ export default class SelectState implements CardsetState {
 
     #disable() {
         this.#removeAllKeyboardListeners();
-        this.resetCardsState();
+        this.reset();
     }
 
     #isAvaliableCardByIndex(index: number): boolean {

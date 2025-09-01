@@ -159,7 +159,7 @@ describe("MockScene", () => {
             onComplete: (cardIndexes: number[]) => {
                 markedCards = cardIndexes;
                 // cardset.#highlightSelectedCards();
-                cardset.restoreSelectState();
+                cardset.restoreSelectMode();
             },
             onLeave: vi.fn(),
         };

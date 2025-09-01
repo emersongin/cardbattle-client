@@ -1,20 +1,17 @@
 import { Card } from "@ui/Card/Card";
 import { CardsetEvents } from "./types/CardsetEvents";
-import { CardsetState, StaticState, SelectState } from "./state/CardsetState";
 import { ColorsPoints } from "../../types/ColorsPoints";
 import { CardData } from "@game/types";
 import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@/game/constants/default";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
+import SelectMode from "./SelectMode";
 
 export class Cardset extends Phaser.GameObjects.Container {
-    #status: CardsetState;
-    #lastState: CardsetState | null = null;
     #cards: Card[] = [];
     #selectedTweens: Phaser.Tweens.Tween[];
-    // #markedTweens: Phaser.Tweens.Tween[];
-    // #highlightedTweens: Phaser.Tweens.Tween[];
+    #selectMode: SelectMode;
 
     constructor(
         readonly scene: Scene, 
@@ -24,7 +21,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     ) {
         super(scene, x, y);
         this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
-        this.changeState(new StaticState(this));
+        this.#selectMode = new SelectMode(this);
         this.#createCards(cards);
         this.scene.add.existing(this);
     }
@@ -110,13 +107,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     getSelectIndexes(): number[] {
-        return this.#status.getSelectIndexes();
-    }
-
-    changeState(state: CardsetState, ...args: any[]): void {
-        this.#lastState = this.#status;
-        this.#status = state;
-        if (this.#status.create) this.#status.create(...args);
+        return this.#selectMode.getSelectIndexes();
     }
 
     disableBattleCards(): void {
@@ -205,16 +196,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
-    restoreSelectState(): void {
-        if (this.#lastState instanceof SelectState) {
-            this.#status = this.#lastState;
-            this.#status.removeSelectLastIndex();
-            this.#status.enable();
-        }
+    restoreSelectMode(): void {
+        this.#selectMode.removeLastSeletedIndex();
+        this.#selectMode.enable();
     }
 
     resetCardsState(): void {
-        this.#status.resetCardsState();
+        this.#selectMode.reset();
     }
 
     isValidIndex(index: number) {
@@ -222,11 +210,11 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     selectModeOne(events: CardsetEvents): void {
-        this.#status.selectMode({ events, selectNumber: 1 });
+        this.#selectMode.create({ events, selectNumber: 1 });
     }
 
     selectModeMany(events: CardsetEvents, colorPoints?: ColorsPoints): void {
-        this.#status.selectMode({ 
+        this.#selectMode.create({ 
             events, 
             colorPoints, 
             selectNumber: 0 
@@ -242,13 +230,8 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     preUpdate(): void {
-        // this.#preUpdateCards();
         this.#preUpdateSelectedTweens();
     }
-
-    // #preUpdateCards(): void {
-    //     this.getCards().forEach((card: Card) => card.preUpdate());
-    // }
 
     #preUpdateSelectedTweens(): void {
         if (!this.#selectedTweens || !this.#selectedTweens?.some(tween => tween.isPlaying())) {
@@ -284,14 +267,6 @@ export class Cardset extends Phaser.GameObjects.Container {
         }
         const card = this.getCardByIndex(index);
         card.setClosed();
-    }
-
-    isStaticMode(): boolean {
-        return this.#status instanceof StaticState;
-    }
-
-    isSelectMode(): boolean {
-        return this.#status instanceof SelectState;
     }
 
     isOpened(): boolean {

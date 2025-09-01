@@ -160,7 +160,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             },
             {
                 description: 'No',
-                onSelect: () => cardset.restoreSelectState()
+                onSelect: () => cardset.restoreSelectMode()
             },
         ]);
         super.openCommandWindow();
