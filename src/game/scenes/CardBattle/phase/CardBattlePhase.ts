@@ -11,15 +11,12 @@ import { CardUi } from '@/game/ui/Card/CardUi';
 import { TextWindowConfig } from '@/game/ui/TextWindow/types/TextWindowConfig';
 import { CardColors } from '@/game/ui/Card/types/CardColors';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
-import { OpenBoardEvents } from '@/game/ui/BoardWindow/types/OpenBoardEvents';
-import { CloseCardsetEvents } from '@/game/ui/Cardset/types/CloseCardsetEvents';
 import { CloseWindowConfig } from '@/game/ui/TextWindow/types/CloseWindowConfig';
-import { CloseBoardEvents } from '@/game/ui/BoardWindow/types/CloseBoardEvents';
-import { OpenCardsetEvents } from '@/game/ui/Cardset/types/OpenCardsetEvents';
 import { OpenWindowConfig } from '@/game/ui/TextWindow/types/OpenWindowConfig';
 import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
 import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
+import { TweenConfig } from '@/game/types/TweenConfig';
 
 export type AlignType = 
     | typeof LEFT 
@@ -174,11 +171,11 @@ export class CardBattlePhase {
         this.#board.setPass(false);
     }
 
-    openBoard(config?: OpenBoardEvents): void {
+    openBoard(config?: TweenConfig): void {
         this.#board.open(config);
     }
 
-    closeBoard(config?: CloseBoardEvents): void {
+    closeBoard(config?: TweenConfig): void {
         this.#board.close(config);
     }
 
@@ -210,12 +207,12 @@ export class CardBattlePhase {
         this.#opponentBoard.setPass(false);
     }
 
-    openOpponentBoard(): void {
-        this.#opponentBoard.open();
+    openOpponentBoard(config?: TweenConfig): void {
+        this.#opponentBoard.open(config);
     }
 
-    closeOpponentBoard(): void {
-        this.#opponentBoard.close();
+    closeOpponentBoard(config?: TweenConfig): void {
+        this.#opponentBoard.close(config);
     }
 
     destroyOpponentBoard(): void {
@@ -242,7 +239,7 @@ export class CardBattlePhase {
         return this.#cardset;
     }
 
-    openCardset(config?: OpenCardsetEvents): void {
+    openCardset(config?: TweenConfig): void {
         const openConfig: TimelineConfig<CardUi> = {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -262,7 +259,7 @@ export class CardBattlePhase {
         this.scene.timeline(openConfig);
     }
 
-    closeCardset(config: CloseCardsetEvents): void {
+    closeCardset(config: TweenConfig): void {
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -323,7 +320,7 @@ export class CardBattlePhase {
         this.getFieldCardset().removeCardById(cardId);
     }
 
-    openFieldCardset(config?: OpenCardsetEvents): void {
+    openFieldCardset(config?: TweenConfig): void {
         if (this.getFieldCardset().isOpened()) {
             if (config?.onComplete) config.onComplete();
             return;
@@ -333,7 +330,7 @@ export class CardBattlePhase {
         this.#openCardset(cardsUi, { ...config, ...openConfig });
     }
 
-    #openCardset(cardsUi: CardUi[], config?: OpenCardsetEvents): void {
+    #openCardset(cardsUi: CardUi[], config?: TweenConfig): void {
         const openConfig: TimelineConfig<CardUi> = {
             targets: cardsUi,
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
@@ -341,7 +338,7 @@ export class CardBattlePhase {
                 CardActionsBuilder
                     .create(card)
                     .open({
-                        delay: (index! * (config?.delay || 0)),
+                        delay: (index! * 100),
                         onComplete: () => resume()
                     })
                     .play();
@@ -353,7 +350,7 @@ export class CardBattlePhase {
         this.scene.timeline(openConfig);
     }
 
-    openFieldCardsetCardByIndex(index: number, config?: OpenCardsetEvents): void {
+    openFieldCardsetCardByIndex(index: number, config?: TweenConfig): void {
         if (!this.getFieldCardset().isValidIndex(index)) {
             throw new Error(`Cardset: index ${index} is out of bounds.`);
         }
@@ -362,7 +359,7 @@ export class CardBattlePhase {
         this.#openCardset(cardsUi, config);
     }
 
-    closeFieldCardset(config?: CloseCardsetEvents): void {
+    closeFieldCardset(config?: TweenConfig): void {
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getFieldCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {

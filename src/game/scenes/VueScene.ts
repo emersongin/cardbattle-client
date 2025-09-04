@@ -1,29 +1,20 @@
 import { Scene } from 'phaser';
 import { EventBus } from '@game/EventBus';
 import { CardBattle } from '../api/CardBattle';
+import { VoidCallback } from '../types/VoidCallback';
 
-export type TimelineEvent<T extends Phaser.GameObjects.Components.Transform> = {
+type TimelineTarget = Phaser.GameObjects.Components.Transform | VoidCallback;
+
+export type TimelineEvent<T extends TimelineTarget> = {
+    target: T, 
+    index: number,
     pause: () => void;
     resume: () => void;
-    target: T, 
     tween?: Phaser.Tweens.Tween, 
-    index?: number, 
-    x?: number, 
-    y?: number,
-    delay?: number, 
-    duration?: number
 };
 
-export type TimelineConfig<T extends Phaser.GameObjects.Components.Transform> = {
+export type TimelineConfig<T extends TimelineTarget> = {
     targets: T[];
-    delay?: number;
-    eachDelay?: number;
-    durantion?: number;
-    eachDuration?: number;
-    x?: number;
-    eachX?: number;
-    y?: number;
-    eachY?: number;
     onStart?: (event: TimelineEvent<T>) => void;
     onComplete?: (target: T, tween: Phaser.Tweens.Tween, index: number) => void;
     onAllComplete?: () => void;
@@ -51,7 +42,7 @@ export class VueScene extends Scene {
         return this.#cardBattle;
     }
 
-    timeline<T extends Phaser.GameObjects.Components.Transform>(timiline: TimelineConfig<T>): void {
+    timeline<T extends TimelineTarget>(timiline: TimelineConfig<T>): void {
         const promises = timiline.targets.map((target: T, index: number) => {
             return new Promise<void>((resolve) => {
                 const tweenConfig = { 
@@ -65,24 +56,29 @@ export class VueScene extends Scene {
                             tween!.resume();
                             resolve();
                         };
-                        if (timiline.onStart) timiline.onStart({
-                            pause,
-                            resume,
-                            target, 
-                            tween, 
-                            index
-                        });
+                        if (timiline.onStart) {
+                            timiline.onStart({ target, index, pause, resume, tween } as TimelineEvent<T>);
+                            return;
+                        }
+                        pause();
+                        if (typeof target === 'function') {
+                            target({ onComplete: resume });
+                            return;
+                        }
+                        resume();
                     },
                     onComplete: (tween: Phaser.Tweens.Tween) => {
-                        if (timiline.onComplete) timiline.onComplete(target, tween, index);
-                        resolve();
+                        if (timiline.onComplete) {
+                            timiline.onComplete(target, tween, index);
+                            resolve();
+                        };
                     },
                 };
                 this.tweens.add(tweenConfig);
             });
         });
         Promise.all(promises).then(() => {
-            timiline.onAllComplete?.();
+            if (timiline.onAllComplete) timiline.onAllComplete();
         });
     }
 }

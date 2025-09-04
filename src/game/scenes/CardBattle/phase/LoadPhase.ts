@@ -8,9 +8,8 @@ import { LoadPhasePlay } from "@/game/api/CardBattle";
 import { CARD_WIDTH } from "@/game/constants/default";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineEvent } from "../../VueScene";
-import { CloseCardsetEvents } from "@/game/ui/Cardset/types/CloseCardsetEvents";
-import { OpenCardsetEvents } from "@/game/ui/Cardset/types/OpenCardsetEvents";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
+import { TweenConfig } from '@/game/types/TweenConfig';
 
 export class LoadPhase extends CardBattlePhase implements Phase {
 
@@ -50,10 +49,17 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.createFieldCardset(powerCards);
     }
 
-    #openGameBoard(config?: OpenCardsetEvents): void {
-        super.openOpponentBoard();
-        super.openBoard();
-        super.openFieldCardset(config);
+    #openGameBoard(config?: TweenConfig): void {
+        this.scene.timeline({
+            targets: [
+                (t?: TweenConfig) => super.openOpponentBoard(t),
+                (t?: TweenConfig) => super.openBoard(t),
+                (t?: TweenConfig) => super.openFieldCardset(t)
+            ],
+            onAllComplete: () => {
+                if (config?.onComplete) config.onComplete();
+            },
+        });
     }
 
     async #goPlay(): Promise<void> {
@@ -88,9 +94,14 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     #onUsePowerCard(): void {
-        super.closeOpponentBoard();
-        super.closeBoard();
-        super.closeFieldCardset({ onComplete: () => this.#createHandZone() });
+        this.scene.timeline({
+            targets: [
+                (config?: TweenConfig) => super.closeOpponentBoard(config),
+                (config?: TweenConfig) => super.closeBoard(config),
+                (config?: TweenConfig) => super.closeFieldCardset(config)
+            ],
+            onAllComplete: () => this.#createHandZone(),
+        });
     }
 
     async #onPassPlay(): Promise<void> {
@@ -172,7 +183,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         }});
     }
 
-    #closeHandBoard(config: CloseCardsetEvents): void {
+    #closeHandBoard(config: TweenConfig): void {
         super.closeAllWindows();
         super.closeBoard();
         super.closeCardset(config);
@@ -272,8 +283,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         const totalCards = this.getFieldCardset().getCardsTotal();
         const moveConfig = {
             targets: this.getFieldCardset().getCardsUi(),
-            x: 0,
-            eachX: CARD_WIDTH,
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 CardActionsBuilder

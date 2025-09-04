@@ -6,8 +6,7 @@ import { BoardZones } from "@/game/types/BoardZones";
 import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
 import { StaticState, UpdatingState, WindowState } from "./state/WindowState";
 import { CardColors } from "../Card/types/CardColors";
-import { OpenBoardEvents } from "./types/OpenBoardEvents";
-import { CloseBoardEvents } from "./types/CloseBoardEvents";
+import { TweenConfig } from "@/game/types/TweenConfig";
 
 export default class BoardWindow extends Sizer {
     #status: WindowState;
@@ -163,7 +162,7 @@ export default class BoardWindow extends Sizer {
         return new BoardWindow(scene, x, y, width, height, config, color, true);
     }
 
-    open(config?: OpenBoardEvents) {
+    open(config?: TweenConfig) {
         this.scene.tweens.add({
             targets: this,
             scaleY: 1,
@@ -175,7 +174,7 @@ export default class BoardWindow extends Sizer {
         });
     }
 
-    close(config?: CloseBoardEvents) {
+    close(config?: TweenConfig) {
         this.scene.tweens.add({
             targets: this,
             scaleY: 0,
