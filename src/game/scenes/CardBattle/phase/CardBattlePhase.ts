@@ -299,7 +299,6 @@ export class CardBattlePhase {
     }
 
     createFieldCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Cardset {
-        console.log('destroyFieldCardset', config.faceUp);
         this.destroyFieldCardset();
         const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
         const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
