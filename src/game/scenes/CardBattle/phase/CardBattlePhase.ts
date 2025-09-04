@@ -11,8 +11,6 @@ import { CardUi } from '@/game/ui/Card/CardUi';
 import { TextWindowConfig } from '@/game/ui/TextWindow/types/TextWindowConfig';
 import { CardColors } from '@/game/ui/Card/types/CardColors';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
-import { CloseWindowConfig } from '@/game/ui/TextWindow/types/CloseWindowConfig';
-import { OpenWindowConfig } from '@/game/ui/TextWindow/types/OpenWindowConfig';
 import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
 import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
@@ -106,7 +104,7 @@ export class CardBattlePhase {
         return this.#textWindows[this.#textWindows.length - 1];
     }
 
-    openAllWindows(config?: OpenWindowConfig): void {
+    openAllWindows(config?: TweenConfig): void {
         if (this.#textWindows.length) {
             this.#textWindows.forEach((window, index) => {
                 if (!index) return window.open(config);
@@ -115,7 +113,7 @@ export class CardBattlePhase {
         }
     }
 
-    closeAllWindows(config?: CloseWindowConfig): void {
+    closeAllWindows(config?: TweenConfig): void {
         if (this.#textWindows.length) {
             this.#textWindows.forEach((window, index) => {
                 if (!index) return window.close(config);

@@ -129,7 +129,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
-                if (cardColor === ORANGE) return;
+                if (cardColor === ORANGE) return resume();
                 pause();
                 CardActionsBuilder
                     .create(card)
@@ -154,6 +154,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             if (!keyboard) {
                 throw new Error('Keyboard input is not available in this scene.');
             }
+            console.log('ENTER key pressed, proceeding to next phase.');
             keyboard.removeAllListeners();
             this.#closeWindows();
             this.#closeCardSets();
@@ -211,7 +212,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             targets: this.getOpponentCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 const cardColor = card.getColor();
-                if (cardColor === ORANGE) return;
+                if (cardColor === ORANGE) return resume();
                 pause();
                 CardActionsBuilder
                     .create(card)

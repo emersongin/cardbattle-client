@@ -29,18 +29,20 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
             this.scene.room.playerId, 
             (opponent: OpponentData) => {
                 this.#createChallengePhaseWindows(opponent);
-                super.openAllWindows({ 
-                    onClose: async () => {
-                        this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
-                        super.openCommandWindow();
-                    } 
-                });
+                super.openAllWindows();
             }
         );
     }
 
     #createChallengePhaseWindows(opponent: OpponentData) {
-        super.createTextWindowCentered('Challenge Phase!', { textAlign: 'center', textColor: '#fff' });
+        super.createTextWindowCentered('Challenge Phase!', { 
+            textAlign: 'center', 
+            textColor: '#fff',
+            onClose: async () => {
+                this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
+                super.openCommandWindow();
+            }  
+        });
         const { name, description } = opponent;
         super.addTextWindow(`${name}\n${description}`);
     }

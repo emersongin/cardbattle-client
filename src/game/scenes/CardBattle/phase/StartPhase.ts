@@ -27,17 +27,14 @@ export class StartPhase extends CardBattlePhase implements Phase {
 
     async #loadStartPhase(): Promise<void> {
         if (await this.cardBattle.isPlayMiniGame(this.scene.room.playerId)) {
-            this.#createStartPhaseWindows();
-            super.openAllWindows({ 
-                onClose: () => {
-                    this.#createMiniGameCommandWindow();
-                    super.openCommandWindow();
-                } 
-            });
+            this.#createStartPhaseWindows({ onClose: () => {
+                this.#createMiniGameCommandWindow();
+                super.openCommandWindow();
+            }});
+            super.openAllWindows();
             return;
         }
-        this.#createStartPhaseWindows();
-        super.openAllWindows({ onClose: () => {
+        this.#createStartPhaseWindows({ onClose: () => {
             this.#createOpponentMiniGameEndWaitingWindow();
             super.openAllWindows({
                 onComplete: async () => {
@@ -52,10 +49,11 @@ export class StartPhase extends CardBattlePhase implements Phase {
                 }
             });
         }});
+        super.openAllWindows();
     }
 
-    #createStartPhaseWindows(): void {
-        super.createTextWindowCentered('Start Phase', { textAlign: 'center' });
+    #createStartPhaseWindows(config: { onClose: () => void }): void {
+        super.createTextWindowCentered('Start Phase', { textAlign: 'center', onClose: config.onClose });
         super.addTextWindow('Draw white card to go first.');
     }
 
