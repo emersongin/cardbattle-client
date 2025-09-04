@@ -237,18 +237,19 @@ export class CardBattlePhase {
         return this.#cardset;
     }
 
-    openCardset(config?: TweenConfig): void {
+    openCardset(config?: TweenConfig & { faceUp?: boolean }): void {
         const openConfig: TimelineConfig<CardUi> = {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                CardActionsBuilder
+                const builder = CardActionsBuilder
                     .create(card)
                     .open({
                         delay: (index! * 100),
                         onComplete: () => resume()
-                    })
-                    .play();
+                    });
+                if (config?.faceUp) builder.faceUp();
+                builder.play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
@@ -297,11 +298,12 @@ export class CardBattlePhase {
         if (this.#opponentCardset) this.#opponentCardset.destroy();
     }
 
-    createFieldCardset(cards: CardData[]): Cardset {
+    createFieldCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Cardset {
+        console.log('destroyFieldCardset', config.faceUp);
         this.destroyFieldCardset();
         const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
         const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
-        const cardset = Cardset.create(this.scene, cards, x, y);
+        const cardset = Cardset.create(this.scene, config.cards, x, y, config.faceUp);
         this.#fieldCardset = cardset;
         return cardset;
     }
@@ -318,7 +320,7 @@ export class CardBattlePhase {
         this.getFieldCardset().removeCardById(cardId);
     }
 
-    openFieldCardset(config?: TweenConfig): void {
+    openFieldCardset(config?: TweenConfig & { faceUp?: boolean }): void {
         if (this.getFieldCardset().isOpened()) {
             if (config?.onComplete) config.onComplete();
             return;
@@ -328,18 +330,19 @@ export class CardBattlePhase {
         this.#openCardset(cardsUi, { ...config, ...openConfig });
     }
 
-    #openCardset(cardsUi: CardUi[], config?: TweenConfig): void {
+    #openCardset(cardsUi: CardUi[], config?: TweenConfig & { faceUp?: boolean }): void {
         const openConfig: TimelineConfig<CardUi> = {
             targets: cardsUi,
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                CardActionsBuilder
+                const builder = CardActionsBuilder
                     .create(card)
                     .open({
                         delay: (index! * 100),
                         onComplete: () => resume()
-                    })
-                    .play();
+                    });
+                if (config?.faceUp) builder.faceUp();
+                builder.play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
@@ -348,7 +351,7 @@ export class CardBattlePhase {
         this.scene.timeline(openConfig);
     }
 
-    openFieldCardsetCardByIndex(index: number, config?: TweenConfig): void {
+    openFieldCardsetCardByIndex(index: number, config?: TweenConfig & { faceUp?: boolean }): void {
         if (!this.getFieldCardset().isValidIndex(index)) {
             throw new Error(`Cardset: index ${index} is out of bounds.`);
         }

@@ -48,7 +48,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
         super.createOpponentBoard(opponentBoard);
         super.createBoard(board);
-        super.createFieldCardset(powerCards);
+        super.createFieldCardset({ cards: powerCards });
     }
 
     #openGameBoard(config?: TweenConfig): void {
@@ -56,7 +56,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             targets: [
                 (t?: TweenConfig) => super.openOpponentBoard(t),
                 (t?: TweenConfig) => super.openBoard(t),
-                (t?: TweenConfig) => super.openFieldCardset(t)
+                (t?: TweenConfig) => super.openFieldCardset({ faceUp: true, ...t })
             ],
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
@@ -144,15 +144,18 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     #openHandCardset(): void {
         const cardset = super.getCardset();
         cardset.disableBattleCards();
-        super.openCardset({ onComplete: () => {
-            super.openAllWindows();
-            super.openBoard();
-            cardset.selectModeOne({
-                onChangeIndex: (cardIndex: number) => this.#onChangeHandCardsetIndex(cardIndex),
-                onComplete: (cardIndexes: number[]) => this.#onSelectHandCardsetCard(cardIndexes),
-                onLeave: () => this.#onLeaveHand(),
-            });
-        }});
+        super.openCardset({ 
+            faceUp: true, 
+            onComplete: () => {
+                super.openAllWindows();
+                super.openBoard();
+                cardset.selectModeOne({
+                    onChangeIndex: (cardIndex: number) => this.#onChangeHandCardsetIndex(cardIndex),
+                    onComplete: (cardIndexes: number[]) => this.#onSelectHandCardsetCard(cardIndexes),
+                    onLeave: () => this.#onLeaveHand(),
+                });
+            }
+        });
     }
 
     #onChangeHandCardsetIndex(cardIndex: number): void {
@@ -222,13 +225,17 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     async #playPowerCard(powerCard: CardData, onComplete: () => void): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
         const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
-        const cardset = super.createFieldCardset([...powerCardsFiltered, powerCard]);
+        const cardset = super.createFieldCardset({
+            cards: [...powerCardsFiltered, powerCard], 
+            faceUp: true
+        });
         cardset.setCardsInLinePosition();
         const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
         const lastIndex = cardset.getCardsLastIndex();
         cardset.setCardAtPosition(lastIndex, widthEdge);
         cardset.setCardClosedByIndex(lastIndex);
         super.openFieldCardsetCardByIndex(lastIndex, {
+            faceUp: true,
             onComplete: () => {
                 const card = cardset.getCardByIndex(lastIndex);
                 cardset.selectCard(card);

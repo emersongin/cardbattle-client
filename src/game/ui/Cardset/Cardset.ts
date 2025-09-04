@@ -18,13 +18,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         readonly cards: CardData[],
         x: number = 0,
         y: number = 0,
+        faceUp: boolean = false
     ) {
         super(scene, x, y);
         this.setDataEnabled();
         this.data.set('selectModeEnabled', false);
         this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.#selectMode = new SelectMode(this);
-        this.#createCards(cards);
+        this.#createCards(cards, faceUp);
         this.scene.add.existing(this);
     }
 
@@ -32,9 +33,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         scene: Scene,
         cards: CardData[],
         x: number = 0,
-        y: number = 0
+        y: number = 0,
+        faceUp: boolean = false
     ): Cardset {
-        return new Cardset(scene, cards, x, y);
+        return new Cardset(scene, cards, x, y, faceUp);
     }
 
     setCardsInLinePosition(x: number = 0, y: number = 0): void {
@@ -221,9 +223,9 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode.create(events, selectionsNumber, colorPoints);
     }
 
-    #createCards(cardsData: CardData[]): void {
-        const cards = cardsData.map((data: CardData) => {
-            const card = new Card(this.scene, this, data);
+    #createCards(cardsData: CardData[], faceUp: boolean = false): void {
+        const cards = cardsData.map((cardData: CardData) => {
+            const card = new Card(this.scene, this, cardData, faceUp);
             return card;
         });
         this.#cards = cards;

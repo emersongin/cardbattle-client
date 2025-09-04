@@ -12,11 +12,12 @@ export class Card extends Phaser.GameObjects.GameObject {
     constructor(
         readonly scene: Phaser.Scene, 
         readonly cardset: Cardset,
-        readonly staticData: CardData
+        readonly staticData: CardData,
+        faceUp: boolean = false
     ) {
         super(scene, 'Card');
-        this.#ui = new CardUi(this.scene, this, staticData);
-        this.#setStartData();
+        this.#setStartData(faceUp);
+        this.#ui = new CardUi(this.scene, this);
         this.cardset.add(this.#ui);
     }
 
@@ -24,12 +25,12 @@ export class Card extends Phaser.GameObjects.GameObject {
         return { ap: this.data.get('ap'), hp: this.data.get('hp') };
     }
 
-    #setStartData(): void {
+    #setStartData(faceUp: boolean = false): void {
         this.setDataEnabled();
         this.updateOrigin();
         this.data.set('ap', this.staticData.hp);
         this.data.set('hp', this.staticData.ap);
-        this.data.set('faceUp', false);
+        this.data.set('faceUp', faceUp);
         this.data.set('closed', false);
         this.data.set('selected', false);
         this.data.set('marked', false);
@@ -160,11 +161,11 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.#setOriginY(y);
     }
 
-    #setOriginX(value: number = this.#ui.x): void {
+    #setOriginX(value: number = this.#ui?.x || 0): void {
         this.data.set('originX', value);
     }
 
-    #setOriginY(value: number = this.#ui.y): void {
+    #setOriginY(value: number = this.#ui?.y || 0): void {
         this.data.set('originY', value);
     }
 
