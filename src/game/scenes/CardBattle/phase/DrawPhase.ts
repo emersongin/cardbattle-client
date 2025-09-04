@@ -154,7 +154,6 @@ export class DrawPhase extends CardBattlePhase implements Phase {
             if (!keyboard) {
                 throw new Error('Keyboard input is not available in this scene.');
             }
-            console.log('ENTER key pressed, proceeding to next phase.');
             keyboard.removeAllListeners();
             this.#closeWindows();
             this.#closeCardSets();

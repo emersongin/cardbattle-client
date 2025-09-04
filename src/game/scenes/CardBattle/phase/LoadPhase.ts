@@ -15,6 +15,8 @@ export class LoadPhase extends CardBattlePhase implements Phase {
 
     async create(goToPlays: boolean = false): Promise<void> {
         if (goToPlays) {
+            super.removeBoardPass();
+            super.removeOpponentBoardPass();
             this.#loadLoadPhase();
             return;
         }
@@ -325,7 +327,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                     this.scene.room.playerId, 
                     (opponentPlay: LoadPhasePlay) => this.#loadOpponentPlay(
                             opponentPlay.pass, 
-                            opponentPlay.powerAction!.powerCard
+                            opponentPlay.powerAction?.powerCard
                         )
                 );
             }
