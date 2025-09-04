@@ -8,13 +8,13 @@ import { BoardWindowData, BoardZones, CardData } from '@/game/types';
 import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { TimelineConfig, TimelineEvent } from '../../VueScene';
 import { CardUi } from '@/game/ui/Card/CardUi';
-import { TextWindowConfig } from '@/game/ui/TextWindow/types/TextWindowConfig';
 import { CardColors } from '@/game/ui/Card/types/CardColors';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
 import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
 import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
 import { TweenConfig } from '@/game/types/TweenConfig';
+import { TextWindowConfig } from '@/game/ui/TextWindow/TextWindowConfig';
 
 export type AlignType = 
     | typeof LEFT 
