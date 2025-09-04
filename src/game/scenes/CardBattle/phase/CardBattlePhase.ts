@@ -10,7 +10,7 @@ import { TimelineConfig, TimelineEvent } from '../../VueScene';
 import { CardUi } from '@/game/ui/Card/CardUi';
 import { CardColors } from '@/game/ui/Card/types/CardColors';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
-import { CommandOption } from '@/game/ui/CommandWindow/types/CommandOption';
+import { CommandOption } from '@/game/ui/CommandWindow/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
 import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
 import { TweenConfig } from '@/game/types/TweenConfig';
