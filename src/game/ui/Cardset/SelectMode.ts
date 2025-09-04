@@ -1,13 +1,12 @@
 import { Card } from "../Card/Card";
 import { Cardset } from "./Cardset";
-import { CardsetEvents } from "./types/CardsetEvents";
+import { CardsetEvents } from "./CardsetEvents";
 import { ColorsPoints } from "../../types/ColorsPoints";
-import { SelectStateConfig } from "./types/SelectStateConfig";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 
 export default class SelectMode {
     #index: number;
-    #selectNumber: number;
+    #selectionsNumber: number;
     #events: CardsetEvents;
     #colorsPoints: ColorsPoints | null = null;
     #selectIndexes: number[] = [];
@@ -15,11 +14,11 @@ export default class SelectMode {
 
     constructor(readonly cardset: Cardset) {}
 
-    create(config: SelectStateConfig): void {
-        this.#events = config.events;
-        this.#colorsPoints = config.colorPoints || null;
-        this.#index = config.startIndex || 0;
-        this.#selectNumber = config.selectNumber || 0;
+    create(events: CardsetEvents, selectionsNumber?: number, colorPoints?: ColorsPoints): void {
+        this.#events = events;
+        this.#colorsPoints = colorPoints || null;
+        this.#index = 0;
+        this.#selectionsNumber = selectionsNumber || 0;
         this.#setDisabledIndexes();
         this.enable();
     }
@@ -89,7 +88,7 @@ export default class SelectMode {
             }
             this.#selectIndex(currentIndex);
             this.#discountPoints(currentIndex);
-            if (this.#selectNumber !== 1) this.#markCard(this.#getCardByIndex(currentIndex));
+            if (this.#selectionsNumber !== 1) this.#markCard(this.#getCardByIndex(currentIndex));
             if (this.#events.onMarked) this.#events.onMarked(currentIndex);
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
                 this.#disable();
@@ -263,7 +262,7 @@ export default class SelectMode {
     }
 
     #isSelectLimitReached(): boolean {
-        return (this.#selectNumber > 0) && (this.#selectIndexes.length >= this.#selectNumber);
+        return (this.#selectionsNumber > 0) && (this.#selectIndexes.length >= this.#selectionsNumber);
     }
 
     #isSelectAll(): boolean {
