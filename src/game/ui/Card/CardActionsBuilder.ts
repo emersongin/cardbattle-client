@@ -44,8 +44,8 @@ export class CardActionsBuilder {
     faceUp(): CardActionsBuilder {
         const onComplete = () => {
             this.card.data.set('faceUp', true);
-            this.card.getUi().setImage(true);
-            this.card.getUi().setDisplay(this.card.data.get('ap'), this.card.data.get('hp'), true);
+            this.card.getUi().setImage();
+            this.card.getUi().setDisplay(this.card.data.get('ap'), this.card.data.get('hp'));
         };
         const config = { onComplete };
         this.#addMove(['faceup', config]);
