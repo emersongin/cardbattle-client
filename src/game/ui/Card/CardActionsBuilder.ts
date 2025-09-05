@@ -3,12 +3,12 @@ import { Card } from "./Card";
 import { ExpandAnimation } from "./animations/ExpandAnimation";
 import { ShrinkAnimation } from "./animations/ShrinkAnimation";
 import { CardAnimation } from "./animations/types/CardAnimation";
-import { ExpandCardConfig } from "./animations/types/ExpandCardConfig";
-import { FlashCardConfig } from "./animations/types/FlashCardConfig";
-import { PositionCardConfig } from "./animations/types/PositionCardConfig";
+import { ExpandCardConfig } from "./animations/types/ExpandConfig";
+import { FlashCardConfig } from "./animations/types/FlashConfig";
+import { PositionCardConfig } from "./animations/types/PositionConfig";
 import { PositionAnimation } from "./animations/PositionAnimation";
 import { ScaleAnimation } from "./animations/ScaleAnimation";
-import { CardScaleMoveConfig } from "./animations/types/CardScaleMoveConfig";
+import { CardScaleConfig } from "./animations/types/ScaleConfig";
 import { TweenConfig } from "@/game/types/TweenConfig";
 
 export class CardActionsBuilder {
@@ -25,7 +25,7 @@ export class CardActionsBuilder {
         return this;
     }
 
-    open(config: CardScaleMoveConfig = {}): CardActionsBuilder {
+    open(config: CardScaleConfig = {}): CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', false);
         config.open = true;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
@@ -33,7 +33,7 @@ export class CardActionsBuilder {
         return this;
     }
 
-    close(config: CardScaleMoveConfig = {}): CardActionsBuilder {
+    close(config: CardScaleConfig = {}): CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', true);
         config.open = false;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
@@ -88,7 +88,7 @@ export class CardActionsBuilder {
                 new PositionAnimation(this.card, config as PositionCardConfig);
                 break;
             case ScaleAnimation.name:
-                new ScaleAnimation(this.card, config as CardScaleMoveConfig);
+                new ScaleAnimation(this.card, config as CardScaleConfig);
                 break;
             case ExpandAnimation.name:
                 new ExpandAnimation(this.card, config as ExpandCardConfig);

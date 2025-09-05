@@ -1,11 +1,11 @@
 import { Card } from "../Card";
-import { FlashCardConfig } from "./types/FlashCardConfig";
+import { FlashConfig } from "./types/FlashConfig";
 
 export class FlashAnimation {
     #flashLayer: Phaser.GameObjects.Rectangle;
     
-    constructor(readonly card: Card, config?: FlashCardConfig) {
-        this.#createFlashLayer(config?.color || 0xffffff);
+    constructor(readonly card: Card, config: FlashConfig) {
+        this.#createFlashLayer(config.color || 0xffffff);
         this.card.scene.tweens.add({
             targets: this.#flashLayer,
             alpha: 0,
@@ -14,12 +14,12 @@ export class FlashAnimation {
             ease: 'Power2',
             onStart: () => {
                 this.#flashLayer.setVisible(true);
-                if (config?.onStart) config.onStart(this.card);
+                if (config?.onStart) config.onStart();
             },
             onComplete: () => {
                 this.#flashLayer.alpha = 1;
                 this.#flashLayer.setVisible(false);
-                if (config?.onComplete) config.onComplete(this.card);
+                if (config?.onComplete) config.onComplete();
             }
         });
     }

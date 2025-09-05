@@ -1,12 +1,11 @@
 
 import { Card } from "../Card";
-import { CardScaleMoveConfig } from "./types/CardScaleMoveConfig";
+import { ScaleConfig } from "./types/ScaleConfig";
 
 export class ScaleAnimation {
 
-    constructor(readonly card: Card, config: CardScaleMoveConfig) {
-        // this.card.updateOrigin();
-        if (config?.open) {
+    constructor(readonly card: Card, config: ScaleConfig) {
+        if (config.open) {
             this.card.scene.tweens.add({ 
                 targets: this.card.getUi(), 
                 x: card.getOriginX(),
@@ -15,8 +14,8 @@ export class ScaleAnimation {
                 onComplete: () => {
                     if (config.onComplete) config.onComplete();
                 },
-                delay: config.delay || 0,
-                duration: config.duration || 100,
+                delay: config?.delay || 0,
+                duration: config?.duration || 100,
             });
             return;
         }
@@ -26,10 +25,10 @@ export class ScaleAnimation {
             scaleX: 0,
             ease: 'Linear',
             onComplete: () => {
-                if (config.onComplete) config.onComplete();
+                if (config?.onComplete) config.onComplete();
             },
-            delay: config.delay || 0,
-            duration: config.duration || 100,
+            delay: config?.delay || 0,
+            duration: config?.duration || 100,
         });
     }
 

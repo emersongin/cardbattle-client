@@ -1,6 +1,6 @@
 import { Card } from "../Card";
 import { CardPoints } from "../types/CardPoints";
-import { UpdateCardConfig } from "./types/UpdateCardConfig";
+import { UpdateConfig } from "./types/UpdateConfig";
 
 export class UpdateAnimation {
     
@@ -43,7 +43,7 @@ export class UpdateAnimation {
         toPoints: number, 
         onUpdate: (tween: Phaser.Tweens.Tween) => void,
         onComplete: () => void,
-    ): UpdateCardConfig {
+    ): UpdateConfig {
         return {
             target,
             from: fromPoints,

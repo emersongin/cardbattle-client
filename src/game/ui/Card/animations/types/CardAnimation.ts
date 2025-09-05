@@ -1,14 +1,14 @@
 import { FlashAnimation } from "../FlashAnimation";
 import { UpdateAnimation } from "../UpdateAnimation";
-import { FlashCardConfig } from "./FlashCardConfig";
-import { UpdateCardConfig } from "./UpdateCardConfig";
+import { FlashConfig } from "./FlashConfig";
+import { UpdateConfig } from "./UpdateConfig";
 import { ExpandAnimation } from "../ExpandAnimation";
 import { ScaleAnimation } from "../ScaleAnimation";
 import { PositionAnimation } from "../PositionAnimation";
 import { ShrinkAnimation } from "../ShrinkAnimation";
-import { ExpandCardConfig } from "./ExpandCardConfig";
-import { CardScaleMoveConfig } from "./CardScaleMoveConfig";
-import { PositionCardConfig } from "./PositionCardConfig";
+import { ExpandConfig } from "./ExpandConfig";
+import { ScaleConfig } from "./ScaleConfig";
+import { PositionConfig } from "./PositionConfig";
 
 export type CardAnimation = [
     typeof FlashAnimation.name | 
@@ -17,9 +17,9 @@ export type CardAnimation = [
     typeof ShrinkAnimation.name | 
     typeof PositionAnimation.name | 
     typeof ScaleAnimation.name,
-    FlashCardConfig | 
-    UpdateCardConfig | 
-    ExpandCardConfig | 
-    PositionCardConfig | 
-    CardScaleMoveConfig
+    FlashConfig | 
+    UpdateConfig | 
+    ExpandConfig | 
+    PositionConfig | 
+    ScaleConfig
 ];

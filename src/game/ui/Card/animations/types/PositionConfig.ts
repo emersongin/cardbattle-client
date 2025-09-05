@@ -1,6 +1,6 @@
 import { TweenConfig } from "@/game/types/TweenConfig";
 
-export type PositionCardConfig = {
+export type PositionConfig = {
     xTo: number, 
     yTo: number, 
     xFrom?: number, 
