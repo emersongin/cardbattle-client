@@ -4,7 +4,7 @@ import { CardsetEvents } from "./CardsetEvents";
 import { ColorsPoints } from "../../types/ColorsPoints";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 
-export default class SelectMode {
+export class SelectMode {
     #index: number;
     #selectionsNumber: number;
     #events: CardsetEvents;

@@ -2,7 +2,7 @@
 import { Card } from "../Card";
 import { CardScaleMoveConfig } from "./types/CardScaleMoveConfig";
 
-export class ScaleMove {
+export class ScaleAnimation {
 
     constructor(readonly card: Card, config: CardScaleMoveConfig) {
         // this.card.updateOrigin();
@@ -12,9 +12,6 @@ export class ScaleMove {
                 x: card.getOriginX(),
                 scaleX: 1,
                 ease: 'Linear',
-                canStart: () => {
-                    return card.isClosed() && (!config.onCanStart || config.onCanStart());
-                },
                 onComplete: () => {
                     if (config.onComplete) config.onComplete(this.card);
                 },
@@ -28,9 +25,6 @@ export class ScaleMove {
             x: card.getX() + (card.getWidth() / 2),
             scaleX: 0,
             ease: 'Linear',
-            canStart: () => {
-                return card.isOpened() && (!config.onCanStart || config.onCanStart());
-            },
             onComplete: () => {
                 if (config.onComplete) config.onComplete(this.card);
             },

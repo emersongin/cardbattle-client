@@ -2,7 +2,7 @@
 import { Card } from "../Card";
 import { PositionCardConfig } from "./types/PositionCardConfig";
 
-export class PositionMove {
+export class PositionAnimation {
 
     constructor(readonly card: Card, config: PositionCardConfig) {
         this.card.scene.tweens.chain({ 

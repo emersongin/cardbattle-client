@@ -2,7 +2,7 @@
 import { Card } from "../Card";
 import { ExpandCardConfig } from "./types/ExpandCardConfig";
 
-export class ExpandMove {
+export class ExpandAnimation {
 
     constructor(readonly card: Card, config: ExpandCardConfig) {
         this.card.scene.tweens.add({

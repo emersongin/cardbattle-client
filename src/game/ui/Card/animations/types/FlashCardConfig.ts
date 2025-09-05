@@ -1,9 +1,5 @@
-import { Card } from "../../Card";
+import { TweenConfig } from "@/game/types/TweenConfig";
 
 export type FlashCardConfig = {
     color?: number,
-    delay?: number,
-    duration?: number,
-    onStart?: (card: Card) => void,
-    onComplete?: (card: Card) => void
-};
+} & TweenConfig;

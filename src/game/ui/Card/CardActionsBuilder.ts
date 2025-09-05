@@ -1,18 +1,18 @@
 import { FlashAnimation } from "./animations/FlashAnimation";
 import { Card } from "./Card";
-import { ExpandMove } from "./moves/ExpandMove";
-import { ShrinkMove } from "./moves/ShrinkMove";
+import { ExpandAnimation } from "./animations/ExpandAnimation";
+import { ShrinkAnimation } from "./animations/ShrinkAnimation";
 import { CardAnimation } from "./animations/types/CardAnimation";
-import { ExpandCardConfig } from "./moves/types/ExpandCardConfig";
+import { ExpandCardConfig } from "./animations/types/ExpandCardConfig";
 import { FlashCardConfig } from "./animations/types/FlashCardConfig";
-import { CardMove } from "./moves/types/CardMove";
-import { PositionCardConfig } from "./moves/types/PositionCardConfig";
-import { PositionMove } from "./moves/PositionMove";
-import { ScaleMove } from "./moves/ScaleMove";
-import { CardScaleMoveConfig } from "./moves/types/CardScaleMoveConfig";
+import { PositionCardConfig } from "./animations/types/PositionCardConfig";
+import { PositionAnimation } from "./animations/PositionAnimation";
+import { ScaleAnimation } from "./animations/ScaleAnimation";
+import { CardScaleMoveConfig } from "./animations/types/CardScaleMoveConfig";
+import { TweenConfig } from "@/game/types/TweenConfig";
 
 export class CardActionsBuilder {
-    #moves: (CardMove | CardAnimation)[] = [];
+    #moves: CardAnimation[] = [];
 
     private constructor(readonly card: Card) {}
 
@@ -20,8 +20,8 @@ export class CardActionsBuilder {
         return new CardActionsBuilder(card);
     }
 
-    move(config: PositionCardConfig = { xTo: this.card.getX(), yTo: this.card.getY() }): CardActionsBuilder {
-        this.#addMove([PositionMove.name, config]);
+    move(config: PositionCardConfig & TweenConfig = { xTo: this.card.getX(), yTo: this.card.getY() }): CardActionsBuilder {
+        this.#addMove([PositionAnimation.name, config]);
         return this;
     }
 
@@ -29,7 +29,7 @@ export class CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', false);
         config.open = true;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
-        this.#addMove([ScaleMove.name, config]);
+        this.#addMove([ScaleAnimation.name, config]);
         return this;
     }
 
@@ -37,7 +37,7 @@ export class CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', true);
         config.open = false;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
-        this.#addMove([ScaleMove.name, config]);
+        this.#addMove([ScaleAnimation.name, config]);
         return this;
     }
 
@@ -53,7 +53,7 @@ export class CardActionsBuilder {
     }
 
     expand(config: ExpandCardConfig = {}): CardActionsBuilder {
-        this.#addMove([ExpandMove.name, config]);
+        this.#addMove([ExpandAnimation.name, config]);
         return this;
     }
 
@@ -63,11 +63,11 @@ export class CardActionsBuilder {
     }
 
     shrink(config: FlashCardConfig = {}): CardActionsBuilder {
-        this.#addMove([ShrinkMove.name, config]);
+        this.#addMove([ShrinkAnimation.name, config]);
         return this;
     }
 
-    #addMove(moveOrAnimation: CardMove | CardAnimation): void {
+    #addMove(moveOrAnimation: CardAnimation): void {
         if (this.#moves.length > 0) {
             this.#addOnCompleteToLastMove((_card: Card) => {
                 this.#runMoves(moveOrAnimation);
@@ -78,23 +78,23 @@ export class CardActionsBuilder {
         this.#moves.push(moveOrAnimation);
     }
 
-    #runMoves(moveOrAnimation?: CardMove | CardAnimation): void {
+    #runMoves(moveOrAnimation?: CardAnimation): void {
         if (this.#moves.length > 0 && !moveOrAnimation) {
             moveOrAnimation = this.#moves[0];
         }
-        const [name, config] = moveOrAnimation as CardMove | CardAnimation;
+        const [name, config] = moveOrAnimation as CardAnimation;
         switch (name) {
-            case PositionMove.name:
-                new PositionMove(this.card, config as PositionCardConfig);
+            case PositionAnimation.name:
+                new PositionAnimation(this.card, config as PositionCardConfig);
                 break;
-            case ScaleMove.name:
-                new ScaleMove(this.card, config as CardScaleMoveConfig);
+            case ScaleAnimation.name:
+                new ScaleAnimation(this.card, config as CardScaleMoveConfig);
                 break;
-            case ExpandMove.name:
-                new ExpandMove(this.card, config as ExpandCardConfig);
+            case ExpandAnimation.name:
+                new ExpandAnimation(this.card, config as ExpandCardConfig);
                 break;
-            case ShrinkMove.name:
-                new ShrinkMove(this.card, config as ExpandCardConfig);
+            case ShrinkAnimation.name:
+                new ShrinkAnimation(this.card, config as ExpandCardConfig);
                 break;
             case FlashAnimation.name:
                 new FlashAnimation(this.card, config as FlashCardConfig);

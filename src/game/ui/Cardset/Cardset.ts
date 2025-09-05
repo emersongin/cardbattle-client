@@ -6,7 +6,7 @@ import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
-import SelectMode from "./SelectMode";
+import { SelectMode } from "./SelectMode";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
