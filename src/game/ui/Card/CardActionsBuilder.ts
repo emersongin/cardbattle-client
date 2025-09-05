@@ -69,7 +69,7 @@ export class CardActionsBuilder {
 
     #addMove(moveOrAnimation: CardAnimation): void {
         if (this.#moves.length > 0) {
-            this.#addOnCompleteToLastMove((_card: Card) => {
+            this.#addOnCompleteToLastMove(() => {
                 this.#runMoves(moveOrAnimation);
             });
             this.#moves.push(moveOrAnimation);
@@ -100,28 +100,28 @@ export class CardActionsBuilder {
                 new FlashAnimation(this.card, config as FlashCardConfig);
                 break;
             case 'faceup':
-                if (config?.onComplete) config.onComplete(this.card);
+                if (config?.onComplete) config.onComplete();
                 break;
             default:
                 throw new Error(`Unknown move or animation: ${name}`);
         }
     }
 
-    #addOnCompleteToLastMove(onComplete: (card: Card) => void): void {
+    #addOnCompleteToLastMove(onComplete: () => void): void {
         if (this.#moves.length === 0) return;
         const [name, config] = this.#getLastMove();
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
         this.#moves[this.#moves.length - 1] = [name, config];
     }
 
-    #getLastMove(): CardMove | CardAnimation {
+    #getLastMove(): CardAnimation {
         return this.#moves[this.#moves.length - 1];
     }
 
-    #mergeOnComplete(onComplete: (card: Card) => void, original?: (card: Card) => void): () => void {
+    #mergeOnComplete(onComplete: () => void, original?: () => void): () => void {
         return () => {
-            if (original) original(this.card);
-            onComplete(this.card);
+            if (original) original();
+            onComplete();
         };
     }
 

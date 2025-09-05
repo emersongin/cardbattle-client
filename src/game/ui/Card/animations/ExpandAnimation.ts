@@ -15,7 +15,7 @@ export class ExpandAnimation {
             delay: config?.delay || 200,
             duration: config?.duration || 200,
             onComplete: () => {
-                if (config?.onComplete) config.onComplete(card);
+                if (config?.onComplete) config.onComplete();
             },
         });
     }

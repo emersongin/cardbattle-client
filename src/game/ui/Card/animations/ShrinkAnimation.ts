@@ -14,7 +14,7 @@ export class ShrinkAnimation {
             delay: config?.delay || 100,
             duration: config?.duration || 100,
             onComplete: () => {
-                if (config?.onComplete) config.onComplete(card);
+                if (config?.onComplete) config.onComplete();
             },
         });
     }

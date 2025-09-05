@@ -3,7 +3,6 @@ import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
 import { CardBattlePhase } from "./CardBattlePhase";
 import { PowerAction } from "@/game/types/PowerAction";
-import { Card } from "@/game/ui/Card/Card";
 import { TRASH } from "@/game/constants/keys";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 
@@ -31,9 +30,9 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
                     .flash()
                     .shrink()
                     .play({
-                        onComplete: (card: Card) => {
+                        onComplete: () => {
                             CardActionsBuilder
-                                .create(card)
+                                .create(powerCard)
                                 .shrink({ onComplete: async () => {
                                     await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
                                     this.originPhase.removeFieldCardById(powerCardId);
