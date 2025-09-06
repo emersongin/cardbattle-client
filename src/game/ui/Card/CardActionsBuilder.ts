@@ -9,6 +9,7 @@ import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
 import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
+import { TweenConfig } from "@/game/types/TweenConfig";
 
 export class CardActionsBuilder {
     #moves: CardAnimation[] = [];
@@ -29,26 +30,18 @@ export class CardActionsBuilder {
         return this;
     }
 
-    open(config?: ScaleConfig): CardActionsBuilder {
-        if (!config) config = { 
-            open: true,
-            onComplete: () => {} 
-        };
+    open(config: TweenConfig): CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', false);
         config.open = true;
-        config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
+        config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
         this.#addMove({ name: ScaleAnimation.name, config });
         return this;
     }
 
-    close(config?: ScaleConfig): CardActionsBuilder {
-        if (!config) config = { 
-            open: false,
-            onComplete: () => {} 
-        };
+    close(config: TweenConfig): CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', true);
         config.open = false;
-        config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
+        config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
         this.#addMove({ name: ScaleAnimation.name, config });
         return this;
     }

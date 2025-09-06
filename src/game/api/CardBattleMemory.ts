@@ -559,7 +559,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     setReadyDrawCards(playerId: string): Promise<void> {
-        return new Promise(async (resolve) => {
+        return new Promise((resolve) => {
             if (this.#isPlayer(playerId)) {
                 this.#setPlayerStep(DRAW_CARDS);
             };
@@ -567,22 +567,19 @@ export default class CardBattleMemory implements CardBattle {
                 this.#setOpponentStep(DRAW_CARDS);
             };
             if (this.#isPlayerStep(DRAW_CARDS) && this.#isOpponentStep(DRAW_CARDS)) {
-                await this.#drawCards();
+                this.#drawCards();
+                this.#setPointsToBoard(this.#playerId);
+                this.#setPointsToBoard(this.#opponentId);
             }
             setTimeout(() => resolve(), delayMock);
         });
     }
 
-    #drawCards(): Promise<void> {
-        return new Promise((resolve) => {
-            this.#shufflePlayerDeck();
-            this.#shuffleOpponentDeck();
-            this.#drawPlayerCards();
-            this.#drawOpponentCards();
-            this.#setPlayerStep(DRAW_CARDS);
-            this.#setOpponentStep(DRAW_CARDS);
-            setTimeout(() => resolve(), delayMock);
-        });
+    #drawCards(): void {
+        this.#shufflePlayerDeck();
+        this.#shuffleOpponentDeck();
+        this.#drawPlayerCards();
+        this.#drawOpponentCards();
     }
 
     #shufflePlayerDeck(): void {
@@ -618,61 +615,58 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    setPointsToBoard(playerId: string): Promise<void> {
-        return new Promise(async (resolve) => {
-            if (this.#isPlayer(playerId)) {
-                this.#playerBoard.redPoints += this.#playerHand.filter(card => card.color === RED).length;
-                this.#playerBoard.greenPoints += this.#playerHand.filter(card => card.color === GREEN).length;
-                this.#playerBoard.bluePoints += this.#playerHand.filter(card => card.color === BLUE).length;
-                this.#playerBoard.blackPoints += this.#playerHand.filter(card => card.color === BLACK).length;
-                this.#playerBoard.whitePoints += this.#playerHand.filter(card => card.color === WHITE).length;
-                this.#playerBoard.numberOfCardsInDeck = this.#playerDeck.length;
-                this.#playerBoard.numberOfCardsInHand = this.#playerHand.length;
-                this.#setPlayerStep(WAITING_TO_PLAY);
-            };
-            if (this.#isOpponent(playerId)) {
-                this.#opponentBoard.redPoints += this.#opponentHand.filter(card => card.color === RED).length;
-                this.#opponentBoard.greenPoints += this.#opponentHand.filter(card => card.color === GREEN).length;
-                this.#opponentBoard.bluePoints += this.#opponentHand.filter(card => card.color === BLUE).length;
-                this.#opponentBoard.blackPoints += this.#opponentHand.filter(card => card.color === BLACK).length;
-                this.#opponentBoard.whitePoints += this.#opponentHand.filter(card => card.color === WHITE).length;
-                this.#opponentBoard.numberOfCardsInDeck = this.#opponentDeck.length;
-                this.#opponentBoard.numberOfCardsInHand = this.#opponentHand.length;
-                this.#setOpponentStep(WAITING_TO_PLAY);
-            };
-            setTimeout(() => resolve(), delayMock);
-        });
+    #setPointsToBoard(playerId: string): void {
+        if (this.#isPlayer(playerId)) {
+            this.#playerBoard.redPoints += this.#playerHand.filter(card => card.color === RED).length;
+            this.#playerBoard.greenPoints += this.#playerHand.filter(card => card.color === GREEN).length;
+            this.#playerBoard.bluePoints += this.#playerHand.filter(card => card.color === BLUE).length;
+            this.#playerBoard.blackPoints += this.#playerHand.filter(card => card.color === BLACK).length;
+            this.#playerBoard.whitePoints += this.#playerHand.filter(card => card.color === WHITE).length;
+            this.#playerBoard.numberOfCardsInDeck = this.#playerDeck.length;
+            this.#playerBoard.numberOfCardsInHand = this.#playerHand.length;
+            this.#setPlayerStep(WAITING_TO_PLAY);
+        };
+        if (this.#isOpponent(playerId)) {
+            this.#opponentBoard.redPoints += this.#opponentHand.filter(card => card.color === RED).length;
+            this.#opponentBoard.greenPoints += this.#opponentHand.filter(card => card.color === GREEN).length;
+            this.#opponentBoard.bluePoints += this.#opponentHand.filter(card => card.color === BLUE).length;
+            this.#opponentBoard.blackPoints += this.#opponentHand.filter(card => card.color === BLACK).length;
+            this.#opponentBoard.whitePoints += this.#opponentHand.filter(card => card.color === WHITE).length;
+            this.#opponentBoard.numberOfCardsInDeck = this.#opponentDeck.length;
+            this.#opponentBoard.numberOfCardsInHand = this.#opponentHand.length;
+            this.#setOpponentStep(WAITING_TO_PLAY);
+        };
     }
 
-    hasOpponentDefinedPointsToBoard(playerId: string): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    resolve(this.#isOpponentStep(WAITING_TO_PLAY));
-                }
-                if (this.#isOpponent(playerId)) {
-                    resolve(this.#isPlayerStep(WAITING_TO_PLAY));
-                }
-            }, delayMock);
-        });
-    }
+    // hasOpponentDefinedPointsToBoard(playerId: string): Promise<boolean> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 resolve(this.#isOpponentStep(WAITING_TO_PLAY));
+    //             }
+    //             if (this.#isOpponent(playerId)) {
+    //                 resolve(this.#isPlayerStep(WAITING_TO_PLAY));
+    //             }
+    //         }, delayMock);
+    //     });
+    // }
 
-    listenOpponentSetPointsToBoard(playerId: string, callback: (isSet: boolean) => void): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    // mock
-                    this.setPointsToBoard(this.#opponentId);
-                    // mock
-                    callback(this.#isOpponentStep(WAITING_TO_PLAY));
-                };
-                if (this.#isOpponent(playerId)) {
-                    callback(this.#isPlayerStep(WAITING_TO_PLAY));
-                };
-                resolve();
-            }, delayMock);
-        });
-    }
+    // listenOpponentSetPointsToBoard(playerId: string, callback: (isSet: boolean) => void): Promise<void> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 // mock
+    //                 this.setPointsToBoard(this.#opponentId);
+    //                 // mock
+    //                 callback(this.#isOpponentStep(WAITING_TO_PLAY));
+    //             };
+    //             if (this.#isOpponent(playerId)) {
+    //                 callback(this.#isPlayerStep(WAITING_TO_PLAY));
+    //             };
+    //             resolve();
+    //         }, delayMock);
+    //     });
+    // }
     
     getBoard(playerId: string): Promise<BoardWindowData> {
         return new Promise((resolve) => {

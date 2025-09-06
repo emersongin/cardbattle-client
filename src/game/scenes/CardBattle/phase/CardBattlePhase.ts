@@ -247,7 +247,6 @@ export class CardBattlePhase {
                 const builder = CardActionsBuilder
                     .create(card)
                     .open({
-                        open: true,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     });
@@ -269,7 +268,6 @@ export class CardBattlePhase {
                 CardActionsBuilder
                     .create(card)
                     .close({
-                        open: false,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     })
@@ -341,7 +339,6 @@ export class CardBattlePhase {
                 const builder = CardActionsBuilder
                     .create(card)
                     .open({
-                        open: true,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     });
@@ -372,7 +369,6 @@ export class CardBattlePhase {
                 CardActionsBuilder
                     .create(card)
                     .close({
-                        open: false,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     })

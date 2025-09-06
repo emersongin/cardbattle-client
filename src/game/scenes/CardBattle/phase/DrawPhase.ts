@@ -111,9 +111,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 pause();
                 CardActionsBuilder
                     .create(card)
-                    .close({ open: false, delay: (index! * 200) })
+                    .close({ delay: (index! * 200) })
                     .faceUp()
-                    .open({ open: true, onComplete: () => resume() })
+                    .open({ onComplete: () => resume() })
                     .play();
             },
             onAllComplete: () => {
@@ -180,33 +180,14 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .close({
-                        open: false,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     })
                     .play();
             },
-            onAllComplete: async () => {
-                await this.cardBattle.setPointsToBoard(this.scene.room.playerId);
-                if (await this.cardBattle.hasOpponentDefinedPointsToBoard(this.scene.room.playerId)) {
-                    this.changeToLoadPhase()
-                    return;
-                }
-                this.#createSetPointsToBoardOpponentWaitingWindow();
-                super.openAllWindows({
-                    onComplete: async () => {
-                        await this.cardBattle.listenOpponentSetPointsToBoard(this.scene.room.playerId, async () => {
-                            super.closeAllWindows({ onComplete: () => this.changeToLoadPhase() });
-                        });
-                    }
-                });
-            }
+            onAllComplete: async () => this.changeToLoadPhase()
         };
         this.scene.timeline(closeConfig);
-    }
-
-    #createSetPointsToBoardOpponentWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to set points to board...');
     }
 
     #closeOpponentCardSet(): void {
@@ -217,7 +198,6 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .close({
-                        open: false,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     })

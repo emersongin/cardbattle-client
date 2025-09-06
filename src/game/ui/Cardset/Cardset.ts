@@ -184,7 +184,7 @@ export class Cardset extends Phaser.GameObjects.Container {
             const duration = 100;
             CardActionsBuilder
                 .create(card)
-                .open({ open: true, delay, duration })
+                .open({ delay, duration })
                 .play();
         });
     }
@@ -195,7 +195,7 @@ export class Cardset extends Phaser.GameObjects.Container {
             const duration = 100;
             CardActionsBuilder
                 .create(card)
-                .close({ open: false, delay, duration })
+                .close({ delay, duration })
                 .play();
         });
     }
