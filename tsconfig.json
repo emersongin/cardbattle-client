@@ -25,13 +25,16 @@
         "baseUrl": ".",
         "paths": {
             "@/*": ["src/*"],
-            "@tests/*": ["src/tests/*"],
             "@game/*": ["src/game/*"],
             "@api/*": ["src/game/api/*"],
+            "@constants/*": ["src/game/constants/*"],
+            "@objects/*": ["src/game/objects/*"],
             "@scenes/*": ["src/game/scenes/*"],
+            "@types/*": ["src/game/types/*"],
             "@ui/*": ["src/game/ui/*"],
             "@utils/*": ["src/game/utils/*"],
-            "@mocks/*": ["src/tests/mocks/*"]
+            "@mocks/*": ["src/tests/mocks/*"],
+            "@tests/*": ["src/tests/*"]
         }
     },
     "include": [
