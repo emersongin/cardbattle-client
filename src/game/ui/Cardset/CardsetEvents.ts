@@ -1,5 +1,5 @@
 export type CardsetEvents = {
-    onChangeIndex?: (cardIndex: number) => void;
+    onChangeIndex?: (cardId: string) => void;
     onMarked?: (cardId: string) => void;
     onComplete?: (cardIds: string[]) => void;
     onLeave?: () => void;

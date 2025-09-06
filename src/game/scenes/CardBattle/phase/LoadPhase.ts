@@ -147,7 +147,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.openAllWindows();
                 super.openBoard();
                 cardset.selectModeOne({
-                    onChangeIndex: (cardIndex: number) => this.#onChangeHandCardsetIndex(cardIndex),
+                    onChangeIndex: (cardId: string) => this.#onChangeHandCardsetIndex(cardId),
                     onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
                     onLeave: () => this.#onLeaveHand(),
                 });
@@ -155,12 +155,11 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         });
     }
 
-    #onChangeHandCardsetIndex(cardIndex: number): void {
+    #onChangeHandCardsetIndex(cardId: string): void {
         const cardset = super.getCardset();
-        if (!cardset.isValidIndex(cardIndex)) return;
-        super.setTextWindowText(cardset.getCardByIndex(cardIndex).getName(), 1);
-        super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDescription(), 2);
-        super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
+        super.setTextWindowText(cardset.getCardById(cardId).getName(), 1);
+        super.setTextWindowText(cardset.getCardById(cardId).getDescription(), 2);
+        super.setTextWindowText(cardset.getCardById(cardId).getDetails(), 3);
     }
 
     #onSelectHandCardsetCard(cardIds: string[]): void {
@@ -235,7 +234,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             faceUp: true,
             onComplete: () => {
                 const card = cardset.getCardByIndex(lastIndex);
-                cardset.selectCard(card);
+                cardset.selectCardById(card.getId());
                 onComplete(); // show select power action config or not
                 // this.#createPowerCardWindows(powerCard); vai no onComplete
             }
@@ -281,7 +280,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         const cardset = super.getFieldCardset();
         const lastIndex = cardset.getCardsLastIndex();
         const card = cardset.getCardByIndex(lastIndex);
-        cardset.deselectCard(card);
+        cardset.deselectCardById(card.getId());
         this.#movePowerCardToField();
     }
 

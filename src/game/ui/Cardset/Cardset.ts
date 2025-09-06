@@ -7,6 +7,7 @@ import { CardUi } from "@ui/Card/CardUi";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
+import { PositionConfig } from "../Card/animations/types/PositionConfig";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -85,15 +86,6 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.#cards.slice(start, end + 1);
     }
 
-    // getCardsByIndexes(indexes: number[]): Card[] {
-    //     return indexes.map((index: number) => {
-    //         if (!this.isValidIndex(index)) {
-    //             throw new Error(`Cardset: index ${index} is out of bounds.`);
-    //         }
-    //         return this.#cards[index];
-    //     });
-    // }
-
     getCardsTotal(): number {
         return this.getCards().length;
     }
@@ -102,36 +94,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.getCardsTotal() - 1;
     }
 
-    // getIndexesToArray(): number[] {
-    //     return this.getCards().map((card: Card) => card);
-    // }
-
-    // getSelectIndexes(): string[] {
-    //     return this.#selectMode.getIdsSelected();
-    // }
-
-    // disableBattleCards(): void {
-    //     const cards = this.getCards();
-    //     cards.forEach((card: Card, index: number) => {
-    //         if (card.isBattleCard()) {
-    //             this.disableCardByIndex(index);
-    //         }
-    //     });
-    // }
-
     disableCardById(cardId: string): void {
         const card = this.getCardById(cardId);
         card.disable();
     }
-
-    // disablePowerCards(): void {
-    //     const cards = this.getCards();
-    //     cards.forEach((card: Card, index: number) => {
-    //         if (card.isPowerCard()) {
-    //             this.disableCardByIndex(index);
-    //         }
-    //     });
-    // }
 
     #stopSelectedTweens(): void {
         if (this.#selectedTweens) {
@@ -140,24 +106,25 @@ export class Cardset extends Phaser.GameObjects.Container {
         }
     }
 
-    selectCard(card: Card): void {
+    selectCardById(cardId: string): void {
+        const card = this.getCardById(cardId);
         card.select();
         this.bringToTop(card.getUi());
         this.#stopSelectedTweens();
     }
 
-    deselectCard(card: Card): void {
-        card.deselect();
+    deselectCardById(cardId: string): void {
+        this.getCardById(cardId).deselect();
         this.#stopSelectedTweens();
     }
 
-    markCard(card: Card): void {
-        card.mark();
+    markCardById(cardId: string): void {
+        this.getCardById(cardId).mark();
         this.#stopSelectedTweens();
     }
 
-    unmarkCard(card: Card): void {
-        card.unmark();
+    unmarkCardById(cardId: string): void {
+        this.getCardById(cardId).unmark();
         this.#stopSelectedTweens();
     }
 
@@ -286,5 +253,18 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     isSelectModeDisabled(): boolean {
         return this.data.get('selectModeEnabled') === false;
+    }
+
+    moveCardById(cardId: string, config: Partial<PositionConfig>): void {
+        const card = this.getCardById(cardId);
+        CardActionsBuilder
+            .create(card)
+            .move({
+                xFrom: config?.xFrom || card.getX(),
+                yFrom: config?.yFrom || card.getY(),
+                xTo: config?.xTo || card.getX(),
+                yTo: config?.yTo || card.getY()
+            })
+            .play();
     }
 }
