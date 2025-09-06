@@ -141,7 +141,6 @@ export class LoadPhase extends CardBattlePhase implements Phase {
 
     #openHandCardset(): void {
         const cardset = super.getCardset();
-        cardset.disableBattleCards();
         super.openCardset({ 
             faceUp: true, 
             onComplete: () => {
@@ -149,7 +148,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
                 super.openBoard();
                 cardset.selectModeOne({
                     onChangeIndex: (cardIndex: number) => this.#onChangeHandCardsetIndex(cardIndex),
-                    onComplete: (cardIndexes: number[]) => this.#onSelectHandCardsetCard(cardIndexes),
+                    onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
                     onLeave: () => this.#onLeaveHand(),
                 });
             }
@@ -164,13 +163,13 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.setTextWindowText(cardset.getCardByIndex(cardIndex).getDetails(), 3);
     }
 
-    #onSelectHandCardsetCard(cardIndexes: number[]): void {
+    #onSelectHandCardsetCard(cardIds: string[]): void {
         const cardset = super.getCardset();
-        cardset.highlightCardsByIndexes(cardIndexes);
+        cardset.highlightCardsByIndexes(cardIds);
         super.createCommandWindowBottom('Complete your choice?', [
             {
                 description: 'Yes',
-                onSelect: () => this.#onPlayPowerCard(cardIndexes.shift() || 0)
+                onSelect: () => this.#onPlayPowerCard(cardIds.shift() as string)
             },
             {
                 description: 'No',
@@ -180,9 +179,9 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.openCommandWindow();
     }
 
-    #onPlayPowerCard(cardIndex: number): void {
+    #onPlayPowerCard(cardId: string): void {
         this.#closeHandBoard({ onComplete: () => {
-            this.#openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardIndex) });
+            this.#openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
         }});
     }
 
@@ -192,8 +191,8 @@ export class LoadPhase extends CardBattlePhase implements Phase {
         super.closeCardset(config);
     }
 
-    async #loadPowerCardAction(cardIndex: number): Promise<void> {
-        const powerCard = await this.cardBattle.getPowerCardByIndex(this.scene.room.playerId, cardIndex);
+    async #loadPowerCardAction(cardId: string): Promise<void> {
+        const powerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
         this.#playPowerCard(powerCard, () => {
             this.removeBoardZonePoints(HAND, 1);
             this.#onSetPowerCardAction(powerCard);

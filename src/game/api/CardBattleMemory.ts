@@ -809,14 +809,14 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getPowerCardByIndex(playerId: string, index: number): Promise<CardData> {
+    getPowerCardById(playerId: string, cardId: string): Promise<CardData> {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand[index]);
+                    resolve(this.#playerHand.find(card => card.id === cardId && card.typeId === POWER) as CardData);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand[index]);
+                    resolve(this.#opponentHand.find(card => card.id === cardId && card.typeId === POWER) as CardData);
                 };
             }, delayMock);
         });

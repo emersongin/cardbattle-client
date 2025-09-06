@@ -30,7 +30,7 @@ export interface CardBattle {
     isStartPlaying: (playerId: string) => Promise<boolean>;
     setPlaying: (playerId: string) => Promise<void>;
     pass(playerId: string): Promise<void>;
-    getPowerCardByIndex: (playerId: string, index: number) => Promise<CardData>;
+    getPowerCardById: (playerId: string, cardId: string) => Promise<CardData>;
     getFieldPowerCards: () => Promise<CardData[]>;
     makePowerCardPlay: (playerId: string, powerAction: PowerActionData) => Promise<void>;
     isPowerfieldLimitReached: () => Promise<boolean>;

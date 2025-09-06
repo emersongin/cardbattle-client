@@ -73,11 +73,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     getCardById(cardId: string): Card {
-        const card = this.#cards.find((card: Card) => card.getId() === cardId);
-        if (!card) {
-            throw new Error(`Cardset: card with id ${cardId} not found.`);
-        }
-        return card;
+        return this.#cards.find((card: Card) => card.getId() === cardId) as Card;
     }
 
     getCardsByFromTo(start: number, end: number): Card[] {
@@ -89,14 +85,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.#cards.slice(start, end + 1);
     }
 
-    getCardsByIndexes(indexes: number[]): Card[] {
-        return indexes.map((index: number) => {
-            if (!this.isValidIndex(index)) {
-                throw new Error(`Cardset: index ${index} is out of bounds.`);
-            }
-            return this.#cards[index];
-        });
-    }
+    // getCardsByIndexes(indexes: number[]): Card[] {
+    //     return indexes.map((index: number) => {
+    //         if (!this.isValidIndex(index)) {
+    //             throw new Error(`Cardset: index ${index} is out of bounds.`);
+    //         }
+    //         return this.#cards[index];
+    //     });
+    // }
 
     getCardsTotal(): number {
         return this.getCards().length;
@@ -106,36 +102,36 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.getCardsTotal() - 1;
     }
 
-    getIndexesToArray(): number[] {
-        return this.getCards().map((_card: Card, index: number) => index);
-    }
+    // getIndexesToArray(): number[] {
+    //     return this.getCards().map((card: Card) => card);
+    // }
 
-    getSelectIndexes(): number[] {
-        return this.#selectMode.getSelectIndexes();
-    }
+    // getSelectIndexes(): string[] {
+    //     return this.#selectMode.getIdsSelected();
+    // }
 
-    disableBattleCards(): void {
-        const cards = this.getCards();
-        cards.forEach((card: Card, index: number) => {
-            if (card.isBattleCard()) {
-                this.disableCardByIndex(index);
-            }
-        });
-    }
+    // disableBattleCards(): void {
+    //     const cards = this.getCards();
+    //     cards.forEach((card: Card, index: number) => {
+    //         if (card.isBattleCard()) {
+    //             this.disableCardByIndex(index);
+    //         }
+    //     });
+    // }
 
-    disableCardByIndex(index: number): void {
-        const card = this.getCardByIndex(index);
+    disableCardById(cardId: string): void {
+        const card = this.getCardById(cardId);
         card.disable();
     }
 
-    disablePowerCards(): void {
-        const cards = this.getCards();
-        cards.forEach((card: Card, index: number) => {
-            if (card.isPowerCard()) {
-                this.disableCardByIndex(index);
-            }
-        });
-    }
+    // disablePowerCards(): void {
+    //     const cards = this.getCards();
+    //     cards.forEach((card: Card, index: number) => {
+    //         if (card.isPowerCard()) {
+    //             this.disableCardByIndex(index);
+    //         }
+    //     });
+    // }
 
     #stopSelectedTweens(): void {
         if (this.#selectedTweens) {
@@ -170,9 +166,9 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#stopSelectedTweens();
     }
 
-    highlightCardsByIndexes(cardIndexes: number[]): void {
-        this.getCards().forEach((card: Card, index: number) => {
-            if (cardIndexes.includes(index)) {
+    highlightCardsByIndexes(cardIds: string[]): void {
+        this.getCards().forEach((card: Card) => {
+            if (cardIds.includes(card.getId())) {
                 card.highlight();
             }
         });
@@ -201,7 +197,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     restoreSelectMode(): void {
-        this.#selectMode.removeLastSeletedIndex();
+        this.#selectMode.removeLastSeletedId();
         this.#selectMode.enable();
     }
 

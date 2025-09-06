@@ -5,12 +5,12 @@ import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 
 export class SelectMode {
+    #events: CardsetEvents;
     #index: number;
     #selectionsNumber: number;
-    #events: CardsetEvents;
     #colorsPoints: ColorsPointsData | null = null;
-    #selectIndexes: number[] = [];
-    #disabledIndexes: number[] = [];
+    #selectIds: string[] = [];
+    #disabledIds: string[] = [];
 
     constructor(readonly cardset: Cardset) {}
 
@@ -19,27 +19,27 @@ export class SelectMode {
         this.#colorsPoints = colorPoints || null;
         this.#index = 0;
         this.#selectionsNumber = selectionsNumber || 0;
-        this.#setDisabledIndexes();
+        this.#setCardsDisabled();
         this.enable();
     }
 
-    #setDisabledIndexes(): void {
-        this.cardset.getCards().forEach((card: Card, index: number) => {
-            if (card.isDisabled()) this.#disabledIndexes.push(index);
+    #setCardsDisabled(): void {
+        this.cardset.getCards().forEach((card: Card) => {
+            if (card.isDisabled()) this.#disabledIds.push(card.getId());
         });
     }
 
-    getSelectIndexes(): number[] {
-        return this.#selectIndexes.slice();
+    getIdsSelected(): string[] {
+        return this.#selectIds.slice();
     }
 
-    removeLastSeletedIndex(): void {
-        if (this.#selectIndexes.length === 0) return;
-        const lastIndex = this.#selectIndexes.pop();
-        if (lastIndex === undefined) return;
-        this.#unmarkCard(this.#getCardByIndex(lastIndex));
-        this.#creditPoints(lastIndex);
-        this.#removeDisabledIndex(lastIndex);
+    removeLastSeletedId(): void {
+        if (this.#selectIds.length === 0) return;
+        const lastId = this.#selectIds.pop();
+        if (!lastId) return;
+        this.#unmarkCard(this.#getCardById(lastId));
+        this.#creditPointsById(lastId);
+        this.#removeDisabledById(lastId);
     }
 
     enable() {
@@ -78,21 +78,21 @@ export class SelectMode {
     #addOnKeydownEnterListener(): void {
         const keyboard = this.#getKeyboard();
         const onKeydownEnter = () => {
-            const currentIndex = this.#getCurrentIndex();
-            if (!this.#isAvaliableCardByIndex(currentIndex)) return;
-            if (this.#isIndexSelected(currentIndex)) {
-                this.#removeIndex(currentIndex);
-                this.#creditPoints(currentIndex);
-                this.#unmarkCard(this.#getCardByIndex(currentIndex));
+            const currentId = this.#getCurrentId();
+            if (!this.#isCardAvaliableById(currentId)) return;
+            if (this.#isIdSelected(currentId)) {
+                this.#removeId(currentId);
+                this.#creditPointsById(currentId);
+                this.#unmarkCard(this.#getCardById(currentId));
                 return;
             }
-            this.#selectIndex(currentIndex);
-            this.#discountPoints(currentIndex);
-            if (this.#selectionsNumber !== 1) this.#markCard(this.#getCardByIndex(currentIndex));
-            if (this.#events.onMarked) this.#events.onMarked(currentIndex);
+            this.#selectIndex(currentId);
+            this.#discountPointsById(currentId);
+            if (this.#selectionsNumber !== 1) this.#markCard(this.#getCardById(currentId));
+            if (this.#events.onMarked) this.#events.onMarked(currentId);
             if (this.#isSelectLimitReached() || this.#isSelectAll() || this.#isNoHasMoreColorsPoints()) {
                 this.#disable();
-                if (this.#events.onComplete) this.#events.onComplete(this.getSelectIndexes());
+                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
             }
         };
         keyboard.on('keydown-ENTER', onKeydownEnter);
@@ -102,8 +102,8 @@ export class SelectMode {
         const keyboard = this.#getKeyboard();
         const onKeydownEsc = () => {
             this.#disable();
-            if (this.getSelectIndexes().length > 0) {
-                if (this.#events.onComplete) this.#events.onComplete(this.getSelectIndexes());
+            if (this.getIdsSelected().length > 0) {
+                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
                 return;
             }
             if (this.#events.onLeave) this.#events.onLeave();
@@ -118,18 +118,23 @@ export class SelectMode {
     }
 
     #updateCardsState(): void {
-        this.cardset.getCards().forEach((card: Card, index: number) => {
-            if (this.#isCardNoHasMorePoints(card) && !this.#disabledIndexes.includes(index)) {
-                this.#disabledIndexes.push(index);
+        this.cardset.getCards().forEach((card: Card) => {
+            const cardId = card.getId();
+            if (this.#isCardNoHasMorePoints(card) && !this.#disabledIds.includes(cardId)) {
+                this.#disabledIds.push(cardId);
             }
-            if (this.#disabledIndexes.includes(index)) {
-                this.cardset.disableCardByIndex(index);
+            if (this.#disabledIds.includes(cardId)) {
+                this.cardset.disableCardById(cardId);
             }
-            if (this.#selectIndexes.includes(index)) {
-                this.#markCard(this.#getCardByIndex(index));
+            if (this.#selectIds.includes(cardId)) {
+                this.#markCard(this.#getCardById(cardId));
             }
         });
     }
+
+    #getCardById(cardId: string): Card {
+        return this.cardset.getCardById(cardId)
+    }  
 
     #getCardByIndex(index: number): Card {
         return this.cardset.getCardByIndex(index)
@@ -146,6 +151,10 @@ export class SelectMode {
         if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCurrentIndex());
     }
 
+    #getCurrentId(): string {
+        return this.cardset.getCardByIndex(this.#getCurrentIndex()).getId();
+    }
+
     #getCurrentIndex(): number {
         return this.#index;
     }
@@ -156,9 +165,8 @@ export class SelectMode {
         this.cardset.data.set('selectModeEnabled', false);
     }
 
-    #isAvaliableCardByIndex(index: number): boolean {
-        if (!this.cardset.isValidIndex(index)) return false;
-        return !this.#disabledIndexes.includes(index) || this.#selectIndexes.includes(index);
+    #isCardAvaliableById(cardId: string): boolean {
+        return !this.#disabledIds.includes(cardId) || this.#selectIds.includes(cardId);
     }
 
     #getKeyboard(): Phaser.Input.Keyboard.KeyboardPlugin {
@@ -214,26 +222,26 @@ export class SelectMode {
             .play();
     }
 
-    #isIndexSelected(index: number): boolean {
-        return this.#selectIndexes.includes(index);
+    #isIdSelected(cardId: string): boolean {
+        return this.#selectIds.includes(cardId);
     }
 
-    #removeIndex(index: number): void {
-        this.#removeSelectIndex(index);
-        this.#removeDisabledIndex(index);
+    #removeId(cardId: string): void {
+        this.#removeSelectedById(cardId);
+        this.#removeDisabledById(cardId);
     }
 
-    #removeSelectIndex(index: number): void {
-        this.#selectIndexes = this.#selectIndexes.filter(i => i !== index);
+    #removeSelectedById(cardId: string): void {
+        this.#selectIds = this.#selectIds.filter(i => i !== cardId);
     }
 
-    #removeDisabledIndex(index: number): void {
-        this.#disabledIndexes = this.#disabledIndexes.filter(i => i !== index);
+    #removeDisabledById(cardId: string): void {
+        this.#disabledIds = this.#disabledIds.filter(i => i !== cardId);
     }
 
-    #creditPoints(index: number): void {
+    #creditPointsById(cardId: string): void {
         if (!this.#colorsPoints) return;
-        const card = this.#getCardByIndex(index);
+        const card = this.#getCardById(cardId);
         const cardColor = card.getColor();
         const cardCost = card.getCost();
         this.#colorsPoints[cardColor] += cardCost;
@@ -243,14 +251,14 @@ export class SelectMode {
         this.cardset.unmarkCard(card);
     }
 
-    #selectIndex(index: number): void {
-        this.#selectIndexes.push(index);
-        this.#disabledIndexes.push(index);
+    #selectIndex(cardId: string): void {
+        this.#selectIds.push(cardId);
+        this.#disabledIds.push(cardId);
     }
 
-    #discountPoints(index: number): void {
+    #discountPointsById(cardId: string): void {
         if (!this.#colorsPoints) return;
-        const card = this.#getCardByIndex(index);
+        const card = this.#getCardById(cardId);
         const cardColor = card.getColor();
         const cardCost = card.getCost();
         this.#colorsPoints[cardColor] -= cardCost;
@@ -262,18 +270,17 @@ export class SelectMode {
     }
 
     #isSelectLimitReached(): boolean {
-        return (this.#selectionsNumber > 0) && (this.#selectIndexes.length >= this.#selectionsNumber);
+        return (this.#selectionsNumber > 0) && (this.#selectIds.length >= this.#selectionsNumber);
     }
 
     #isSelectAll(): boolean {
-        return this.#selectIndexes.length === (this.cardset.getCardsTotal() - this.#disabledIndexes.length);
+        return this.#selectIds.length === (this.cardset.getCardsTotal() - this.#disabledIds.length);
     }
 
     #isNoHasMoreColorsPoints(): boolean {
         if (!this.#colorsPoints) return false;
-        const allIndexes = this.cardset.getIndexesToArray();
-        const avaliableIndexes = allIndexes.filter((index: number) => !this.#selectIndexes.includes(index));
-        const avaliableCards = this.cardset.getCardsByIndexes(avaliableIndexes);
+        const cards = this.cardset.getCards();
+        const avaliableCards = cards.filter((card: Card) => !this.#selectIds.includes(card.getId()));
         return avaliableCards.some((card: Card) => {
             return this.#isCardNoHasMorePoints(card);
         });
