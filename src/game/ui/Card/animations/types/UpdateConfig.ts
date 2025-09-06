@@ -1,5 +1,5 @@
 import { TweenConfig } from "@/game/types/TweenConfig";
-import { CardPoints } from "../../../Card/types/CardPoints";
+import { CardPoints } from "../../../../types/CardPoints";
 
 export type UpdateConfig = {
     target: CardPoints;

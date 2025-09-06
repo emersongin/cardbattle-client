@@ -1,10 +1,10 @@
-import { CardPoints } from "./types/CardPoints";
+import { CardPoints } from "../../types/CardPoints";
 import { CardUi } from "./CardUi";
-import { CardData } from "@game/types";
 import { Cardset } from "../Cardset/Cardset";
-import { CardColors } from "./types/CardColors";
+import { CardColors } from "../../types/CardColors";
 import { BATTLE, POWER } from "@game/constants/keys";
-import { CardType } from "./types/CardType";
+import { CardType } from "../../types/CardType";
+import { CardData } from "@/game/types/CardData";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;

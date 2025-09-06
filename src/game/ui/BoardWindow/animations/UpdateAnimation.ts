@@ -1,6 +1,6 @@
 import { UpdateConfig } from "./UpdateConfig";
-import BoardWindow from "../BoardWindow";
-import { BoardWindowData } from "@/game/types";
+import { BoardWindow } from "../BoardWindow";
+import { BoardWindowData } from "@/game/types/BoardWindowData";
 
 export class UpdateAnimation {
     

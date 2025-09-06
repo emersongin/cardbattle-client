@@ -6,8 +6,8 @@ import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { ORANGE } from "@/game/constants/colors";
 import { DECK, HAND } from "@/game/constants/keys";
 import { CARD_WIDTH } from "@/game/constants/default";
-import { BoardWindowData } from "@/game/types";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
+import { BoardWindowData } from "@/game/types/BoardWindowData";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 

@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
 import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '../constants/keys';
-import { CardColors } from '../ui/Card/types/CardColors';
-import { CardType } from '../ui/Card/types/CardType';
+import { CardColors } from '../types/CardColors';
+import { CardType } from '../types/CardType';
 import { MathUtil } from '../utils/MathUtil';
 import { CardBattle, LoadPhasePlay } from './CardBattle';
 import { RoomData } from '../types/RoomData';

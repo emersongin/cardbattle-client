@@ -3,13 +3,13 @@ import { CardBattlePhase } from "./CardBattlePhase";
 import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
 import { HAND } from "@/game/constants/keys";
-import { CardData } from "@/game/types";
 import { LoadPhasePlay } from "@/game/api/CardBattle";
 import { CARD_WIDTH } from "@/game/constants/default";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineEvent } from "../../VueScene";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 import { TweenConfig } from '@/game/types/TweenConfig';
+import { CardData } from "@/game/types/CardData";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
 

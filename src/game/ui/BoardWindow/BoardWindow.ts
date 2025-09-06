@@ -4,11 +4,11 @@ import { BoardWindowData } from "@game/types/BoardWindowData";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
 import { BoardZones } from "@/game/types/BoardZones";
 import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
-import { CardColors } from "../Card/types/CardColors";
+import { CardColors } from "../../types/CardColors";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { UpdateAnimation } from "./animations/UpdateAnimation";
 
-export default class BoardWindow extends Sizer {
+export class BoardWindow extends Sizer {
     #contentLabel: Label;
 
     private constructor(

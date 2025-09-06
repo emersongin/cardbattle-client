@@ -1,13 +1,13 @@
-import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import Phaser from "@mocks/phaser";
+import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { ColorsPoints } from "@game/types/ColorsPoints";
 import { VueScene } from "@game/scenes/VueScene";
-import { CardData } from "@game/types";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/colors";
-import { CardColors } from "@game/ui/Card/types/CardColors";
-import { CardType } from "@game/ui/Card/types/CardType";
+import { CardColors } from "@/game/types/CardColors";
+import { CardType } from "@/game/types/CardType";
 import { BATTLE, POWER } from "@game/constants/keys";
+import { CardData } from "@/game/types/CardData";
 
 const cards = [
     {

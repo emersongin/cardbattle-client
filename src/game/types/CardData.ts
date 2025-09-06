@@ -1,5 +1,5 @@
-import { CardColors } from "../ui/Card/types/CardColors";
-import { CardType } from "../ui/Card/types/CardType";
+import { CardColors } from "./CardColors";
+import { CardType } from "./CardType";
 
 export type CardData = {
     id: string;

@@ -3,18 +3,20 @@ import { CardBattle } from "@game/api/CardBattle";
 import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
 import { LEFT, CENTER, RIGHT } from '@/game/constants/keys';
 import { CommandWindow } from '@/game/ui/CommandWindow/CommandWindow';
-import BoardWindow from '@/game/ui/BoardWindow/BoardWindow';
-import { BoardWindowData, BoardZones, CardData } from '@/game/types';
+import { BoardWindow } from '@/game/ui/BoardWindow/BoardWindow';
 import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { TimelineConfig, TimelineEvent } from '../../VueScene';
 import { CardUi } from '@/game/ui/Card/CardUi';
-import { CardColors } from '@/game/ui/Card/types/CardColors';
+import { CardColors } from '@/game/types/CardColors';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
 import { CommandOption } from '@/game/ui/CommandWindow/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
 import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
 import { TweenConfig } from '@/game/types/TweenConfig';
 import { TextWindowConfig } from '@/game/ui/TextWindow/TextWindowConfig';
+import { BoardWindowData } from '@/game/types/BoardWindowData';
+import { BoardZones } from '@/game/types/BoardZones';
+import { CardData } from '@/game/types/CardData';
 
 export type AlignType = 
     | typeof LEFT 

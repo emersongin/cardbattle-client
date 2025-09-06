@@ -1,5 +1,5 @@
 import { Card } from "../Card";
-import { CardPoints } from "../types/CardPoints";
+import { CardPoints } from "../../../types/CardPoints";
 import { UpdateConfig } from "./types/UpdateConfig";
 
 export class UpdateAnimation {

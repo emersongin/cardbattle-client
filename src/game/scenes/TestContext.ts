@@ -1,11 +1,11 @@
 // import { Cardset } from '@game/ui/Cardset/Cardset';
+import { CardData } from '../types/CardData';
 import { VueScene } from './VueScene';
 // import { Card } from '../ui/Card/Card';
 // import { ColorsPoints } from '../types/ColorsPoints';
 // import { CARD_HEIGHT, CARD_WIDTH, CardColors, CardType } from '../ui/Card/Card';
 // import { CardPoints } from '../ui/Card/types/CardPoints';
 // import BoardWindow from '../ui/BoardWindow/BoardWindow';
-import { CardData } from '../types';
 // import { CardColors } from '../ui/Card/types/CardColors';
 // import { CardType } from '../ui/Card/types/CardType';
 // import { Cardset } from '../ui/Cardset/Cardset';

@@ -1,12 +1,12 @@
 import { Card } from "@ui/Card/Card";
 import { CardsetEvents } from "./CardsetEvents";
 import { ColorsPoints } from "../../types/ColorsPoints";
-import { CardData } from "@game/types";
 import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 import { SelectMode } from "./SelectMode";
+import { CardData } from "@/game/types/CardData";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -184,7 +184,7 @@ export class Cardset extends Phaser.GameObjects.Container {
             const duration = 100;
             CardActionsBuilder
                 .create(card)
-                .open({ delay, duration })
+                .open({ open: true, delay, duration })
                 .play();
         });
     }
@@ -195,7 +195,7 @@ export class Cardset extends Phaser.GameObjects.Container {
             const duration = 100;
             CardActionsBuilder
                 .create(card)
-                .close({ delay, duration })
+                .close({ open: false, delay, duration })
                 .play();
         });
     }

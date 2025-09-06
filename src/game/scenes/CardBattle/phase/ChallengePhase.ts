@@ -1,7 +1,8 @@
 import { Phase } from "./Phase";
 import { StartPhase } from "./StartPhase";
-import { CardsFolderData, OpponentData } from "@game/types";
 import { CardBattlePhase } from "./CardBattlePhase";
+import { OpponentData } from "@/game/types/OpponentData";
+import { CardsFolderData } from "@/game/types/CardsFolderData";
 
 export class ChallengePhase extends CardBattlePhase implements Phase {
 
