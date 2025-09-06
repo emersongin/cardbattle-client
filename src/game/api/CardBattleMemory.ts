@@ -266,6 +266,10 @@ export default class CardBattleMemory implements CardBattle {
     #opponentHand: CardData[] = [];
     #opponentTrash: CardData[] = [];
 
+    getTotalCardsInDeck(): number {
+        return this.#playerDeck.length;
+    }
+
     createRoom(): Promise<RoomData> {
         return new Promise((resolve) => {
             const roomId = uuidv4();
@@ -570,10 +574,10 @@ export default class CardBattleMemory implements CardBattle {
     #drawCards(): Promise<void> {
         return new Promise((resolve) => {
             this.#shufflePlayerDeck();
-            this.#drawPlayerCards();
-            this.#setPlayerStep(DRAW_CARDS);
             this.#shuffleOpponentDeck();
+            this.#drawPlayerCards();
             this.#drawOpponentCards();
+            this.#setPlayerStep(DRAW_CARDS);
             this.#setOpponentStep(DRAW_CARDS);
             setTimeout(() => resolve(), delayMock);
         });
@@ -605,9 +609,6 @@ export default class CardBattleMemory implements CardBattle {
                     callback(this.#isOpponentStep(DRAW_CARDS));
                 };
                 if (this.#isOpponent(playerId)) {
-                    // mock
-                    this.setReadyDrawCards(this.#playerStep);
-                    // mock
                     callback(this.#isPlayerStep(DRAW_CARDS));
                 };
                 resolve();
@@ -659,7 +660,6 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    this.#setOpponentStep(WAITING_TO_PLAY);
                     this.setPointsToBoard(this.#opponentId);
                     // mock
                     callback(this.#isOpponentStep(WAITING_TO_PLAY));
