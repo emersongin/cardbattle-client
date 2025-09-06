@@ -1,4 +1,4 @@
-import { BATTLE, POWER } from "@/game/constants/keys";
+import { BATTLE, POWER } from "@constants/keys";
 
 export type CardType = 
     | typeof BATTLE 

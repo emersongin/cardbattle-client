@@ -1,5 +1,5 @@
-import { BoardWindowData } from "@/game/objects/BoardWindowData";
-import { TweenConfig } from "@/game/types/TweenConfig";
+import { BoardWindowData } from "@objects/BoardWindowData";
+import { TweenConfig } from "@types/TweenConfig";
 
 export type UpdateConfig = {
     target: BoardWindowData;

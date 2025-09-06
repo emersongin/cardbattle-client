@@ -1,8 +1,8 @@
-import { CardBattlePhase } from "./CardBattlePhase";
-import { Phase } from "./Phase";
-import { WHITE, BLACK } from "@/game/constants/colors";
-import { DrawPhase } from "./DrawPhase";
-import { ArrayUtil } from "@/game/utils/ArrayUtil";
+import { WHITE, BLACK } from "@constants/colors";
+import { Phase } from "@scenes/CardBattle/phase/Phase";
+import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
+import { DrawPhase } from "@scenes/CardBattle/phase/DrawPhase";
+import { ArrayUtil } from "@utils/ArrayUtil";
 
 export class StartPhase extends CardBattlePhase implements Phase {
 

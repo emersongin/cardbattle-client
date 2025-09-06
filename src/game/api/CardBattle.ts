@@ -1,10 +1,10 @@
-import { BoardWindowData } from "../objects/BoardWindowData";
-import { CardData } from "../objects/CardData";
-import { CardsFolderData } from "../objects/CardsFolderData";
-import { OpponentData } from "../objects/OpponentData";
-import { PowerActionData } from "../objects/PowerActionData";
-import { PowerCardPlayData } from "../objects/PowerCardPlayData";
-import { RoomData } from "../objects/RoomData";
+import { BoardWindowData } from "@objects/BoardWindowData";
+import { CardData } from "@objects/CardData";
+import { CardsFolderData } from "@objects/CardsFolderData";
+import { OpponentData } from "@objects/OpponentData";
+import { PowerActionData } from "@objects/PowerActionData";
+import { PowerCardPlayData } from "@objects/PowerCardPlayData";
+import { RoomData } from "@objects/RoomData";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;

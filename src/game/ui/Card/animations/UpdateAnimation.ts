@@ -1,6 +1,6 @@
-import { Card } from "../Card";
-import { CardPointsData } from "../../../objects/CardPointsData";
-import { UpdateConfig } from "./types/UpdateConfig";
+import { Card } from "@ui/Card/Card";
+import { CardPointsData } from "@objects/CardPointsData";
+import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
 
 export class UpdateAnimation {
     

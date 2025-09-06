@@ -1,7 +1,7 @@
 import { Scene } from 'phaser';
 import { EventBus } from '@game/EventBus';
-import { CardBattle } from '../api/CardBattle';
-import { TweenConfig } from '../types/TweenConfig';
+import { CardBattle } from '@api/CardBattle';
+import { TweenConfig } from '@types/TweenConfig';
 
 type VoidCallback = (config?: TweenConfig) => void;
 type TimelineTarget = Phaser.GameObjects.Components.Transform | VoidCallback;

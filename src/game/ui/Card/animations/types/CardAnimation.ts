@@ -1,14 +1,14 @@
-import { FlashAnimation } from "../FlashAnimation";
-import { ExpandAnimation } from "../ExpandAnimation";
-import { ScaleAnimation } from "../ScaleAnimation";
-import { PositionAnimation } from "../PositionAnimation";
-import { ShrinkAnimation } from "../ShrinkAnimation";
-import { UpdateAnimation } from "../UpdateAnimation";
-import { FlashConfig } from "./FlashConfig";
-import { ExpandConfig } from "./ExpandConfig";
-import { ScaleConfig } from "./ScaleConfig";
-import { PositionConfig } from "./PositionConfig";
-import { UpdateConfig } from "@/game/ui/Card/animations/types/UpdateConfig";
+import { FlashAnimation } from "@ui/Card/animations/FlashAnimation";
+import { ExpandAnimation } from "@ui/Card/animations/ExpandAnimation";
+import { ScaleAnimation } from "@ui/Card/animations/ScaleAnimation";
+import { PositionAnimation } from "@ui/Card/animations/PositionAnimation";
+import { ShrinkAnimation } from "@ui/Card/animations/ShrinkAnimation";
+import { UpdateAnimation } from "@ui/Card/animations/UpdateAnimation";
+import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
+import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
+import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
+import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
+import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
 
 export type CardAnimation = {
     name: 

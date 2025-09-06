@@ -1,5 +1,5 @@
-import { Card } from "../Card";
-import { ExpandConfig } from "./types/ExpandConfig";
+import { Card } from "@ui/Card/Card";
+import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
 
 export class ShrinkAnimation {
     

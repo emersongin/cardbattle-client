@@ -1,12 +1,12 @@
 import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
-import { DisplayUtil } from "../../utils/DisplayUtil";
-import { BoardWindowData } from "@/game/objects/BoardWindowData";
-import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
-import { BoardZonesType } from "@/game/types/BoardZonesType";
-import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
-import { CardColorsType } from "../../types/CardColorsType";
-import { TweenConfig } from "@/game/types/TweenConfig";
-import { UpdateAnimation } from "./animations/UpdateAnimation";
+import { BLACK, BLUE, GREEN, RED, WHITE } from "@constants/colors";
+import { DECK, HAND, TRASH, WINS } from "@constants/keys";
+import { BoardWindowData } from "@objects/BoardWindowData";
+import { DisplayUtil } from "@utils/DisplayUtil";
+import { BoardZonesType } from "@types/BoardZonesType";
+import { CardColorsType } from "@types/CardColorsType";
+import { TweenConfig } from "@types/TweenConfig";
+import { UpdateAnimation } from "@ui/BoardWindow/animations/UpdateAnimation";
 
 export class BoardWindow extends Sizer {
     #contentLabel: Label;

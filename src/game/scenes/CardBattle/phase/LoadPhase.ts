@@ -1,15 +1,15 @@
-import { Phase } from "./Phase";
-import { CardBattlePhase } from "./CardBattlePhase";
-import { SummonPhase } from "./SummonPhase";
-import { TriggerPhase } from "./TriggerPhase";
-import { HAND } from "@/game/constants/keys";
-import { CARD_WIDTH } from "@/game/constants/default";
-import { CardUi } from "@/game/ui/Card/CardUi";
-import { TimelineEvent } from "../../VueScene";
-import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
-import { TweenConfig } from '@/game/types/TweenConfig';
-import { CardData } from "@/game/objects/CardData";
-import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
+import { HAND } from "@constants/keys";
+import { CARD_WIDTH } from "@constants/default";
+import { CardUi } from "@ui/Card/CardUi";
+import { CardData } from "@objects/CardData";
+import { PowerCardPlayData } from "@objects/PowerCardPlayData";
+import { TimelineEvent } from "@scenes/VueScene";
+import { Phase } from "@scenes/CardBattle/phase/Phase";
+import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
+import { SummonPhase } from "@scenes/CardBattle/phase/SummonPhase";
+import { TriggerPhase } from "@scenes/CardBattle/phase/TriggerPhase";
+import { TweenConfig } from '@types/TweenConfig';
+import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
 

@@ -1,8 +1,8 @@
-import { Card } from "../Card/Card";
-import { Cardset } from "./Cardset";
-import { CardsetEvents } from "./CardsetEvents";
-import { CardActionsBuilder } from "../Card/CardActionsBuilder";
-import { ColorsPointsData } from "@/game/objects/CardsFolderData";
+import { ColorsPointsData } from "@objects/CardsFolderData";
+import { Card } from "@ui/Card/Card";
+import { Cardset } from "@ui/Cardset/Cardset";
+import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
+import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 
 export class SelectMode {
     #index: number;

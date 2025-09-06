@@ -1,7 +1,7 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
-import { DisplayUtil } from '../../utils/DisplayUtil';
-import { TweenConfig } from '@/game/types/TweenConfig';
-import { TextWindowConfig } from './TextWindowConfig';
+import { TweenConfig } from '@types/TweenConfig';
+import { DisplayUtil } from '@utils/DisplayUtil';
+import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
 
 export class TextWindow extends TextBox {
     #onStartClose?: () => void;

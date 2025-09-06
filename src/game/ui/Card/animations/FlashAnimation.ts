@@ -1,5 +1,5 @@
-import { Card } from "../Card";
-import { FlashConfig } from "./types/FlashConfig";
+import { Card } from "@ui/Card/Card";
+import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 
 export class FlashAnimation {
     #flashLayer: Phaser.GameObjects.Rectangle;

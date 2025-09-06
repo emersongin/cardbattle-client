@@ -1,4 +1,4 @@
-import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
+import { DECK, HAND, TRASH, WINS } from "@constants/keys";
 
 export type BoardZonesType = 
     | typeof HAND 

@@ -1,13 +1,13 @@
-import { Phase } from "./Phase";
-import { CardBattlePhase } from "./CardBattlePhase";
-import { LoadPhase } from "./LoadPhase";
-import { CardUi } from "@game/ui/Card/CardUi";
-import { TimelineConfig, TimelineEvent } from "../../VueScene";
-import { ORANGE } from "@/game/constants/colors";
-import { DECK, HAND } from "@/game/constants/keys";
-import { CARD_WIDTH } from "@/game/constants/default";
-import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
-import { BoardWindowData } from "@/game/objects/BoardWindowData";
+import { ORANGE } from "@constants/colors";
+import { DECK, HAND } from "@constants/keys";
+import { CARD_WIDTH } from "@constants/default";
+import { BoardWindowData } from "@objects/BoardWindowData";
+import { TimelineConfig, TimelineEvent } from "@scenes/VueScene";
+import { LoadPhase } from "@scenes/CardBattle/phase/LoadPhase";
+import { Phase } from "@scenes/CardBattle/phase/Phase";
+import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
+import { CardUi } from "@ui/Card/CardUi";
+import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 

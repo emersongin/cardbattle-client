@@ -1,12 +1,12 @@
-import { Card } from "@ui/Card/Card";
-import { CardsetEvents } from "./CardsetEvents";
-import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
-import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
-import { CardActionsBuilder } from "../Card/CardActionsBuilder";
-import { SelectMode } from "./SelectMode";
-import { CardData } from "@/game/objects/CardData";
-import { ColorsPointsData } from "@/game/objects/CardsFolderData";
+import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
+import { CardData } from "@objects/CardData";
+import { ColorsPointsData } from "@objects/CardsFolderData";
+import { Card } from "@ui/Card/Card";
+import { CardUi } from "@ui/Card/CardUi";
+import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
+import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
+import { SelectMode } from "@ui/Cardset/SelectMode";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];

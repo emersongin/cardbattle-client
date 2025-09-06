@@ -1,6 +1,6 @@
 
-import { Card } from "../Card";
-import { PositionConfig } from "./types/PositionConfig";
+import { Card } from "@ui/Card/Card";
+import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 
 export class PositionAnimation {
 

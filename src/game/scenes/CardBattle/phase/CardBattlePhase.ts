@@ -1,22 +1,22 @@
-import { CardBattleScene } from '../CardBattleScene';
-import { CardBattle } from "@game/api/CardBattle";
-import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
-import { LEFT, CENTER, RIGHT } from '@/game/constants/keys';
-import { CommandWindow } from '@/game/ui/CommandWindow/CommandWindow';
-import { BoardWindow } from '@/game/ui/BoardWindow/BoardWindow';
-import { Cardset } from '@/game/ui/Cardset/Cardset';
-import { TimelineConfig, TimelineEvent } from '../../VueScene';
-import { CardUi } from '@/game/ui/Card/CardUi';
-import { CardColorsType } from '@/game/types/CardColorsType';
-import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
-import { CommandOption } from '@/game/ui/CommandWindow/CommandOption';
-import { Card } from '@/game/ui/Card/Card';
-import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
-import { TweenConfig } from '@/game/types/TweenConfig';
-import { TextWindowConfig } from '@/game/ui/TextWindow/TextWindowConfig';
-import { BoardWindowData } from '@/game/objects/BoardWindowData';
-import { BoardZonesType } from '@/game/types/BoardZonesType';
-import { CardData } from '@/game/objects/CardData';
+import { CardBattle } from "@api/CardBattle";
+import { LEFT, CENTER, RIGHT } from '@constants/keys';
+import { CARD_HEIGHT, CARD_WIDTH } from '@constants/default';
+import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
+import { TimelineConfig, TimelineEvent } from '@scenes/VueScene';
+import { BoardWindowData } from '@objects/BoardWindowData';
+import { CardData } from '@objects/CardData';
+import { CardColorsType } from '@types/CardColorsType';
+import { TweenConfig } from '@types/TweenConfig';
+import { BoardZonesType } from '@types/BoardZonesType';
+import { TextWindow } from '@ui/TextWindow/TextWindow';
+import { CommandWindow } from '@ui/CommandWindow/CommandWindow';
+import { BoardWindow } from '@ui/BoardWindow/BoardWindow';
+import { Cardset } from '@ui/Cardset/Cardset';
+import { Card } from '@ui/Card/Card';
+import { CardUi } from '@ui/Card/CardUi';
+import { CommandOption } from '@ui/CommandWindow/CommandOption';
+import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
+import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
 
 export type AlignType = 
     | typeof LEFT 

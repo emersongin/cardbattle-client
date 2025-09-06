@@ -1,6 +1,6 @@
 
-import { Card } from "../Card";
-import { ScaleConfig } from "./types/ScaleConfig";
+import { Card } from "@ui/Card/Card";
+import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 
 export class ScaleAnimation {
 

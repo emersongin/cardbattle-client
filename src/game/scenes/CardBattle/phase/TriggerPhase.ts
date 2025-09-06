@@ -1,10 +1,10 @@
-import { Phase } from "./Phase";
-import { CardBattleScene } from '../CardBattleScene';
-import { LoadPhase } from "./LoadPhase";
-import { CardBattlePhase } from "./CardBattlePhase";
-import { PowerActionData } from "@/game/objects/PowerActionData";
-import { TRASH } from "@/game/constants/keys";
-import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
+import { TRASH } from "@constants/keys";
+import { PowerActionData } from "@objects/PowerActionData";
+import { Phase } from "@scenes/CardBattle/phase/Phase";
+import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
+import { LoadPhase } from "@scenes/CardBattle/phase/LoadPhase";
+import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
+import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 
 export class TriggerPhase extends CardBattlePhase implements Phase {
 

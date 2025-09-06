@@ -1,4 +1,4 @@
-import { CardData } from "./CardData";
+import { CardData } from "@objects/CardData";
 
 export type PowerActionData = {
     powerCard: CardData;

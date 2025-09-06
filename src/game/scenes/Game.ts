@@ -1,5 +1,5 @@
-import { EventBus } from '../EventBus';
 import { Scene } from 'phaser';
+import { EventBus } from '@game/EventBus';
 
 export class Game extends Scene
 {

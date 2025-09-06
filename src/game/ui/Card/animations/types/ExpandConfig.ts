@@ -1,3 +1,3 @@
-import { TweenConfig } from "@/game/types/TweenConfig";
+import { TweenConfig } from "@types/TweenConfig";
 
 export type ExpandConfig = {} & TweenConfig;

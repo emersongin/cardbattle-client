@@ -1,7 +1,6 @@
-import { Phase } from "./Phase";
-import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
-import { CompilePhase } from "./CompilePhase";
-import { CardBattlePhase } from "./CardBattlePhase";
+import { Phase } from "@scenes/CardBattle/phase/Phase";
+import { TextWindow } from '@ui/TextWindow/TextWindow';
+import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 
 export class SummonPhase extends CardBattlePhase implements Phase {
     #window: TextWindow;
@@ -41,7 +40,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     changeToCompilePhase(): void {
-        this.scene.changePhase(new CompilePhase(this.scene));
+        // this.scene.changePhase(new CompilePhase(this.scene));
     }
 
     changeToBattlePhase(): void {

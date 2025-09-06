@@ -1,7 +1,7 @@
-import { Phase } from "./Phase";
-import { CardBattleScene } from '../CardBattleScene';
-import { TextWindow } from '@/game/ui/TextWindow/TextWindow';
-import { ChallengePhase } from "./ChallengePhase";
+import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
+import { Phase } from "@scenes/CardBattle/phase/Phase";
+import { ChallengePhase } from "@scenes/CardBattle/phase/ChallengePhase";
+import { TextWindow } from '@ui/TextWindow/TextWindow';
 
 export class BattlePhase implements Phase {
     #window: TextWindow;

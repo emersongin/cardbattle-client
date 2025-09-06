@@ -1,4 +1,4 @@
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
 
 export type CardColorsType = 
     | typeof RED 

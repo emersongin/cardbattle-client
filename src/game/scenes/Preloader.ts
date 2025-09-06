@@ -1,4 +1,4 @@
-import { VueScene } from './VueScene';
+import { VueScene } from '@scenes/VueScene';
 
 export class Preloader extends VueScene
 {

@@ -1,14 +1,14 @@
-import { FlashAnimation } from "./animations/FlashAnimation";
-import { Card } from "./Card";
-import { ExpandAnimation } from "./animations/ExpandAnimation";
-import { ShrinkAnimation } from "./animations/ShrinkAnimation";
-import { CardAnimation } from "./animations/types/CardAnimation";
-import { ExpandConfig } from "./animations/types/ExpandConfig";
-import { FlashConfig } from "./animations/types/FlashConfig";
-import { PositionConfig } from "./animations/types/PositionConfig";
-import { PositionAnimation } from "./animations/PositionAnimation";
-import { ScaleAnimation } from "./animations/ScaleAnimation";
-import { ScaleConfig } from "./animations/types/ScaleConfig";
+import { Card } from "@ui/Card/Card";
+import { FlashAnimation } from "@ui/Card/animations/FlashAnimation";
+import { ExpandAnimation } from "@ui/Card/animations/ExpandAnimation";
+import { ShrinkAnimation } from "@ui/Card/animations/ShrinkAnimation";
+import { PositionAnimation } from "@ui/Card/animations/PositionAnimation";
+import { ScaleAnimation } from "@ui/Card/animations/ScaleAnimation";
+import { CardAnimation } from "@ui/Card/animations/types/CardAnimation";
+import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
+import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
+import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
+import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 
 export class CardActionsBuilder {
     #moves: CardAnimation[] = [];

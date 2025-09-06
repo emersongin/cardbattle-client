@@ -1,19 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
-import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
-import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '../constants/keys';
-import { CardColorsType } from '../types/CardColorsType';
-import { CardType } from '../types/CardType';
-import { MathUtil } from '../utils/MathUtil';
-import { CardBattle } from './CardBattle';
-import { RoomData } from '../objects/RoomData';
-import { PowerActionData } from '../objects/PowerActionData';
-import { ArrayUtil } from '../utils/ArrayUtil';
-import { CardData } from '../objects/CardData';
-import { PowerActionUpdatesData } from '../objects/PowerActionUpdatesData';
-import { BoardWindowData } from '../objects/BoardWindowData';
-import { OpponentData } from '../objects/OpponentData';
-import { CardsFolderData } from '../objects/CardsFolderData';
-import { PowerCardPlayData } from '../objects/PowerCardPlayData';
+import { CardBattle } from '@api/CardBattle';
+import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '@constants/keys';
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
+import { BoardWindowData } from "@objects/BoardWindowData";
+import { CardData } from "@objects/CardData";
+import { CardsFolderData } from "@objects/CardsFolderData";
+import { OpponentData } from "@objects/OpponentData";
+import { PowerActionData } from "@objects/PowerActionData";
+import { PowerCardPlayData } from "@objects/PowerCardPlayData";
+import { RoomData } from "@objects/RoomData";
+import { PowerActionUpdatesData } from '@objects/PowerActionUpdatesData';
+import { CardColorsType } from '@types/CardColorsType';
+import { CardType } from '@types/CardType';
+import { ArrayUtil } from '@utils/ArrayUtil';
+import { MathUtil } from '@utils/MathUtil';
 
 const delayMock = 100;
 

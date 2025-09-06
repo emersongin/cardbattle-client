@@ -1,12 +1,12 @@
-import { VueScene } from '../VueScene';
-import { Phase } from './phase/Phase';
 import { EventBus } from '@game/EventBus';
-import { RoomData } from '@/game/objects/RoomData';
-import { ChallengePhase } from './phase/ChallengePhase';
-import { StartPhase } from './phase/StartPhase';
-import { DrawPhase } from './phase/DrawPhase';
 import { WHITE } from '@/game/constants/colors';
-import { LoadPhase } from './phase/LoadPhase';
+import { RoomData } from '@objects/RoomData';
+import { VueScene } from '@scenes/VueScene';
+import { Phase } from '@scenes/CardBattle/phase/Phase';
+import { ChallengePhase } from '@scenes/CardBattle/phase/ChallengePhase';
+import { StartPhase } from '@scenes/CardBattle/phase/StartPhase';
+import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
+import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
 
 export class CardBattleScene extends VueScene {
     room: RoomData;
