@@ -32,6 +32,8 @@ export class CardBattleScene extends VueScene {
         await this.getCardBattle().setReadyDrawCards(opponentId);
         await this.getCardBattle().setReadyDrawCards(playerId);
         // LOAD PHASE
+        await this.getCardBattle().setPointsToBoard(playerId);
+        await this.getCardBattle().setPointsToBoard(opponentId);
 
         this.changePhase(new LoadPhase(this));
     }
