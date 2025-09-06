@@ -1,12 +1,12 @@
-import { BoardWindowData } from "@/game/types";
+import { UpdateConfig } from "./UpdateConfig";
 import BoardWindow from "../BoardWindow";
-import { UpdatePoints } from "../types/UpdatePoints";
+import { BoardWindowData } from "@/game/types";
 
 export class UpdateAnimation {
     
     constructor(readonly window: BoardWindow, toTarget: BoardWindowData) {
         const fromTarget = this.window.getAllData();
-        const updates = this.#createUpdatePoints(fromTarget, toTarget);
+        const updates = this.#createUpdateConfig(fromTarget, toTarget);
         const updateTweens = updates.map(update => {
             return {
                 ...update,
@@ -19,7 +19,7 @@ export class UpdateAnimation {
         }
     }
 
-    #createUpdatePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints[] {
+    #createUpdateConfig(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdateConfig[] {
         const { apPoints, hpPoints } = this.#createUpdateBattlePoints(fromTarget, toTarget);
         const passUpdates = this.#createUpdatePass(fromTarget, toTarget);
         const { redPoints, greenPoints, bluePoints, blackPoints, whitePoints } = this.#createUpdateColorsPoints(fromTarget, toTarget);
@@ -41,7 +41,7 @@ export class UpdateAnimation {
     }
 
     #createUpdateBattlePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
-        apPoints: UpdatePoints, hpPoints: UpdatePoints
+        apPoints: UpdateConfig, hpPoints: UpdateConfig
     } {
         const apPoints = this.#createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
             (tween: Phaser.Tweens.Tween) => {
@@ -60,7 +60,7 @@ export class UpdateAnimation {
         return { apPoints, hpPoints };
     }
 
-    #createUpdatePass(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints {
+    #createUpdatePass(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdateConfig {
         const pass = this.#createUpdate(fromTarget, fromTarget.pass ? 1 : 0, toTarget.pass ? 1 : 0,
             (tween: Phaser.Tweens.Tween) => {
                 fromTarget.pass = tween.getValue() === 1;
@@ -72,11 +72,11 @@ export class UpdateAnimation {
     }
 
     #createUpdateColorsPoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
-        redPoints: UpdatePoints, 
-        greenPoints: UpdatePoints, 
-        bluePoints: UpdatePoints, 
-        blackPoints: UpdatePoints, 
-        whitePoints: UpdatePoints
+        redPoints: UpdateConfig, 
+        greenPoints: UpdateConfig, 
+        bluePoints: UpdateConfig, 
+        blackPoints: UpdateConfig, 
+        whitePoints: UpdateConfig
     } {
         const redPoints = this.#createUpdate(fromTarget, fromTarget.redPoints, toTarget.redPoints,
             (tween: Phaser.Tweens.Tween) => {
@@ -117,10 +117,10 @@ export class UpdateAnimation {
     }
 
     #createUpdateBoardPoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
-        numberOfCardsInHand: UpdatePoints,
-        numberOfCardsInDeck: UpdatePoints,
-        numberOfCardsInTrash: UpdatePoints,
-        numberOfWins: UpdatePoints
+        numberOfCardsInHand: UpdateConfig,
+        numberOfCardsInDeck: UpdateConfig,
+        numberOfCardsInTrash: UpdateConfig,
+        numberOfWins: UpdateConfig
     } {
         const numberOfCardsInHand = this.#createUpdate(fromTarget, fromTarget.numberOfCardsInHand, toTarget.numberOfCardsInHand,
             (tween: Phaser.Tweens.Tween) => {
@@ -159,7 +159,7 @@ export class UpdateAnimation {
         toPoints: number, 
         onUpdate: (tween: Phaser.Tweens.Tween) => void,
         onComplete?: () => void,
-    ): UpdatePoints {
+    ): UpdateConfig {
         return {
             target,
             from: fromPoints,
