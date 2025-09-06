@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
 import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '../constants/keys';
-import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerActionUpdates } from '../types';
 import { CardColors } from '../ui/Card/types/CardColors';
 import { CardType } from '../ui/Card/types/CardType';
 import { MathUtil } from '../utils/MathUtil';
@@ -9,6 +8,11 @@ import { CardBattle, LoadPhasePlay } from './CardBattle';
 import { RoomData } from '../types/RoomData';
 import { PowerAction } from '../types/PowerAction';
 import { ArrayUtil } from '../utils/ArrayUtil';
+import { CardData } from '../types/CardData';
+import { PowerActionUpdates } from '../types/PowerActionUpdates';
+import { BoardWindowData } from '../types/BoardWindowData';
+import { OpponentData } from '../types/OpponentData';
+import { CardsFolderData } from '../types/CardsFolderData';
 
 const delayMock = 100;
 
