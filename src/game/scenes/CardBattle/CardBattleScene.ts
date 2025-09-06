@@ -21,19 +21,20 @@ export class CardBattleScene extends VueScene {
     }
 
     async create () {
+        // CREATE ROOM
         this.room = await this.getCardBattle().createRoom();
         const { roomId, playerId } = this.room;
+        // CHALLENGE PHASE
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
-
         // START PHASE
         // await this.getCardBattle().setFolder(playerId, 'f3');
         // DRAW PHASE
         // await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
+        // LOAD PHASE
         // await this.getCardBattle().setReadyDrawCards(opponentId);
         // await this.getCardBattle().setReadyDrawCards(playerId);
         // await this.getCardBattle().setPointsToBoard(playerId);
         // await this.getCardBattle().setPointsToBoard(opponentId);
-        // LOAD PHASE
 
         this.changePhase(new ChallengePhase(this));
     }

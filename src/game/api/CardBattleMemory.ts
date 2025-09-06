@@ -10,8 +10,8 @@ import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
 import { PowerActionUpdatesData } from '@objects/PowerActionUpdatesData';
-import { CardColorsType } from '@types/CardColorsType';
-import { CardType } from '@types/CardType';
+import { CardColorsType } from '@game/types/CardColorsType';
+import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
 
@@ -377,14 +377,11 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     //mock
                     this.#setOpponentStep(IN_LOBBY);
-                    callback(this.#isOpponentStep(IN_LOBBY));
                     // mock
+                    callback(this.#isOpponentStep(IN_LOBBY));
                 };
                 if (this.#isOpponent(playerId)) {
-                    //mock
-                    this.#setPlayerStep(IN_LOBBY);
                     callback(this.#isPlayerStep(IN_LOBBY));
-                    // mock
                 };
                 resolve();
             }, delayMock);
@@ -448,15 +445,15 @@ export default class CardBattleMemory implements CardBattle {
     setFolder(playerId: string, folderId: string): Promise<boolean> {
         return new Promise((resolve) => {
             const folderIndex = folders.findIndex((f) => f.id === folderId);
-            const deck = folders[folderIndex].deck || [];
+            const deck = ArrayUtil.clone(folders[folderIndex].deck || []);
             if (this.#isPlayer(playerId)) {
                 this.#setPlayerDeck(deck);
                 this.#setPlayerStep(SET_DECK);
-                this.#playerBoard.numberOfCardsInDeck = deck.length;
+                this.#playerBoard.numberOfCardsInDeck = this.#playerDeck.length;
                 //mock
-                this.#setOpponentDeck(folders[0].deck);
+                this.#setOpponentDeck(ArrayUtil.clone(folders[0].deck));
                 this.#setOpponentStep(SET_DECK);
-                this.#opponentBoard.numberOfCardsInDeck = deck.length;
+                this.#opponentBoard.numberOfCardsInDeck = this.#opponentDeck.length;
                 // mock
             };
             if (this.#isOpponent(playerId)) {
@@ -744,9 +741,9 @@ export default class CardBattleMemory implements CardBattle {
                         bluePoints: this.#playerBoard.bluePoints,
                         blackPoints: this.#playerBoard.blackPoints,
                         whitePoints: this.#playerBoard.whitePoints,
-                        numberOfCardsInHand: this.#playerHand.length,
-                        numberOfCardsInDeck: this.#playerDeck.length,
-                        numberOfCardsInTrash: this.#playerTrash.length,
+                        numberOfCardsInHand: this.#playerBoard.numberOfCardsInHand,
+                        numberOfCardsInDeck: this.#playerBoard.numberOfCardsInDeck,
+                        numberOfCardsInTrash: this.#playerBoard.numberOfCardsInTrash,
                         numberOfWins: this.#playerBoard.numberOfWins,
                         pass: this.#playerBoard.pass
                     });

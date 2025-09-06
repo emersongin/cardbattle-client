@@ -3,4 +3,8 @@ export class ArrayUtil {
         array.sort(() => Math.random() - 0.5);
         return array;
     }
+
+    static clone<T>(array: T[]): T[] {
+        return array.slice();
+    }
 }
