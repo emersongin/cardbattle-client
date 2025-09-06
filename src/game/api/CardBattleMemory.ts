@@ -922,7 +922,6 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     // mock
                     const powerCard = this.#opponentHand.find(card => card.typeId === POWER);
-                    console.log('powerCard', powerCard);
                     //counter === 0 && powerCard
                     if (powerCard) {
                         counter++;
