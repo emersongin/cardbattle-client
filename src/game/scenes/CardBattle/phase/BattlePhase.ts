@@ -41,11 +41,11 @@ export class BattlePhase implements Phase {
     }
 
     create(): void {
-        this.#window = TextWindow.createCentered(this.scene, 'Battle Phase started!', {
-            onClose: () => {
-                this.changeToChallengePhase();
-            }
-        });
+        // this.#window = TextWindow.createCentered(this.scene, 'Battle Phase started!', {
+        //     onClose: () => {
+        //         this.changeToChallengePhase();
+        //     }
+        // });
         this.#window.open();
     }
 

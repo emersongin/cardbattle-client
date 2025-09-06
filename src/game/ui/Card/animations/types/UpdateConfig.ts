@@ -1,5 +1,5 @@
 import { CardPointsData } from "@objects/CardPointsData";
-import { TweenConfig } from "@types/TweenConfig";
+import { TweenConfig } from "@game/types/TweenConfig";
 
 export type UpdateConfig = {
     target: CardPointsData;

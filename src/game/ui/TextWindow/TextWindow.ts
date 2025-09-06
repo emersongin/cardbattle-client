@@ -1,5 +1,5 @@
 import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
-import { TweenConfig } from '@types/TweenConfig';
+import { TweenConfig } from '@game/types/TweenConfig';
 import { DisplayUtil } from '@utils/DisplayUtil';
 import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
 

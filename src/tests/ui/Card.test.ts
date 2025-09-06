@@ -2,12 +2,12 @@ import Phaser from "phaser";
 import PhaserMock from "@mocks/phaser";
 import CardBattleMock from "@mocks/cardset";
 import { describe, it, expect, beforeAll } from "vitest";
-import { Cardset } from "@game/ui/Cardset/Cardset";
-import { Card } from "@game/ui/Card/Card";
-import { BLUE } from "@game/constants/colors";
+import { Cardset } from "@ui/Cardset/Cardset";
+import { Card } from "@ui/Card/Card";
+import { BLUE } from "@constants/colors";
 import { CardColorsType } from "@/game/types/CardColorsType";
-import { BATTLE } from "@game/constants/keys";
-import { CardType } from "@/game/types/CardType";
+import { BATTLE } from "@constants/keys";
+import { CardType } from "@game/types/CardType";
 
 describe("MockScene", () => {
     let scene: Phaser.Scene;

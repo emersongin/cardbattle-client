@@ -3,9 +3,9 @@ import { BLACK, BLUE, GREEN, RED, WHITE } from "@constants/colors";
 import { DECK, HAND, TRASH, WINS } from "@constants/keys";
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { DisplayUtil } from "@utils/DisplayUtil";
-import { BoardZonesType } from "@types/BoardZonesType";
-import { CardColorsType } from "@types/CardColorsType";
-import { TweenConfig } from "@types/TweenConfig";
+import { BoardZonesType } from "@game/types/BoardZonesType";
+import { CardColorsType } from "@game/types/CardColorsType";
+import { TweenConfig } from "@game/types/TweenConfig";
 import { UpdateAnimation } from "@ui/BoardWindow/animations/UpdateAnimation";
 
 export class BoardWindow extends Sizer {

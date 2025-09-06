@@ -1,8 +1,8 @@
 import { BATTLE, POWER } from "@constants/keys";
 import { CardPointsData } from "@objects/CardPointsData";
 import { CardData } from "@objects/CardData";
-import { CardColorsType } from "@types/CardColorsType";
-import { CardType } from "@types/CardType";
+import { CardColorsType } from "@game/types/CardColorsType";
+import { CardType } from "@game/types/CardType";
 import { CardUi } from "@ui/Card/CardUi";
 import { Cardset } from "@ui/Cardset/Cardset";
 

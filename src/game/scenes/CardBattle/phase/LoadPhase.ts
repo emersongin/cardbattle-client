@@ -8,7 +8,7 @@ import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { SummonPhase } from "@scenes/CardBattle/phase/SummonPhase";
 import { TriggerPhase } from "@scenes/CardBattle/phase/TriggerPhase";
-import { TweenConfig } from '@types/TweenConfig';
+import { TweenConfig } from '@game/types/TweenConfig';
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 
 export class LoadPhase extends CardBattlePhase implements Phase {

@@ -14,12 +14,14 @@ export default defineConfig({
         alias: {
             '@src': resolve(__dirname, 'src'),
             '@game': resolve(__dirname, 'src/game'),
+            '@api': resolve(__dirname, 'src/game/api'),
+            '@constants': resolve(__dirname, 'src/game/constants'),
+            '@objects': resolve(__dirname, 'src/game/objects'),
             '@scenes': resolve(__dirname, 'src/game/scenes'),
             '@ui': resolve(__dirname, 'src/game/ui'),
             '@utils': resolve(__dirname, 'src/utils'),
-            '@api': resolve(__dirname, 'src/game/api'),
-            '@tests': resolve(__dirname, 'src/tests'),
             '@mocks': resolve(__dirname, 'src/tests/mocks'),
+            '@tests': resolve(__dirname, 'src/tests'),
         },
     },
 });
