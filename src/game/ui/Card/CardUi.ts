@@ -135,7 +135,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     #createDisabledLayer(): void {
         const disabledLayer = this.scene.add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
         disabledLayer.setOrigin(0, 0);
-        disabledLayer.setVisible(false);
+        disabledLayer.setVisible(this.card.staticData.disabled || false);
         this.disabledLayer = disabledLayer;
         this.add(this.disabledLayer);
     }

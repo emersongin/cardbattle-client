@@ -30,7 +30,8 @@ const battleCards = [
         ap: 5,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'B2',
@@ -44,7 +45,8 @@ const battleCards = [
         ap: 4,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'B3',
@@ -58,7 +60,8 @@ const battleCards = [
         ap: 6,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'B4',
@@ -72,7 +75,8 @@ const battleCards = [
         ap: 3,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'B5',
@@ -86,7 +90,8 @@ const battleCards = [
         ap: 7,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'B6',
@@ -100,7 +105,8 @@ const battleCards = [
         ap: 2,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1
+        cost: 1,
+        disabled: false
     }
 ];
 
@@ -117,7 +123,8 @@ const powerCards = [
         ap: 0,
         typeId: POWER as CardType,
         powerId: 'power-1',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'P2',
@@ -131,7 +138,8 @@ const powerCards = [
         ap: 0,
         typeId: POWER as CardType,
         powerId: 'power-2',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'P3',
@@ -145,7 +153,8 @@ const powerCards = [
         ap: 0,
         typeId: POWER as CardType,
         powerId: 'power-3',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'P4',
@@ -159,7 +168,8 @@ const powerCards = [
         ap: 0,
         typeId: POWER as CardType,
         powerId: 'power-4',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'P5',
@@ -173,7 +183,8 @@ const powerCards = [
         ap: 0,
         typeId: POWER as CardType,
         powerId: 'power-5',
-        cost: 1
+        cost: 1,
+        disabled: false
     },
     {
         id: 'P6',
@@ -187,7 +198,8 @@ const powerCards = [
         ap: 0,
         typeId: POWER as CardType,
         powerId: 'power-6',
-        cost: 1
+        cost: 1,
+        disabled: false
     }
 ];
 
@@ -637,36 +649,6 @@ export default class CardBattleMemory implements CardBattle {
             this.#setOpponentStep(WAITING_TO_PLAY);
         };
     }
-
-    // hasOpponentDefinedPointsToBoard(playerId: string): Promise<boolean> {
-    //     return new Promise((resolve) => {
-    //         setTimeout(() => {
-    //             if (this.#isPlayer(playerId)) {
-    //                 resolve(this.#isOpponentStep(WAITING_TO_PLAY));
-    //             }
-    //             if (this.#isOpponent(playerId)) {
-    //                 resolve(this.#isPlayerStep(WAITING_TO_PLAY));
-    //             }
-    //         }, delayMock);
-    //     });
-    // }
-
-    // listenOpponentSetPointsToBoard(playerId: string, callback: (isSet: boolean) => void): Promise<void> {
-    //     return new Promise((resolve) => {
-    //         setTimeout(() => {
-    //             if (this.#isPlayer(playerId)) {
-    //                 // mock
-    //                 this.setPointsToBoard(this.#opponentId);
-    //                 // mock
-    //                 callback(this.#isOpponentStep(WAITING_TO_PLAY));
-    //             };
-    //             if (this.#isOpponent(playerId)) {
-    //                 callback(this.#isPlayerStep(WAITING_TO_PLAY));
-    //             };
-    //             resolve();
-    //         }, delayMock);
-    //     });
-    // }
     
     getBoard(playerId: string): Promise<BoardWindowData> {
         return new Promise((resolve) => {
@@ -746,7 +728,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getHandCards(playerId: string): Promise<CardData[]> {
+    getCardsFromHand(playerId: string): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
@@ -759,7 +741,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getOpponentHandCards(playerId: string): Promise<CardData[]> {
+    getOpponentCardsFromHand(playerId: string): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isOpponent(playerId)) {
@@ -767,6 +749,25 @@ export default class CardBattleMemory implements CardBattle {
                 };
                 if (this.#isPlayer(playerId)) {
                     resolve(this.#opponentHand);
+                };
+            }, delayMock);
+        });
+    }
+
+    getCardsFromHandInTheLoadPhase(playerId: string): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
+                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
+                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                };
+                if (this.#isOpponent(playerId)) {
+                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
+                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
+                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
                 };
             }, delayMock);
         });

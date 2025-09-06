@@ -231,6 +231,8 @@ export class CardBattlePhase {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
         const y = this.scene.cameras.main.centerY; 
         const cardset = Cardset.create(this.scene, cards, x, y);
+        cardset.setCardsInLinePosition();
+        cardset.setCardsClosed();
         this.#cardset = cardset;
         return cardset;
     }

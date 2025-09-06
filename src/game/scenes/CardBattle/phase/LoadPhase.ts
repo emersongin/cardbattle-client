@@ -134,10 +134,8 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     async #createHandCardset(): Promise<void> {
-        const cards: CardData[] = await this.cardBattle.getHandCards(this.scene.room.playerId);
-        const cardset = super.createHandCardset(cards);
-        cardset.setCardsInLinePosition();
-        cardset.setCardsClosed();
+        const cards: CardData[] = await this.cardBattle.getCardsFromHandInTheLoadPhase(this.scene.room.playerId);
+        super.createHandCardset(cards);
         this.#openHandCardset();
     }
 

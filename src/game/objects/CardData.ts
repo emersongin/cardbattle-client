@@ -14,4 +14,5 @@ export type CardData = {
     typeId: CardType;
     powerId: string;
     cost: number;
+    disabled: boolean;
 } 

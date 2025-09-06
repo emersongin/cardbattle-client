@@ -16,7 +16,8 @@ export class Card extends Phaser.GameObjects.GameObject {
         faceUp: boolean = false
     ) {
         super(scene, 'Card');
-        this.#setStartData(faceUp);
+        this.#setStartData();
+        this.data.set('faceUp', faceUp);
         this.#ui = new CardUi(this.scene, this);
         this.cardset.add(this.#ui);
     }
@@ -25,17 +26,16 @@ export class Card extends Phaser.GameObjects.GameObject {
         return { ap: this.data.get('ap'), hp: this.data.get('hp') };
     }
 
-    #setStartData(faceUp: boolean = false): void {
+    #setStartData(): void {
         this.setDataEnabled();
         this.updateOrigin();
         this.data.set('ap', this.staticData.hp);
         this.data.set('hp', this.staticData.ap);
-        this.data.set('faceUp', faceUp);
+        this.data.set('disabled', this.staticData.disabled || false);
         this.data.set('closed', false);
         this.data.set('selected', false);
         this.data.set('marked', false);
         this.data.set('highlight', false);
-        this.data.set('disabled', false);
     }
 
     getSelectedLayer(): Phaser.GameObjects.Container {
