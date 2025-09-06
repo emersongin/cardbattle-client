@@ -12,5 +12,3 @@ export type BoardWindowData = {
     numberOfWins: number,
     pass: boolean;
 };
-
-export type MaybePartialBoardWindowData = BoardWindowData | Partial<BoardWindowData>;

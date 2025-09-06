@@ -1,6 +1,6 @@
 import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 import { DisplayUtil } from "../../utils/DisplayUtil";
-import { BoardWindowData, MaybePartialBoardWindowData } from "@game/types/BoardWindowData";
+import { BoardWindowData } from "@game/types/BoardWindowData";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
 import { BoardZones } from "@/game/types/BoardZones";
 import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
@@ -211,7 +211,7 @@ export default class BoardWindow extends Sizer {
             numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
             numberOfCardsInTrash: this.data.get('numberOfCardsInTrash'),
             numberOfWins: this.data.get('numberOfWins'),
-        } as MaybePartialBoardWindowData;
+        } as Partial<BoardWindowData>;
         this.#updating(boardPoints);
     }
 
@@ -225,7 +225,7 @@ export default class BoardWindow extends Sizer {
             numberOfCardsInDeck: this.data.get('numberOfCardsInDeck'),
             numberOfCardsInTrash: this.data.get('numberOfCardsInTrash'),
             numberOfWins: this.data.get('numberOfWins'),
-        } as MaybePartialBoardWindowData;
+        } as Partial<BoardWindowData>;
         this.#updating(boardPoints);
     }
 
@@ -241,7 +241,7 @@ export default class BoardWindow extends Sizer {
             bluePoints: this.data.get('bluePoints'),
             blackPoints: this.data.get('blackPoints'),
             whitePoints: this.data.get('whitePoints'),
-        } as MaybePartialBoardWindowData;
+        } as Partial<BoardWindowData>;
         this.#updating(colorsPoints);
     }
 
@@ -257,7 +257,7 @@ export default class BoardWindow extends Sizer {
             bluePoints: this.data.get('bluePoints'),
             blackPoints: this.data.get('blackPoints'),
             whitePoints: this.data.get('whitePoints'),
-        } as MaybePartialBoardWindowData;
+        } as Partial<BoardWindowData>;
         this.#updating(colorsPoints);
     }
 
@@ -265,11 +265,11 @@ export default class BoardWindow extends Sizer {
         this.data.set('pass', pass);
         let boardWindowData = {
             pass: this.data.get('pass')
-        } as MaybePartialBoardWindowData;
+        } as Partial<BoardWindowData>;
         this.#updating(boardWindowData);
     }
 
-    #updating(toTarget: MaybePartialBoardWindowData): void {
+    #updating(toTarget: Partial<BoardWindowData>): void {
         const boardWindowData = {
             ap: toTarget.ap ?? this.data.get('ap'),
             hp: toTarget.hp ?? this.data.get('hp'),
