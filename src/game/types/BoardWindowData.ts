@@ -6,7 +6,6 @@ export type BoardWindowData = {
     bluePoints: number;
     blackPoints: number;
     whitePoints: number;
-    orangePoints: number;
     numberOfCardsInHand: number,
     numberOfCardsInDeck: number,
     numberOfCardsInTrash: number,

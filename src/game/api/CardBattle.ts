@@ -1,4 +1,4 @@
-import { BoardWindowData, CardData, CardsFolderData, OpponentData, PowerActionUpdates } from "../types";
+import { BoardWindowData, CardData, CardsFolderData, OpponentData } from "../types";
 import { PowerAction } from "../types/PowerAction";
 import { RoomData } from "../types/RoomData";
 
@@ -23,6 +23,9 @@ export interface CardBattle {
     isOpponentReadyDrawCards: (playerId: string) => Promise<boolean>;
     setReadyDrawCards: (playerId: string) => Promise<void>;
     listenOpponentDrawCards(playerId: string, callback: (isReady: boolean) => void): Promise<void>;
+    setPointsToBoard: (playerId: string) => Promise<void>;
+    hasOpponentDefinedPointsToBoard: (playerId: string) => Promise<boolean>;
+    listenOpponentSetPointsToBoard: (playerId: string, callback: (isSet: boolean) => void) => Promise<void>;
     getBoard: (playerId: string) => Promise<BoardWindowData>;
     getOpponentBoard: (playerId: string) => Promise<BoardWindowData>;
     getHandCards: (playerId: string) => Promise<CardData[]>;

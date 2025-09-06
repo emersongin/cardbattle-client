@@ -92,8 +92,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                         delay: (index! * 100), 
                         duration: (300 / totalCards) * (totalCards - index!),
                         onStart: () => {
-                            this.addBoardZonePoints(HAND, 1);
-                            this.removeBoardZonePoints(DECK, 1);
+                            super.addBoardZonePoints(HAND, 1);
+                            super.removeBoardZonePoints(DECK, 1);
                         },
                         onComplete: () => resume()
                     })
@@ -111,9 +111,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 pause();
                 CardActionsBuilder
                     .create(card)
-                    .close({ delay: (index! * 200) })
+                    .close({ open: false, delay: (index! * 200) })
                     .faceUp()
-                    .open({ onComplete: () => resume() })
+                    .open({ open: true, onComplete: () => resume() })
                     .play();
             },
             onAllComplete: () => {
@@ -134,8 +134,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .flash({
+                        color: 0xffffff,
                         delay: (index! * 100),
-                        onStart: () => this.addBoardColorPoints(card.getColor(), 1),
+                        onStart: () => super.addBoardColorPoints(card.getColor(), 1),
                         onComplete: () => resume()
                     })
                     .play();
@@ -179,14 +180,33 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .close({
+                        open: false,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     })
                     .play();
             },
-            onAllComplete: () => this.changeToLoadPhase()
+            onAllComplete: async () => {
+                await this.cardBattle.setPointsToBoard(this.scene.room.playerId);
+                if (await this.cardBattle.hasOpponentDefinedPointsToBoard(this.scene.room.playerId)) {
+                    this.changeToLoadPhase()
+                    return;
+                }
+                this.#createSetPointsToBoardOpponentWaitingWindow();
+                super.openAllWindows({
+                    onComplete: async () => {
+                        await this.cardBattle.listenOpponentSetPointsToBoard(this.scene.room.playerId, async () => {
+                            super.closeAllWindows({ onComplete: () => this.changeToLoadPhase() });
+                        });
+                    }
+                });
+            }
         };
         this.scene.timeline(closeConfig);
+    }
+
+    #createSetPointsToBoardOpponentWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to set points to board...');
     }
 
     #closeOpponentCardSet(): void {
@@ -197,6 +217,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .close({
+                        open: false,
                         delay: (index! * 100),
                         onComplete: () => resume()
                     })
@@ -216,6 +237,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .flash({
+                        color: 0xfffff,
                         delay: (index! * 100),
                         onStart: () => this.addOpponentBoardColorPoints(card.getColor(), 1),
                         onComplete: () => resume()
@@ -244,8 +266,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                         delay: (index! * 100), 
                         duration: (300 / totalCards) * (totalCards - index!),
                         onStart: () => {
-                            this.addOpponentBoardZonePoints(HAND, 1);
-                            this.removeOpponentBoardZonePoints(DECK, 1);
+                            super.addOpponentBoardZonePoints(HAND, 1);
+                            super.removeOpponentBoardZonePoints(DECK, 1);
                         },
                         onComplete: () => resume()
                     })

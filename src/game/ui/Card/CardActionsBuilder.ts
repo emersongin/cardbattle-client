@@ -9,7 +9,6 @@ import { PositionConfig } from "./animations/types/PositionConfig";
 import { PositionAnimation } from "./animations/PositionAnimation";
 import { ScaleAnimation } from "./animations/ScaleAnimation";
 import { ScaleConfig } from "./animations/types/ScaleConfig";
-import { TweenConfig } from "@/game/types/TweenConfig";
 
 export class CardActionsBuilder {
     #moves: CardAnimation[] = [];
@@ -20,12 +19,21 @@ export class CardActionsBuilder {
         return new CardActionsBuilder(card);
     }
 
-    move(config: PositionConfig & TweenConfig = { xTo: this.card.getX(), yTo: this.card.getY() }): CardActionsBuilder {
+    move(config: PositionConfig): CardActionsBuilder {
+        if (!config) config = { 
+            xTo: this.card.getX(), 
+            yTo: this.card.getY(), 
+            onComplete: () => {} 
+        };
         this.#addMove({ name: PositionAnimation.name, config });
         return this;
     }
 
     open(config: ScaleConfig): CardActionsBuilder {
+        if (!config) config = { 
+            open: true,
+            onComplete: () => {} 
+        };
         const onComplete = () => this.card.data.set('closed', false);
         config.open = true;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
@@ -34,6 +42,10 @@ export class CardActionsBuilder {
     }
 
     close(config: ScaleConfig): CardActionsBuilder {
+        if (!config) config = { 
+            open: false,
+            onComplete: () => {} 
+        };
         const onComplete = () => this.card.data.set('closed', true);
         config.open = false;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
@@ -52,18 +64,21 @@ export class CardActionsBuilder {
         return this;
     }
 
-    expand(config: ExpandConfig = {}): CardActionsBuilder {
+    expand(config: ExpandConfig): CardActionsBuilder {
+        if (!config) config = { onComplete: () => {} };
         this.#addMove({ name: ExpandAnimation.name, config });
         return this;
     }
 
-    flash(config: FlashConfig): CardActionsBuilder {
-        this.#addMove({ name: FlashAnimation.name, config });
+    shrink(config: ExpandConfig): CardActionsBuilder {
+        if (!config) config = { onComplete: () => {} };
+        this.#addMove({ name: ShrinkAnimation.name, config });
         return this;
     }
 
-    shrink(config: FlashConfig): CardActionsBuilder {
-        this.#addMove({ name: ShrinkAnimation.name, config });
+    flash(config: FlashConfig): CardActionsBuilder {
+        if (!config) config = { color: 0xffffff, onComplete: () => {} };
+        this.#addMove({ name: FlashAnimation.name, config });
         return this;
     }
 
