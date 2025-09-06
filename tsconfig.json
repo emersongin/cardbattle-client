@@ -22,19 +22,19 @@
         "noUnusedParameters": true,
         "noFallthroughCasesInSwitch": true,
         "strictPropertyInitialization": false,
-        "baseUrl": ".",
+        "baseUrl": "src",
         "paths": {
-            "@/*": ["src/*"],
-            "@game/*": ["src/game/*"],
-            "@api/*": ["src/game/api/*"],
-            "@constants/*": ["src/game/constants/*"],
-            "@objects/*": ["src/game/objects/*"],
-            "@scenes/*": ["src/game/scenes/*"],
-            "@types/*": ["src/game/types/*"],
-            "@ui/*": ["src/game/ui/*"],
-            "@utils/*": ["src/game/utils/*"],
-            "@mocks/*": ["src/tests/mocks/*"],
-            "@tests/*": ["src/tests/*"]
+            "@/*": ["*"],
+            "@game/*": ["game/*"],
+            "@api/*": ["game/api/*"],
+            "@constants/*": ["game/constants/*"],
+            "@objects/*": ["game/objects/*"],
+            "@scenes/*": ["game/scenes/*"],
+            "@types/*": ["game/types/*"],
+            "@ui/*": ["game/ui/*"],
+            "@utils/*": ["game/utils/*"],
+            "@mocks/*": ["tests/mocks/*"],
+            "@tests/*": ["tests/*"]
         }
     },
     "include": [
@@ -43,8 +43,6 @@
         "src/**/*.vue"
     ],
     "references": [
-        {
-            "path": "./tsconfig.node.json"
-        }
+        { "path": "./tsconfig.node.json" }
     ]
 }

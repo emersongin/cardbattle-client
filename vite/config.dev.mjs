@@ -8,6 +8,7 @@ export default defineConfig({
     base: './',
     plugins: [
         vue(),
+        phasermsg()
     ],
     resolve: {
         alias: {
