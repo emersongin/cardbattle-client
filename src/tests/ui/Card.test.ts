@@ -5,7 +5,7 @@ import { describe, it, expect, beforeAll } from "vitest";
 import { Cardset } from "@game/ui/Cardset/Cardset";
 import { Card } from "@game/ui/Card/Card";
 import { BLUE } from "@game/constants/colors";
-import { CardColors } from "@/game/types/CardColors";
+import { CardColorsType } from "@/game/types/CardColorsType";
 import { BATTLE } from "@game/constants/keys";
 import { CardType } from "@/game/types/CardType";
 
@@ -29,7 +29,7 @@ describe("MockScene", () => {
             name: 'Test Card',
             description: 'This is a test card description.',
             details: 'This is a test card details.',
-            color: BLUE as CardColors,
+            color: BLUE as CardColorsType,
             imageName: 'card-picture',
             hp: 10,
             ap: 5,

@@ -3,13 +3,13 @@ import { CardBattlePhase } from "./CardBattlePhase";
 import { SummonPhase } from "./SummonPhase";
 import { TriggerPhase } from "./TriggerPhase";
 import { HAND } from "@/game/constants/keys";
-import { LoadPhasePlay } from "@/game/api/CardBattle";
 import { CARD_WIDTH } from "@/game/constants/default";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { TimelineEvent } from "../../VueScene";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 import { TweenConfig } from '@/game/types/TweenConfig';
-import { CardData } from "@/game/types/CardData";
+import { CardData } from "@/game/objects/CardData";
+import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
 
 export class LoadPhase extends CardBattlePhase implements Phase {
 
@@ -332,7 +332,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
             onComplete: async () => {
                 await this.cardBattle.listenOpponentPlay(
                     this.scene.room.playerId, 
-                    (opponentPlay: LoadPhasePlay) => this.#loadOpponentPlay(
+                    (opponentPlay: PowerCardPlayData) => this.#loadOpponentPlay(
                             opponentPlay.pass, 
                             opponentPlay.powerAction?.powerCard
                         )

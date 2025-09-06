@@ -1,5 +1,5 @@
-import { CardColors } from "./CardColors";
-import { CardType } from "./CardType";
+import { CardColorsType } from "../types/CardColorsType";
+import { CardType } from "../types/CardType";
 
 export type CardData = {
     id: string;
@@ -7,7 +7,7 @@ export type CardData = {
     name: string;
     description: string;
     details: string;
-    color: CardColors;
+    color: CardColorsType;
     imageName: string;
     hp: number;
     ap: number;

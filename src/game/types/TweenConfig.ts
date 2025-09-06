@@ -7,4 +7,4 @@ export type TweenConfig = {
     yoyo?: boolean;
     onStart?: (tween?: Phaser.Tweens.Tween) => void;
     onComplete?: (tween?: Phaser.Tweens.Tween) => void;
-}
+} & Partial<Phaser.Types.Tweens.TweenBuilderConfig>;

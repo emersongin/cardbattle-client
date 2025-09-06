@@ -1,10 +1,10 @@
 import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 import { DisplayUtil } from "../../utils/DisplayUtil";
-import { BoardWindowData } from "@game/types/BoardWindowData";
+import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
-import { BoardZones } from "@/game/types/BoardZones";
+import { BoardZonesType } from "@/game/types/BoardZonesType";
 import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
-import { CardColors } from "../../types/CardColors";
+import { CardColorsType } from "../../types/CardColorsType";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { UpdateAnimation } from "./animations/UpdateAnimation";
 
@@ -201,7 +201,7 @@ export class BoardWindow extends Sizer {
         };
     }
 
-    addZonePoints(boardZone: BoardZones, value: number): void {
+    addZonePoints(boardZone: BoardZonesType, value: number): void {
         this.data.set('numberOfCardsInHand', this.data.get('numberOfCardsInHand') + (boardZone === HAND ? value : 0));
         this.data.set('numberOfCardsInDeck', this.data.get('numberOfCardsInDeck') + (boardZone === DECK ? value : 0));
         this.data.set('numberOfCardsInTrash', this.data.get('numberOfCardsInTrash') + (boardZone === TRASH ? value : 0));
@@ -215,7 +215,7 @@ export class BoardWindow extends Sizer {
         this.#updating(boardPoints);
     }
 
-    removeZonePoints(boardZone: BoardZones, value: number): void {
+    removeZonePoints(boardZone: BoardZonesType, value: number): void {
         this.data.set('numberOfCardsInHand', this.data.get('numberOfCardsInHand') - (boardZone === HAND ? value : 0));
         this.data.set('numberOfCardsInDeck', this.data.get('numberOfCardsInDeck') - (boardZone === DECK ? value : 0));
         this.data.set('numberOfCardsInTrash', this.data.get('numberOfCardsInTrash') - (boardZone === TRASH ? value : 0));
@@ -229,7 +229,7 @@ export class BoardWindow extends Sizer {
         this.#updating(boardPoints);
     }
 
-    addColorPoints(cardColor: CardColors, value: number): void {
+    addColorPoints(cardColor: CardColorsType, value: number): void {
         this.data.set('redPoints', this.data.get('redPoints') + (cardColor === RED ? value : 0));
         this.data.set('greenPoints', this.data.get('greenPoints') + (cardColor === GREEN ? value : 0));
         this.data.set('bluePoints', this.data.get('bluePoints') + (cardColor === BLUE ? value : 0));
@@ -245,7 +245,7 @@ export class BoardWindow extends Sizer {
         this.#updating(colorsPoints);
     }
 
-    removeColorPoints(cardColor: CardColors, value: number): void {
+    removeColorPoints(cardColor: CardColorsType, value: number): void {
         this.data.set('redPoints', this.data.get('redPoints') - (cardColor === RED ? value : 0));
         this.data.set('greenPoints', this.data.get('greenPoints') - (cardColor === GREEN ? value : 0));
         this.data.set('bluePoints', this.data.get('bluePoints') - (cardColor === BLUE ? value : 0));

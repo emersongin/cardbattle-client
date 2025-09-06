@@ -1,6 +1,6 @@
 import { CardData } from "./CardData";
 
-export type PowerAction = {
+export type PowerActionData = {
     powerCard: CardData;
     // action:{} config...
 }

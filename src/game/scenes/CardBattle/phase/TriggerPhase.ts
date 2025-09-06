@@ -2,7 +2,7 @@ import { Phase } from "./Phase";
 import { CardBattleScene } from '../CardBattleScene';
 import { LoadPhase } from "./LoadPhase";
 import { CardBattlePhase } from "./CardBattlePhase";
-import { PowerAction } from "@/game/types/PowerAction";
+import { PowerActionData } from "@/game/objects/PowerActionData";
 import { TRASH } from "@/game/constants/keys";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 
@@ -22,7 +22,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     async #loadPowerCardUpdates(): Promise<void> {
         await this.cardBattle.listenNextPowerCard(
             this.scene.room.playerId,
-            (powerAction: PowerAction, belongToPlayer: boolean) => {
+            (powerAction: PowerActionData, belongToPlayer: boolean) => {
                 const powerCardId = powerAction.powerCard.id;
                 const powerCard = this.originPhase.getFieldCardById(powerCardId);
                 CardActionsBuilder.create(powerCard)

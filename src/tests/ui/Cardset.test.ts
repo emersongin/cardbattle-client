@@ -1,13 +1,13 @@
 import Phaser from "@mocks/phaser";
 import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vitest";
 import { Cardset } from "@ui/Cardset/Cardset";
-import { ColorsPoints } from "@game/types/ColorsPoints";
-import { VueScene } from "@game/scenes/VueScene";
+import { VueScene } from "@/game/scenes/VueScene";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@game/constants/colors";
-import { CardColors } from "@/game/types/CardColors";
+import { CardColorsType } from "@/game/types/CardColorsType";
 import { CardType } from "@/game/types/CardType";
 import { BATTLE, POWER } from "@game/constants/keys";
-import { CardData } from "@/game/types/CardData";
+import { CardData } from "@/game/objects/CardData";
+import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 
 const cards = [
     {
@@ -16,7 +16,7 @@ const cards = [
         name: 'Test Card',
         description: 'This is a test card description.',
         details: 'This is a test card details.',
-        color: BLUE as CardColors,
+        color: BLUE as CardColorsType,
         imageName: 'card-picture',
         hp: 10,
         ap: 5,
@@ -30,7 +30,7 @@ const cards = [
         name: 'Test Power Card',
         description: 'This is a test power card description.',
         details: 'This is a test power card details.',
-        color: RED as CardColors,
+        color: RED as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -45,7 +45,7 @@ const eventsMock = {
     onComplete: vi.fn(),
     onLeave: vi.fn(),
 };
-const colorPoints: ColorsPoints = {
+const colorPoints: ColorsPointsData = {
     [RED]: 3,
     [BLUE]: 3,
     [GREEN]: 0,

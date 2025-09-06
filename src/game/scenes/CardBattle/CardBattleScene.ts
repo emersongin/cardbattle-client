@@ -1,7 +1,7 @@
 import { VueScene } from '../VueScene';
 import { Phase } from './phase/Phase';
 import { EventBus } from '@game/EventBus';
-import { RoomData } from '@/game/types/RoomData';
+import { RoomData } from '@/game/objects/RoomData';
 import { ChallengePhase } from './phase/ChallengePhase';
 import { StartPhase } from './phase/StartPhase';
 import { DrawPhase } from './phase/DrawPhase';
@@ -26,16 +26,16 @@ export class CardBattleScene extends VueScene {
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
 
         // START PHASE
-        await this.getCardBattle().setFolder(playerId, 'f3');
+        // await this.getCardBattle().setFolder(playerId, 'f3');
         // DRAW PHASE
-        await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
-        await this.getCardBattle().setReadyDrawCards(opponentId);
-        await this.getCardBattle().setReadyDrawCards(playerId);
-        await this.getCardBattle().setPointsToBoard(playerId);
-        await this.getCardBattle().setPointsToBoard(opponentId);
+        // await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
+        // await this.getCardBattle().setReadyDrawCards(opponentId);
+        // await this.getCardBattle().setReadyDrawCards(playerId);
+        // await this.getCardBattle().setPointsToBoard(playerId);
+        // await this.getCardBattle().setPointsToBoard(opponentId);
         // LOAD PHASE
 
-        this.changePhase(new LoadPhase(this));
+        this.changePhase(new ChallengePhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

@@ -1,18 +1,19 @@
 import { v4 as uuidv4 } from 'uuid';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '../constants/colors';
 import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '../constants/keys';
-import { CardColors } from '../types/CardColors';
+import { CardColorsType } from '../types/CardColorsType';
 import { CardType } from '../types/CardType';
 import { MathUtil } from '../utils/MathUtil';
-import { CardBattle, LoadPhasePlay } from './CardBattle';
-import { RoomData } from '../types/RoomData';
-import { PowerAction } from '../types/PowerAction';
+import { CardBattle } from './CardBattle';
+import { RoomData } from '../objects/RoomData';
+import { PowerActionData } from '../objects/PowerActionData';
 import { ArrayUtil } from '../utils/ArrayUtil';
-import { CardData } from '../types/CardData';
-import { PowerActionUpdates } from '../types/PowerActionUpdates';
-import { BoardWindowData } from '../types/BoardWindowData';
-import { OpponentData } from '../types/OpponentData';
-import { CardsFolderData } from '../types/CardsFolderData';
+import { CardData } from '../objects/CardData';
+import { PowerActionUpdatesData } from '../objects/PowerActionUpdatesData';
+import { BoardWindowData } from '../objects/BoardWindowData';
+import { OpponentData } from '../objects/OpponentData';
+import { CardsFolderData } from '../objects/CardsFolderData';
+import { PowerCardPlayData } from '../objects/PowerCardPlayData';
 
 const delayMock = 100;
 
@@ -23,7 +24,7 @@ const battleCards = [
         name: 'Battle Card n° 1',
         description: 'This is a battle card description.',
         details: 'This card is used for battle purposes.',
-        color: RED as CardColors,
+        color: RED as CardColorsType,
         imageName: 'card-picture',
         hp: 5,
         ap: 5,
@@ -37,7 +38,7 @@ const battleCards = [
         name: 'Battle Card n° 2',
         description: 'This is another battle card description.',
         details: 'This card is used for battle purposes.',
-        color: GREEN as CardColors,
+        color: GREEN as CardColorsType,
         imageName: 'card-picture',
         hp: 6,
         ap: 4,
@@ -51,7 +52,7 @@ const battleCards = [
         name: 'Battle Card n° 3',
         description: 'This is yet another battle card description.',
         details: 'This card is used for battle purposes.',
-        color: BLUE as CardColors,
+        color: BLUE as CardColorsType,
         imageName: 'card-picture',
         hp: 4,
         ap: 6,
@@ -65,7 +66,7 @@ const battleCards = [
         name: 'Battle Card n° 4',
         description: 'This is a different battle card description.',
         details: 'This card is used for battle purposes.',
-        color: BLACK as CardColors,
+        color: BLACK as CardColorsType,
         imageName: 'card-picture',
         hp: 7,
         ap: 3,
@@ -79,7 +80,7 @@ const battleCards = [
         name: 'Battle Card n° 5',
         description: 'This is a unique battle card description.',
         details: 'This card is used for battle purposes.',
-        color: WHITE as CardColors,
+        color: WHITE as CardColorsType,
         imageName: 'card-picture',
         hp: 3,
         ap: 7,
@@ -93,7 +94,7 @@ const battleCards = [
         name: 'Battle Card n° 6',
         description: 'This is a special battle card description.',
         details: 'This card is used for battle purposes.',
-        color: ORANGE as CardColors,
+        color: ORANGE as CardColorsType,
         imageName: 'card-picture',
         hp: 8,
         ap: 2,
@@ -110,7 +111,7 @@ const powerCards = [
         name: 'Power Card n° 1',
         description: 'This is a test power card description.',
         details: 'This card is used for testing power effects.',
-        color: RED as CardColors,
+        color: RED as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -124,7 +125,7 @@ const powerCards = [
         name: 'Power Card n° 2',
         description: 'This is another test power card description.',
         details: 'This card is used for testing power effects.',
-        color: GREEN as CardColors,
+        color: GREEN as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -138,7 +139,7 @@ const powerCards = [
         name: 'Power Card n° 3',
         description: 'This is yet another test power card description.',
         details: 'This card is used for testing power effects.',
-        color: BLUE as CardColors,
+        color: BLUE as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -152,7 +153,7 @@ const powerCards = [
         name: 'Power Card n° 4',
         description: 'This is a different test power card description.',
         details: 'This card is used for testing power effects.',
-        color: BLACK as CardColors,
+        color: BLACK as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -166,7 +167,7 @@ const powerCards = [
         name: 'Power Card n° 5',
         description: 'This is a unique test power card description.',
         details: 'This card is used for testing power effects.',
-        color: WHITE as CardColors,
+        color: WHITE as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -180,7 +181,7 @@ const powerCards = [
         name: 'Power Card n° 6',
         description: 'This is a special test power card description.',
         details: 'This card is used for testing power effects.',
-        color: ORANGE as CardColors,
+        color: ORANGE as CardColorsType,
         imageName: 'card-picture',
         hp: 0,
         ap: 0,
@@ -228,7 +229,7 @@ export default class CardBattleMemory implements CardBattle {
     #roomId: string = '';
     #whoPlayMiniGame: string = '';
     #firstPlayer: string = '';
-    #powerActionUpdates: PowerActionUpdates[] = [];
+    #powerActionUpdates: PowerActionUpdatesData[] = [];
     // player is the room creator
     #playerId: string = '';
     #playerStep: string = 'NONE';
@@ -837,7 +838,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    makePowerCardPlay(playerId: string, powerAction: PowerAction): Promise<void> {
+    makePowerCardPlay(playerId: string, powerAction: PowerActionData): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 const powerCardId = powerAction.powerCard.id;
@@ -915,7 +916,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenOpponentPlay(playerId: string, callback: (play: LoadPhasePlay) => void): Promise<void> {
+    listenOpponentPlay(playerId: string, callback: (play: PowerCardPlayData) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
@@ -925,7 +926,7 @@ export default class CardBattleMemory implements CardBattle {
                     //counter === 0 && powerCard
                     if (powerCard) {
                         counter++;
-                        const powerAction = { powerCard } as PowerAction;
+                        const powerAction = { powerCard } as PowerActionData;
                         this.makePowerCardPlay(this.#opponentId, powerAction);
                         callback({
                             pass: false,
@@ -967,7 +968,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenNextPowerCard(playerId: string, callback: (powerAction: PowerAction, belongToPlayer: boolean) => void): Promise<void> {
+    listenNextPowerCard(playerId: string, callback: (powerAction: PowerActionData, belongToPlayer: boolean) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {

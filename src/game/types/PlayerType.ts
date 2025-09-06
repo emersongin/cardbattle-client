@@ -1,5 +1,5 @@
 import { OPPONENT, PLAYER } from "../constants/keys";
 
-export type Player = 
+export type PlayerType = 
     | typeof PLAYER 
     | typeof OPPONENT;

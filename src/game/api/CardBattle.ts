@@ -1,11 +1,10 @@
-import { BoardWindowData, CardData, CardsFolderData, OpponentData } from "../types";
-import { PowerAction } from "../types/PowerAction";
-import { RoomData } from "../types/RoomData";
-
-export type LoadPhasePlay = {
-    pass: boolean;
-    powerAction: PowerAction | null;
-}
+import { BoardWindowData } from "../objects/BoardWindowData";
+import { CardData } from "../objects/CardData";
+import { CardsFolderData } from "../objects/CardsFolderData";
+import { OpponentData } from "../objects/OpponentData";
+import { PowerActionData } from "../objects/PowerActionData";
+import { PowerCardPlayData } from "../objects/PowerCardPlayData";
+import { RoomData } from "../objects/RoomData";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
@@ -35,14 +34,14 @@ export interface CardBattle {
     pass(playerId: string): Promise<void>;
     getPowerCardByIndex: (playerId: string, index: number) => Promise<CardData>;
     getFieldPowerCards: () => Promise<CardData[]>;
-    makePowerCardPlay: (playerId: string, powerAction: PowerAction) => Promise<void>;
+    makePowerCardPlay: (playerId: string, powerAction: PowerActionData) => Promise<void>;
     isPowerfieldLimitReached: () => Promise<boolean>;
     hasPowerCardsInField: () => Promise<boolean>;
     allPass: () => Promise<boolean>;
     isOpponentPassed: (playerId: string) => Promise<boolean>;
-    listenOpponentPlay: (playerId: string, callback: (play: LoadPhasePlay) => void) => Promise<void>;
+    listenOpponentPlay: (playerId: string, callback: (play: PowerCardPlayData) => void) => Promise<void>;
     hasPowerCardInHand: (playerId: string) => Promise<boolean>;
-    listenNextPowerCard: (playerId: string, callback: (powerAction: PowerAction, belongToPlayer: boolean) => void) => Promise<void>;
+    listenNextPowerCard: (playerId: string, callback: (powerAction: PowerActionData, belongToPlayer: boolean) => void) => Promise<void>;
     setPowerActionCompleted: (playerId: string, powerCardId: string) => Promise<void>;
     hasPowerCardUpdates: (playerId: string) => Promise<boolean>;
     listenOpponentPowerActionUpdates: (playerId: string, callback: (isEnd: boolean) => void) => Promise<void>;

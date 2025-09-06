@@ -7,16 +7,16 @@ import { BoardWindow } from '@/game/ui/BoardWindow/BoardWindow';
 import { Cardset } from '@/game/ui/Cardset/Cardset';
 import { TimelineConfig, TimelineEvent } from '../../VueScene';
 import { CardUi } from '@/game/ui/Card/CardUi';
-import { CardColors } from '@/game/types/CardColors';
+import { CardColorsType } from '@/game/types/CardColorsType';
 import { CARD_HEIGHT, CARD_WIDTH } from '@/game/constants/default';
 import { CommandOption } from '@/game/ui/CommandWindow/CommandOption';
 import { Card } from '@/game/ui/Card/Card';
 import { CardActionsBuilder } from '@/game/ui/Card/CardActionsBuilder';
 import { TweenConfig } from '@/game/types/TweenConfig';
 import { TextWindowConfig } from '@/game/ui/TextWindow/TextWindowConfig';
-import { BoardWindowData } from '@/game/types/BoardWindowData';
-import { BoardZones } from '@/game/types/BoardZones';
-import { CardData } from '@/game/types/CardData';
+import { BoardWindowData } from '@/game/objects/BoardWindowData';
+import { BoardZonesType } from '@/game/types/BoardZonesType';
+import { CardData } from '@/game/objects/CardData';
 
 export type AlignType = 
     | typeof LEFT 
@@ -151,15 +151,15 @@ export class CardBattlePhase {
         this.#board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
     }
 
-    addBoardZonePoints(boardZone: BoardZones, value: number): void {
+    addBoardZonePoints(boardZone: BoardZonesType, value: number): void {
         this.#board.addZonePoints(boardZone, value);
     }
 
-    removeBoardZonePoints(boardZone: BoardZones, value: number): void {
+    removeBoardZonePoints(boardZone: BoardZonesType, value: number): void {
         this.#board.removeZonePoints(boardZone, value);
     }
 
-    addBoardColorPoints(cardColor: CardColors, value: number): void {
+    addBoardColorPoints(cardColor: CardColorsType, value: number): void {
         this.#board.addColorPoints(cardColor, value);
     }
 
@@ -187,15 +187,15 @@ export class CardBattlePhase {
         this.#opponentBoard = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
     }
 
-    addOpponentBoardZonePoints(boardZone: BoardZones, value: number): void {
+    addOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
         this.#opponentBoard.addZonePoints(boardZone, value);
     }
 
-    removeOpponentBoardZonePoints(boardZone: BoardZones, value: number): void {
+    removeOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
         this.#opponentBoard.removeZonePoints(boardZone, value);
     }
 
-    addOpponentBoardColorPoints(cardColor: CardColors, value: number): void {
+    addOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
         this.#opponentBoard.addColorPoints(cardColor, value);
     }
 

@@ -1,10 +1,10 @@
-import { CardPoints } from "../../types/CardPoints";
+import { CardPointsData } from "../../objects/CardPointsData";
 import { CardUi } from "./CardUi";
 import { Cardset } from "../Cardset/Cardset";
-import { CardColors } from "../../types/CardColors";
+import { CardColorsType } from "../../types/CardColorsType";
 import { BATTLE, POWER } from "@game/constants/keys";
 import { CardType } from "../../types/CardType";
-import { CardData } from "@/game/types/CardData";
+import { CardData } from "@/game/objects/CardData";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
@@ -21,7 +21,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.cardset.add(this.#ui);
     }
 
-    getAllData(): CardPoints {
+    getAllData(): CardPointsData {
         return { ap: this.data.get('ap'), hp: this.data.get('hp') };
     }
 
@@ -127,7 +127,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.staticData.details;
     }
 
-    getColor(): CardColors {
+    getColor(): CardColorsType {
         return this.staticData.color;
     }
 

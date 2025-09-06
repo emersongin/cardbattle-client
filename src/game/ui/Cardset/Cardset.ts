@@ -1,12 +1,12 @@
 import { Card } from "@ui/Card/Card";
 import { CardsetEvents } from "./CardsetEvents";
-import { ColorsPoints } from "../../types/ColorsPoints";
 import { CardUi } from "../Card/CardUi";
 import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
 import { SelectMode } from "./SelectMode";
-import { CardData } from "@/game/types/CardData";
+import { CardData } from "@/game/objects/CardData";
+import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -218,7 +218,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode.create(events, selectionsNumber);
     }
 
-    selectModeMany(events: CardsetEvents, colorPoints?: ColorsPoints): void {
+    selectModeMany(events: CardsetEvents, colorPoints?: ColorsPointsData): void {
         const selectionsNumber = 0;
         this.#selectMode.create(events, selectionsNumber, colorPoints);
     }

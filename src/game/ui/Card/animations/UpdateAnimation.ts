@@ -1,11 +1,11 @@
 import { Card } from "../Card";
-import { CardPoints } from "../../../types/CardPoints";
+import { CardPointsData } from "../../../objects/CardPointsData";
 import { UpdateConfig } from "./types/UpdateConfig";
 
 export class UpdateAnimation {
     
-    constructor(readonly card: Card, toTarget: CardPoints) {
-        const fromTarget: CardPoints = this.card.getAllData();
+    constructor(readonly card: Card, toTarget: CardPointsData) {
+        const fromTarget: CardPointsData = this.card.getAllData();
         const apPoints = this.#createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
             (tween: Phaser.Tweens.Tween) => {
                 fromTarget.ap = Math.round(tween.getValue() ?? 0);
@@ -38,7 +38,7 @@ export class UpdateAnimation {
     }
 
     #createUpdate(
-        target: CardPoints,
+        target: CardPointsData,
         fromPoints: number, 
         toPoints: number, 
         onUpdate: (tween: Phaser.Tweens.Tween) => void,

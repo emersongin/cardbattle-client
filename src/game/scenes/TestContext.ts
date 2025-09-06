@@ -1,5 +1,5 @@
 // import { Cardset } from '@game/ui/Cardset/Cardset';
-import { CardData } from '../types/CardData';
+import { CardData } from '../objects/CardData';
 import { VueScene } from './VueScene';
 // import { Card } from '../ui/Card/Card';
 // import { ColorsPoints } from '../types/ColorsPoints';

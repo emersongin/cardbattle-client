@@ -7,7 +7,7 @@ import { ORANGE } from "@/game/constants/colors";
 import { DECK, HAND } from "@/game/constants/keys";
 import { CARD_WIDTH } from "@/game/constants/default";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
-import { BoardWindowData } from "@/game/types/BoardWindowData";
+import { BoardWindowData } from "@/game/objects/BoardWindowData";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 

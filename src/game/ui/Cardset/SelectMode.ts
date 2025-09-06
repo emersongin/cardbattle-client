@@ -1,20 +1,20 @@
 import { Card } from "../Card/Card";
 import { Cardset } from "./Cardset";
 import { CardsetEvents } from "./CardsetEvents";
-import { ColorsPoints } from "../../types/ColorsPoints";
 import { CardActionsBuilder } from "../Card/CardActionsBuilder";
+import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 
 export class SelectMode {
     #index: number;
     #selectionsNumber: number;
     #events: CardsetEvents;
-    #colorsPoints: ColorsPoints | null = null;
+    #colorsPoints: ColorsPointsData | null = null;
     #selectIndexes: number[] = [];
     #disabledIndexes: number[] = [];
 
     constructor(readonly cardset: Cardset) {}
 
-    create(events: CardsetEvents, selectionsNumber?: number, colorPoints?: ColorsPoints): void {
+    create(events: CardsetEvents, selectionsNumber?: number, colorPoints?: ColorsPointsData): void {
         this.#events = events;
         this.#colorsPoints = colorPoints || null;
         this.#index = 0;
