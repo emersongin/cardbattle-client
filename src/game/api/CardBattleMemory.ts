@@ -917,6 +917,7 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     // mock
                     const powerCard = this.#opponentHand.find(card => card.typeId === POWER);
+                    console.log('powerCard', powerCard);
                     //counter === 0 && powerCard
                     if (powerCard) {
                         counter++;
@@ -1027,10 +1028,21 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#powerActionUpdates.some(update => update.playerSincronized === false));
+                    const hasUpdates = this.#powerActionUpdates.some(update => update.playerSincronized === false);
+                    if (!hasUpdates) {
+                        this.#setPlayerStep(WAITING_TO_PLAY);
+                        // mock
+                        this.#setOpponentStep(WAITING_TO_PLAY);
+                        // mock
+                    }
+                    resolve(hasUpdates);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#powerActionUpdates.some(update => update.opponentSincronized === false));
+                    const hasUpdates = this.#powerActionUpdates.some(update => update.opponentSincronized === false);
+                    if (!hasUpdates) {
+                        this.#setOpponentStep(WAITING_TO_PLAY);
+                    }
+                    resolve(hasUpdates);
                 };
             }, delayMock);
         });

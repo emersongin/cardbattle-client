@@ -29,7 +29,7 @@ export class CardActionsBuilder {
         return this;
     }
 
-    open(config: ScaleConfig): CardActionsBuilder {
+    open(config?: ScaleConfig): CardActionsBuilder {
         if (!config) config = { 
             open: true,
             onComplete: () => {} 
@@ -41,7 +41,7 @@ export class CardActionsBuilder {
         return this;
     }
 
-    close(config: ScaleConfig): CardActionsBuilder {
+    close(config?: ScaleConfig): CardActionsBuilder {
         if (!config) config = { 
             open: false,
             onComplete: () => {} 
@@ -64,19 +64,19 @@ export class CardActionsBuilder {
         return this;
     }
 
-    expand(config: ExpandConfig): CardActionsBuilder {
+    expand(config?: ExpandConfig): CardActionsBuilder {
         if (!config) config = { onComplete: () => {} };
         this.#addMove({ name: ExpandAnimation.name, config });
         return this;
     }
 
-    shrink(config: ExpandConfig): CardActionsBuilder {
+    shrink(config?: ExpandConfig): CardActionsBuilder {
         if (!config) config = { onComplete: () => {} };
         this.#addMove({ name: ShrinkAnimation.name, config });
         return this;
     }
 
-    flash(config: FlashConfig): CardActionsBuilder {
+    flash(config?: FlashConfig): CardActionsBuilder {
         if (!config) config = { color: 0xffffff, onComplete: () => {} };
         this.#addMove({ name: FlashAnimation.name, config });
         return this;
