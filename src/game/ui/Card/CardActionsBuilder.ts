@@ -111,7 +111,11 @@ export class CardActionsBuilder {
         if (this.#moves.length === 0) return;
         const { name, config } = this.#getLastMove();
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
-        this.#moves[this.#moves.length - 1] = { name, config };
+        this.#replaceLastMove({ name, config });
+    }
+
+    #replaceLastMove(cardAnimation: CardAnimation): void {
+        this.#moves[this.#moves.length - 1] = cardAnimation;
     }
 
     #getLastMove(): CardAnimation {

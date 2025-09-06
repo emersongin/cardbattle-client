@@ -1,37 +1,22 @@
-import { BoardWindowData } from "@game/types";
-import { StaticState, WindowState } from "./WindowState";
+import { BoardWindowData } from "@/game/types";
 import BoardWindow from "../BoardWindow";
 import { UpdatePoints } from "../types/UpdatePoints";
 
-export default class UpdatingState implements WindowState {
-    #updates: UpdatePoints[][] = [];
-    #tweens: Phaser.Tweens.Tween[][] = [];
+export class UpdateAnimation {
     
-    constructor(readonly window: BoardWindow) {}
-
-    create(toTarget: BoardWindowData, duration: number) {
-        this.addTweens(toTarget, duration);
-    }
-
-    addTweens(toTarget: BoardWindowData, duration: number = 0): void {
+    constructor(readonly window: BoardWindow, toTarget: BoardWindowData) {
         const fromTarget = this.window.getAllData();
         const updates = this.#createUpdatePoints(fromTarget, toTarget);
         const updateTweens = updates.map(update => {
             return {
                 ...update,
                 hold: 0,
-                duration,
+                duration: 0,
             };
         });
-        this.#pushUpdates(updateTweens);
-    }
-
-    static() {
-        this.window.changeState(new StaticState(this.window));
-    }
-
-    updating() {
-        throw new Error('MovingState: cannot call updating() from MovingState.');
+        for (const points of updateTweens) {
+            this.window.scene.tweens.addCounter({ ...points });
+        }
     }
 
     #createUpdatePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdatePoints[] {
@@ -167,7 +152,7 @@ export default class UpdatingState implements WindowState {
         );
         return { numberOfCardsInHand, numberOfCardsInDeck, numberOfCardsInTrash, numberOfWins };
     }
-
+    
     #createUpdate(
         target: BoardWindowData,
         fromPoints: number, 
@@ -184,48 +169,5 @@ export default class UpdatingState implements WindowState {
             onUpdate,
             onComplete
         };
-    }
-    
-    #pushUpdates(updates: UpdatePoints[]) {
-        this.#updates.push(updates);
-    }
-
-    preUpdate() {
-        if (this.#isPlaying()) return;
-        if (this.#hasUpdates()) this.#createTweens();
-        if (this.#hasTweens()) return;
-        this.static();
-    }
-
-    #isPlaying(): boolean {
-        return this.#tweens.some(group  => group.some(tween => tween.isPlaying())) ?? false;
-    }
-
-    #hasUpdates(): boolean {
-        return this.#updates.length > 0;
-    }
-
-    #createTweens() {
-        const updates = this.#updates.shift();
-        if (!updates || updates.length === 0) return;
-        let counterTweens = [];
-        for (const points of updates) {
-            const tween = this.window.scene.tweens.addCounter({
-                ...points,
-                onComplete: () => {
-                    for (let index = 0; index < this.#tweens.length; index++) {
-                        const group = this.#tweens[index];
-                        const filteredGroup = group.filter(t => t !== tween);
-                        this.#tweens[index] = filteredGroup;
-                    }
-                } 
-            });
-            counterTweens.push(tween);
-        }
-        this.#tweens.push(counterTweens);
-    }
-
-    #hasTweens(): boolean {
-        return this.#hasUpdates() || this.#tweens.length > 0;
     }
 }

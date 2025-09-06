@@ -4,12 +4,11 @@ import { BoardWindowData, MaybePartialBoardWindowData } from "@game/types/BoardW
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
 import { BoardZones } from "@/game/types/BoardZones";
 import { DECK, HAND, TRASH, WINS } from "@/game/constants/keys";
-import { StaticState, UpdatingState, WindowState } from "./state/WindowState";
 import { CardColors } from "../Card/types/CardColors";
 import { TweenConfig } from "@/game/types/TweenConfig";
+import { UpdateAnimation } from "./animations/UpdateAnimation";
 
 export default class BoardWindow extends Sizer {
-    #status: WindowState;
     #contentLabel: Label;
 
     private constructor(
@@ -30,7 +29,6 @@ export default class BoardWindow extends Sizer {
             height,
             orientation: vertical,
         });
-        this.#status = new StaticState(this);
         this.#setStartData(data, reverse);
         this.#createBackground(color);
         this.#createContentLabel(data);
@@ -186,11 +184,6 @@ export default class BoardWindow extends Sizer {
         });
     }
 
-    changeState(state: WindowState, ...args: any[]): void {
-        this.#status = state;
-        this.#status.create(...args);
-    }
-
     getAllData(): BoardWindowData {
         return {
             ap: this.data.get('ap'),
@@ -207,10 +200,6 @@ export default class BoardWindow extends Sizer {
             numberOfWins: this.data.get('numberOfWins'),
             pass: this.data.get('pass'),
         };
-    }
-
-    preUpdate() {
-        if (this.#status) this.#status.preUpdate();
     }
 
     addZonePoints(boardZone: BoardZones, value: number): void {
@@ -282,7 +271,6 @@ export default class BoardWindow extends Sizer {
     }
 
     #updating(toTarget: MaybePartialBoardWindowData): void {
-        if (!this.#status) return
         const boardWindowData = {
             ap: toTarget.ap ?? this.data.get('ap'),
             hp: toTarget.hp ?? this.data.get('hp'),
@@ -298,10 +286,6 @@ export default class BoardWindow extends Sizer {
             numberOfWins: toTarget.numberOfWins ?? this.data.get('numberOfWins'),
             pass: toTarget.pass ?? this.data.get('pass'),
         };
-        if (this.#status instanceof UpdatingState) {
-            this.#status.addTweens(boardWindowData);
-        } else if (this.#status instanceof StaticState) {
-            this.#status.updating(boardWindowData);
-        }
+        new UpdateAnimation(this, boardWindowData);
     }
 }
