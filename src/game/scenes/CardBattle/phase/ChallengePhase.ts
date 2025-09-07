@@ -36,7 +36,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     }
 
     #createChallengePhaseWindows(opponent: OpponentData) {
-        super.createTextWindowCentered('Challenge Phase!', { 
+        super.createTextWindowCentered('Challenge Phase', { 
             textAlign: 'center', 
             textColor: '#fff',
             onClose: async () => {

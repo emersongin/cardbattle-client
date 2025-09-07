@@ -99,6 +99,11 @@ export class Cardset extends Phaser.GameObjects.Container {
         card.disable();
     }
 
+    enableCardById(cardId: string): void {
+        const card = this.getCardById(cardId);
+        card.enable();
+    }
+
     #stopSelectedTweens(): void {
         if (this.#selectedTweens) {
             this.#selectedTweens?.forEach(tween => tween.stop());
@@ -108,29 +113,46 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     selectCardById(cardId: string): void {
         const card = this.getCardById(cardId);
-        card.select();
         this.bringToTop(card.getUi());
+        if (card.isMarked()) return this.markCardById(cardId);
+        if (card.isHighlighted()) return;
+        if (card.isDisabled()) return this.banCardById(cardId);
+        card.select();
         this.#stopSelectedTweens();
     }
 
     deselectCardById(cardId: string): void {
-        this.getCardById(cardId).deselect();
+        const card = this.getCardById(cardId);
+        card.unhighlight();
+        card.unmark();
+        card.deselect();
+        card.unban();
         this.#stopSelectedTweens();
+    }
+
+    banCardById(cardId: string): void {
+        this.#stopSelectedTweens();
+        this.getCardById(cardId).ban();
+    }
+
+    unbanCardById(cardId: string): void {
+        this.#stopSelectedTweens();
+        this.getCardById(cardId).unban();
     }
 
     markCardById(cardId: string): void {
+        this.deselectCardById(cardId);
         this.getCardById(cardId).mark();
-        this.#stopSelectedTweens();
     }
 
     unmarkCardById(cardId: string): void {
-        this.getCardById(cardId).unmark();
         this.#stopSelectedTweens();
+        this.getCardById(cardId).unmark();
     }
 
     unhighlightCard(card: Card): void {
-        card.unhighlight();
         this.#stopSelectedTweens();
+        card.unhighlight();
     }
 
     highlightCardsByIndexes(cardIds: string[]): void {
@@ -165,7 +187,6 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     restoreSelectMode(): void {
         this.#selectMode.removeLastSeletedId();
-        this.#selectMode.enable();
     }
 
     resetCardsState(): void {
@@ -181,7 +202,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode.create(events, selectionsNumber);
     }
 
-    selectModeMany(events: CardsetEvents, colorPoints?: ColorsPointsData): void {
+    selectModeMany(events: CardsetEvents, colorPoints?: Partial<ColorsPointsData>): void {
         const selectionsNumber = 0;
         this.#selectMode.create(events, selectionsNumber, colorPoints);
     }
@@ -202,7 +223,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         if (!this.#selectedTweens || !this.#selectedTweens?.some(tween => tween.isPlaying())) {
             const selectedTargets: Phaser.GameObjects.Graphics[] = [];
             this.getCards().forEach((card: Card) => {
-                if (card.isSelected() || card.isMarked() || card.isHighlighted()) {
+                if (card.isSelected() || card.isMarked() || card.isHighlighted() || card.isBanned()) {
                     const colorLayer = card.getSelectedLayer().list[1] as Phaser.GameObjects.Graphics;
                     selectedTargets.push(colorLayer);
                 }

@@ -7,6 +7,7 @@ import { ChallengePhase } from '@scenes/CardBattle/phase/ChallengePhase';
 import { StartPhase } from '@scenes/CardBattle/phase/StartPhase';
 import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
 import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
+import { SummonPhase } from './phase/SummonPhase';
 
 export class CardBattleScene extends VueScene {
     room: RoomData;
@@ -33,8 +34,9 @@ export class CardBattleScene extends VueScene {
         // LOAD PHASE
         await this.getCardBattle().setReadyDrawCards(opponentId);
         await this.getCardBattle().setReadyDrawCards(playerId);
+        // SUMMON PHASE
 
-        this.changePhase(new LoadPhase(this));
+        this.changePhase(new SummonPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

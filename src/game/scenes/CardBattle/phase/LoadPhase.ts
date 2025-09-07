@@ -26,7 +26,7 @@ export class LoadPhase extends CardBattlePhase implements Phase {
     }
 
     #createLoadPhaseWindows(): void {
-        super.createTextWindowCentered('Load Phase started!', {
+        super.createTextWindowCentered('Load Phase', {
             textAlign: 'center',
             onClose: () => this.#loadLoadPhase()
         });

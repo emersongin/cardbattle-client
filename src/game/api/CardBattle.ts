@@ -43,4 +43,5 @@ export interface CardBattle {
     setPowerActionCompleted: (playerId: string, powerCardId: string) => Promise<void>;
     hasPowerCardUpdates: (playerId: string) => Promise<boolean>;
     listenOpponentPowerActionUpdates: (playerId: string, callback: (isEnd: boolean) => void) => Promise<void>;
+    getCardsFromHandInTheSummonPhase: (playerId: string) => Promise<CardData[]>;
 }

@@ -30,7 +30,7 @@ const battleCards = [
         ap: 5,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1,
+        cost: 2,
         disabled: false
     },
     {
@@ -75,7 +75,7 @@ const battleCards = [
         ap: 3,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1,
+        cost: 2,
         disabled: false
     },
     {
@@ -90,7 +90,7 @@ const battleCards = [
         ap: 7,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1,
+        cost: 2,
         disabled: false
     },
     {
@@ -105,7 +105,7 @@ const battleCards = [
         ap: 2,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1,
+        cost: 0,
         disabled: false
     }
 ];
@@ -1056,6 +1056,25 @@ export default class CardBattleMemory implements CardBattle {
                     callback(powerCards.length === 0);
                 };
                 resolve();
+            }, delayMock);
+        });
+    }
+
+    getCardsFromHandInTheSummonPhase(playerId: string): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
+                    const powerCardsDisabled = powerCards.map(card => ({ ...card, disabled: true }));
+                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCards]));
+                };
+                if (this.#isOpponent(playerId)) {
+                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
+                    const powerCardsDisabled = powerCards.map(card => ({ ...card, disabled: true }));
+                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCards]));
+                };
             }, delayMock);
         });
     }

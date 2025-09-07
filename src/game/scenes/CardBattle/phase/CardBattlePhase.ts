@@ -163,6 +163,10 @@ export class CardBattlePhase {
         this.#board.addColorPoints(cardColor, value);
     }
 
+    removeBoardColorPoints(cardColor: CardColorsType, value: number): void {
+        this.#board.removeColorPoints(cardColor, value);
+    }
+
     addBoardPass(): void {
         this.#board.setPass(true);
     }

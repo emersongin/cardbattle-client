@@ -77,19 +77,34 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('selected');
     }
 
+    ban(): void {
+        this.data.set('banned', true);
+        this.#ui.changeSelectedLayerColor(0xff0000);
+        this.#ui.setSelectedLayerVisible(true);
+    }
+
+    unban(): void {
+        this.data.set('banned', false);
+        this.#ui.setSelectedLayerVisible(false);
+    }
+
+    isBanned(): boolean {
+        return this.data.get('banned');
+    }
+
     mark(): void {
         this.data.set('marked', true);
         this.#ui.changeSelectedLayerColor(0x00ff00);
         this.#ui.setSelectedLayerVisible(true);
     }
 
-    isMarked(): boolean {
-        return this.data.get('marked');
-    }
-
     unmark(): void {
         this.data.set('marked', false);
         this.#ui.setSelectedLayerVisible(false);
+    }
+
+    isMarked(): boolean {
+        return this.data.get('marked');
     }
 
     highlight(): void {
