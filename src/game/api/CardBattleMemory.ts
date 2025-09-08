@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CardBattle } from '@api/CardBattle';
-import { BATTLE, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '@constants/keys';
+import { BATTLE, BATTLE_CARDS_SET, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '@constants/keys';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { CardData } from "@objects/CardData";
@@ -1097,6 +1097,52 @@ export default class CardBattleMemory implements CardBattle {
             default:
                 return true;
         }
+    }
+
+    setBattleCards(playerId: string, cardIds: string[]): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    console.log(cardIds);
+                    this;this.#setPlayerStep(BATTLE_CARDS_SET);
+                };
+                if (this.#isOpponent(playerId)) {
+                    console.log(cardIds);
+                    this.#setOpponentStep(BATTLE_CARDS_SET);
+                };
+                resolve();
+            }, delayMock);
+        });
+    }
+
+    isOpponentBattleCardsSet(playerId: string): Promise<boolean> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#isOpponentStep(BATTLE_CARDS_SET));
+                }
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#isPlayerStep(BATTLE_CARDS_SET));
+                }
+            }, delayMock);
+        });
+    }
+
+    listenOpponentBattleCardsSet(playerId: string, callback: (isSet: boolean) => void): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    // mock
+                    this.#setOpponentStep(BATTLE_CARDS_SET);
+                    // mock
+                    callback(this.#isOpponentStep(BATTLE_CARDS_SET));
+                }
+                if (this.#isOpponent(playerId)) {
+                    callback(this.#isPlayerStep(BATTLE_CARDS_SET));
+                }
+                resolve();
+            }, delayMock);
+        });
     }
 
 }

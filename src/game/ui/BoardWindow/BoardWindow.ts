@@ -242,7 +242,6 @@ export class BoardWindow extends Sizer {
             blackPoints: this.data.get('blackPoints'),
             whitePoints: this.data.get('whitePoints'),
         } as Partial<BoardWindowData>;
-        console.log(colorsPoints);
         this.#updating(colorsPoints);
     }
 

@@ -152,34 +152,34 @@ export class SelectMode {
         const onKeydownEnter = () => {
             const currentId = this.#getCurrentId();
             if (this.#isCardDisabledById(currentId)) return;
+            if (this.#isOneSelectMode()) {
+                this.#selectId(currentId);
+                this.#disable();
+                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
+                return;
+            }
+            // select mode many
             if (!this.#isIdSelected(currentId) && this.#notHaveEnoughPoints(currentId)) return;
-
             if (this.#isIdSelected(currentId)) {
                 this.#removeId(currentId);
                 this.#creditPointsById(currentId);
                 this.cardset.enableCardById(currentId);
-                if (this.#isManySelectMode()) this.#unmarkCardById(currentId);
+                this.#unmarkCardById(currentId);
                 this.#disableCardsWithoutEnoughPoints();
                 return;
             }
-
             this.#selectId(currentId);
             this.#debitPointsById(currentId);
             this.cardset.disableCardById(currentId);
-            if (this.#isManySelectMode()) this.#markCardById(currentId);
+            this.#markCardById(currentId);
             if (this.#events.onMarked) this.#events.onMarked(currentId);
             this.#disableCardsWithoutEnoughPoints();
-
-            if (this.#isOneSelectMode() || this.#noCardsAvaliable()) {
+            if (this.#noCardsAvaliable()) {
                 this.#disable();
                 if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
             }
         };
         this.#getKeyboard().on('keydown-ENTER', onKeydownEnter);
-    }
-
-    #isManySelectMode(): boolean {
-        return this.#selectionsNumber !== 1;
     }
 
     #isOneSelectMode(): boolean {
@@ -237,11 +237,9 @@ export class SelectMode {
             const cardId = card.getId();
             if (this.#isIdSelected(cardId) || this.#isIdDisabled(cardId)) return;
             if (this.#notHaveEnoughPoints(cardId)) {
-                console.log('disable card by id', cardId);
                 this.cardset.disableCardById(cardId);
                 return;
             }
-            console.log('enable card by id', cardId);
             this.cardset.enableCardById(cardId);
         });
     }
@@ -288,6 +286,10 @@ export class SelectMode {
             this.cardset.disableCardById(cardId);
         });
         this.enable();
+    }
+
+    #isManySelectMode(): boolean {
+        return this.#selectionsNumber !== 1;
     }
 
     #getLastIdSelected(): string {

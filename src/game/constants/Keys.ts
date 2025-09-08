@@ -18,3 +18,4 @@ export const DRAW_CARDS = 'DRAW_CARDS';
 export const WAITING_TO_PLAY = 'WAITING_TO_PLAY';
 export const PASS = 'PASS';
 export const IN_PLAY = 'IN_PLAY';
+export const BATTLE_CARDS_SET = 'BATTLE_CARDS_SET';

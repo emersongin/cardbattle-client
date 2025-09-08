@@ -3,6 +3,7 @@ import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { CardData } from "@/game/objects/CardData";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { ColorsPointsData } from "@/game/objects/CardsFolderData";
+import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 
 export class SummonPhase extends CardBattlePhase implements Phase {
 
@@ -80,7 +81,28 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.createCommandWindowBottom('Put in field?', [
             {
                 description: 'Yes',
-                onSelect: () => console.log('Summon cards to the field:', cardIds)
+                onSelect: () => {
+                    super.closeAllWindows();
+                    super.closeBoard();
+                    super.closeCardset({
+                        onComplete: async () => {
+                            await this.cardBattle.setBattleCards(this.scene.room.playerId, cardIds);
+                            if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.room.playerId)) {
+                                this.changeToCompilePhase();
+                                return;
+                            }
+                            this.#createOpponentBattleCardSetWaitingWindow();
+                            super.openAllWindows({
+                                onComplete: async () => {
+                                    await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, async () => {
+                                        super.closeAllWindows({ onComplete: () => this.changeToCompilePhase() });
+                                    });
+                                }
+                            });
+                        }
+                    });
+
+                }
             },
             {
                 description: 'No',
@@ -88,6 +110,10 @@ export class SummonPhase extends CardBattlePhase implements Phase {
             },
         ]);
         super.openCommandWindow();
+    }
+
+    #createOpponentBattleCardSetWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to set battle cards...');
     }
 
     changeToChallengePhase(): void {
@@ -115,7 +141,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     changeToCompilePhase(): void {
-        // this.scene.changePhase(new CompilePhase(this.scene));
+        this.scene.changePhase(new CompilePhase(this.scene));
     }
 
     changeToBattlePhase(): void {

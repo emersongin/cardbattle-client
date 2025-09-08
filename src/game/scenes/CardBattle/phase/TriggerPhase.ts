@@ -5,12 +5,13 @@ import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { LoadPhase } from "@scenes/CardBattle/phase/LoadPhase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
+import { CompilePhase } from "./CompilePhase";
 
 export class TriggerPhase extends CardBattlePhase implements Phase {
 
     constructor(
         scene: CardBattleScene, 
-        readonly originPhase: LoadPhase
+        readonly originPhase: LoadPhase | CompilePhase
     ) {
         super(scene);
     }
@@ -83,7 +84,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     }
 
     #end(): void {
-        if (this.originPhase instanceof LoadPhase) {
+        if (this.originPhase instanceof LoadPhase || this.originPhase instanceof CompilePhase) {
             this.changeToLoadPhase();
             return;
         }
