@@ -1,4 +1,5 @@
 import { ORANGE } from "@/game/constants/colors";
+import { CardColorsType } from "@/game/types/CardColorsType";
 import { ColorsPointsData } from "@objects/CardsFolderData";
 import { Card } from "@ui/Card/Card";
 import { Cardset } from "@ui/Cardset/Cardset";
@@ -8,13 +9,13 @@ export class SelectMode {
     #events: CardsetEvents;
     #index: number;
     #selectionsNumber: number;
-    #colorsPoints: Partial<ColorsPointsData>;
+    #colorsPoints: ColorsPointsData;
     #selectIds: string[] = [];
     #disabledIds: string[] = [];
 
     constructor(readonly cardset: Cardset) {}
 
-    create(events: CardsetEvents, selectionsNumber: number = 0, colorPoints: Partial<ColorsPointsData> = {}): void {
+    create(events: CardsetEvents, selectionsNumber: number = 0, colorPoints: ColorsPointsData): void {
         this.#events = events;
         this.#colorsPoints = colorPoints;
         this.#index = 0;
@@ -31,28 +32,8 @@ export class SelectMode {
 
     enable() {
         this.cardset.data.set('selectModeEnabled', true);
-        console.log(this.#disabledIds);
-        // this.reset();
-        this.#updateCardsState();
         this.#updateCursor();
         this.#addAllKeyboardListeners();
-    }
-
-    #updateCardsState(): void {
-        this.cardset.getCards().forEach((card: Card) => {
-            const cardId = card.getId();
-            const cardColor = card.getColor();
-            const isNotOrangeColor = cardColor !== ORANGE;
-            // if (isNotOrangeColor && (this.#notHavePointsForCard(card) && !this.#disabledIds.includes(cardId))) {
-            //     this.#disabledIds.push(cardId);
-            // }
-            // if (this.#disabledIds.includes(cardId)) {
-            //     this.cardset.disableCardById(cardId);
-            // }
-            // if (this.#selectIds.includes(cardId)) {
-            //     this.#markCardById(cardId);
-            // }
-        });
     }
 
     #updateCursor(newIndex: number = this.#getCurrentIndex()): void {
@@ -60,7 +41,10 @@ export class SelectMode {
         this.#deselectCardByIndex(this.#getCurrentIndex());
         this.#changeIndex(newIndex);
         if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCurrentId());
+        const card = this.#getCardByIndex(newIndex);
+        const isMarkedState = card.isMarked();
         this.#selectCardByIndex(newIndex);
+        if (isMarkedState) this.cardset.markCardById(card.getId());
     }
 
     #getCurrentIndex(): number {
@@ -70,7 +54,10 @@ export class SelectMode {
     #deselectCardByIndex(index: number): void {
         this.#sendCardsToBackEqualOrLessByIndex(index);
         const cardId = this.#getIdByIndex(index);
-        this.cardset.deselectCardById(cardId);
+        const card = this.#getCardById(cardId);
+        const isMarkedState = card.isMarked();
+        this.cardset.removeAllSelectCardById(cardId);
+        if (isMarkedState) this.cardset.markCardById(cardId);
         this.cardset.moveCardById(cardId, { yTo: 0, duration: 10 });
     }
 
@@ -165,38 +152,46 @@ export class SelectMode {
         const onKeydownEnter = () => {
             const currentId = this.#getCurrentId();
             if (this.#isCardDisabledById(currentId)) return;
+            if (!this.#isIdSelected(currentId) && this.#notHaveEnoughPoints(currentId)) return;
+
             if (this.#isIdSelected(currentId)) {
-                // this.#removeId(currentId);
-                // this.#creditPointsById(currentId);
-                // if (this.#selectionsNumber !== 1) this.#unmarkCardById(currentId);
+                this.#removeId(currentId);
+                this.#creditPointsById(currentId);
+                this.cardset.enableCardById(currentId);
+                if (this.#isManySelectMode()) this.#unmarkCardById(currentId);
+                this.#disableCardsWithoutEnoughPoints();
                 return;
             }
 
             this.#selectId(currentId);
             this.#debitPointsById(currentId);
             this.cardset.disableCardById(currentId);
-            // if (this.#selectionsNumber !== 1) this.#markCardById(currentId);
+            if (this.#isManySelectMode()) this.#markCardById(currentId);
             if (this.#events.onMarked) this.#events.onMarked(currentId);
+            this.#disableCardsWithoutEnoughPoints();
 
-
-            // if (this.#isSelectLimitReached() || this.#isAllIdsSelected() || this.#noHasMoreColorPoints()) {
-            //     this.#disable();
-            //     if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
-            // }
+            if (this.#isOneSelectMode() || this.#noCardsAvaliable()) {
+                this.#disable();
+                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
+            }
         };
         this.#getKeyboard().on('keydown-ENTER', onKeydownEnter);
     }
 
+    #isManySelectMode(): boolean {
+        return this.#selectionsNumber !== 1;
+    }
+
+    #isOneSelectMode(): boolean {
+        return this.#selectionsNumber === 1;
+    }
+
     #isCardDisabledById(cardId: string): boolean {
-        console.log(
-            this.#disabledIds,
-            this.#selectIds,
-            (this.#disabledIds.includes(cardId) && !this.#selectIds.includes(cardId)), 
-            this.#disabledIds.includes(cardId),
-            !this.#selectIds.includes(cardId),
-            this.#getCurrentId()
-        );
         return this.#disabledIds.includes(cardId) && !this.#selectIds.includes(cardId);
+    }
+
+    #isIdSelected(cardId: string): boolean {
+        return this.#selectIds.includes(cardId);
     }
 
     #selectId(cardId: string): void {
@@ -208,92 +203,18 @@ export class SelectMode {
 
     #debitPointsById(cardId: string): void {
         const card = this.#getCardById(cardId);
-        const cardColor = card.getColor();
+        const cardColor = card.getColor() as CardColorsType;
         const cardCost = card.getCost();
         if (cardColor === ORANGE) return;
-        console.log(this.#colorsPoints[cardColor] ? this.#colorsPoints[cardColor] - cardCost : 0);
-        if (this.#colorsPoints[cardColor] && (this.#colorsPoints[cardColor] - cardCost >= 0)) {
+        if (!(this.#colorsPoints[cardColor] - cardCost < 0)) {
             this.#colorsPoints[cardColor] -= cardCost;
             if (this.#events.onDebitPoint) this.#events.onDebitPoint(cardId);
         }
-        console.log(this.#colorsPoints);
-    }
-
-
-
-
-
-
-
-
-
-
-    reset(): void {
-        this.#unhighlightAll();
-        this.#deselectAll();
-        this.#unbanAll();
-        this.#unmarkAll();
-    }
-
-    #unbanAll(): void {
-        this.cardset.getCards().forEach((card: Card) => {
-            this.#unbanCardById(card.getId());
-        });
-    }
-
-    #unbanCardById(cardId: string): void {
-        this.cardset.unbanCardById(cardId);
-    }
-
-    #deselectAll(): void {
-        this.cardset.getCards().forEach((_card: Card, index: number) => {
-            this.#deselectCardByIndex(index);
-        });
-    }
-
-    #unmarkAll(): void {
-        this.cardset.getCards().forEach((card: Card) => {
-            this.#unmarkCardById(card.getId());
-        });
-    }
-
-    #unhighlightAll(): void {
-        this.cardset.getCards().forEach((card: Card) => {
-            this.#unhighlightCard(card);
-        });
-    }
-
-    #unhighlightCard(card: Card): void {
-        this.cardset.unhighlightCard(card);
-    }
-
-    #notHavePointsForCard(card: Card): boolean {
-        const cardColor = card.getColor();
-        const cardCost = card.getCost();
-        const points = this.#colorsPoints[cardColor] || 0;
-        return points < cardCost;
-    }
-
-    #markCardById(cardId: string): void {
-        this.cardset.markCardById(cardId);
-        this.cardset.disableCardById(cardId);
-    }
-
-
-
-
-
-    #isIdSelected(cardId: string): boolean {
-        return this.#selectIds.includes(cardId);
     }
 
     #removeId(cardId: string): void {
-        this.#removeSelectedById(cardId);
-        this.#removeDisabledById(cardId);
-    }
-
-    #removeSelectedById(cardId: string): void {
         this.#selectIds = this.#selectIds.filter(i => i !== cardId);
+        this.#removeDisabledById(cardId);
     }
 
     #removeDisabledById(cardId: string): void {
@@ -302,57 +223,75 @@ export class SelectMode {
 
     #creditPointsById(cardId: string): void {
         const card = this.#getCardById(cardId);
-        const cardColor = card.getColor();
+        const cardColor = card.getColor() as CardColorsType;
         const cardCost = card.getCost();
         if (cardColor === ORANGE) return;
-        if (this.#colorsPoints[cardColor]) this.#colorsPoints[cardColor] += cardCost;
-        if (this.#events.onCreditPoint) this.#events.onCreditPoint(cardId);
+        if (cardCost > 0) {
+            this.#colorsPoints[cardColor] += cardCost;
+            if (this.#events.onCreditPoint) this.#events.onCreditPoint(cardId);
+        }
     }
 
-    #unmarkCardById(cardId: string): void {
-        this.cardset.unmarkCardById(cardId);
-        this.cardset.enableCardById(cardId);
-        this.cardset.selectCardById(cardId);
-    }
-
-
-
-
-
-    #isSelectLimitReached(): boolean {
-        return (this.#selectionsNumber > 0) && (this.#selectIds.length >= this.#selectionsNumber);
-    }
-
-    #isAllIdsSelected(): boolean {
-        return this.cardset.getCardsTotal() === ([...new Set([...this.#selectIds, ...this.#disabledIds])].length);
-    }
-
-    #noHasMoreColorPoints(): boolean {
-        const cards = this.cardset.getCards();
-        const avaliableCards = cards.filter((card: Card) => !this.#selectIds.includes(card.getId()));
-        return avaliableCards.every((card: Card) => {
-            return this.#notHavePointsForCard(card);
+    #disableCardsWithoutEnoughPoints(): void {
+        this.cardset.getCards().forEach((card: Card) => {
+            const cardId = card.getId();
+            if (this.#isIdSelected(cardId) || this.#isIdDisabled(cardId)) return;
+            if (this.#notHaveEnoughPoints(cardId)) {
+                console.log('disable card by id', cardId);
+                this.cardset.disableCardById(cardId);
+                return;
+            }
+            console.log('enable card by id', cardId);
+            this.cardset.enableCardById(cardId);
         });
     }
 
+    #isIdDisabled(cardId: string): boolean {
+        return this.#disabledIds.includes(cardId);
+    }
 
+    #notHaveEnoughPoints(cardId: string): boolean {
+        const card = this.#getCardById(cardId);
+        const cardColor = card.getColor();
+        const cardCost = card.getCost();
+        return this.#colorsPoints[cardColor] - cardCost < 0;
+    }
 
+    #markCardById(cardId: string): void {
+        this.cardset.markCardById(cardId);
+        this.cardset.disableCardById(cardId);
+    }
 
+    #unmarkCardById(cardId: string): void {
+        this.cardset.selectCardById(cardId);
+        this.cardset.enableCardById(cardId);
+    }
+
+    #noCardsAvaliable(): boolean {
+        return this.cardset.getCards().every((card: Card) => card.isDisabled());
+    }
 
     getIdsSelected(): string[] {
         return this.#selectIds.slice();
     }
 
-
-
-    removeLastSeletedId(): void {
-        if (this.#selectIds.length === 0) return;
-        const lastId = this.#selectIds.pop();
-        if (!lastId) return;
-        this.#removeDisabledById(lastId);
+    restoreSelectMode(): void {
+        const lastId = this.#getLastIdSelected();
+        this.#removeId(lastId);
         this.#creditPointsById(lastId);
-        this.#unmarkCardById(lastId);
+        this.cardset.enableCardById(lastId);
+        if (this.#isManySelectMode()) this.#unmarkCardById(lastId);
+        this.#disableCardsWithoutEnoughPoints();
+        const cardsSelected = this.getIdsSelected();
+        cardsSelected.forEach(cardId => {
+            this.cardset.markCardById(cardId);
+            this.cardset.disableCardById(cardId);
+        });
         this.enable();
+    }
+
+    #getLastIdSelected(): string {
+        return this.#selectIds[this.#selectIds.length - 1];
     }
 
 }

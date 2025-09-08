@@ -26,7 +26,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
             GREEN: boardData.greenPoints,
             BLUE: boardData.bluePoints,
             BLACK: boardData.blackPoints,
-            WHITE: boardData.whitePoints
+            WHITE: boardData.whitePoints,
+            ORANGE: 0
         });
     }
 
@@ -39,7 +40,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.addTextWindow('...');
     }
 
-    #openHandCardset(colorPoints: Partial<ColorsPointsData>): void {
+    #openHandCardset(colorPoints: ColorsPointsData): void {
         const cardset = super.getCardset();
         super.openCardset({ 
             faceUp: true, 
@@ -48,8 +49,6 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 super.openBoard();
                 cardset.selectModeMany({
                     onChangeIndex: (cardId: string) => this.#onChangeHandCardsetIndex(cardId),
-                    onMarked: (cardId: string) => console.log('Marked card in hand cardset:', cardId),
-                    onLeave: () => console.log('Leave hand cardset selection mode'),
                     onCreditPoint: (cardId: string) => {
                         const card = cardset.getCardById(cardId);
                         const cardColor = card.getColor();

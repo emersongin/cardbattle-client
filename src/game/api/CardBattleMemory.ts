@@ -45,7 +45,7 @@ const battleCards = [
         ap: 4,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1,
+        cost: 2,
         disabled: false
     },
     {
@@ -60,7 +60,7 @@ const battleCards = [
         ap: 6,
         typeId: BATTLE as CardType,
         powerId: 'none',
-        cost: 1,
+        cost: 2,
         disabled: false
     },
     {
@@ -1065,18 +1065,38 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: !this.#hasEnoughPointsByColorAndCost(card.color, card.cost, this.#playerBoard) }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
                     const powerCardsDisabled = powerCards.map(card => ({ ...card, disabled: true }));
-                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCards]));
+                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCardsDisabled]));
                 };
                 if (this.#isOpponent(playerId)) {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: !this.#hasEnoughPointsByColorAndCost(card.color, card.cost, this.#opponentBoard) }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
                     const powerCardsDisabled = powerCards.map(card => ({ ...card, disabled: true }));
-                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCards]));
+                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCardsDisabled]));
                 };
             }, delayMock);
         });
+    }
+
+    #hasEnoughPointsByColorAndCost(cardColor: CardColorsType, cardCost: number, boardWindowData: BoardWindowData): boolean {
+        if (cardColor === ORANGE) return true;
+        switch (cardColor) {
+            case RED:
+                return boardWindowData.redPoints >= cardCost;
+            case GREEN:
+                return boardWindowData.greenPoints >= cardCost;
+            case BLUE:
+                return boardWindowData.bluePoints >= cardCost;
+            case BLACK:
+                return boardWindowData.blackPoints >= cardCost;
+            case WHITE:
+                return boardWindowData.whitePoints >= cardCost;
+            default:
+                return true;
+        }
     }
 
 }

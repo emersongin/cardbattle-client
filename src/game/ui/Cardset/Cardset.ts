@@ -95,8 +95,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     disableCardById(cardId: string): void {
-        const card = this.getCardById(cardId);
-        card.disable();
+        this.getCardById(cardId).disable();
     }
 
     enableCardById(cardId: string): void {
@@ -112,6 +111,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     selectCardById(cardId: string): void {
+        this.removeAllSelectCardById(cardId);
         const card = this.getCardById(cardId);
         this.bringToTop(card.getUi());
         if (card.isMarked()) return this.markCardById(cardId);
@@ -121,7 +121,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#stopSelectedTweens();
     }
 
-    deselectCardById(cardId: string): void {
+    removeAllSelectCardById(cardId: string): void {
         const card = this.getCardById(cardId);
         card.unhighlight();
         card.unmark();
@@ -131,28 +131,13 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     banCardById(cardId: string): void {
-        this.#stopSelectedTweens();
+        this.removeAllSelectCardById(cardId);
         this.getCardById(cardId).ban();
     }
 
-    unbanCardById(cardId: string): void {
-        this.#stopSelectedTweens();
-        this.getCardById(cardId).unban();
-    }
-
     markCardById(cardId: string): void {
-        this.deselectCardById(cardId);
+        this.removeAllSelectCardById(cardId);
         this.getCardById(cardId).mark();
-    }
-
-    unmarkCardById(cardId: string): void {
-        this.#stopSelectedTweens();
-        this.getCardById(cardId).unmark();
-    }
-
-    unhighlightCard(card: Card): void {
-        this.#stopSelectedTweens();
-        card.unhighlight();
     }
 
     highlightCardsByIndexes(cardIds: string[]): void {
@@ -186,11 +171,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     restoreSelectMode(): void {
-        this.#selectMode.removeLastSeletedId();
-    }
-
-    resetCardsState(): void {
-        this.#selectMode.reset();
+        this.#selectMode.restoreSelectMode();
     }
 
     isValidIndex(index: number) {
@@ -199,10 +180,18 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     selectModeOne(events: CardsetEvents): void {
         const selectionsNumber = 1;
-        this.#selectMode.create(events, selectionsNumber);
+        const colorPoints = {
+            RED: 0,
+            GREEN: 0,
+            BLUE: 0,
+            BLACK: 0,
+            WHITE: 0,
+            ORANGE: 0
+        };
+        this.#selectMode.create(events, selectionsNumber, colorPoints);
     }
 
-    selectModeMany(events: CardsetEvents, colorPoints?: Partial<ColorsPointsData>): void {
+    selectModeMany(events: CardsetEvents, colorPoints: ColorsPointsData): void {
         const selectionsNumber = 0;
         this.#selectMode.create(events, selectionsNumber, colorPoints);
     }
