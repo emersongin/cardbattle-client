@@ -227,6 +227,8 @@ export class CardBattlePhase {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
         const y = (this.#board.y - (this.#board.height / 2)) - CARD_HEIGHT - 10; 
         const cardset = Cardset.create(this.scene, cards, x, y);
+        cardset.setCardsInLinePosition();
+        cardset.setCardsClosed();
         this.#cardset = cardset;
         return cardset;
     }
@@ -294,12 +296,35 @@ export class CardBattlePhase {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
         const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
         const cardset = Cardset.create(this.scene, cards, x, y);
+        cardset.setCardsInLinePosition();
+        cardset.setCardsClosed();
         this.#opponentCardset = cardset;
         return cardset;
     }
 
     getOpponentCardset(): Cardset {
         return this.#opponentCardset;
+    }
+
+    openOpponentCardset(config?: TweenConfig & { faceUp?: boolean }): void {
+        const openConfig: TimelineConfig<CardUi> = {
+            targets: this.getOpponentCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+                pause();
+                const builder = CardActionsBuilder
+                    .create(card)
+                    .open({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    });
+                if (config?.faceUp) builder.faceUp();
+                builder.play();
+            },
+            onAllComplete: () => {
+                if (config?.onComplete) config.onComplete();
+            }
+        };
+        this.scene.timeline(openConfig);
     }
 
     destroyOpponentCardset(): void {

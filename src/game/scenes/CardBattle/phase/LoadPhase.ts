@@ -5,15 +5,38 @@ import { PowerPhase } from "./PowerPhase";
 import { CardData } from "@/game/objects/CardData";
 import { HAND } from "@/game/constants/keys";
 import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
+import { TweenConfig } from "@/game/types/TweenConfig";
 
 export class LoadPhase extends PowerPhase implements Phase {
 
-    createLoadPhaseWindows(): void {
+    createPhaseWindows(): void {
         super.createTextWindowCentered('Load Phase', {
             textAlign: 'center',
             onClose: () => super.loadPhase()
         });
         super.addTextWindow('Select and use a Power Card');
+    }
+
+    async createGameBoard(): Promise<void> {
+        const board = await this.cardBattle.getBoard(this.scene.room.playerId);
+        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+        const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
+        super.createOpponentBoard(opponentBoard);
+        super.createBoard(board);
+        super.createFieldCardset({ cards: powerCards });
+    }
+
+    openGameBoard(config?: TweenConfig): void {
+        this.scene.timeline({
+            targets: [
+                (t?: TweenConfig) => super.openOpponentBoard(t),
+                (t?: TweenConfig) => super.openBoard(t),
+                (t?: TweenConfig) => super.openFieldCardset({ faceUp: true, ...t })
+            ],
+            onAllComplete: () => {
+                if (config?.onComplete) config.onComplete();
+            },
+        });
     }
 
     async nextPlay(): Promise<void> {

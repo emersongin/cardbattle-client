@@ -262,6 +262,7 @@ export default class CardBattleMemory implements CardBattle {
     #playerDeck: CardData[] = [];
     #playerHand: CardData[] = [];
     #playerTrash: CardData[] = [];
+    #playerBattleCardsSet: CardData[] = [];
     // opponent is the one who joins the room
     #opponentId: string = '';
     #opponentStep: string = 'NONE';
@@ -282,6 +283,7 @@ export default class CardBattleMemory implements CardBattle {
     #opponentDeck: CardData[] = [];
     #opponentHand: CardData[] = [];
     #opponentTrash: CardData[] = [];
+    #opponentBattleCardsSet: CardData[] = [];
 
     getTotalCardsInDeck(): number {
         return this.#playerDeck.length;
@@ -463,7 +465,7 @@ export default class CardBattleMemory implements CardBattle {
                 this.#setPlayerStep(SET_DECK);
                 this.#playerBoard.numberOfCardsInDeck = this.#playerDeck.length;
                 //mock
-                this.#setOpponentDeck(ArrayUtil.clone(folders[0].deck));
+                this.#setOpponentDeck(ArrayUtil.clone(redDeck));
                 this.#setOpponentStep(SET_DECK);
                 this.#opponentBoard.numberOfCardsInDeck = this.#opponentDeck.length;
                 // mock
@@ -744,11 +746,11 @@ export default class CardBattleMemory implements CardBattle {
     getOpponentCardsFromHand(playerId: string): Promise<CardData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                if (this.#isOpponent(playerId)) {
-                    resolve(this.#playerHand);
-                };
                 if (this.#isPlayer(playerId)) {
                     resolve(this.#opponentHand);
+                };
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#playerHand);
                 };
             }, delayMock);
         });
@@ -914,8 +916,7 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     // mock
                     const powerCard = this.#opponentHand.find(card => card.typeId === POWER);
-                    //counter === 0 && powerCard
-                    if (powerCard) {
+                    if (counter === 0 && powerCard) {
                         counter++;
                         const powerAction = { powerCard } as PowerActionData;
                         this.makePowerCardPlay(this.#opponentId, powerAction);
@@ -1103,13 +1104,22 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    console.log(cardIds);
+                    const cards = this.#playerHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
+                    this.#playerBattleCardsSet = cards;
+                    this.#playerHand = this.#playerHand.filter(card => !cardIds.includes(card.id));
                     this;this.#setPlayerStep(BATTLE_CARDS_SET);
+                    // mock
+                    // this.#setOpponentStep(BATTLE_CARDS_SET);
+                    // const opponentCardIds = this.#opponentHand.filter(c => c.typeId === BATTLE).map(c => c.id);
+                    // this.setBattleCards(this.#opponentId, opponentCardIds);
+                    // mock
                 };
-                if (this.#isOpponent(playerId)) {
-                    console.log(cardIds);
-                    this.#setOpponentStep(BATTLE_CARDS_SET);
-                };
+                // if (this.#isOpponent(playerId)) {
+                //     const cards = this.#opponentHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
+                //     this.#opponentBattleCardsSet = cards;
+                //     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
+                //     this.#setOpponentStep(BATTLE_CARDS_SET);
+                // };
                 resolve();
             }, delayMock);
         });
@@ -1143,6 +1153,32 @@ export default class CardBattleMemory implements CardBattle {
                 resolve();
             }, delayMock);
         });
+    }
+
+    getBattleCards(playerId: string): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#playerBattleCardsSet);
+                }
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#opponentBattleCardsSet);
+                }
+            }, delayMock);
+        });
+    }
+
+    getOpponentBattleCards(playerId: string): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    resolve(this.#opponentBattleCardsSet);
+                }
+                if (this.#isOpponent(playerId)) {
+                    resolve(this.#playerBattleCardsSet);
+                }
+            }, delayMock);
+        }); 
     }
 
 }

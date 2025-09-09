@@ -16,40 +16,18 @@ export abstract class PowerPhase extends CardBattlePhase {
             this.loadPhase();
             return;
         }
-        await this.#createGameBoard();
-        this.createLoadPhaseWindows();
+        await this.createGameBoard();
+        this.createPhaseWindows();
         super.openAllWindows();
     }
 
     async loadPhase(): Promise<void> {
-        this.#openGameBoard();
+        this.openGameBoard();
         if (await this.cardBattle.isStartPlaying(this.scene.room.playerId)) {
             this.goPlay();
             return;
         }
         this.nextPlay();
-    }
-
-    async #createGameBoard(): Promise<void> {
-        const board = await this.cardBattle.getBoard(this.scene.room.playerId);
-        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-        const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
-        super.createOpponentBoard(opponentBoard);
-        super.createBoard(board);
-        super.createFieldCardset({ cards: powerCards });
-    }
-
-    #openGameBoard(config?: TweenConfig): void {
-        this.scene.timeline({
-            targets: [
-                (t?: TweenConfig) => super.openOpponentBoard(t),
-                (t?: TweenConfig) => super.openBoard(t),
-                (t?: TweenConfig) => super.openFieldCardset({ faceUp: true, ...t })
-            ],
-            onAllComplete: () => {
-                if (config?.onComplete) config.onComplete();
-            },
-        });
     }
 
     async goPlay(): Promise<void> {
@@ -168,7 +146,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #onPlayPowerCard(cardId: string): void {
         this.#closeHandBoard({ onComplete: () => {
-            this.#openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
+            this.openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
         }});
     }
 
@@ -202,7 +180,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #onLeaveHand(): void {
         this.#closeHandBoard({ onComplete: () => {
-            this.#openGameBoard({ onComplete: () => this.goPlay() });
+            this.openGameBoard({ onComplete: () => this.goPlay() });
         }});
     }
 
@@ -290,6 +268,8 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.scene.timeline(moveConfig);
     }
 
-    abstract createLoadPhaseWindows(): void;
+    abstract createGameBoard(): Promise<void>;
+    abstract openGameBoard(config?: TweenConfig): void;
+    abstract createPhaseWindows(): void;
     abstract nextPlay(): Promise<void>;
 }
