@@ -13,7 +13,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (goToPlays) {
             super.removeBoardPass();
             super.removeOpponentBoardPass();
-            this.loadPhase();
+            this.start();
             return;
         }
         await this.createGameBoard();
@@ -21,8 +21,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openAllWindows();
     }
 
-    async loadPhase(): Promise<void> {
-        this.openGameBoard();
+    async start(): Promise<void> {
         if (await this.cardBattle.isStartPlaying(this.scene.room.playerId)) {
             this.goPlay();
             return;

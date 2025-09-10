@@ -37,18 +37,18 @@ export class CardBattleScene extends VueScene {
         await this.getCardBattle().setReadyDrawCards(opponentId);
         await this.getCardBattle().setReadyDrawCards(playerId);
         // SUMMON PHASE
-        console.log(await this.getCardBattle().getOpponentCardsFromHand(opponentId));
+        // console.log(await this.getCardBattle().getOpponentCardsFromHand(opponentId));
         
-        const playerBattleCards = await this.getCardBattle().getCardsFromHand(playerId);
-        const playerCardIds = playerBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
-        await this.getCardBattle().setBattleCards(playerId, playerCardIds);
+        // const playerBattleCards = await this.getCardBattle().getCardsFromHand(playerId);
+        // const playerCardIds = playerBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
+        // await this.getCardBattle().setBattleCards(playerId, playerCardIds);
 
-        console.log(await this.getCardBattle().getOpponentCardsFromHand(opponentId));
-        const opponentBattleCards = await this.getCardBattle().getOpponentCardsFromHand(opponentId);
-        const opponentCardIds = opponentBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
-        await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
+        // console.log(await this.getCardBattle().getOpponentCardsFromHand(opponentId));
+        // const opponentBattleCards = await this.getCardBattle().getOpponentCardsFromHand(opponentId);
+        // const opponentCardIds = opponentBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
+        // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
 
-        this.changePhase(new CompilePhase(this));
+        this.changePhase(new LoadPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {
