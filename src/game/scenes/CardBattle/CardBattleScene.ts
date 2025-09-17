@@ -48,7 +48,7 @@ export class CardBattleScene extends VueScene {
         // const opponentCardIds = opponentBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
         // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
 
-        this.changePhase(new LoadPhase(this));
+        this.changePhase(new SummonPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

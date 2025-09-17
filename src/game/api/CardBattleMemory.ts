@@ -1105,23 +1105,44 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     const cards = this.#playerHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
+                    this.#removeBoardPointsByBattleCards(cards, this.#playerBoard);
                     this.#playerBattleCardsSet = cards;
                     this.#playerHand = this.#playerHand.filter(card => !cardIds.includes(card.id));
-                    this;this.#setPlayerStep(BATTLE_CARDS_SET);
-                    // mock
-                    // this.#setOpponentStep(BATTLE_CARDS_SET);
-                    // const opponentCardIds = this.#opponentHand.filter(c => c.typeId === BATTLE).map(c => c.id);
-                    // this.setBattleCards(this.#opponentId, opponentCardIds);
-                    // mock
-                };
-                // if (this.#isOpponent(playerId)) {
-                //     const cards = this.#opponentHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
-                //     this.#opponentBattleCardsSet = cards;
-                //     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
-                //     this.#setOpponentStep(BATTLE_CARDS_SET);
-                // };
+                    this.#setPlayerStep(BATTLE_CARDS_SET);
+                }
+                if (this.#isOpponent(playerId)) {
+                    const cards = this.#opponentHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
+                    this.#removeBoardPointsByBattleCards(cards, this.#opponentBoard);
+                    this.#opponentBattleCardsSet = cards;
+                    this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
+                    this.#setOpponentStep(BATTLE_CARDS_SET);
+                }
                 resolve();
             }, delayMock);
+        });
+    }
+
+    #removeBoardPointsByBattleCards(cards: CardData[], boardWindowData: BoardWindowData): void {
+        cards.forEach(card => {
+            switch (card.color) {
+                case RED:
+                    boardWindowData.redPoints -= card.cost;
+                    break;
+                case GREEN:
+                    boardWindowData.greenPoints -= card.cost;
+                    break;
+                case BLUE:
+                    boardWindowData.bluePoints -= card.cost;
+                    break;
+                case BLACK:
+                    boardWindowData.blackPoints -= card.cost;
+                    break;
+                case WHITE:
+                    boardWindowData.whitePoints -= card.cost;
+                    break;
+                case ORANGE:
+                    break;
+            }
         });
     }
 
@@ -1143,7 +1164,15 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    this.#setOpponentStep(BATTLE_CARDS_SET);
+                    let boardOpponentClone = { ...this.#opponentBoard };
+                    const cardIds = this.#opponentHand.filter(card => {
+                        if (card.typeId !== BATTLE) return false;
+                        if (this.#hasEnoughPointsByColorAndCost(card.color, card.cost, boardOpponentClone)) { 
+                            this.#removeBoardPointsByBattleCards([card], boardOpponentClone);
+                            return true;
+                        }
+                    }).map(card => card.id);
+                    this.setBattleCards(this.#opponentId, cardIds);
                     // mock
                     callback(this.#isOpponentStep(BATTLE_CARDS_SET));
                 }
