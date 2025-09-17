@@ -4,6 +4,7 @@ import { CardData } from "@/game/objects/CardData";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
+import { TweenConfig } from "@/game/types/TweenConfig";
 
 export class SummonPhase extends CardBattlePhase implements Phase {
 
@@ -88,14 +89,14 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                         onComplete: async () => {
                             await this.cardBattle.setBattleCards(this.scene.room.playerId, cardIds);
                             if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.room.playerId)) {
-                                this.changeToCompilePhase();
+                                this.#showBattleCards();
                                 return;
                             }
                             this.#createOpponentBattleCardSetWaitingWindow();
                             super.openAllWindows({
                                 onComplete: async () => {
                                     await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, async () => {
-                                        super.closeAllWindows({ onComplete: () => this.changeToCompilePhase() });
+                                        super.closeAllWindows({ onComplete: () => this.#showBattleCards() });
                                     });
                                 }
                             });
@@ -110,6 +111,30 @@ export class SummonPhase extends CardBattlePhase implements Phase {
             },
         ]);
         super.openCommandWindow();
+    }
+
+    async #showBattleCards(): Promise<void> {
+        const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
+        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+        super.createBoard(boardData);
+        super.createOpponentBoard(opponentBoard);
+        this.openGameBoard({
+            onComplete: () => {
+                console.log('Both players have set their battle cards.');
+            }
+        })
+    }
+
+    openGameBoard(config?: TweenConfig): void {
+        this.scene.timeline({
+            targets: [
+                (t?: TweenConfig) => super.openOpponentBoard(t),
+                (t?: TweenConfig) => super.openBoard(t),
+            ],
+            onAllComplete: () => {
+                if (config?.onComplete) config.onComplete();
+            },
+        });
     }
 
     #createOpponentBattleCardSetWaitingWindow(): void {
