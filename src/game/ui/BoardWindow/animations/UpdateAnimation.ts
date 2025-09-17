@@ -14,10 +14,6 @@ export class UpdateAnimation {
                 ...update,
                 hold: 0,
                 duration: config.duration || 0,
-                onComplete: () => {
-                    if (update.onComplete) update.onComplete();
-                    if (config.onComplete) config.onComplete();
-                }
             };
         });
         for (const points of updateTweens) {
