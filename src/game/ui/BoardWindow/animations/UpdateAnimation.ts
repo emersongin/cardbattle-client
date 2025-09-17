@@ -4,14 +4,18 @@ import { BoardWindow } from "@ui/BoardWindow/BoardWindow";
 
 export class UpdateAnimation {
     
-    constructor(readonly window: BoardWindow, toTarget: BoardWindowData) {
-        const fromTarget = this.window.getAllData();
+    constructor(
+        readonly window: BoardWindow, 
+        fromTarget: BoardWindowData, 
+        toTarget: BoardWindowData, 
+        duration: number = 0
+    ) {
         const updates = this.#createUpdateConfig(fromTarget, toTarget);
         const updateTweens = updates.map(update => {
             return {
                 ...update,
                 hold: 0,
-                duration: 0,
+                duration: duration,
             };
         });
         for (const points of updateTweens) {
@@ -164,7 +168,6 @@ export class UpdateAnimation {
             target,
             from: fromPoints,
             to: toPoints,
-            duration: 300,
             ease: 'linear',
             onUpdate,
             onComplete

@@ -1,4 +1,4 @@
-import { CardPointsData } from "@objects/CardPointsData";
+import { CardPointsData } from "@/game/objects/BattlePointsData";
 import { TweenConfig } from "@game/types/TweenConfig";
 
 export type UpdateConfig = {

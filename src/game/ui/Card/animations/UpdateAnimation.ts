@@ -1,5 +1,5 @@
 import { Card } from "@ui/Card/Card";
-import { CardPointsData } from "@objects/CardPointsData";
+import { CardPointsData } from "@/game/objects/BattlePointsData";
 import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
 
 export class UpdateAnimation {

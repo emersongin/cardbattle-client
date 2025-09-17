@@ -1,4 +1,4 @@
-export type CardPointsData = {
+export type BattlePointsData = {
     ap: number;
     hp: number;
 }

@@ -5,6 +5,9 @@ import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
+import { TimelineConfig, TimelineEvent } from "../../VueScene";
+import { CardUi } from "@/game/ui/Card/CardUi";
+import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 
 export class SummonPhase extends CardBattlePhase implements Phase {
 
@@ -116,26 +119,53 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     async #showBattleCards(): Promise<void> {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+        const cardsData: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
+        const opponentCards = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
         super.createBoard(boardData);
         super.createOpponentBoard(opponentBoard);
-        this.openGameBoard({
-            onComplete: () => {
-                console.log('Both players have set their battle cards.');
-            }
-        })
+        super.createCardset(cardsData);
+        super.createOpponentCardset(opponentCards);
+        this.openGameBoard()
     }
 
-    openGameBoard(config?: TweenConfig): void {
+    openGameBoard(): void {
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.openOpponentBoard(t),
                 (t?: TweenConfig) => super.openBoard(t),
+                (t?: TweenConfig) => super.openCardset({ faceUp: true, ...t }),
+                (t?: TweenConfig) => super.openOpponentCardset(t),
             ],
             onAllComplete: () => {
-                if (config?.onComplete) config.onComplete();
+                this.#flipOpponentCardSet();
             },
         });
     }
+
+    #flipOpponentCardSet(): void {
+        const flipConfig: TimelineConfig<CardUi> = {
+            targets: this.getOpponentCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+                pause();
+                CardActionsBuilder
+                    .create(card)
+                    .close({ delay: (index! * 200) })
+                    .faceUp()
+                    .open({ onComplete: () => resume() })
+                    .play();
+            },
+            onAllComplete: () => {
+                this.#loadBattlePoints();
+            }
+        };
+        this.scene.timeline(flipConfig);
+    }
+
+    async #loadBattlePoints(): Promise<void> {
+        super.setBattlePointsWithDuration(await this.cardBattle.getBattlePoints(this.scene.room.playerId));
+        super.setOpponentBoardBattlePointsWithDuration(await this.cardBattle.getOpponentBattlePoints(this.scene.room.playerId));
+    }
+
 
     #createOpponentBattleCardSetWaitingWindow(): void {
         super.createWaitingWindow('Waiting for opponent to set battle cards...');

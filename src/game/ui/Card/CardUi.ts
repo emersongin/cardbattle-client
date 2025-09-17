@@ -87,7 +87,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     #createDisplay(): void {
         const display = this.scene.add.text(this.width - 80, this.height - 32, '', {
             fontSize: '24px',
-            color: '#ffffff',
+            color: (this.card.staticData.color === WHITE) ? '#000' : '#fff',
             fontStyle: 'bold',
         });
         this.display = display;

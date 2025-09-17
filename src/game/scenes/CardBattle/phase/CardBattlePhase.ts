@@ -17,6 +17,7 @@ import { CardUi } from '@ui/Card/CardUi';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
 import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
+import { BattlePointsData } from "@/game/objects/BattlePointsData";
 
 export type AlignType = 
     | typeof LEFT 
@@ -25,21 +26,31 @@ export type AlignType =
 
 export class CardBattlePhase {
     protected cardBattle: CardBattle;
+
     #textWindows: TextWindow[] = [];
     #commandWindow: CommandWindow;
     #board: BoardWindow;
     #opponentBoard: BoardWindow;
+    
     #cardset: Cardset;
     #opponentCardset: Cardset;
     #fieldCardset: Cardset;
-    
+        
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
     }
 
+    // TEXT WINDOWS
     createTextWindowTop(text: string, config: Partial<TextWindowConfig>): void {
         this.destroyAllTextWindows();
         this.#textWindows[0] = this.#createTextWindowTop(text, config);
+    }
+
+    destroyAllTextWindows(): void {
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach(window => window.destroy());
+            this.#textWindows = [];
+        }
     }
 
     #createTextWindowTop(text: string, config: Partial<TextWindowConfig>): TextWindow {
@@ -53,6 +64,14 @@ export class CardBattlePhase {
             onClose: config.onClose
         };
         return TextWindow.createTop(this.scene, { ...windowConfig, text });
+    }
+
+    #closeAllChildWindows(): void {
+        if (this.#textWindows.length) {
+            this.#textWindows.forEach((window, index) => {
+                if (index > 0) window.close({ onComplete: () => window.destroy()})
+            });
+        }
     }
 
     createTextWindowCentered(title: string, config: Partial<TextWindowConfig>): void {
@@ -74,22 +93,18 @@ export class CardBattlePhase {
         return TextWindow.createCentered(this.scene, { ...windowConfig, text });
     }
 
-    #closeAllChildWindows(): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
-                if (index > 0) window.close({ onComplete: () => window.destroy()})
-            });
-        }
-    }
-
     addTextWindow(title: string, config?: Partial<TextWindowConfig>): void {
         if (!this.#textWindows.length) {
             throw new Error('You should create a text window first.');
         }
         if (!config) config = {};
-        config.relativeParent = this.getLastTextWindow();
+        config.relativeParent = this.#getLastTextWindow();
         config.onStartClose = () => {}; // null
         this.#textWindows.push(this.#createTextWindowCentered(title, config));
+    }
+
+    #getLastTextWindow(): TextWindow {
+        return this.#textWindows[this.#textWindows.length - 1];
     }
 
     setTextWindowText(text: string, index: number): void {
@@ -100,10 +115,6 @@ export class CardBattlePhase {
             throw new Error(`TextWindow: index ${index} is out of bounds.`);
         }
         this.#textWindows[index].setText(text);
-    }
-
-    getLastTextWindow(): TextWindow {
-        return this.#textWindows[this.#textWindows.length - 1];
     }
 
     openAllWindows(config?: TweenConfig): void {
@@ -124,13 +135,11 @@ export class CardBattlePhase {
         }
     }
 
-    destroyAllTextWindows(): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach(window => window.destroy());
-            this.#textWindows = [];
-        }
+    createWaitingWindow(text: string = 'Waiting for opponent...'): void {
+        this.createTextWindowCentered(text, { textAlign: 'center' });
     }
 
+    // COMMAND WINDOW
     createCommandWindowCentered(title: string, options: CommandOption[]): void {
         this.#commandWindow = CommandWindow.createCentered(this.scene, title, options);
     }
@@ -147,24 +156,33 @@ export class CardBattlePhase {
         if (this.#commandWindow) this.#commandWindow.destroy();
     }
 
+    // PLAYER BOARD
     createBoard(boardData: BoardWindowData): void {
         this.#board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
     }
 
+    setBattlePointsWithDuration(battlePoints: BattlePointsData): void {
+        this.#board.setBattlePointsWithDuration(battlePoints.ap, battlePoints.hp);
+    }
+
     addBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        this.#board.addZonePoints(boardZone, value);
+        const lastValue = this.#board.getZonePoints(boardZone);
+        this.#board.setZonePoints(boardZone, (lastValue + value));
     }
 
     removeBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        this.#board.removeZonePoints(boardZone, value);
+        const lastValue = this.#board.getZonePoints(boardZone);
+        this.#board.setZonePoints(boardZone, (lastValue - value));
     }
 
     addBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        this.#board.addColorPoints(cardColor, value);
+        const lastValue = this.#board.getColorPoints(cardColor);
+        this.#board.setColorPoints(cardColor, (lastValue + value));
     }
 
     removeBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        this.#board.removeColorPoints(cardColor, value);
+        const lastValue = this.#board.getColorPoints(cardColor);
+        this.#board.setColorPoints(cardColor, (lastValue - value));
     }
 
     addBoardPass(): void {
@@ -187,20 +205,33 @@ export class CardBattlePhase {
         if (this.#board) this.#board.destroy();
     }
 
+    // OPPONENT BOARD
     createOpponentBoard(opponentBoardData: BoardWindowData): void {
         this.#opponentBoard = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
     }
 
+    setOpponentBoardBattlePointsWithDuration(battlePoints: BattlePointsData): void {
+        this.#opponentBoard.setBattlePointsWithDuration(battlePoints.ap, battlePoints.hp);
+    }
+
     addOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        this.#opponentBoard.addZonePoints(boardZone, value);
+        const lastValue = this.#opponentBoard.getZonePoints(boardZone);
+        this.#opponentBoard.setZonePoints(boardZone, (lastValue + value));
     }
 
     removeOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        this.#opponentBoard.removeZonePoints(boardZone, value);
+        const lastValue = this.#opponentBoard.getZonePoints(boardZone);
+        this.#opponentBoard.setZonePoints(boardZone, (lastValue - value));
     }
 
     addOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        this.#opponentBoard.addColorPoints(cardColor, value);
+        const lastValue = this.#opponentBoard.getColorPoints(cardColor);
+        this.#opponentBoard.setColorPoints(cardColor, (lastValue + value));
+    }
+
+    removeOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
+        const lastValue = this.#opponentBoard.getColorPoints(cardColor);
+        this.#opponentBoard.setColorPoints(cardColor, (lastValue - value));
     }
 
     addOpponentBoardPass(): void {
@@ -222,6 +253,24 @@ export class CardBattlePhase {
     destroyOpponentBoard(): void {
         if (this.#opponentBoard) this.#opponentBoard.destroy();
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     createCardset(cards: CardData[]): Cardset {
         const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
@@ -416,7 +465,6 @@ export class CardBattlePhase {
         if (this.#fieldCardset) this.#fieldCardset.destroy();
     }
 
-    createWaitingWindow(text: string = 'Waiting for opponent...'): void {
-        this.createTextWindowCentered(text, { textAlign: 'center' });
-    }
+
+
 }

@@ -86,6 +86,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 pause();
                 CardActionsBuilder
                     .create(card)
+                    .open({ delay: 0, duration: 0 })
                     .move({
                         xTo: (index! * CARD_WIDTH),
                         yTo: 0,
@@ -135,7 +136,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     .create(card)
                     .flash({
                         color: 0xffffff,
-                        delay: (index! * 100),
+                        delay: (index! * 200),
                         onStart: () => super.addBoardColorPoints(card.getColor(), 1),
                         onComplete: () => resume()
                     })
@@ -218,7 +219,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                     .create(card)
                     .flash({
                         color: 0xfffff,
-                        delay: (index! * 100),
+                        delay: (index! * 200),
                         onStart: () => this.addOpponentBoardColorPoints(card.getColor(), 1),
                         onComplete: () => resume()
                     })
@@ -238,6 +239,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 pause();
                 CardActionsBuilder
                     .create(card)
+                    .open({ delay: 0, duration: 0 })
                     .move({
                         xFrom: card.getX(),
                         yFrom: card.getY(),

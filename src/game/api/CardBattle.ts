@@ -5,6 +5,7 @@ import { OpponentData } from "@objects/OpponentData";
 import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
+import { BattlePointsData } from "../objects/BattlePointsData";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
@@ -49,4 +50,6 @@ export interface CardBattle {
     listenOpponentBattleCardsSet: (playerId: string, callback: (isSet: boolean) => void) => Promise<void>;
     getBattleCards: (playerId: string) => Promise<CardData[]>;
     getOpponentBattleCards: (playerId: string) => Promise<CardData[]>;
+    getBattlePoints: (playerId: string) => Promise<BattlePointsData>;
+    getOpponentBattlePoints: (playerId: string) => Promise<BattlePointsData>;
 }

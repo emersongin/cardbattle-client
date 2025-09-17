@@ -1,5 +1,6 @@
 import { EventBus } from '@game/EventBus';
 import { WHITE } from '@/game/constants/colors';
+import { BATTLE } from '@/game/constants/keys';
 import { RoomData } from '@objects/RoomData';
 import { VueScene } from '@scenes/VueScene';
 import { Phase } from '@scenes/CardBattle/phase/Phase';
@@ -9,7 +10,6 @@ import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
 import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
 import { SummonPhase } from './phase/SummonPhase';
 import { CompilePhase } from './phase/CompilePhase';
-import { BATTLE } from '@/game/constants/keys';
 
 export class CardBattleScene extends VueScene {
     room: RoomData;
@@ -27,17 +27,16 @@ export class CardBattleScene extends VueScene {
         // CREATE ROOM
         this.room = await this.getCardBattle().createRoom();
         const { roomId, playerId } = this.room;
-        // CHALLENGE PHASE
+        // // CHALLENGE PHASE
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
-        // START PHASE
+        // // START PHASE
         await this.getCardBattle().setFolder(playerId, 'f3');
-        // DRAW PHASE
+        // // DRAW PHASE
         await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
-        // LOAD PHASE
+        // // LOAD PHASE
         await this.getCardBattle().setReadyDrawCards(opponentId);
         await this.getCardBattle().setReadyDrawCards(playerId);
         // SUMMON PHASE
-        // console.log(await this.getCardBattle().getOpponentCardsFromHand(opponentId));
         
         // const playerBattleCards = await this.getCardBattle().getCardsFromHand(playerId);
         // const playerCardIds = playerBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);

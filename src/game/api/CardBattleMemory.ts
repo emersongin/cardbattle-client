@@ -14,6 +14,7 @@ import { CardColorsType } from '@game/types/CardColorsType';
 import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
+import { BattlePointsData } from '../objects/BattlePointsData';
 
 const delayMock = 100;
 
@@ -203,9 +204,13 @@ const powerCards = [
     }
 ];
 
-const redDeck = createDeck([...battleCards, ...powerCards], 40);
-const greenDeck = createDeck([...battleCards, ...powerCards], 40);
-const blueDeck = createDeck([...battleCards, ...powerCards], 40);
+const cardsMock = [
+    ...battleCards, 
+    // ...powerCards
+];
+const redDeck = createDeck(cardsMock, 40);
+const greenDeck = createDeck(cardsMock, 40);
+const blueDeck = createDeck(cardsMock, 40);
 
 function createDeck(cards: CardData[], number: number) {
     const deck: CardData[] = [];
@@ -1210,4 +1215,41 @@ export default class CardBattleMemory implements CardBattle {
         }); 
     }
 
+    getBattlePoints(playerId: string): Promise<BattlePointsData> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    const battleCards = this.#playerBattleCardsSet;
+                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
+                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
+                    resolve({ ap: apTotal, hp: hpTotal });
+                }
+                if (this.#isOpponent(playerId)) {
+                    const battleCards = this.#opponentBattleCardsSet;
+                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
+                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
+                    resolve({ ap: apTotal, hp: hpTotal });
+                }
+            }, delayMock);
+        });
+    }
+
+    getOpponentBattlePoints(playerId: string): Promise<BattlePointsData> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    const battleCards = this.#opponentBattleCardsSet;
+                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
+                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
+                    resolve({ ap: apTotal, hp: hpTotal });
+                }
+                if (this.#isOpponent(playerId)) {
+                    const battleCards = this.#playerBattleCardsSet;
+                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
+                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
+                    resolve({ ap: apTotal, hp: hpTotal });
+                }
+            }, delayMock);
+        });
+    }
 }
