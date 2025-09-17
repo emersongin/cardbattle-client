@@ -222,7 +222,7 @@ export class BoardWindow extends Sizer {
         return 0;
     }
 
-    setBattlePointsWithDuration(attackPoints: number, healthPoints: number): void {
+    setBattlePointsWithDuration(attackPoints: number, healthPoints: number, onComplete?: () => void): void {
         const fromTarget = {
             ap: this.#getData('ap'),
             hp: this.#getData('hp'),
@@ -231,7 +231,10 @@ export class BoardWindow extends Sizer {
             ap: attackPoints,
             hp: healthPoints,
         } as Partial<BoardWindowData>;
-        this.#updating(fromTarget, toTarget, 1000);
+
+console.log(fromTarget, toTarget);
+
+        this.#updating(fromTarget, toTarget, 1000, onComplete);
         this.data.set('ap', attackPoints);
         this.data.set('hp', healthPoints);
     }
@@ -302,7 +305,12 @@ export class BoardWindow extends Sizer {
         this.data.set('pass', pass);
     }
 
-    #updating(fromTarget: Partial<BoardWindowData>, toTarget: Partial<BoardWindowData>, duration: number = 0): void {
+    #updating(
+        fromTarget: Partial<BoardWindowData>, 
+        toTarget: Partial<BoardWindowData>, 
+        duration: number = 0,
+        onComplete?: () => void
+    ): void {
         const fromTargetMerged = {
             ap: fromTarget.ap ?? this.#getData('ap'),
             hp: fromTarget.hp ?? this.#getData('hp'),
@@ -331,6 +339,11 @@ export class BoardWindow extends Sizer {
             numberOfWins: toTarget.numberOfWins ?? this.#getData('numberOfWins'),
             pass: toTarget.pass ?? this.#getData('pass'),
         };
-        new UpdateAnimation(this, fromTargetMerged, toTargetMerged, duration);
+        new UpdateAnimation(this, { 
+            fromTarget: fromTargetMerged, 
+            toTarget: toTargetMerged, 
+            duration,
+            onComplete
+        });
     }
 }

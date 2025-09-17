@@ -1,21 +1,23 @@
 import { BoardWindowData } from "@objects/BoardWindowData";
-import { UpdateConfig } from "@ui/BoardWindow/animations/UpdateConfig";
+import { UpdateConfig } from "@/game/ui/BoardWindow/animations/types/UpdateConfig";
 import { BoardWindow } from "@ui/BoardWindow/BoardWindow";
-
+import { BoardUpdateConfig } from "./types/BoardUpdateConfig";
 export class UpdateAnimation {
     
     constructor(
         readonly window: BoardWindow, 
-        fromTarget: BoardWindowData, 
-        toTarget: BoardWindowData, 
-        duration: number = 0
+        config: BoardUpdateConfig
     ) {
-        const updates = this.#createUpdateConfig(fromTarget, toTarget);
+        const updates = this.#createUpdateConfig(config.fromTarget, config.toTarget);
         const updateTweens = updates.map(update => {
             return {
                 ...update,
                 hold: 0,
-                duration: duration,
+                duration: config.duration || 0,
+                onComplete: () => {
+                    if (update.onComplete) update.onComplete();
+                    if (config.onComplete) config.onComplete();
+                }
             };
         });
         for (const points of updateTweens) {

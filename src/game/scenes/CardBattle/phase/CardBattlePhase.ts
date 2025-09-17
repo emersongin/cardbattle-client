@@ -161,8 +161,8 @@ export class CardBattlePhase {
         this.#board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
     }
 
-    setBattlePointsWithDuration(battlePoints: BattlePointsData): void {
-        this.#board.setBattlePointsWithDuration(battlePoints.ap, battlePoints.hp);
+    setBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
+        this.#board.setBattlePointsWithDuration(config.ap, config.hp, config.onComplete);
     }
 
     addBoardZonePoints(boardZone: BoardZonesType, value: number): void {
@@ -210,8 +210,8 @@ export class CardBattlePhase {
         this.#opponentBoard = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
     }
 
-    setOpponentBoardBattlePointsWithDuration(battlePoints: BattlePointsData): void {
-        this.#opponentBoard.setBattlePointsWithDuration(battlePoints.ap, battlePoints.hp);
+    setOpponentBoardBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
+        this.#opponentBoard.setBattlePointsWithDuration(config.ap, config.hp);
     }
 
     addOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {

@@ -162,10 +162,79 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #loadBattlePoints(): Promise<void> {
-        super.setBattlePointsWithDuration(await this.cardBattle.getBattlePoints(this.scene.room.playerId));
-        super.setOpponentBoardBattlePointsWithDuration(await this.cardBattle.getOpponentBattlePoints(this.scene.room.playerId));
+        const battlePoints = await this.cardBattle.getBattlePoints(this.scene.room.playerId);
+        const opponentBattlePoints = await this.cardBattle.getOpponentBattlePoints(this.scene.room.playerId);
+        this.scene.timeline({
+            targets: [
+                (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),
+                (t?: TweenConfig) => super.setOpponentBoardBattlePointsWithDuration({ ...t, ...opponentBattlePoints }),
+            ],
+            onAllComplete: () => {
+                this.#addOnCompleteListener();
+            },
+        });
     }
 
+    #addOnCompleteListener() {
+        const keyboard = this.scene.input.keyboard;
+        if (!keyboard) {
+            throw new Error('Keyboard input is not available in this scene.');
+        }
+        const onKeyDown = () => {
+            if (!keyboard) {
+                throw new Error('Keyboard input is not available in this scene.');
+            }
+            keyboard.removeAllListeners();
+            this.#closeWindows();
+            this.#closeCardSets();
+        };
+        keyboard.once('keydown-ENTER', onKeyDown, this);
+    }
+
+    #closeWindows(): void {
+        this.closeBoard();
+        this.closeOpponentBoard();
+    }
+
+    #closeCardSets(): void {
+        this.#closePlayerCardSet();
+        this.#closeOpponentCardSet();
+    }
+
+    #closePlayerCardSet(): void {
+        const closeConfig: TimelineConfig<CardUi> = {
+            targets: this.getCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+                pause();
+                CardActionsBuilder
+                    .create(card)
+                    .close({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
+            },
+            onAllComplete: async () => this.changeToLoadPhase()
+        };
+        this.scene.timeline(closeConfig);
+    }
+
+    #closeOpponentCardSet(): void {
+        const closeConfig: TimelineConfig<CardUi> = {
+            targets: this.getOpponentCardset().getCardsUi(),
+            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+                pause();
+                CardActionsBuilder
+                    .create(card)
+                    .close({
+                        delay: (index! * 100),
+                        onComplete: () => resume()
+                    })
+                    .play();
+            },
+        };
+        this.scene.timeline(closeConfig);
+    }
 
     #createOpponentBattleCardSetWaitingWindow(): void {
         super.createWaitingWindow('Waiting for opponent to set battle cards...');
