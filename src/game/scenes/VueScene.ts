@@ -47,7 +47,7 @@ export class VueScene extends Scene {
         const promises = timiline.targets.map((target: T, index: number) => {
             return new Promise<void>((resolve) => {
                 const tweenConfig = { 
-                    targets: target,
+                    targets: (typeof target === 'function') ? () => target : target,
                     durantion: 0,
                     delay: 0,
                     hold: 0,
