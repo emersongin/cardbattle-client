@@ -641,7 +641,7 @@ export default class CardBattleMemory implements CardBattle {
             this.#playerBoard[BLUE] += this.#playerHand.filter(card => card.color === BLUE).length;
             this.#playerBoard[BLACK] += this.#playerHand.filter(card => card.color === BLACK).length;
             this.#playerBoard[WHITE] += this.#playerHand.filter(card => card.color === WHITE).length;
-            this.#playerBoard[WHITE] = this.#playerDeck.length;
+            this.#playerBoard[DECK] = this.#playerDeck.length;
             this.#playerBoard[HAND] = this.#playerHand.length;
             this.#setPlayerStep(WAITING_TO_PLAY);
         };
@@ -651,7 +651,7 @@ export default class CardBattleMemory implements CardBattle {
             this.#opponentBoard[BLUE] += this.#opponentHand.filter(card => card.color === BLUE).length;
             this.#opponentBoard[BLACK] += this.#opponentHand.filter(card => card.color === BLACK).length;
             this.#opponentBoard[WHITE] += this.#opponentHand.filter(card => card.color === WHITE).length;
-            this.#opponentBoard[WHITE] = this.#opponentDeck.length;
+            this.#opponentBoard[DECK] = this.#opponentDeck.length;
             this.#opponentBoard[HAND] = this.#opponentHand.length;
             this.#setOpponentStep(WAITING_TO_PLAY);
         };

@@ -10,6 +10,7 @@ import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
 import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
 import { SummonPhase } from './phase/SummonPhase';
 import { CompilePhase } from './phase/CompilePhase';
+import { CardColorsType } from '@/game/types/CardColorsType';
 
 export class CardBattleScene extends VueScene {
     room: RoomData;
@@ -39,14 +40,24 @@ export class CardBattleScene extends VueScene {
         // SUMMON PHASE
         const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
         const playerBoard = await this.getCardBattle().getBoard(playerId);
+        console.log(playerBoard);
         const playerCardIds = playerCards.filter(card => {
             if (card.color === ORANGE) return true;
-            const colorPoints = playerBoard
-        })
+            const colorPoints = playerBoard[card.color];
+            if (colorPoints < card.cost) return false;
+            playerBoard[card.color] = colorPoints - card.cost;
+            return true;
+        }).map(card => card.id);
         await this.getCardBattle().setBattleCards(playerId, playerCardIds);
         const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
         const opponentBoard = await this.getCardBattle().getBoard(opponentId);
-        const opponentCardIds = opponentCards.map(card => card.id);
+        const opponentCardIds = opponentCards.filter(card => {
+            if (card.color === ORANGE) return true;
+            const colorPoints = opponentBoard[card.color];
+            if (colorPoints < card.cost) return false;
+            opponentBoard[card.color] = colorPoints - card.cost;
+            return true;
+        }).map(card => card.id);
         await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
         // COMPILE PHASE
 
