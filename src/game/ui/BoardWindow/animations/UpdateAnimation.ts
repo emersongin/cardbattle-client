@@ -2,6 +2,8 @@ import { BoardWindowData } from "@objects/BoardWindowData";
 import { UpdateConfig } from "@/game/ui/BoardWindow/animations/types/UpdateConfig";
 import { BoardWindow } from "@ui/BoardWindow/BoardWindow";
 import { BoardUpdateConfig } from "./types/BoardUpdateConfig";
+import { AP, DECK, HAND, HP, PASS, TRASH, WINS } from "@/game/constants/keys";
+import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
 export class UpdateAnimation {
     
     constructor(
@@ -51,16 +53,16 @@ export class UpdateAnimation {
     #createUpdateBattlePoints(fromTarget: BoardWindowData, toTarget: BoardWindowData): {
         apPoints: UpdateConfig, hpPoints: UpdateConfig
     } {
-        const apPoints = this.#createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
+        const apPoints = this.#createUpdate(fromTarget, fromTarget[AP], toTarget[AP],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.ap = Math.round(tween.getValue() ?? 0);
+                fromTarget[AP] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const hpPoints = this.#createUpdate(fromTarget, fromTarget.hp, toTarget.hp,
+        const hpPoints = this.#createUpdate(fromTarget, fromTarget[HP], toTarget[HP],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.hp = Math.round(tween.getValue() ?? 0);
+                fromTarget[HP] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
@@ -69,9 +71,9 @@ export class UpdateAnimation {
     }
 
     #createUpdatePass(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdateConfig {
-        const pass = this.#createUpdate(fromTarget, fromTarget.pass ? 1 : 0, toTarget.pass ? 1 : 0,
+        const pass = this.#createUpdate(fromTarget, fromTarget[PASS] ? 1 : 0, toTarget[PASS] ? 1 : 0,
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.pass = tween.getValue() === 1;
+                fromTarget[PASS] = tween.getValue() === 1;
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
@@ -86,37 +88,37 @@ export class UpdateAnimation {
         blackPoints: UpdateConfig, 
         whitePoints: UpdateConfig
     } {
-        const redPoints = this.#createUpdate(fromTarget, fromTarget.redPoints, toTarget.redPoints,
+        const redPoints = this.#createUpdate(fromTarget, fromTarget[RED], toTarget[RED],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.redPoints = Math.round(tween.getValue() ?? 0);
+                fromTarget[RED] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const greenPoints = this.#createUpdate(fromTarget, fromTarget.greenPoints, toTarget.greenPoints,
+        const greenPoints = this.#createUpdate(fromTarget, fromTarget[GREEN], toTarget[GREEN],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.greenPoints = Math.round(tween.getValue() ?? 0);
+                fromTarget[GREEN] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const bluePoints = this.#createUpdate(fromTarget, fromTarget.bluePoints, toTarget.bluePoints,
+        const bluePoints = this.#createUpdate(fromTarget, fromTarget[BLUE], toTarget[BLUE],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.bluePoints = Math.round(tween.getValue() ?? 0);
+                fromTarget[BLUE] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const blackPoints = this.#createUpdate(fromTarget, fromTarget.blackPoints, toTarget.blackPoints,
+        const blackPoints = this.#createUpdate(fromTarget, fromTarget[BLACK], toTarget[BLACK],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.blackPoints = Math.round(tween.getValue() ?? 0);
+                fromTarget[BLACK] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const whitePoints = this.#createUpdate(fromTarget, fromTarget.whitePoints, toTarget.whitePoints,
+        const whitePoints = this.#createUpdate(fromTarget, fromTarget[WHITE], toTarget[WHITE],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.whitePoints = Math.round(tween.getValue() ?? 0);
+                fromTarget[WHITE] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
@@ -130,30 +132,30 @@ export class UpdateAnimation {
         numberOfCardsInTrash: UpdateConfig,
         numberOfWins: UpdateConfig
     } {
-        const numberOfCardsInHand = this.#createUpdate(fromTarget, fromTarget.numberOfCardsInHand, toTarget.numberOfCardsInHand,
+        const numberOfCardsInHand = this.#createUpdate(fromTarget, fromTarget[HAND], toTarget[HAND],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.numberOfCardsInHand = Math.round(tween.getValue() ?? 0);
+                fromTarget[HAND] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const numberOfCardsInDeck = this.#createUpdate(fromTarget, fromTarget.numberOfCardsInDeck, toTarget.numberOfCardsInDeck,
+        const numberOfCardsInDeck = this.#createUpdate(fromTarget, fromTarget[DECK], toTarget[DECK],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.numberOfCardsInDeck = Math.round(tween.getValue() ?? 0);
+                fromTarget[DECK] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const numberOfCardsInTrash = this.#createUpdate(fromTarget, fromTarget.numberOfCardsInTrash, toTarget.numberOfCardsInTrash,
+        const numberOfCardsInTrash = this.#createUpdate(fromTarget, fromTarget[TRASH], toTarget[TRASH],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.numberOfCardsInTrash = Math.round(tween.getValue() ?? 0);
+                fromTarget[TRASH] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }
         );
-        const numberOfWins = this.#createUpdate(fromTarget, fromTarget.numberOfWins, toTarget.numberOfWins,
+        const numberOfWins = this.#createUpdate(fromTarget, fromTarget[WINS], toTarget[WINS],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.numberOfWins = Math.round(tween.getValue() ?? 0);
+                fromTarget[WINS] = Math.round(tween.getValue() ?? 0);
                 const content = this.window.createContent(fromTarget);
                 this.window.setText(content);
             }

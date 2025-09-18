@@ -1,28 +1,29 @@
 import { Card } from "@ui/Card/Card";
-import { CardPointsData } from "@/game/objects/BattlePointsData";
+import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
+import { AP, HP } from "@/game/constants/keys";
 
 export class UpdateAnimation {
     
-    constructor(readonly card: Card, toTarget: CardPointsData) {
-        const fromTarget: CardPointsData = this.card.getAllData();
-        const apPoints = this.#createUpdate(fromTarget, fromTarget.ap, toTarget.ap,
+    constructor(readonly card: Card, toTarget: BattlePointsData) {
+        const fromTarget: BattlePointsData = this.card.getAllData();
+        const apPoints = this.#createUpdate(fromTarget, fromTarget[AP], toTarget[AP],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.ap = Math.round(tween.getValue() ?? 0);
-                const ap = Math.round(fromTarget.ap);
-                const hp = Math.round(fromTarget.hp);
+                fromTarget[AP] = Math.round(tween.getValue() ?? 0);
+                const ap = Math.round(fromTarget[AP]);
+                const hp = Math.round(fromTarget[HP]);
                 this.card.setPointsDisplay(ap, hp);
             },
-            () => this.card.setAp(toTarget.ap)
+            () => this.card.setAp(toTarget[AP])
         );
-        const hpPoints = this.#createUpdate(fromTarget, fromTarget.hp, toTarget.hp,
+        const hpPoints = this.#createUpdate(fromTarget, fromTarget[HP], toTarget[HP],
             (tween: Phaser.Tweens.Tween) => {
-                fromTarget.hp = Math.round(tween.getValue() ?? 0);
-                const ap = Math.round(fromTarget.ap);
-                const hp = Math.round(fromTarget.hp);
+                fromTarget[HP] = Math.round(tween.getValue() ?? 0);
+                const ap = Math.round(fromTarget[AP]);
+                const hp = Math.round(fromTarget[HP]);
                 this.card.setPointsDisplay(ap, hp);
             },
-            () => this.card.setHp(toTarget.hp)
+            () => this.card.setHp(toTarget[HP])
         );
         const updates = [apPoints, hpPoints];
         const updateTweens = updates.map(update => {
@@ -38,7 +39,7 @@ export class UpdateAnimation {
     }
 
     #createUpdate(
-        target: CardPointsData,
+        target: BattlePointsData,
         fromPoints: number, 
         toPoints: number, 
         onUpdate: (tween: Phaser.Tweens.Tween) => void,

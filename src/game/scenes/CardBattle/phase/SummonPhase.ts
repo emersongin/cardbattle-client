@@ -8,6 +8,8 @@ import { TweenConfig } from "@/game/types/TweenConfig";
 import { TimelineConfig, TimelineEvent } from "../../VueScene";
 import { CardUi } from "@/game/ui/Card/CardUi";
 import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
+import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
+import { AP, HP } from "@/game/constants/keys";
 
 export class SummonPhase extends CardBattlePhase implements Phase {
 
@@ -27,12 +29,12 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.createHandCardset(cardsData);
         this.#createHandDisplayWindows();
         this.#openHandCardset({
-            RED: boardData.redPoints,
-            GREEN: boardData.greenPoints,
-            BLUE: boardData.bluePoints,
-            BLACK: boardData.blackPoints,
-            WHITE: boardData.whitePoints,
-            ORANGE: 0
+            [RED]: boardData[RED],
+            [GREEN]: boardData[GREEN],
+            [BLUE]: boardData[BLUE],
+            [BLACK]: boardData[BLACK],
+            [WHITE]: boardData[WHITE],
+            [ORANGE]: 0
         });
     }
 
@@ -121,8 +123,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const cardsData: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
         const opponentCards = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
-        super.createBoard(boardData);
-        super.createOpponentBoard(opponentBoard);
+        super.createBoard({ ...boardData, [AP]: 0, [HP]: 0 });
+        super.createOpponentBoard({ ...opponentBoard, [AP]: 0, [HP]: 0 });
         super.createCardset(cardsData);
         super.createOpponentCardset(opponentCards);
         this.#openGameBoard()
@@ -162,8 +164,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #loadBattlePoints(): Promise<void> {
-        const battlePoints = await this.cardBattle.getBattlePoints(this.scene.room.playerId);
-        const opponentBattlePoints = await this.cardBattle.getOpponentBattlePoints(this.scene.room.playerId);
+        const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.room.playerId);
+        const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.room.playerId);
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),

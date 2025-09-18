@@ -1,6 +1,6 @@
 import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@constants/colors";
-import { DECK, HAND, TRASH, WINS } from "@constants/keys";
+import { AP, DECK, HAND, HP, PASS, TRASH, WINS } from "@constants/keys";
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { DisplayUtil } from "@utils/DisplayUtil";
 import { BoardZonesType } from "@game/types/BoardZonesType";
@@ -39,19 +39,19 @@ export class BoardWindow extends Sizer {
 
     #setStartData(data: BoardWindowData, reverse: boolean = false) {
         this.setDataEnabled();
-        this.data.set('ap', data.ap ?? 0);
-        this.data.set('hp', data.hp ?? 0);
-        this.data.set('redPoints', data.redPoints ?? 0);
-        this.data.set('greenPoints', data.greenPoints ?? 0);
-        this.data.set('bluePoints', data.bluePoints ?? 0);
-        this.data.set('blackPoints', data.blackPoints ?? 0);
-        this.data.set('whitePoints', data.whitePoints ?? 0);
-        this.data.set('numberOfCardsInHand', data.numberOfCardsInHand ?? 0);
-        this.data.set('numberOfCardsInDeck', data.numberOfCardsInDeck ?? 0);
-        this.data.set('numberOfCardsInTrash', data.numberOfCardsInTrash ?? 0);
-        this.data.set('numberOfWins', data.numberOfWins ?? 0);
+        this.data.set('ap', data[AP] ?? 0);
+        this.data.set('hp', data[HP] ?? 0);
+        this.data.set('redPoints', data[RED] ?? 0);
+        this.data.set('greenPoints', data[GREEN] ?? 0);
+        this.data.set('bluePoints', data[BLUE] ?? 0);
+        this.data.set('blackPoints', data[BLACK] ?? 0);
+        this.data.set('whitePoints', data[WHITE] ?? 0);
+        this.data.set('numberOfCardsInHand', data[HAND] ?? 0);
+        this.data.set('numberOfCardsInDeck', data[DECK] ?? 0);
+        this.data.set('numberOfCardsInTrash', data[TRASH] ?? 0);
+        this.data.set('numberOfWins', data[WINS] ?? 0);
         this.data.set('reverse', reverse ?? false);
-        this.data.set('pass', data.pass ?? false);
+        this.data.set('pass', data[PASS] ?? false);
     }
 
     #createBackground(color: number) {
@@ -77,17 +77,17 @@ export class BoardWindow extends Sizer {
     }
 
     createContent(data: BoardWindowData): string {
-        const battlePoints = this.#createBattlePoints(data.ap, data.hp, data.pass);
+        const battlePoints = this.#createBattlePoints(data[AP], data[HP], data[PASS]);
         const boardPoints = this.#createBoardPoints(
-            data.redPoints,
-            data.greenPoints,
-            data.bluePoints,
-            data.blackPoints,
-            data.whitePoints,
-            data.numberOfCardsInHand, 
-            data.numberOfCardsInDeck,
-            data.numberOfCardsInTrash, 
-            data.numberOfWins
+            data[RED],
+            data[GREEN],
+            data[BLUE],
+            data[BLACK],
+            data[WHITE],
+            data[HAND], 
+            data[DECK],
+            data[TRASH], 
+            data[WINS]
         );
         return this.#getData('reverse') ? `${boardPoints}\n\n${battlePoints}` : `${battlePoints}\n\n${boardPoints}`;
     }
@@ -190,18 +190,18 @@ export class BoardWindow extends Sizer {
 
     getAllData(): BoardWindowData {
         return {
-            ap: this.#getData('ap'),
-            hp: this.#getData('hp'),
-            redPoints: this.#getData('redPoints'),
-            greenPoints: this.#getData('greenPoints'),
-            bluePoints: this.#getData('bluePoints'),
-            blackPoints: this.#getData('blackPoints'),
-            whitePoints: this.#getData('whitePoints'),
-            numberOfCardsInHand: this.#getData('numberOfCardsInHand'),
-            numberOfCardsInDeck: this.#getData('numberOfCardsInDeck'),
-            numberOfCardsInTrash: this.#getData('numberOfCardsInTrash'),
-            numberOfWins: this.#getData('numberOfWins'),
-            pass: this.#getData('pass'),
+            [AP]: this.#getData('ap'),
+            [HP]: this.#getData('hp'),
+            [RED]: this.#getData('redPoints'),
+            [GREEN]: this.#getData('greenPoints'),
+            [BLUE]: this.#getData('bluePoints'),
+            [BLACK]: this.#getData('blackPoints'),
+            [WHITE]: this.#getData('whitePoints'),
+            [HAND]: this.#getData('numberOfCardsInHand'),
+            [DECK]: this.#getData('numberOfCardsInDeck'),
+            [TRASH]: this.#getData('numberOfCardsInTrash'),
+            [WINS]: this.#getData('numberOfWins'),
+            [PASS]: this.#getData('pass'),
         };
     }
 
@@ -240,20 +240,20 @@ export class BoardWindow extends Sizer {
         const fromTarget = {} as Partial<BoardWindowData>;
         const toTarget = {} as Partial<BoardWindowData>;
         if (boardZone === HAND) {
-            fromTarget.numberOfCardsInHand = this.#getData('numberOfCardsInHand');
-            toTarget.numberOfCardsInHand = value
+            fromTarget[HAND] = this.#getData('numberOfCardsInHand');
+            toTarget[HAND] = value
         }
         if (boardZone === DECK) {
-            fromTarget.numberOfCardsInDeck = this.#getData('numberOfCardsInDeck');
-            toTarget.numberOfCardsInDeck = value
+            fromTarget[DECK] = this.#getData('numberOfCardsInDeck');
+            toTarget[DECK] = value
         }
         if (boardZone === TRASH) {
-            fromTarget.numberOfCardsInTrash = this.#getData('numberOfCardsInTrash');
-            toTarget.numberOfCardsInTrash = value
+            fromTarget[TRASH] = this.#getData('numberOfCardsInTrash');
+            toTarget[TRASH] = value
         }
         if (boardZone === WINS) {
-            fromTarget.numberOfWins = this.#getData('numberOfWins');
-            toTarget.numberOfWins = value
+            fromTarget[WINS] = this.#getData('numberOfWins');
+            toTarget[WINS] = value
         }
         this.#updating(fromTarget, toTarget);
         if (boardZone === HAND) this.data.set('numberOfCardsInHand', value);
@@ -266,24 +266,24 @@ export class BoardWindow extends Sizer {
         const fromTarget = {} as Partial<BoardWindowData>;
         const toTarget = {} as Partial<BoardWindowData>;
         if (cardColor === RED) {
-            fromTarget.redPoints = this.#getData('redPoints');
-            toTarget.redPoints = value;
+            fromTarget[RED] = this.#getData('redPoints');
+            toTarget[RED] = value;
         }
         if (cardColor === GREEN) {
-            fromTarget.greenPoints = this.#getData('greenPoints');
-            toTarget.greenPoints = value;
+            fromTarget[GREEN] = this.#getData('greenPoints');
+            toTarget[GREEN] = value;
         }
         if (cardColor === BLUE) {
-            fromTarget.bluePoints = this.#getData('bluePoints');
-            toTarget.bluePoints = value;
+            fromTarget[BLUE] = this.#getData('bluePoints');
+            toTarget[BLUE] = value;
         }
         if (cardColor === BLACK) {
-            fromTarget.blackPoints = this.#getData('blackPoints');
-            toTarget.blackPoints = value;
+            fromTarget[BLACK] = this.#getData('blackPoints');
+            toTarget[BLACK] = value;
         }
         if (cardColor === WHITE) {
-            fromTarget.whitePoints = this.#getData('whitePoints');
-            toTarget.whitePoints = value;
+            fromTarget[WHITE] = this.#getData('whitePoints');
+            toTarget[WHITE] = value;
         }
         this.#updating(fromTarget, toTarget);
         if (cardColor === RED) this.data.set('redPoints', value);
@@ -296,8 +296,8 @@ export class BoardWindow extends Sizer {
     setPass(pass: boolean): void {
         const fromTarget = {} as Partial<BoardWindowData>;
         const toTarget = {} as Partial<BoardWindowData>;
-        fromTarget.pass = this.#getData('pass');
-        toTarget.pass = pass;
+        fromTarget[PASS] = this.#getData('pass');
+        toTarget[PASS] = pass;
         this.#updating(fromTarget, toTarget);
         this.data.set('pass', pass);
     }
@@ -309,32 +309,32 @@ export class BoardWindow extends Sizer {
         onComplete?: () => void
     ): void {
         const fromTargetMerged = {
-            ap: fromTarget.ap ?? this.#getData('ap'),
-            hp: fromTarget.hp ?? this.#getData('hp'),
-            redPoints: fromTarget.redPoints ?? this.#getData('redPoints'),
-            greenPoints: fromTarget.greenPoints ?? this.#getData('greenPoints'),
-            bluePoints: fromTarget.bluePoints ?? this.#getData('bluePoints'),
-            blackPoints: fromTarget.blackPoints ?? this.#getData('blackPoints'),
-            whitePoints: fromTarget.whitePoints ?? this.#getData('whitePoints'),
-            numberOfCardsInHand: fromTarget.numberOfCardsInHand ?? this.#getData('numberOfCardsInHand'),
-            numberOfCardsInDeck: fromTarget.numberOfCardsInDeck ?? this.#getData('numberOfCardsInDeck'),
-            numberOfCardsInTrash: fromTarget.numberOfCardsInTrash ?? this.#getData('numberOfCardsInTrash'),
-            numberOfWins: fromTarget.numberOfWins ?? this.#getData('numberOfWins'),
-            pass: fromTarget.pass ?? this.#getData('pass'),
+            [AP]: fromTarget[AP] ?? this.#getData('ap'),
+            [HP]: fromTarget[HP] ?? this.#getData('hp'),
+            [RED]: fromTarget[RED] ?? this.#getData('redPoints'),
+            [GREEN]: fromTarget[GREEN] ?? this.#getData('greenPoints'),
+            [BLUE]: fromTarget[BLUE] ?? this.#getData('bluePoints'),
+            [BLACK]: fromTarget[BLACK] ?? this.#getData('blackPoints'),
+            [WHITE]: fromTarget[WHITE] ?? this.#getData('whitePoints'),
+            [HAND]: fromTarget[HAND] ?? this.#getData('numberOfCardsInHand'),
+            [DECK]: fromTarget[DECK] ?? this.#getData('numberOfCardsInDeck'),
+            [TRASH]: fromTarget[TRASH] ?? this.#getData('numberOfCardsInTrash'),
+            [WINS]: fromTarget[WINS] ?? this.#getData('numberOfWins'),
+            [PASS]: fromTarget[PASS] ?? this.#getData('pass'),
         }
         const toTargetMerged = {
-            ap: toTarget.ap ?? this.#getData('ap'),
-            hp: toTarget.hp ?? this.#getData('hp'),
-            redPoints: toTarget.redPoints ?? this.#getData('redPoints'),
-            greenPoints: toTarget.greenPoints ?? this.#getData('greenPoints'),
-            bluePoints: toTarget.bluePoints ?? this.#getData('bluePoints'),
-            blackPoints: toTarget.blackPoints ?? this.#getData('blackPoints'),
-            whitePoints: toTarget.whitePoints ?? this.#getData('whitePoints'),
-            numberOfCardsInHand: toTarget.numberOfCardsInHand ?? this.#getData('numberOfCardsInHand'),
-            numberOfCardsInDeck: toTarget.numberOfCardsInDeck ?? this.#getData('numberOfCardsInDeck'),
-            numberOfCardsInTrash: toTarget.numberOfCardsInTrash ?? this.#getData('numberOfCardsInTrash'),
-            numberOfWins: toTarget.numberOfWins ?? this.#getData('numberOfWins'),
-            pass: toTarget.pass ?? this.#getData('pass'),
+            [AP]: toTarget[AP] ?? this.#getData('ap'),
+            [HP]: toTarget[HP] ?? this.#getData('hp'),
+            [RED]: toTarget[RED] ?? this.#getData('redPoints'),
+            [GREEN]: toTarget[GREEN] ?? this.#getData('greenPoints'),
+            [BLUE]: toTarget[BLUE] ?? this.#getData('bluePoints'),
+            [BLACK]: toTarget[BLACK] ?? this.#getData('blackPoints'),
+            [WHITE]: toTarget[WHITE] ?? this.#getData('whitePoints'),
+            [HAND]: toTarget[HAND] ?? this.#getData('numberOfCardsInHand'),
+            [DECK]: toTarget[DECK] ?? this.#getData('numberOfCardsInDeck'),
+            [TRASH]: toTarget[TRASH] ?? this.#getData('numberOfCardsInTrash'),
+            [WINS]: toTarget[WINS] ?? this.#getData('numberOfWins'),
+            [PASS]: toTarget[PASS] ?? this.#getData('pass'),
         };
         new UpdateAnimation(this, { 
             fromTarget: fromTargetMerged, 

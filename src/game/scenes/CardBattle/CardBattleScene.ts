@@ -1,5 +1,5 @@
 import { EventBus } from '@game/EventBus';
-import { WHITE } from '@/game/constants/colors';
+import { ORANGE, WHITE } from '@/game/constants/colors';
 import { BATTLE } from '@/game/constants/keys';
 import { RoomData } from '@objects/RoomData';
 import { VueScene } from '@scenes/VueScene';
@@ -27,27 +27,30 @@ export class CardBattleScene extends VueScene {
         // CREATE ROOM
         this.room = await this.getCardBattle().createRoom();
         const { roomId, playerId } = this.room;
-        // // CHALLENGE PHASE
+        // CHALLENGE PHASE
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
-        // // START PHASE
+        // START PHASE
         await this.getCardBattle().setFolder(playerId, 'f3');
-        // // DRAW PHASE
+        // DRAW PHASE
         await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
-        // // LOAD PHASE
+        // LOAD PHASE
         await this.getCardBattle().setReadyDrawCards(opponentId);
         await this.getCardBattle().setReadyDrawCards(playerId);
         // SUMMON PHASE
-        
-        // const playerBattleCards = await this.getCardBattle().getCardsFromHand(playerId);
-        // const playerCardIds = playerBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
-        // await this.getCardBattle().setBattleCards(playerId, playerCardIds);
+        const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
+        const playerBoard = await this.getCardBattle().getBoard(playerId);
+        const playerCardIds = playerCards.filter(card => {
+            if (card.color === ORANGE) return true;
+            const colorPoints = playerBoard
+        })
+        await this.getCardBattle().setBattleCards(playerId, playerCardIds);
+        const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
+        const opponentBoard = await this.getCardBattle().getBoard(opponentId);
+        const opponentCardIds = opponentCards.map(card => card.id);
+        await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
+        // COMPILE PHASE
 
-        // console.log(await this.getCardBattle().getOpponentCardsFromHand(opponentId));
-        // const opponentBattleCards = await this.getCardBattle().getOpponentCardsFromHand(opponentId);
-        // const opponentCardIds = opponentBattleCards.filter(c => c.typeId === BATTLE).map(c => c.id);
-        // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
-
-        this.changePhase(new SummonPhase(this));
+        this.changePhase(new CompilePhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

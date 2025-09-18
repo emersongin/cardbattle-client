@@ -1,4 +1,6 @@
+import { AP, HP } from "../constants/keys";
+
 export type BattlePointsData = {
-    ap: number;
-    hp: number;
+    [AP]: number;
+    [HP]: number;
 }

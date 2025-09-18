@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CardBattle } from '@api/CardBattle';
-import { BATTLE, BATTLE_CARDS_SET, DRAW_CARDS, END_MINI_GAME, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, WAITING_TO_PLAY } from '@constants/keys';
+import { AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { CardData } from "@objects/CardData";
@@ -251,18 +251,18 @@ export default class CardBattleMemory implements CardBattle {
     #playerId: string = '';
     #playerStep: string = 'NONE';
     #playerBoard: BoardWindowData = {
-        ap: 0,
-        hp: 0,
-        redPoints: 0,
-        greenPoints: 0,
-        bluePoints: 0,
-        blackPoints: 0,
-        whitePoints: 0,
-        numberOfCardsInHand: 0,
-        numberOfCardsInDeck: 0,
-        numberOfCardsInTrash: 0,
-        numberOfWins: 0,
-        pass: false,
+        [AP]: 0,
+        [HP]: 0,
+        [RED]: 0,
+        [GREEN]: 0,
+        [BLUE]: 0,
+        [BLACK]: 0,
+        [WHITE]: 0,
+        [HAND]: 0,
+        [DECK]: 0,
+        [TRASH]: 0,
+        [WINS]: 0,
+        [PASS]: false,
     };
     #playerDeck: CardData[] = [];
     #playerHand: CardData[] = [];
@@ -272,18 +272,18 @@ export default class CardBattleMemory implements CardBattle {
     #opponentId: string = '';
     #opponentStep: string = 'NONE';
     #opponentBoard: BoardWindowData = {
-        ap: 0,
-        hp: 0,
-        redPoints: 0,
-        greenPoints: 0,
-        bluePoints: 0,
-        blackPoints: 0,
-        whitePoints: 0,
-        numberOfCardsInHand: 0,
-        numberOfCardsInDeck: 0,
-        numberOfCardsInTrash: 0,
-        numberOfWins: 0,
-        pass: false,
+        [AP]: 0,
+        [HP]: 0,
+        [RED]: 0,
+        [GREEN]: 0,
+        [BLUE]: 0,
+        [BLACK]: 0,
+        [WHITE]: 0,
+        [HAND]: 0,
+        [DECK]: 0,
+        [TRASH]: 0,
+        [WINS]: 0,
+        [PASS]: false,
     };
     #opponentDeck: CardData[] = [];
     #opponentHand: CardData[] = [];
@@ -468,17 +468,17 @@ export default class CardBattleMemory implements CardBattle {
             if (this.#isPlayer(playerId)) {
                 this.#setPlayerDeck(deck);
                 this.#setPlayerStep(SET_DECK);
-                this.#playerBoard.numberOfCardsInDeck = this.#playerDeck.length;
+                this.#playerBoard[DECK] = this.#playerDeck.length;
                 //mock
                 this.#setOpponentDeck(ArrayUtil.clone(redDeck));
                 this.#setOpponentStep(SET_DECK);
-                this.#opponentBoard.numberOfCardsInDeck = this.#opponentDeck.length;
+                this.#opponentBoard[DECK] = this.#opponentDeck.length;
                 // mock
             };
             if (this.#isOpponent(playerId)) {
                 this.#setOpponentDeck(deck);
                 this.#setOpponentStep(SET_DECK);
-                this.#opponentBoard.numberOfCardsInDeck = deck.length;
+                this.#opponentBoard[DECK] = deck.length;
             };
             setTimeout(() => resolve(true), delayMock);
         });
@@ -636,23 +636,23 @@ export default class CardBattleMemory implements CardBattle {
 
     #setPointsToBoard(playerId: string): void {
         if (this.#isPlayer(playerId)) {
-            this.#playerBoard.redPoints += this.#playerHand.filter(card => card.color === RED).length;
-            this.#playerBoard.greenPoints += this.#playerHand.filter(card => card.color === GREEN).length;
-            this.#playerBoard.bluePoints += this.#playerHand.filter(card => card.color === BLUE).length;
-            this.#playerBoard.blackPoints += this.#playerHand.filter(card => card.color === BLACK).length;
-            this.#playerBoard.whitePoints += this.#playerHand.filter(card => card.color === WHITE).length;
-            this.#playerBoard.numberOfCardsInDeck = this.#playerDeck.length;
-            this.#playerBoard.numberOfCardsInHand = this.#playerHand.length;
+            this.#playerBoard[RED] += this.#playerHand.filter(card => card.color === RED).length;
+            this.#playerBoard[GREEN] += this.#playerHand.filter(card => card.color === GREEN).length;
+            this.#playerBoard[BLUE] += this.#playerHand.filter(card => card.color === BLUE).length;
+            this.#playerBoard[BLACK] += this.#playerHand.filter(card => card.color === BLACK).length;
+            this.#playerBoard[WHITE] += this.#playerHand.filter(card => card.color === WHITE).length;
+            this.#playerBoard[WHITE] = this.#playerDeck.length;
+            this.#playerBoard[HAND] = this.#playerHand.length;
             this.#setPlayerStep(WAITING_TO_PLAY);
         };
         if (this.#isOpponent(playerId)) {
-            this.#opponentBoard.redPoints += this.#opponentHand.filter(card => card.color === RED).length;
-            this.#opponentBoard.greenPoints += this.#opponentHand.filter(card => card.color === GREEN).length;
-            this.#opponentBoard.bluePoints += this.#opponentHand.filter(card => card.color === BLUE).length;
-            this.#opponentBoard.blackPoints += this.#opponentHand.filter(card => card.color === BLACK).length;
-            this.#opponentBoard.whitePoints += this.#opponentHand.filter(card => card.color === WHITE).length;
-            this.#opponentBoard.numberOfCardsInDeck = this.#opponentDeck.length;
-            this.#opponentBoard.numberOfCardsInHand = this.#opponentHand.length;
+            this.#opponentBoard[RED] += this.#opponentHand.filter(card => card.color === RED).length;
+            this.#opponentBoard[GREEN] += this.#opponentHand.filter(card => card.color === GREEN).length;
+            this.#opponentBoard[BLUE] += this.#opponentHand.filter(card => card.color === BLUE).length;
+            this.#opponentBoard[BLACK] += this.#opponentHand.filter(card => card.color === BLACK).length;
+            this.#opponentBoard[WHITE] += this.#opponentHand.filter(card => card.color === WHITE).length;
+            this.#opponentBoard[WHITE] = this.#opponentDeck.length;
+            this.#opponentBoard[HAND] = this.#opponentHand.length;
             this.#setOpponentStep(WAITING_TO_PLAY);
         };
     }
@@ -662,34 +662,34 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     resolve({
-                        ap: this.#playerBoard.ap,
-                        hp: this.#playerBoard.hp,
-                        redPoints: this.#playerBoard.redPoints,
-                        greenPoints: this.#playerBoard.greenPoints,
-                        bluePoints: this.#playerBoard.bluePoints,
-                        blackPoints: this.#playerBoard.blackPoints,
-                        whitePoints: this.#playerBoard.whitePoints,
-                        numberOfCardsInHand: this.#playerBoard.numberOfCardsInHand,
-                        numberOfCardsInDeck: this.#playerBoard.numberOfCardsInDeck,
-                        numberOfCardsInTrash: this.#playerBoard.numberOfCardsInTrash,
-                        numberOfWins: this.#playerBoard.numberOfWins,
-                        pass: this.#playerBoard.pass
+                        [AP]: this.#playerBoard[AP],
+                        [HP]: this.#playerBoard[HP],
+                        [RED]: this.#playerBoard[RED],
+                        [GREEN]: this.#playerBoard[GREEN],
+                        [BLUE]: this.#playerBoard[BLUE],
+                        [BLACK]: this.#playerBoard[BLACK],
+                        [WHITE]: this.#playerBoard[WHITE],
+                        [HAND]: this.#playerBoard[HAND],
+                        [DECK]: this.#playerBoard[DECK],
+                        [TRASH]: this.#playerBoard[TRASH],
+                        [WINS]: this.#playerBoard[WINS],
+                        [PASS]: this.#playerBoard[PASS]
                     });
                 };
                 if (this.#isOpponent(playerId)) {
                     resolve({
-                        ap: this.#opponentBoard.ap,
-                        hp: this.#opponentBoard.hp,
-                        redPoints: this.#opponentBoard.redPoints,
-                        greenPoints: this.#opponentBoard.greenPoints,
-                        bluePoints: this.#opponentBoard.bluePoints,
-                        blackPoints: this.#opponentBoard.blackPoints,
-                        whitePoints: this.#opponentBoard.whitePoints,
-                        numberOfCardsInHand: this.#opponentBoard.numberOfCardsInHand,
-                        numberOfCardsInDeck: this.#opponentBoard.numberOfCardsInDeck,
-                        numberOfCardsInTrash: this.#opponentBoard.numberOfCardsInTrash,
-                        numberOfWins: this.#opponentBoard.numberOfWins,
-                        pass: this.#opponentBoard.pass
+                        [AP]: this.#opponentBoard[AP],
+                        [HP]: this.#opponentBoard[HP],
+                        [RED]: this.#opponentBoard[RED],
+                        [GREEN]: this.#opponentBoard[GREEN],
+                        [BLUE]: this.#opponentBoard[BLUE],
+                        [BLACK]: this.#opponentBoard[BLACK],
+                        [WHITE]: this.#opponentBoard[WHITE],
+                        [HAND]: this.#opponentBoard[HAND],
+                        [DECK]: this.#opponentBoard[DECK],
+                        [TRASH]: this.#opponentBoard[TRASH],
+                        [WINS]: this.#opponentBoard[WINS],
+                        [PASS]: this.#opponentBoard[PASS]
                     });
                 };
             }, delayMock);
@@ -701,34 +701,34 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     resolve({
-                        ap: this.#opponentBoard.ap,
-                        hp: this.#opponentBoard.hp,
-                        redPoints: this.#opponentBoard.redPoints,
-                        greenPoints: this.#opponentBoard.greenPoints,
-                        bluePoints: this.#opponentBoard.bluePoints,
-                        blackPoints: this.#opponentBoard.blackPoints,
-                        whitePoints: this.#opponentBoard.whitePoints,
-                        numberOfCardsInHand: this.#opponentBoard.numberOfCardsInHand,
-                        numberOfCardsInDeck: this.#opponentBoard.numberOfCardsInDeck,
-                        numberOfCardsInTrash: this.#opponentBoard.numberOfCardsInTrash,
-                        numberOfWins: this.#opponentBoard.numberOfWins,
-                        pass: this.#opponentBoard.pass
+                        [AP]: this.#opponentBoard[AP],
+                        [HP]: this.#opponentBoard[HP],
+                        [RED]: this.#opponentBoard[RED],
+                        [GREEN]: this.#opponentBoard[GREEN],
+                        [BLUE]: this.#opponentBoard[BLUE],
+                        [BLACK]: this.#opponentBoard[BLACK],
+                        [WHITE]: this.#opponentBoard[WHITE],
+                        [HAND]: this.#opponentBoard[HAND],
+                        [DECK]: this.#opponentBoard[DECK],
+                        [TRASH]: this.#opponentBoard[TRASH],
+                        [WINS]: this.#opponentBoard[WINS],
+                        [PASS]: this.#opponentBoard[PASS]
                     });
                 };
                 if (this.#isOpponent(playerId)) {
                     resolve({
-                        ap: this.#playerBoard.ap,
-                        hp: this.#playerBoard.hp,
-                        redPoints: this.#playerBoard.redPoints,
-                        greenPoints: this.#playerBoard.greenPoints,
-                        bluePoints: this.#playerBoard.bluePoints,
-                        blackPoints: this.#playerBoard.blackPoints,
-                        whitePoints: this.#playerBoard.whitePoints,
-                        numberOfCardsInHand: this.#playerBoard.numberOfCardsInHand,
-                        numberOfCardsInDeck: this.#playerBoard.numberOfCardsInDeck,
-                        numberOfCardsInTrash: this.#playerBoard.numberOfCardsInTrash,
-                        numberOfWins: this.#playerBoard.numberOfWins,
-                        pass: this.#playerBoard.pass
+                        [AP]: this.#playerBoard[AP],
+                        [HP]: this.#playerBoard[HP],
+                        [RED]: this.#playerBoard[RED],
+                        [GREEN]: this.#playerBoard[GREEN],
+                        [BLUE]: this.#playerBoard[BLUE],
+                        [BLACK]: this.#playerBoard[BLACK],
+                        [WHITE]: this.#playerBoard[WHITE],
+                        [HAND]: this.#playerBoard[HAND],
+                        [DECK]: this.#playerBoard[DECK],
+                        [TRASH]: this.#playerBoard[TRASH],
+                        [WINS]: this.#playerBoard[WINS],
+                        [PASS]: this.#playerBoard[PASS]
                     });
                 };
             }, delayMock);
@@ -1091,15 +1091,15 @@ export default class CardBattleMemory implements CardBattle {
         if (cardColor === ORANGE) return true;
         switch (cardColor) {
             case RED:
-                return boardWindowData.redPoints >= cardCost;
+                return boardWindowData[RED] >= cardCost;
             case GREEN:
-                return boardWindowData.greenPoints >= cardCost;
+                return boardWindowData[GREEN] >= cardCost;
             case BLUE:
-                return boardWindowData.bluePoints >= cardCost;
+                return boardWindowData[BLUE] >= cardCost;
             case BLACK:
-                return boardWindowData.blackPoints >= cardCost;
+                return boardWindowData[BLACK] >= cardCost;
             case WHITE:
-                return boardWindowData.whitePoints >= cardCost;
+                return boardWindowData[WHITE] >= cardCost;
             default:
                 return true;
         }
@@ -1113,6 +1113,9 @@ export default class CardBattleMemory implements CardBattle {
                     this.#removeBoardPointsByBattleCards(cards, this.#playerBoard);
                     this.#playerBattleCardsSet = cards;
                     this.#playerHand = this.#playerHand.filter(card => !cardIds.includes(card.id));
+                    const battePoints = this.#getBattlePointsFromBattleCards(this.#playerId);
+                    this.#playerBoard[AP] = battePoints[AP];
+                    this.#playerBoard[HP] = battePoints[HP];
                     this.#setPlayerStep(BATTLE_CARDS_SET);
                 }
                 if (this.#isOpponent(playerId)) {
@@ -1120,6 +1123,9 @@ export default class CardBattleMemory implements CardBattle {
                     this.#removeBoardPointsByBattleCards(cards, this.#opponentBoard);
                     this.#opponentBattleCardsSet = cards;
                     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
+                    const battePoints = this.#getBattlePointsFromBattleCards(this.#playerId);
+                    this.#opponentBoard[AP] = battePoints[AP];
+                    this.#opponentBoard[HP] = battePoints[HP];
                     this.#setOpponentStep(BATTLE_CARDS_SET);
                 }
                 resolve();
@@ -1131,24 +1137,40 @@ export default class CardBattleMemory implements CardBattle {
         cards.forEach(card => {
             switch (card.color) {
                 case RED:
-                    boardWindowData.redPoints -= card.cost;
+                    boardWindowData[RED] -= card.cost;
                     break;
                 case GREEN:
-                    boardWindowData.greenPoints -= card.cost;
+                    boardWindowData[GREEN] -= card.cost;
                     break;
                 case BLUE:
-                    boardWindowData.bluePoints -= card.cost;
+                    boardWindowData[BLUE] -= card.cost;
                     break;
                 case BLACK:
-                    boardWindowData.blackPoints -= card.cost;
+                    boardWindowData[BLACK] -= card.cost;
                     break;
                 case WHITE:
-                    boardWindowData.whitePoints -= card.cost;
+                    boardWindowData[WHITE] -= card.cost;
                     break;
                 case ORANGE:
                     break;
             }
         });
+    }
+
+    #getBattlePointsFromBattleCards(playerId: string): BattlePointsData {
+        if (this.#isPlayer(playerId)) {
+            const battleCards = this.#playerBattleCardsSet;
+            const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
+            const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
+            return { [AP]: apTotal, [HP]: hpTotal };
+        }
+        if (this.#isOpponent(playerId)) {
+            const battleCards = this.#opponentBattleCardsSet;
+            const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
+            const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
+            return { [AP]: apTotal, [HP]: hpTotal };
+        }
+        return { [AP]: 0, [HP]: 0 };
     }
 
     isOpponentBattleCardsSet(playerId: string): Promise<boolean> {
@@ -1215,39 +1237,27 @@ export default class CardBattleMemory implements CardBattle {
         }); 
     }
 
-    getBattlePoints(playerId: string): Promise<BattlePointsData> {
+    getBattlePointsFromBoard(playerId: string): Promise<BattlePointsData> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    const battleCards = this.#playerBattleCardsSet;
-                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
-                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
-                    resolve({ ap: apTotal, hp: hpTotal });
+                    resolve({ [AP]: this.#playerBoard[AP], [HP]: this.#playerBoard[HP] });
                 }
                 if (this.#isOpponent(playerId)) {
-                    const battleCards = this.#opponentBattleCardsSet;
-                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
-                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
-                    resolve({ ap: apTotal, hp: hpTotal });
+                    resolve({ [AP]: this.#opponentBoard[AP], [HP]: this.#opponentBoard[HP] });
                 }
             }, delayMock);
         });
     }
 
-    getOpponentBattlePoints(playerId: string): Promise<BattlePointsData> {
+    getOpponentBattlePointsFromBoard(playerId: string): Promise<BattlePointsData> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    const battleCards = this.#opponentBattleCardsSet;
-                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
-                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
-                    resolve({ ap: apTotal, hp: hpTotal });
+                    resolve({ [AP]: this.#opponentBoard[AP], [HP]: this.#opponentBoard[HP] });
                 }
                 if (this.#isOpponent(playerId)) {
-                    const battleCards = this.#playerBattleCardsSet;
-                    const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
-                    const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
-                    resolve({ ap: apTotal, hp: hpTotal });
+                    resolve({ [AP]: this.#playerBoard[AP], [HP]: this.#playerBoard[HP] });
                 }
             }, delayMock);
         });

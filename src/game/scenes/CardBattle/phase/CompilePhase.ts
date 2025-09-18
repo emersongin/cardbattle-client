@@ -48,8 +48,8 @@ export class CompilePhase extends PowerPhase implements Phase {
                 (t?: TweenConfig) => super.openOpponentBoard(t),
                 (t?: TweenConfig) => super.openBoard(t),
                 (t?: TweenConfig) => super.openFieldCardset({ faceUp: true, ...t }),
-                (t?: TweenConfig) => super.openOpponentCardset(t),
-                (t?: TweenConfig) => super.openCardset(t)
+                (t?: TweenConfig) => super.openOpponentCardset({ faceUp: true, ...t }),
+                (t?: TweenConfig) => super.openCardset({ faceUp: true, ...t })
             ],
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();

@@ -1,3 +1,5 @@
+export const AP = 'AP';
+export const HP = 'HP';
 export const HAND = 'HAND';
 export const DECK = 'DECK';
 export const TRASH = 'TRASH';

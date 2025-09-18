@@ -50,6 +50,6 @@ export interface CardBattle {
     listenOpponentBattleCardsSet: (playerId: string, callback: (isSet: boolean) => void) => Promise<void>;
     getBattleCards: (playerId: string) => Promise<CardData[]>;
     getOpponentBattleCards: (playerId: string) => Promise<CardData[]>;
-    getBattlePoints: (playerId: string) => Promise<BattlePointsData>;
-    getOpponentBattlePoints: (playerId: string) => Promise<BattlePointsData>;
+    getBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
+    getOpponentBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
 }

@@ -1,4 +1,4 @@
-import { BATTLE, POWER } from "@constants/keys";
+import { AP, BATTLE, HP, POWER } from "@constants/keys";
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { CardData } from "@objects/CardData";
 import { CardColorsType } from "@game/types/CardColorsType";
@@ -23,7 +23,7 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     getAllData(): BattlePointsData {
-        return { ap: this.data.get('ap'), hp: this.data.get('hp') };
+        return { [AP]: this.data.get('ap'), [HP]: this.data.get('hp') };
     }
 
     #setStartData(): void {
