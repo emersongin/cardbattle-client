@@ -211,7 +211,7 @@ export class CardBattlePhase {
     }
 
     setOpponentBoardBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
-        this.#opponentBoard.setBattlePointsWithDuration(config.ap, config.hp);
+        this.#opponentBoard.setBattlePointsWithDuration(config.ap, config.hp, config.onComplete);
     }
 
     addOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {

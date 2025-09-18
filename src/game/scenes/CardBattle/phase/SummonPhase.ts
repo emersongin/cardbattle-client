@@ -170,6 +170,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 (t?: TweenConfig) => super.setOpponentBoardBattlePointsWithDuration({ ...t, ...opponentBattlePoints }),
             ],
             onAllComplete: () => {
+                console.log('updated battle points');
                 this.#addOnCompleteListener();
             },
         });

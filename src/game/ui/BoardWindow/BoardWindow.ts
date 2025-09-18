@@ -231,9 +231,6 @@ export class BoardWindow extends Sizer {
             ap: attackPoints,
             hp: healthPoints,
         } as Partial<BoardWindowData>;
-
-console.log(fromTarget, toTarget);
-
         this.#updating(fromTarget, toTarget, 1000, onComplete);
         this.data.set('ap', attackPoints);
         this.data.set('hp', healthPoints);

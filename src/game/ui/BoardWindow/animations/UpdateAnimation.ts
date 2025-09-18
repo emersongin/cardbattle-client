@@ -9,16 +9,22 @@ export class UpdateAnimation {
         config: BoardUpdateConfig
     ) {
         const updates = this.#createUpdateConfig(config.fromTarget, config.toTarget);
-        const updateTweens = updates.map(update => {
-            return {
-                ...update,
-                hold: 0,
-                duration: config.duration || 0,
-            };
+        const promises = updates.map(update => {
+            return new Promise<void>((resolve) => {
+                this.window.scene.tweens.addCounter({
+                    ...update,
+                    hold: 0,
+                    duration: config.duration || 0,
+                    onComplete: () => {
+                        if (update.onComplete) update.onComplete();
+                        resolve();
+                    }
+                });
+            });
         });
-        for (const points of updateTweens) {
-            this.window.scene.tweens.addCounter({ ...points });
-        }
+        Promise.all(promises).then(() => {
+            if (config.onComplete) config.onComplete();
+        });
     }
 
     #createUpdateConfig(fromTarget: BoardWindowData, toTarget: BoardWindowData): UpdateConfig[] {
