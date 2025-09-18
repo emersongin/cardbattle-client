@@ -125,10 +125,10 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.createOpponentBoard(opponentBoard);
         super.createCardset(cardsData);
         super.createOpponentCardset(opponentCards);
-        this.openGameBoard()
+        this.#openGameBoard()
     }
 
-    openGameBoard(): void {
+    #openGameBoard(): void {
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.openOpponentBoard(t),
@@ -169,10 +169,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),
                 (t?: TweenConfig) => super.setOpponentBoardBattlePointsWithDuration({ ...t, ...opponentBattlePoints }),
             ],
-            onAllComplete: () => {
-                console.log('updated battle points');
-                this.#addOnCompleteListener();
-            },
+            onAllComplete: () => this.#addOnCompleteListener(),
         });
     }
 
@@ -186,23 +183,25 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 throw new Error('Keyboard input is not available in this scene.');
             }
             keyboard.removeAllListeners();
-            this.#closeWindows();
-            this.#closeCardSets();
+            this.#closeGameBoard();
         };
         keyboard.once('keydown-ENTER', onKeyDown, this);
     }
 
-    #closeWindows(): void {
-        this.closeBoard();
-        this.closeOpponentBoard();
+    #closeGameBoard(): void {
+        this.scene.timeline({
+            targets: [
+                (t?: TweenConfig) => super.closeBoard(t),
+                (t?: TweenConfig) => super.closeOpponentBoard(t),
+                (t?: TweenConfig) => this.#closePlayerCardSet(t),
+                (t?: TweenConfig) => this.#closeOpponentCardSet(t),
+            ],
+            onAllComplete: () => this.changeToCompilePhase(),
+        });
     }
 
-    #closeCardSets(): void {
-        this.#closePlayerCardSet();
-        this.#closeOpponentCardSet();
-    }
 
-    #closePlayerCardSet(): void {
+    #closePlayerCardSet(config?: TweenConfig): void {
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
@@ -215,12 +214,14 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                     })
                     .play();
             },
-            onAllComplete: async () => this.changeToLoadPhase()
+            onAllComplete: async () => {
+                if (config?.onComplete) config.onComplete()
+            }
         };
         this.scene.timeline(closeConfig);
     }
 
-    #closeOpponentCardSet(): void {
+    #closeOpponentCardSet(config?: TweenConfig): void {
         const closeConfig: TimelineConfig<CardUi> = {
             targets: this.getOpponentCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
@@ -233,6 +234,9 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                     })
                     .play();
             },
+            onAllComplete: async () => {
+                if (config?.onComplete) config.onComplete()
+            }
         };
         this.scene.timeline(closeConfig);
     }
