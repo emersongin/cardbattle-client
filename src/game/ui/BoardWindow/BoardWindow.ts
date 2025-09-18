@@ -224,12 +224,12 @@ export class BoardWindow extends Sizer {
 
     setBattlePointsWithDuration(attackPoints: number, healthPoints: number, onComplete?: () => void): void {
         const fromTarget = {
-            ap: this.#getData('ap'),
-            hp: this.#getData('hp'),
+            [AP]: this.#getData('ap'),
+            [HP]: this.#getData('hp'),
         } as Partial<BoardWindowData>;
         const toTarget = {
-            ap: attackPoints,
-            hp: healthPoints,
+            [AP]: attackPoints,
+            [HP]: healthPoints,
         } as Partial<BoardWindowData>;
         this.#updating(fromTarget, toTarget, 1000, onComplete);
         this.data.set('ap', attackPoints);

@@ -166,6 +166,9 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     async #loadBattlePoints(): Promise<void> {
         const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.room.playerId);
         const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.room.playerId);
+
+        console.log(battlePoints, opponentBattlePoints);
+
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),

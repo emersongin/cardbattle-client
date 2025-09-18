@@ -32,36 +32,36 @@ export class CardBattleScene extends VueScene {
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
         // START PHASE
         await this.getCardBattle().setFolder(playerId, 'f3');
-        // DRAW PHASE
+        // // DRAW PHASE
         await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
-        // LOAD PHASE
+        // // LOAD PHASE
         await this.getCardBattle().setReadyDrawCards(opponentId);
         await this.getCardBattle().setReadyDrawCards(playerId);
-        // SUMMON PHASE
-        const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
-        const playerBoard = await this.getCardBattle().getBoard(playerId);
-        console.log(playerBoard);
-        const playerCardIds = playerCards.filter(card => {
-            if (card.color === ORANGE) return true;
-            const colorPoints = playerBoard[card.color];
-            if (colorPoints < card.cost) return false;
-            playerBoard[card.color] = colorPoints - card.cost;
-            return true;
-        }).map(card => card.id);
-        await this.getCardBattle().setBattleCards(playerId, playerCardIds);
-        const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
-        const opponentBoard = await this.getCardBattle().getBoard(opponentId);
-        const opponentCardIds = opponentCards.filter(card => {
-            if (card.color === ORANGE) return true;
-            const colorPoints = opponentBoard[card.color];
-            if (colorPoints < card.cost) return false;
-            opponentBoard[card.color] = colorPoints - card.cost;
-            return true;
-        }).map(card => card.id);
-        await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
+        // // SUMMON PHASE
+        // const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
+        // const playerBoard = await this.getCardBattle().getBoard(playerId);
+        // console.log(playerBoard);
+        // const playerCardIds = playerCards.filter(card => {
+        //     if (card.color === ORANGE) return true;
+        //     const colorPoints = playerBoard[card.color];
+        //     if (colorPoints < card.cost) return false;
+        //     playerBoard[card.color] = colorPoints - card.cost;
+        //     return true;
+        // }).map(card => card.id);
+        // await this.getCardBattle().setBattleCards(playerId, playerCardIds);
+        // const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
+        // const opponentBoard = await this.getCardBattle().getBoard(opponentId);
+        // const opponentCardIds = opponentCards.filter(card => {
+        //     if (card.color === ORANGE) return true;
+        //     const colorPoints = opponentBoard[card.color];
+        //     if (colorPoints < card.cost) return false;
+        //     opponentBoard[card.color] = colorPoints - card.cost;
+        //     return true;
+        // }).map(card => card.id);
+        // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
         // COMPILE PHASE
 
-        this.changePhase(new CompilePhase(this));
+        this.changePhase(new SummonPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

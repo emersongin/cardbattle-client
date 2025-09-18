@@ -1,5 +1,5 @@
 import { CardBattle } from "@api/CardBattle";
-import { LEFT, CENTER, RIGHT } from '@constants/keys';
+import { LEFT, CENTER, RIGHT, AP, HP } from '@constants/keys';
 import { CARD_HEIGHT, CARD_WIDTH } from '@constants/default';
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { TimelineConfig, TimelineEvent } from '@scenes/VueScene';
@@ -162,7 +162,7 @@ export class CardBattlePhase {
     }
 
     setBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
-        this.#board.setBattlePointsWithDuration(config.ap, config.hp, config.onComplete);
+        this.#board.setBattlePointsWithDuration(config[AP], config[HP], config.onComplete);
     }
 
     addBoardZonePoints(boardZone: BoardZonesType, value: number): void {
@@ -211,7 +211,7 @@ export class CardBattlePhase {
     }
 
     setOpponentBoardBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
-        this.#opponentBoard.setBattlePointsWithDuration(config.ap, config.hp, config.onComplete);
+        this.#opponentBoard.setBattlePointsWithDuration(config[AP], config[HP], config.onComplete);
     }
 
     addOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
