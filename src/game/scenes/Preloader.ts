@@ -35,6 +35,8 @@ export class Preloader extends VueScene
 
         this.load.image('logo', 'logo.png');
         this.load.image('star', 'star.png');
+        this.load.image('cardback', 'cardback.png');
+        this.load.image('card-picture', 'card-picture.png');
     }
 
     create ()

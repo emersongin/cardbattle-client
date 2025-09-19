@@ -68,7 +68,7 @@ export class CardUi extends Phaser.GameObjects.Container {
         if (faceUp) {
             this.image.setTexture(this.card.staticData.imageName);
         } else {
-            this.image.setTexture('card-back');
+            this.image.setTexture('cardback');
         }
         this.#adjustImagePosition();
     }

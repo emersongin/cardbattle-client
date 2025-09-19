@@ -301,14 +301,13 @@ export class CardBattlePhase {
             targets: this.getCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                const builder = CardActionsBuilder
-                    .create(card)
-                    .open({
-                        delay: (index! * 100),
-                        onComplete: () => resume()
-                    });
-                if (config?.faceUp) builder.faceUp();
-                builder.play();
+                const builder = CardActionsBuilder.create(card);
+                if (config?.faceUp) {
+                    builder.faceUp();
+                } 
+                builder
+                    .open({ delay: (index! * 100), onComplete: () => resume() })
+                    .play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
@@ -360,14 +359,13 @@ export class CardBattlePhase {
             targets: this.getOpponentCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
-                const builder = CardActionsBuilder
-                    .create(card)
-                    .open({
-                        delay: (index! * 100),
-                        onComplete: () => resume()
-                    });
-                if (config?.faceUp) builder.faceUp();
-                builder.play();
+                const builder = CardActionsBuilder.create(card);
+                if (config?.faceUp) {
+                    builder.faceUp();
+                }
+                builder
+                    .open({ delay: (index! * 100), onComplete: () => resume() })
+                    .play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
