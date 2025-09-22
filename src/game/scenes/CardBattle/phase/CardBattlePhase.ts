@@ -414,13 +414,14 @@ export class CardBattlePhase {
             onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
                 pause();
                 const builder = CardActionsBuilder
-                    .create(card)
+                    .create(card);
+                if (config?.faceUp) builder.faceUp();
+                builder
                     .open({
                         delay: (index! * 100),
                         onComplete: () => resume()
-                    });
-                if (config?.faceUp) builder.faceUp();
-                builder.play();
+                    })
+                    .play();
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
