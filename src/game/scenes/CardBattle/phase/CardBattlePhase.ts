@@ -571,7 +571,6 @@ export class CardBattlePhase {
     }
 
     openGameBoard(config: TweenConfig & { isOpponentCardsetOpen?: boolean }): void {
-        console.log(config.isOpponentCardsetOpen);
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => this.openOpponentBoard(t),
