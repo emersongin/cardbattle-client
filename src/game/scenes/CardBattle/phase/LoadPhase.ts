@@ -68,7 +68,7 @@ export class LoadPhase extends PowerPhase implements Phase {
             this.goPlay();
             return;
         }
-        this.#createOpponentPlayingWaitingWindow();
+        super.createOpponentPlayingWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
                 await this.cardBattle.listenOpponentPlay(
@@ -99,10 +99,6 @@ export class LoadPhase extends PowerPhase implements Phase {
                 });
             }
         }})
-    }
-
-    #createOpponentPlayingWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to play...');
     }
 
     changeToChallengePhase(): void {

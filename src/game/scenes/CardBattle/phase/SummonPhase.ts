@@ -5,9 +5,6 @@ import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
-import { TimelineConfig, TimelineEvent } from "../../VueScene";
-import { CardUi } from "@/game/ui/Card/CardUi";
-import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
 import { AP, HP } from "@/game/constants/keys";
 
@@ -94,14 +91,14 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                         onComplete: async () => {
                             await this.cardBattle.setBattleCards(this.scene.room.playerId, cardIds);
                             if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.room.playerId)) {
-                                this.#showBattleCards();
+                                this.#createGameBoard();
                                 return;
                             }
                             this.#createOpponentBattleCardSetWaitingWindow();
                             super.openAllWindows({
                                 onComplete: async () => {
                                     await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, async () => {
-                                        super.closeAllWindows({ onComplete: () => this.#showBattleCards() });
+                                        super.closeAllWindows({ onComplete: () => this.#createGameBoard() });
                                     });
                                 }
                             });
@@ -118,7 +115,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.openCommandWindow();
     }
 
-    async #showBattleCards(): Promise<void> {
+    async #createGameBoard(): Promise<void> {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const cardsData: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
@@ -139,36 +136,16 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 (t?: TweenConfig) => super.openOpponentCardset(t),
             ],
             onAllComplete: () => {
-                this.#flipOpponentCardSet();
+                this.flipOpponentCardSet({
+                    onComplete: () => this.#loadBattlePoints()
+                });
             },
         });
-    }
-
-    #flipOpponentCardSet(): void {
-        const flipConfig: TimelineConfig<CardUi> = {
-            targets: this.getOpponentCardset().getCardsUi(),
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
-                pause();
-                CardActionsBuilder
-                    .create(card)
-                    .close({ delay: (index! * 200) })
-                    .faceUp()
-                    .open({ onComplete: () => resume() })
-                    .play();
-            },
-            onAllComplete: () => {
-                this.#loadBattlePoints();
-            }
-        };
-        this.scene.timeline(flipConfig);
     }
 
     async #loadBattlePoints(): Promise<void> {
         const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.room.playerId);
         const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.room.playerId);
-
-        console.log(battlePoints, opponentBattlePoints);
-
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),
@@ -198,52 +175,11 @@ export class SummonPhase extends CardBattlePhase implements Phase {
             targets: [
                 (t?: TweenConfig) => super.closeBoard(t),
                 (t?: TweenConfig) => super.closeOpponentBoard(t),
-                (t?: TweenConfig) => this.#closePlayerCardSet(t),
-                (t?: TweenConfig) => this.#closeOpponentCardSet(t),
+                (t?: TweenConfig) => super.closeCardset(t),
+                (t?: TweenConfig) => super.closeOpponentCardset(t),
             ],
             onAllComplete: () => this.changeToCompilePhase(),
         });
-    }
-
-
-    #closePlayerCardSet(config?: TweenConfig): void {
-        const closeConfig: TimelineConfig<CardUi> = {
-            targets: this.getCardset().getCardsUi(),
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
-                pause();
-                CardActionsBuilder
-                    .create(card)
-                    .close({
-                        delay: (index! * 100),
-                        onComplete: () => resume()
-                    })
-                    .play();
-            },
-            onAllComplete: async () => {
-                if (config?.onComplete) config.onComplete()
-            }
-        };
-        this.scene.timeline(closeConfig);
-    }
-
-    #closeOpponentCardSet(config?: TweenConfig): void {
-        const closeConfig: TimelineConfig<CardUi> = {
-            targets: this.getOpponentCardset().getCardsUi(),
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
-                pause();
-                CardActionsBuilder
-                    .create(card)
-                    .close({
-                        delay: (index! * 100),
-                        onComplete: () => resume()
-                    })
-                    .play();
-            },
-            onAllComplete: async () => {
-                if (config?.onComplete) config.onComplete()
-            }
-        };
-        this.scene.timeline(closeConfig);
     }
 
     #createOpponentBattleCardSetWaitingWindow(): void {

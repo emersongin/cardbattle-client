@@ -267,6 +267,10 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.scene.timeline(moveConfig);
     }
 
+    createOpponentPlayingWaitingWindow(): void {
+        super.createWaitingWindow('Waiting for opponent to play...');
+    }
+
     abstract createGameBoard(): Promise<void>;
     abstract openGameBoard(config?: TweenConfig): void;
     abstract createPhaseWindows(): void;
