@@ -292,7 +292,7 @@ export class CardBattlePhase {
         this.#closeCardset(cardsUi, config);
     }
 
-    flipPlayerCardSet(config: TweenConfig) {
+    flipPlayerCardSet(config?: TweenConfig) {
         const cardsUis = this.getCardset().getCardsUi();
         this.#flipCardSet(cardsUis, config);
     }
@@ -348,7 +348,7 @@ export class CardBattlePhase {
         this.#flashCardSet(cardsUis, config);
     }
 
-    moveOpponentCardSetToBoard(config: TweenConfig): void {
+    moveOpponentCardSetToBoard(config?: TweenConfig): void {
         const cardsUis = this.getOpponentCardset().getCardsUi();
         this.#moveCardSetToBoard(cardsUis, config);
     }
