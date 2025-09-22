@@ -548,27 +548,36 @@ export class CardBattlePhase {
     }
 
     // GENERAL
-
-    async createGameBoard(): Promise<void> {
+    async createGameBoard(config: TweenConfig & { isShowBattlePoints?: boolean }): Promise<void> {
         const board = await this.cardBattle.getBoard(this.scene.room.playerId);
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
         const battleCards: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
         const opponentBattleCards: CardData[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
-        if (board) this.createBoard(board);
-        if (opponentBoard) this.createOpponentBoard(opponentBoard);
-        if (powerCards) this.createFieldCardset({ cards: powerCards });
-        if (battleCards) this.createCardset(battleCards);
-        if (opponentBattleCards) this.createOpponentCardset(opponentBattleCards);
+        const promises = [];
+        if (board) {
+            const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
+            promises.push(this.createBoard(boardData));
+        };
+        if (opponentBoard) {
+            const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
+            promises.push(this.createOpponentBoard(opponentBoardData));
+        }
+        if (powerCards) promises.push(this.createFieldCardset({ cards: powerCards }));
+        if (battleCards) promises.push(this.createCardset(battleCards));
+        if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
+        await Promise.all(promises);
+        if (config?.onComplete) config.onComplete();
     }
 
-    openGameBoard(config?: TweenConfig): void {
+    openGameBoard(config: TweenConfig & { isOpponentCardsetOpen?: boolean }): void {
+        console.log(config.isOpponentCardsetOpen);
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => this.openOpponentBoard(t),
                 (t?: TweenConfig) => this.openBoard(t),
                 (t?: TweenConfig) => this.openFieldCardset({ faceUp: true, ...t }),
-                (t?: TweenConfig) => this.openOpponentCardset({ faceUp: true, ...t }),
+                (t?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...t }),
                 (t?: TweenConfig) => this.openCardset({ faceUp: true, ...t })
             ],
             onAllComplete: () => {

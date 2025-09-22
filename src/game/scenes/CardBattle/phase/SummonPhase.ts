@@ -6,8 +6,6 @@ import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@/game/constants/colors";
-import { AP, HP } from "@/game/constants/keys";
-
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -116,23 +114,19 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #createGameBoard(): Promise<void> {
-        const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
-        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-        const cardsData: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
-        const opponentCards = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
-        await Promise.all([
-            super.createBoard({ ...boardData, [AP]: 0, [HP]: 0 }),
-            super.createOpponentBoard({ ...opponentBoard, [AP]: 0, [HP]: 0 }),
-            super.createCardset(cardsData),
-            super.createOpponentCardset(opponentCards)
-        ]);
-        super.openGameBoard({
+        super.createGameBoard({
+            isShowBattlePoints: false,
             onComplete: () => {
-                this.flipOpponentCardSet({
-                    onComplete: () => this.#loadBattlePoints()
+                super.openGameBoard({
+                    isOpponentCardsetOpen: false,
+                    onComplete: () => {
+                        super.flipOpponentCardSet({
+                            onComplete: () => this.#loadBattlePoints()
+                        });
+                    }
                 });
             }
-        })
+        });
     }
 
     async #loadBattlePoints(): Promise<void> {
