@@ -46,7 +46,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
 
     #openHandCardset(colorPoints: ColorsPointsData): void {
         const cardset = super.getCardset();
-        super.openCardset({ 
+        super.openCardset({
             faceUp: true, 
             onComplete: () => {
                 super.openAllWindows();
@@ -94,7 +94,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                                 this.#createGameBoard();
                                 return;
                             }
-                            this.#createOpponentBattleCardSetWaitingWindow();
+                            super.createWaitingWindow('Waiting for opponent to set battle cards...');
                             super.openAllWindows({
                                 onComplete: async () => {
                                     await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, async () => {
@@ -120,27 +120,19 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const cardsData: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
         const opponentCards = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
-        super.createBoard({ ...boardData, [AP]: 0, [HP]: 0 });
-        super.createOpponentBoard({ ...opponentBoard, [AP]: 0, [HP]: 0 });
-        super.createCardset(cardsData);
-        super.createOpponentCardset(opponentCards);
-        this.#openGameBoard()
-    }
-
-    #openGameBoard(): void {
-        this.scene.timeline({
-            targets: [
-                (t?: TweenConfig) => super.openOpponentBoard(t),
-                (t?: TweenConfig) => super.openBoard(t),
-                (t?: TweenConfig) => super.openCardset({ faceUp: true, ...t }),
-                (t?: TweenConfig) => super.openOpponentCardset(t),
-            ],
-            onAllComplete: () => {
+        await Promise.all([
+            super.createBoard({ ...boardData, [AP]: 0, [HP]: 0 }),
+            super.createOpponentBoard({ ...opponentBoard, [AP]: 0, [HP]: 0 }),
+            super.createCardset(cardsData),
+            super.createOpponentCardset(opponentCards)
+        ]);
+        super.openGameBoard({
+            onComplete: () => {
                 this.flipOpponentCardSet({
                     onComplete: () => this.#loadBattlePoints()
                 });
-            },
-        });
+            }
+        })
     }
 
     async #loadBattlePoints(): Promise<void> {
@@ -165,25 +157,11 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 throw new Error('Keyboard input is not available in this scene.');
             }
             keyboard.removeAllListeners();
-            this.#closeGameBoard();
+            this.closeGameBoard({
+                onComplete: () => this.changeToCompilePhase(),
+            });
         };
         keyboard.once('keydown-ENTER', onKeyDown, this);
-    }
-
-    #closeGameBoard(): void {
-        this.scene.timeline({
-            targets: [
-                (t?: TweenConfig) => super.closeBoard(t),
-                (t?: TweenConfig) => super.closeOpponentBoard(t),
-                (t?: TweenConfig) => super.closeCardset(t),
-                (t?: TweenConfig) => super.closeOpponentCardset(t),
-            ],
-            onAllComplete: () => this.changeToCompilePhase(),
-        });
-    }
-
-    #createOpponentBattleCardSetWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to set battle cards...');
     }
 
     changeToChallengePhase(): void {

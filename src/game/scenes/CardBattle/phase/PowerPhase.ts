@@ -17,7 +17,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             return;
         }
         await this.createGameBoard();
-        this.createPhaseWindows();
+        this.createPhase();
         super.openAllWindows();
     }
 
@@ -271,8 +271,6 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.createWaitingWindow('Waiting for opponent to play...');
     }
 
-    abstract createGameBoard(): Promise<void>;
-    abstract openGameBoard(config?: TweenConfig): void;
-    abstract createPhaseWindows(): void;
+    abstract createPhase(): void;
     abstract nextPlay(): Promise<void>;
 }

@@ -84,11 +84,10 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     }
 
     #end(): void {
-        if (this.originPhase instanceof LoadPhase || this.originPhase instanceof CompilePhase) {
-            this.changeToLoadPhase();
-            return;
+        if (this.originPhase !instanceof LoadPhase && this.originPhase !instanceof CompilePhase) {
+            throw new Error("Origin phase not recognized.");
         }
-        throw new Error("Origin phase not recognized.");
+        this.changeToLoadPhase();
     }
 
     changeToChallengePhase(): void {
