@@ -11,7 +11,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
             this.#loadChallengePhase();
             return;
         }
-        this.#createOpponentWaitingWindow();
+        super.createWaitingWindow('Waiting for opponent to join the room...');
         super.openAllWindows({
             onComplete: async () => {
                 await this.cardBattle.listenOpponentJoined(this.scene.room.playerId, () => 
@@ -21,31 +21,23 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         });
     }
 
-    #createOpponentWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to join the room...');
-    }
-
     async #loadChallengePhase(): Promise<void> {
         await this.cardBattle.getOpponentData(
             this.scene.room.playerId, 
             (opponent: OpponentData) => {
-                this.#createChallengePhaseWindows(opponent);
+                const { name, description } = opponent;
+                super.createTextWindowCentered('Challenge Phase', { 
+                    textAlign: 'center', 
+                    textColor: '#fff',
+                    onClose: async () => {
+                        this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
+                        super.openCommandWindow();
+                    }  
+                });
+                super.addTextWindow(`${name}\n${description}`);
                 super.openAllWindows();
             }
         );
-    }
-
-    #createChallengePhaseWindows(opponent: OpponentData) {
-        super.createTextWindowCentered('Challenge Phase', { 
-            textAlign: 'center', 
-            textColor: '#fff',
-            onClose: async () => {
-                this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
-                super.openCommandWindow();
-            }  
-        });
-        const { name, description } = opponent;
-        super.addTextWindow(`${name}\n${description}`);
     }
 
     #createFoldersCommandWindow(folders: CardsFolderData[]): void {
@@ -67,12 +59,12 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         super.createCommandWindowCentered('Choose your folder', options);
     }
 
-    changeToChallengePhase(): void {
-        throw new Error("Method not implemented.");
-    }
-    
     changeToStartPhase(): void {
         this.scene.changePhase(new StartPhase(this.scene));
+    }
+    
+    changeToChallengePhase(): void {
+        throw new Error("Method not implemented.");
     }
 
     changeToDrawPhase(): void {

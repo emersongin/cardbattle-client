@@ -11,7 +11,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
             this.#loadStartPhase();
             return;
         }
-        this.#createOpponentDeckSetWaitingWindow();
+        super.createWaitingWindow('Waiting for opponent to set their deck...');
         super.openAllWindows({
             onComplete: async () => {
                 await this.cardBattle.listenOpponentDeckSet(this.scene.room.playerId, () => {
@@ -21,44 +21,35 @@ export class StartPhase extends CardBattlePhase implements Phase {
         });
     }
 
-    #createOpponentDeckSetWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to set their deck...');
-    }
-
     async #loadStartPhase(): Promise<void> {
         if (await this.cardBattle.isPlayMiniGame(this.scene.room.playerId)) {
-            this.#createStartPhaseWindows({ onClose: () => {
-                this.#createMiniGameCommandWindow();
-                super.openCommandWindow();
-            }});
+            super.createTextWindowCentered('Start Phase', { 
+                textAlign: 'center', 
+                onClose: () => {
+                    this.#createMiniGameCommandWindow();
+                    super.openCommandWindow();
+                }
+            });
             super.openAllWindows();
             return;
         }
-        this.#createStartPhaseWindows({ onClose: () => {
-            this.#createOpponentMiniGameEndWaitingWindow();
-            super.openAllWindows({
-                onComplete: async () => {
-                    await this.cardBattle.listenOpponentEndMiniGame(
-                        this.scene.room.playerId,
-                        (choice: string) => super.closeAllWindows({ 
-                            onComplete: () => {
-                                this.#createResultWindow(choice)
-                            } 
-                        })
-                    );
-                }
-            });
-        }});
-        super.openAllWindows();
-    }
-
-    #createStartPhaseWindows(config: { onClose: () => void }): void {
-        super.createTextWindowCentered('Start Phase', { textAlign: 'center', onClose: config.onClose });
+        super.createTextWindowCentered('Start Phase', { 
+            textAlign: 'center', 
+            onClose: () => {
+                super.createWaitingWindow('Waiting for opponent to finish the mini-game...');
+                super.openAllWindows({
+                    onComplete: async () => {
+                        await this.cardBattle.listenOpponentEndMiniGame(
+                            this.scene.room.playerId,
+                            (choice: string) => 
+                                super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice)})
+                        );                           
+                    }
+                });
+            } 
+        });
         super.addTextWindow('Draw white card to go first.');
-    }
-
-    #createOpponentMiniGameEndWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to finish the mini-game...');
+        super.openAllWindows();
     }
 
     #createMiniGameCommandWindow(): void {
@@ -90,16 +81,16 @@ export class StartPhase extends CardBattlePhase implements Phase {
         super.openAllWindows();
     }
 
+    changeToDrawPhase(): void {
+        this.scene.changePhase(new DrawPhase(this.scene));
+    }
+
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");
     }
     
     changeToStartPhase(): void {
         throw new Error("Method not implemented.");
-    }
-
-    changeToDrawPhase(): void {
-        this.scene.changePhase(new DrawPhase(this.scene));
     }
 
     changeToLoadPhase(): void {
