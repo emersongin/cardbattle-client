@@ -6,6 +6,7 @@ import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { ORANGE } from "@/game/constants/colors";
 import { CardColorsType } from "@/game/types/CardColorsType";
+import { Card } from "@/game/ui/Card/Card";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -23,51 +24,53 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.createBoard(boardData);
         super.createHandCardset(cardsData);
         super.createHandDisplayWindows();
-        this.#openAndSelectModeHandCardset();
+        this.#openHandZone();
     }
 
-    #openAndSelectModeHandCardset(): void {
+    #openHandZone(): void {
         this.scene.timeline({
             targets: [
-                (config?: TweenConfig) => super.openAllWindows(config),
                 (config?: TweenConfig) => super.openBoard(config),
                 (config?: TweenConfig) => super.openCardset({ ...config, faceUp: true }),
             ],
             onAllComplete: () => {
+                super.openAllWindows();
                 super.setSelectModeMultCardset({
-                    onHasEnoughColorPointsByColor: (cardId: string) => {
-                        const card = super.getCardset().getCardById(cardId);
-                        const cardColor = card.getColor();
-                        const cardCost = card.getCost();
-                        if (cardColor === ORANGE) return true;
-                        return super.getBoard().hasEnoughColorPointsByColor(cardColor, cardCost);
-                    },
-                    onCreditPoint: (cardId: string) => {
-                        const card = super.getCardset().getCardById(cardId);
-                        const cardColor = card.getColor() as CardColorsType;
-                        const cardCost = card.getCost();
-                        if (cardColor === ORANGE) return;
-                        if (cardCost > 0) super.getBoard().addColorPoints(cardColor, cardCost);
-                    },
-                    onDebitPoint: (cardId: string) => {
-                        const card = super.getCardset().getCardById(cardId);
-                        const cardColor = card.getColor() as CardColorsType;
-                        const cardCost = card.getCost();
-                        if (cardColor === ORANGE) return;
-                        if (cardCost > 0) super.getBoard().removeColorPoints(cardColor, cardCost);
-                    },
-                    onChangeIndex: (cardId: string) => this.#onChangeHandCardsetIndex(cardId),
+                    onChangeIndex: (card: Card) => this.#onChangeHandCardsetIndex(card),
+                    onHasEnoughColorPointsByColor: (card: Card) => this.#onHasEnoughColorPointsByColor(card),
+                    onCreditPoint: (card: Card) => this.#onCreditPoint(card),
+                    onDebitPoint: (card: Card) => this.#onDebitPoint(card),
                     onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
                 });
             },
         });
     }
+    
+    #onChangeHandCardsetIndex(card: Card): void {
+        super.setTextWindowText(card.getName(), 1);
+        super.setTextWindowText(card.getDescription(), 2);
+        super.setTextWindowText(card.getDetails(), 3);
+    }
+    
+    #onHasEnoughColorPointsByColor(card: Card): boolean {
+        const cardColor = card.getColor();
+        const cardCost = card.getCost();
+        if (cardColor === ORANGE) return true;
+        return super.getBoard().hasEnoughColorPointsByColor(cardColor, cardCost);
+    }
 
-    #onChangeHandCardsetIndex(cardId: string): void {
-        const cardset = super.getCardset();
-        super.setTextWindowText(cardset.getCardById(cardId).getName(), 1);
-        super.setTextWindowText(cardset.getCardById(cardId).getDescription(), 2);
-        super.setTextWindowText(cardset.getCardById(cardId).getDetails(), 3);
+    #onCreditPoint(card: Card): void {
+        const cardColor = card.getColor() as CardColorsType;
+        const cardCost = card.getCost();
+        if (cardColor === ORANGE) return;
+        if (cardCost > 0) super.getBoard().addColorPoints(cardColor, cardCost);
+    }
+
+    #onDebitPoint(card: Card): void {
+        const cardColor = card.getColor() as CardColorsType;
+        const cardCost = card.getCost();
+        if (cardColor === ORANGE) return;
+        if (cardCost > 0) super.getBoard().removeColorPoints(cardColor, cardCost);
     }
 
     #onSelectHandCardsetCard(cardIds: string[]): void {
@@ -124,6 +127,10 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     async #loadBattlePoints(): Promise<void> {
         const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.room.playerId);
         const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.room.playerId);
+
+console.log('battlePoints', battlePoints);
+console.log('opponentBattlePoints', opponentBattlePoints);
+
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),

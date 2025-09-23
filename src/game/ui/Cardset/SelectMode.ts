@@ -35,7 +35,7 @@ export class SelectMode {
         if (!this.cardset.isValidIndex(newIndex)) return;
         this.#deselectCardByIndex(this.#getCurrentIndex());
         this.#changeIndex(newIndex);
-        if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCurrentId());
+        if (this.#events.onChangeIndex) this.#events.onChangeIndex(this.#getCardById(this.#getCurrentId()));
         const card = this.#getCardByIndex(newIndex);
         const isMarkedState = card.isMarked();
         this.#selectCardByIndex(newIndex);
@@ -167,7 +167,7 @@ export class SelectMode {
             this.#debitPointsById(currentId);
             this.cardset.disableCardById(currentId);
             this.#markCardById(currentId);
-            if (this.#events.onMarked) this.#events.onMarked(currentId);
+            if (this.#events.onMarked) this.#events.onMarked(this.#getCardById(currentId));
             this.#disableCardsWithoutEnoughPoints();
             if (this.#noCardsAvaliable()) {
                 this.#disable();
@@ -197,7 +197,7 @@ export class SelectMode {
     }
 
     #debitPointsById(cardId: string): void {
-        if (this.#events.onDebitPoint) this.#events.onDebitPoint(cardId);
+        if (this.#events.onDebitPoint) this.#events.onDebitPoint(this.#getCardById(cardId));
     }
 
     #removeId(cardId: string): void {
@@ -210,7 +210,7 @@ export class SelectMode {
     }
 
     #creditPointsById(cardId: string): void {
-        if (this.#events.onCreditPoint) this.#events.onCreditPoint(cardId);
+        if (this.#events.onCreditPoint) this.#events.onCreditPoint(this.#getCardById(cardId));
     }
 
     #disableCardsWithoutEnoughPoints(): void {
@@ -231,7 +231,7 @@ export class SelectMode {
 
     #notHaveEnoughPoints(cardId: string): boolean {
         if (this.#events.onHasEnoughColorPointsByColor) {
-            return this.#events.onHasEnoughColorPointsByColor(cardId) === false;
+            return this.#events.onHasEnoughColorPointsByColor(this.#getCardById(cardId)) === false;
         }
         return false;
     }

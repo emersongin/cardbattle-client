@@ -1123,7 +1123,7 @@ export default class CardBattleMemory implements CardBattle {
                     this.#removeBoardPointsByBattleCards(cards, this.#opponentBoard);
                     this.#opponentBattleCardsSet = cards;
                     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
-                    const battePoints = this.#getBattlePointsFromBattleCards(this.#playerId);
+                    const battePoints = this.#getBattlePointsFromBattleCards(this.#opponentId);
                     this.#opponentBoard[AP] = battePoints[AP];
                     this.#opponentBoard[HP] = battePoints[HP];
                     this.#setOpponentStep(BATTLE_CARDS_SET);

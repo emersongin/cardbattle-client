@@ -81,7 +81,12 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                         onComplete: () => super.flipPlayerCardset(t)
                     });
                 },
-                (t?: TweenConfig) => super.moveOpponentCardsetToBoard(t),
+                (t?: TweenConfig) => super.moveOpponentCardsetToBoard({ ...t,
+                    onStartEach: () => {
+                        this.addOpponentBoardZonePoints(HAND, 1);
+                        this.removeOpponentBoardZonePoints(DECK, 1);
+                    },
+                }),
             ],
             onAllComplete: () => { 
                 this.#addColorCardToBoards();

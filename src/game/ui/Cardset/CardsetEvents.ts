@@ -1,9 +1,11 @@
+import { Card } from "../Card/Card";
+
 export type CardsetEvents = {
-    onChangeIndex?: (cardId: string) => void;
-    onHasEnoughColorPointsByColor?: (cardId: string) => boolean;
-    onCreditPoint?: (cardId: string) => void;
-    onDebitPoint?: (cardId: string) => void;
-    onMarked?: (cardId: string) => void;
+    onChangeIndex?: (card: Card) => void;
+    onHasEnoughColorPointsByColor?: (card: Card) => boolean;
+    onCreditPoint?: (card: Card) => void;
+    onDebitPoint?: (card: Card) => void;
+    onMarked?: (card: Card) => void;
     onComplete?: (cardIds: string[]) => void;
     onLeave?: () => void;
 } 

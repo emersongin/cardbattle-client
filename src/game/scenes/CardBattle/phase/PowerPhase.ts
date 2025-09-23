@@ -7,6 +7,7 @@ import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { TweenConfig } from '@game/types/TweenConfig';
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
+import { Card } from "@/game/ui/Card/Card";
 
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -120,19 +121,19 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.createHandDisplayWindows();
         const cards: CardData[] = await this.cardBattle.getCardsFromHandInTheLoadPhase(this.scene.room.playerId);
         super.createHandCardset(cards);
-        this.#openAndSelectModeHandCardset();
+        this.#openHandZone();
     }
 
-    #openAndSelectModeHandCardset(): void {
+    #openHandZone(): void {
         this.scene.timeline({
             targets: [
-                (config?: TweenConfig) => super.openAllWindows(config),
                 (config?: TweenConfig) => super.openBoard(config),
                 (config?: TweenConfig) => super.openCardset({ ...config, faceUp: true }),
             ],
             onAllComplete: () => {
+                super.openAllWindows();
                 super.setSelectModeOnceCardset({
-                    onChangeIndex: (cardId: string) => this.#onChangeHandCardsetIndex(cardId),
+                    onChangeIndex: (card: Card) => this.#onChangeHandCardsetIndex(card),
                     onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
                     onLeave: () => this.#onLeaveHand(),
                 });
@@ -140,11 +141,10 @@ export abstract class PowerPhase extends CardBattlePhase {
         });
     }
 
-    #onChangeHandCardsetIndex(cardId: string): void {
-        const cardset = super.getCardset();
-        super.setTextWindowText(cardset.getCardById(cardId).getName(), 1);
-        super.setTextWindowText(cardset.getCardById(cardId).getDescription(), 2);
-        super.setTextWindowText(cardset.getCardById(cardId).getDetails(), 3);
+    #onChangeHandCardsetIndex(card: Card): void {
+        super.setTextWindowText(card.getName(), 1);
+        super.setTextWindowText(card.getDescription(), 2);
+        super.setTextWindowText(card.getDetails(), 3);
     }
 
     #onSelectHandCardsetCard(cardIds: string[]): void {
