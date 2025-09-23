@@ -6,6 +6,7 @@ import { TimelineEvent } from "@scenes/VueScene";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { TweenConfig } from '@game/types/TweenConfig';
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
+import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
 
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -13,29 +14,28 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (goToPlays) {
             super.removeBoardPass();
             super.removeOpponentBoardPass();
-            this.start();
+            this.resumePhase();
             return;
         }
-        await this.createGameBoard();
-        this.createPhase();
-        super.openAllWindows();
+        await super.createGameBoard();
+        this.startPhase();
     }
 
-    async start(): Promise<void> {
+    async resumePhase(): Promise<void> {
         if (await this.cardBattle.isStartPlaying(this.scene.room.playerId)) {
-            this.goPlay();
+            this.#goPlay();
             return;
         }
-        this.nextPlay();
+        this.#nextPlay();
     }
 
-    async goPlay(): Promise<void> {
-        await this.resetPlay();
+    async #goPlay(): Promise<void> {
+        await this.#resetPlay();
         await this.#createCommandWindow();
         super.openCommandWindow()
     }
 
-    resetPlay(): Promise<void> {
+    #resetPlay(): Promise<void> {
         return new Promise<void>(async (resolve) => {
             await this.cardBattle.setPlaying(this.scene.room.playerId);
             super.removeBoardPass();
@@ -73,7 +73,57 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     async #onPassPlay(): Promise<void> {
         await this.#passPlay();
-        this.nextPlay();
+        this.#nextPlay();
+    }
+
+    async #nextPlay(): Promise<void> {
+        if (await this.cardBattle.isPowerfieldLimitReached()) {
+            this.changeToTriggerPhase();
+            return;
+        }
+        if (await this.cardBattle.allPass()) {
+            if (await this.cardBattle.hasPowerCardsInField()) {
+                this.changeToTriggerPhase();
+                return;
+            }
+            this.changeTo();
+            return;
+        }
+        if (await this.cardBattle.isOpponentPassed(this.scene.room.playerId)) {
+            this.#goPlay();
+            return;
+        }
+        super.createWaitingWindow('Waiting for opponent to play...');
+        super.openAllWindows({
+            onComplete: async () => {
+                await this.cardBattle.listenOpponentPlay(
+                    this.scene.room.playerId, 
+                    (opponentPlay: PowerCardPlayData) => this.#loadOpponentPlay(
+                            opponentPlay.pass, 
+                            opponentPlay.powerAction?.powerCard
+                        )
+                );
+            }
+        });
+    }
+
+    async #loadOpponentPlay(pass: boolean, powerCard?: CardData): Promise<void> {
+        super.closeAllWindows({ onComplete: async () => {
+            super.addOpponentBoardPass();
+            if (pass) {
+                this.#nextPlay();
+                return;
+            }
+            if (!await this.cardBattle.isPowerfieldLimitReached()) {
+                await this.#resetPlay();
+            }
+            if (!pass && powerCard) {
+                this.playPowerCard(powerCard, () => {
+                    this.removeOpponentBoardZonePoints(HAND, 1);
+                    this.loadPlayAndMovePowerCardToField();
+                });
+            }
+        }})
     }
 
     #passPlay(): Promise<void> {
@@ -179,7 +229,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #onLeaveHand(): void {
         this.#closeHandBoard({ onComplete: () => {
-            this.openGameBoard({ onComplete: () => this.goPlay() });
+            this.openGameBoard({ onComplete: () => this.#goPlay() });
         }});
     }
 
@@ -262,15 +312,11 @@ export abstract class PowerPhase extends CardBattlePhase {
                     })
                     .play();
             },
-            onAllComplete: () => this.nextPlay(),
+            onAllComplete: () => this.#nextPlay(),
         };
         this.scene.timeline(moveConfig);
     }
 
-    createOpponentPlayingWaitingWindow(): void {
-        super.createWaitingWindow('Waiting for opponent to play...');
-    }
-
-    abstract createPhase(): void;
-    abstract nextPlay(): Promise<void>;
+    abstract startPhase(): void;
+    abstract changeTo(): void;
 }

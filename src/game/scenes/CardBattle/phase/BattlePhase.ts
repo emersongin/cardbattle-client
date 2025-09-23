@@ -1,56 +1,14 @@
-import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { ChallengePhase } from "@scenes/CardBattle/phase/ChallengePhase";
-import { TextWindow } from '@ui/TextWindow/TextWindow';
+import { CardBattlePhase } from './CardBattlePhase';
 
-export class BattlePhase implements Phase {
-    #window: TextWindow;
+export class BattlePhase extends CardBattlePhase implements Phase {
     
-    constructor(readonly scene: CardBattleScene) {}
+    create(): void {
+        // Create and show the Battle Phase window
+    }
 
     changeToChallengePhase(): void {
         this.scene.changePhase(new ChallengePhase(this.scene));
     }
-    
-    changeToStartPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToDrawPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToLoadPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToTriggerPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToSummonPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToCompilePhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToBattlePhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    create(): void {
-        // this.#window = TextWindow.createCentered(this.scene, 'Battle Phase started!', {
-        //     onClose: () => {
-        //         this.changeToChallengePhase();
-        //     }
-        // });
-        this.#window.open();
-    }
-
-    destroy(): void {
-        if (this.#window) this.#window.destroy();
-    }
-
 }

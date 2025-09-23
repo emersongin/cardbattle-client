@@ -19,13 +19,14 @@ import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
 import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { ORANGE } from "@/game/constants/colors";
+import { Phase } from "./Phase";
 
 export type AlignType = 
     | typeof LEFT 
     | typeof CENTER 
     | typeof RIGHT;
 
-export class CardBattlePhase {
+export class CardBattlePhase implements Phase {
     protected cardBattle: CardBattle;
 
     #textWindows: TextWindow[] = [];
@@ -38,6 +39,10 @@ export class CardBattlePhase {
         
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
+    }
+
+    create(_p?: any): void {
+        throw new Error("Method not implemented.");
     }
 
     // TEXT WINDOWS
@@ -548,7 +553,7 @@ export class CardBattlePhase {
     }
 
     // GENERAL
-    async createGameBoard(config: TweenConfig & { isShowBattlePoints?: boolean }): Promise<void> {
+    async createGameBoard(config?: TweenConfig & { isShowBattlePoints?: boolean }): Promise<void> {
         const board = await this.cardBattle.getBoard(this.scene.room.playerId);
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
@@ -598,5 +603,47 @@ export class CardBattlePhase {
                 if (config?.onComplete) config.onComplete();
             },
         });
+    }
+
+    changeToChallengePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+    
+    changeToStartPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToDrawPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToLoadPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToTriggerPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToSummonPhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToCompilePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    changeToBattlePhase(): void {
+        throw new Error("Method not implemented.");
+    }
+
+    destroy(): void {
+        this.destroyAllTextWindows();
+        this.destroyCommandWindow();
+        this.destroyBoard();
+        this.destroyOpponentBoard();
+        this.destroyCardset();
+        this.destroyOpponentCardset();
+        this.destroyFieldCardset();
     }
 }
