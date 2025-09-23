@@ -21,7 +21,6 @@ import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { ORANGE } from "@/game/constants/colors";
 import { Phase } from "./Phase";
 import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
-import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 
 export type AlignType = 
     | typeof LEFT 

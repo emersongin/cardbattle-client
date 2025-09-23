@@ -21,10 +21,10 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.createBoard(boardData);
         super.createHandCardset(cardsData);
         super.createHandDisplayWindows();
-        this.#openHandCardset();
+        this.#openAndSelectModeHandCardset();
     }
 
-    #openHandCardset(): void {
+    #openAndSelectModeHandCardset(): void {
         this.scene.timeline({
             targets: [
                 (config?: TweenConfig) => super.openAllWindows(config),
