@@ -1,13 +1,13 @@
 import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { CardData } from "@objects/CardData";
-import { ColorsPointsData } from "@objects/CardsFolderData";
 import { Card } from "@ui/Card/Card";
 import { CardUi } from "@ui/Card/CardUi";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
 import { PositionConfig } from "../Card/animations/types/PositionConfig";
+import { BoardWindow } from "../BoardWindow/BoardWindow";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -180,20 +180,12 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     selectModeOne(events: CardsetEvents): void {
         const selectionsNumber = 1;
-        const colorPoints = {
-            RED: 0,
-            GREEN: 0,
-            BLUE: 0,
-            BLACK: 0,
-            WHITE: 0,
-            ORANGE: 0
-        };
-        this.#selectMode.create(events, selectionsNumber, colorPoints);
+        this.#selectMode.create(events, selectionsNumber);
     }
 
-    selectModeMany(events: CardsetEvents, colorPoints: ColorsPointsData): void {
+    selectModeMany(events: CardsetEvents, board?: BoardWindow): void {
         const selectionsNumber = 0;
-        this.#selectMode.create(events, selectionsNumber, colorPoints);
+        this.#selectMode.create(events, selectionsNumber, board);
     }
 
     #createCards(cardsData: CardData[], faceUp: boolean = false): void {

@@ -205,7 +205,7 @@ export class BoardWindow extends Sizer {
         };
     }
 
-    getZonePoints(boardZone: BoardZonesType): number {
+    getZonePointsByZone(boardZone: BoardZonesType): number {
         if (boardZone === HAND) return this.#getData('numberOfCardsInHand');
         if (boardZone === DECK) return this.#getData('numberOfCardsInDeck');
         if (boardZone === TRASH) return this.#getData('numberOfCardsInTrash');
@@ -213,7 +213,16 @@ export class BoardWindow extends Sizer {
         return 0;
     }
 
-    getColorPoints(cardColor: CardColorsType): number {
+    hasEnoughColorPointsByColor(cardColor: CardColorsType, cost: number): boolean {
+        if (cardColor === RED) return this.#getColorPointsByColor(cardColor) - cost >= 0;
+        if (cardColor === GREEN) return this.#getColorPointsByColor(cardColor) - cost >= 0;
+        if (cardColor === BLUE) return this.#getColorPointsByColor(cardColor) - cost >= 0;
+        if (cardColor === BLACK) return this.#getColorPointsByColor(cardColor) - cost >= 0;
+        if (cardColor === WHITE) return this.#getColorPointsByColor(cardColor) - cost >= 0;
+        return false;
+    }
+
+    #getColorPointsByColor(cardColor: CardColorsType): number {
         if (cardColor === RED) return this.#getData('redPoints');
         if (cardColor === GREEN) return this.#getData('greenPoints');
         if (cardColor === BLUE) return this.#getData('bluePoints');
@@ -236,7 +245,17 @@ export class BoardWindow extends Sizer {
         this.data.set('hp', healthPoints);
     }
 
-    setZonePoints(boardZone: BoardZonesType, value: number): void {
+    addZonePoints(boardZone: BoardZonesType, value: number): void {
+        const lastValue = this.getZonePointsByZone(boardZone);
+        this.#setZonePoints(boardZone, (lastValue + value));
+    }
+
+    removeZonePoints(boardZone: BoardZonesType, value: number): void {
+        const lastValue = this.getZonePointsByZone(boardZone);
+        this.#setZonePoints(boardZone, (lastValue - value));
+    }
+
+    #setZonePoints(boardZone: BoardZonesType, value: number): void {
         const fromTarget = {} as Partial<BoardWindowData>;
         const toTarget = {} as Partial<BoardWindowData>;
         if (boardZone === HAND) {
@@ -262,7 +281,17 @@ export class BoardWindow extends Sizer {
         if (boardZone === WINS) this.data.set('numberOfWins', value);
     }
 
-    setColorPoints(cardColor: CardColorsType, value: number): void {
+    addColorPoints(cardColor: CardColorsType, value: number): void {
+        const lastValue = this.#getColorPointsByColor(cardColor);
+        this.#setColorPoints(cardColor, (lastValue + value));
+    }
+
+    removeColorPoints(cardColor: CardColorsType, value: number): void {
+        const lastValue = this.#getColorPointsByColor(cardColor);
+        this.#setColorPoints(cardColor, (lastValue - value));
+    }
+
+    #setColorPoints(cardColor: CardColorsType, value: number): void {
         const fromTarget = {} as Partial<BoardWindowData>;
         const toTarget = {} as Partial<BoardWindowData>;
         if (cardColor === RED) {

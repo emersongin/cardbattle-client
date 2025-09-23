@@ -20,6 +20,8 @@ import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { ORANGE } from "@/game/constants/colors";
 import { Phase } from "./Phase";
+import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
+import { ColorsPointsData } from "@/game/objects/CardsFolderData";
 
 export type AlignType = 
     | typeof LEFT 
@@ -144,6 +146,15 @@ export class CardBattlePhase implements Phase {
         this.createTextWindowCentered(text, { textAlign: 'center' });
     }
 
+    createHandDisplayWindows(): void {
+        this.createTextWindowTop('Your Hand', {
+            textAlign: 'center',
+        });
+        this.addTextWindow('...', { marginTop: 32 });
+        this.addTextWindow('...');
+        this.addTextWindow('...');
+    }
+
     // COMMAND WINDOW
     createCommandWindowCentered(title: string, options: CommandOption[]): void {
         this.#commandWindow = CommandWindow.createCentered(this.scene, title, options);
@@ -171,23 +182,19 @@ export class CardBattlePhase implements Phase {
     }
 
     addBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        const lastValue = this.#board.getZonePoints(boardZone);
-        this.#board.setZonePoints(boardZone, (lastValue + value));
+        this.#board.addZonePoints(boardZone, value);
     }
 
     removeBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        const lastValue = this.#board.getZonePoints(boardZone);
-        this.#board.setZonePoints(boardZone, (lastValue - value));
+        this.#board.removeZonePoints(boardZone, value);
     }
 
     addBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        const lastValue = this.#board.getColorPoints(cardColor);
-        this.#board.setColorPoints(cardColor, (lastValue + value));
+        this.#board.addColorPoints(cardColor, value);
     }
 
     removeBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        const lastValue = this.#board.getColorPoints(cardColor);
-        this.#board.setColorPoints(cardColor, (lastValue - value));
+        this.#board.removeColorPoints(cardColor, value);
     }
 
     addBoardPass(): void {
@@ -220,23 +227,19 @@ export class CardBattlePhase implements Phase {
     }
 
     addOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        const lastValue = this.#opponentBoard.getZonePoints(boardZone);
-        this.#opponentBoard.setZonePoints(boardZone, (lastValue + value));
+        this.#opponentBoard.addZonePoints(boardZone, value);
     }
 
     removeOpponentBoardZonePoints(boardZone: BoardZonesType, value: number): void {
-        const lastValue = this.#opponentBoard.getZonePoints(boardZone);
-        this.#opponentBoard.setZonePoints(boardZone, (lastValue - value));
+        this.#opponentBoard.removeZonePoints(boardZone, value);
     }
 
     addOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        const lastValue = this.#opponentBoard.getColorPoints(cardColor);
-        this.#opponentBoard.setColorPoints(cardColor, (lastValue + value));
+        this.#opponentBoard.addColorPoints(cardColor, value);
     }
 
     removeOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
-        const lastValue = this.#opponentBoard.getColorPoints(cardColor);
-        this.#opponentBoard.setColorPoints(cardColor, (lastValue - value));
+        this.#opponentBoard.removeColorPoints(cardColor, value);
     }
 
     addOpponentBoardPass(): void {
@@ -301,22 +304,36 @@ export class CardBattlePhase implements Phase {
         this.#closeCardset(cardset, config);
     }
 
-    flipPlayerCardSet(config?: TweenConfig) {
+    flipPlayerCardset(config?: TweenConfig) {
         const cardset = this.getCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#flipCardSet(cardset, config);
     }
 
-    flashPlayerCardSet(config: TweenConfig): void {
+    flashPlayerCardset(config: TweenConfig): void {
         const cardset = this.getCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#flashCardSet(cardset, config);
     }
 
-    movePlayerCardSetToBoard(config: TweenConfig): void {
+    movePlayerCardsetToBoard(config: TweenConfig): void {
         const cardset = this.getCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#moveCardSetToBoard(cardset, config);
+    }
+
+    setSelectModeOnceCardset(events: CardsetEvents): void {
+        const cardset = this.getCardset();
+        if (!cardset) return (events?.onComplete) ? events.onComplete([]) : undefined;
+        this.#setSelectModeOnceCardset(cardset, events);
+    }
+
+    setSelectModeMultCardset(events: CardsetEvents): void {
+        const cardset = this.getCardset();
+        const boardWindow = this.#board;
+        if (!cardset) return (events?.onComplete) ? events.onComplete([]) : undefined;
+        if (!boardWindow) return (events?.onComplete) ? events.onComplete([]) : undefined;
+        this.#setSelectModeMultCardset(cardset, events, boardWindow);
     }
 
     destroyCardset(): void {
@@ -354,19 +371,19 @@ export class CardBattlePhase implements Phase {
         this.#closeCardset(cardset, config);
     }
 
-    flipOpponentCardSet(config?: TweenConfig): void {
+    flipOpponentCardset(config?: TweenConfig): void {
         const cardset = this.getOpponentCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#flipCardSet(cardset, config);
     }
 
-    flashOpponentCardSet(config?: TweenConfig): void {
+    flashOpponentCardset(config?: TweenConfig): void {
         const cardset = this.getOpponentCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#flashCardSet(cardset, config);
     }
 
-    moveOpponentCardSetToBoard(config?: TweenConfig): void {
+    moveOpponentCardsetToBoard(config?: TweenConfig): void {
         const cardset = this.getOpponentCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#moveCardSetToBoard(cardset, config);
@@ -377,8 +394,8 @@ export class CardBattlePhase implements Phase {
     }
 
     // FIELD CARDSET
-    createFieldCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Cardset {
-        this.destroyFieldCardset();
+    createPowerCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Cardset {
+        this.destroyPowerCardset();
         const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
         const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
         const cardset = Cardset.create(this.scene, config.cards, x, y, config.faceUp);
@@ -386,38 +403,38 @@ export class CardBattlePhase implements Phase {
         return cardset;
     }
 
-    getFieldCardset(): Cardset {
+    getPowerCardset(): Cardset {
         return this.#fieldCardset;
     }
 
-    getFieldCardById(cardId: string): Card {
-        return this.getFieldCardset().getCardById(cardId);
+    getCardFromPowerCardsetById(cardId: string): Card {
+        return this.getPowerCardset().getCardById(cardId);
     }
 
-    removeFieldCardById(cardId: string): void {
-        this.getFieldCardset().removeCardById(cardId);
+    removeCardFromPowerCardsetById(cardId: string): void {
+        this.getPowerCardset().removeCardById(cardId);
     }
 
-    openFieldCardset(config?: TweenConfig & { faceUp?: boolean }): void {
-        const cardset = this.getFieldCardset();
+    openPowerCardset(config?: TweenConfig & { faceUp?: boolean }): void {
+        const cardset = this.getPowerCardset();
         if (!cardset || cardset.isOpened()) return (config?.onComplete) ? config.onComplete() : undefined;
         const openConfig = { delay: 100 };
         this.#openCardset(cardset, { ...config, ...openConfig });
     }
 
-    openFieldCardsetCardByIndex(index: number, config?: TweenConfig & { faceUp?: boolean }): void {
-        const cardset = this.getFieldCardset();
+    openCardFromPowerCardsetByIndex(index: number, config?: TweenConfig & { faceUp?: boolean }): void {
+        const cardset = this.getPowerCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#openCardset(cardset, config, index);
     }
 
-    closeFieldCardset(config?: TweenConfig): void {
-        const cardset = this.getFieldCardset();
+    closePowerCardset(config?: TweenConfig): void {
+        const cardset = this.getPowerCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#closeCardset(cardset, config);
     }
 
-    destroyFieldCardset(): void {
+    destroyPowerCardset(): void {
         if (this.#fieldCardset) this.#fieldCardset.destroy();
     }
 
@@ -552,6 +569,14 @@ export class CardBattlePhase implements Phase {
         this.scene.timeline(moveConfig);
     }
 
+    #setSelectModeOnceCardset(cardset: Cardset, events: CardsetEvents): void {
+        cardset.selectModeOne(events);
+    }
+
+    #setSelectModeMultCardset(cardset: Cardset, events: CardsetEvents, boardWindow?: BoardWindow): void {
+        cardset.selectModeMany(events, boardWindow);
+    }
+
     // GENERAL
     async createGameBoard(config?: TweenConfig & { isShowBattlePoints?: boolean }): Promise<void> {
         const board = await this.cardBattle.getBoard(this.scene.room.playerId);
@@ -568,7 +593,7 @@ export class CardBattlePhase implements Phase {
             const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
             promises.push(this.createOpponentBoard(opponentBoardData));
         }
-        if (powerCards) promises.push(this.createFieldCardset({ cards: powerCards }));
+        if (powerCards) promises.push(this.createPowerCardset({ cards: powerCards }));
         if (battleCards) promises.push(this.createCardset(battleCards));
         if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
         await Promise.all(promises);
@@ -580,7 +605,7 @@ export class CardBattlePhase implements Phase {
             targets: [
                 (t?: TweenConfig) => this.openOpponentBoard(t),
                 (t?: TweenConfig) => this.openBoard(t),
-                (t?: TweenConfig) => this.openFieldCardset({ faceUp: true, ...t }),
+                (t?: TweenConfig) => this.openPowerCardset({ faceUp: true, ...t }),
                 (t?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...t }),
                 (t?: TweenConfig) => this.openCardset({ faceUp: true, ...t })
             ],
@@ -595,7 +620,7 @@ export class CardBattlePhase implements Phase {
             targets: [
                 (t?: TweenConfig) => this.closeBoard(t),
                 (t?: TweenConfig) => this.closeOpponentBoard(t),
-                (t?: TweenConfig) => this.closeFieldCardset(t),
+                (t?: TweenConfig) => this.closePowerCardset(t),
                 (t?: TweenConfig) => this.closeCardset(t),
                 (t?: TweenConfig) => this.closeOpponentCardset(t),
             ],
@@ -644,6 +669,6 @@ export class CardBattlePhase implements Phase {
         this.destroyOpponentBoard();
         this.destroyCardset();
         this.destroyOpponentCardset();
-        this.destroyFieldCardset();
+        this.destroyPowerCardset();
     }
 }

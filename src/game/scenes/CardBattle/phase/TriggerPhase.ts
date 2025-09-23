@@ -25,7 +25,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
             this.scene.room.playerId,
             (powerAction: PowerActionData, belongToPlayer: boolean) => {
                 const powerCardId = powerAction.powerCard.id;
-                const powerCard = this.originPhase.getFieldCardById(powerCardId);
+                const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
                 CardActionsBuilder.create(powerCard)
                     .expand()
                     .flash()
@@ -36,7 +36,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
                                 .create(powerCard)
                                 .shrink({ onComplete: async () => {
                                     await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
-                                    this.originPhase.removeFieldCardById(powerCardId);
+                                    this.originPhase.removeCardFromPowerCardsetById(powerCardId);
                                     if (belongToPlayer) {
                                         this.originPhase.addBoardZonePoints(TRASH, 1);
                                     } else {

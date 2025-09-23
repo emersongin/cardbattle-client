@@ -73,15 +73,15 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => {
-                    super.movePlayerCardSetToBoard({ ...t,
+                    super.movePlayerCardsetToBoard({ ...t,
                         onStartEach: () => {
                             this.addBoardZonePoints(HAND, 1);
                             this.removeBoardZonePoints(DECK, 1);
                         },
-                        onComplete: () => super.flipPlayerCardSet(t)
+                        onComplete: () => super.flipPlayerCardset(t)
                     });
                 },
-                (t?: TweenConfig) => super.moveOpponentCardSetToBoard(t),
+                (t?: TweenConfig) => super.moveOpponentCardsetToBoard(t),
             ],
             onAllComplete: () => { 
                 this.#addColorCardToBoards();
@@ -92,11 +92,11 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     #addColorCardToBoards() {
         this.scene.timeline({
             targets: [
-                (t?: TweenConfig) => super.flashPlayerCardSet({ 
+                (t?: TweenConfig) => super.flashPlayerCardset({ 
                     ...t,
                     onStartEach: (card) => this.addBoardColorPoints(card.getColor(), 1),
                 }),
-                (t?: TweenConfig) => super.flashOpponentCardSet({ 
+                (t?: TweenConfig) => super.flashOpponentCardset({ 
                     ...t,
                     onStartEach: (card) => this.addOpponentBoardColorPoints(card.getColor(), 1),
                 })

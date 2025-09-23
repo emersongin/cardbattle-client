@@ -65,7 +65,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             targets: [
                 (config?: TweenConfig) => super.closeOpponentBoard(config),
                 (config?: TweenConfig) => super.closeBoard(config),
-                (config?: TweenConfig) => super.closeFieldCardset(config)
+                (config?: TweenConfig) => super.closePowerCardset(config)
             ],
             onAllComplete: () => this.#createHandZone(),
         });
@@ -134,21 +134,8 @@ export abstract class PowerPhase extends CardBattlePhase {
         });
     }
 
-    #createHandZone(): void {
-        this.#createHandDisplayWindows();
-        this.#createHandCardset();
-    }
-
-    #createHandDisplayWindows(): void {
-        super.createTextWindowTop('Your Hand', {
-            textAlign: 'center',
-        });
-        super.addTextWindow('...', { marginTop: 32 });
-        super.addTextWindow('...');
-        super.addTextWindow('...');
-    }
-
-    async #createHandCardset(): Promise<void> {
+    async #createHandZone(): Promise<void> {
+        super.createHandDisplayWindows();
         const cards: CardData[] = await this.cardBattle.getCardsFromHandInTheLoadPhase(this.scene.room.playerId);
         super.createHandCardset(cards);
         this.#openHandCardset();
@@ -236,7 +223,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     async playPowerCard(powerCard: CardData, onComplete: () => void): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
         const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
-        const cardset = super.createFieldCardset({
+        const cardset = super.createPowerCardset({
             cards: [...powerCardsFiltered, powerCard], 
             faceUp: true
         });
@@ -245,7 +232,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         const lastIndex = cardset.getCardsLastIndex();
         cardset.setCardAtPosition(lastIndex, widthEdge);
         cardset.setCardClosedByIndex(lastIndex);
-        super.openFieldCardsetCardByIndex(lastIndex, {
+        super.openCardFromPowerCardsetByIndex(lastIndex, {
             faceUp: true,
             onComplete: () => {
                 const card = cardset.getCardByIndex(lastIndex);
@@ -278,7 +265,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     //                 super.closeAllWindows();
     //                 super.closeOpponentBoard();
     //                 super.closeBoard();
-    //                 super.closeFieldCardset({ onComplete: () => this.#createHandZone() });
+    //                 super.closePowerCardset({ onComplete: () => this.#createHandZone() });
     //             }
     //         }
     //     ]);
@@ -288,7 +275,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     loadPlayAndMovePowerCardToField(): void {
         super.closeAllWindows();
-        const cardset = super.getFieldCardset();
+        const cardset = super.getPowerCardset();
         const lastIndex = cardset.getCardsLastIndex();
         const card = cardset.getCardByIndex(lastIndex);
         cardset.removeAllSelectCardById(card.getId());
@@ -296,9 +283,9 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     #movePowerCardToField(): void {
-        const totalCards = this.getFieldCardset().getCardsTotal();
+        const totalCards = this.getPowerCardset().getCardsTotal();
         const moveConfig = {
-            targets: this.getFieldCardset().getCardsUi(),
+            targets: this.getPowerCardset().getCardsUi(),
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
                 pause();
                 CardActionsBuilder
