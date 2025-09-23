@@ -1,9 +1,6 @@
-import { ORANGE } from "@/game/constants/colors";
-import { CardColorsType } from "@/game/types/CardColorsType";
 import { Card } from "@ui/Card/Card";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
-import { BoardWindow } from "../BoardWindow/BoardWindow";
 
 export class SelectMode {
     #events: CardsetEvents;
@@ -11,13 +8,11 @@ export class SelectMode {
     #selectionsNumber: number;
     #selectIds: string[] = [];
     #disabledIds: string[] = [];
-    #board: BoardWindow | null;
 
     constructor(readonly cardset: Cardset) {}
 
-    create(events: CardsetEvents, selectionsNumber: number = 0, board?: BoardWindow): void {
+    create(events: CardsetEvents, selectionsNumber: number = 0): void {
         this.#events = events;
-        this.#board = board ?? null;
         this.#index = 0;
         this.#selectionsNumber = selectionsNumber;
         this.#addDisabledCards();
@@ -202,13 +197,6 @@ export class SelectMode {
     }
 
     #debitPointsById(cardId: string): void {
-        const card = this.#getCardById(cardId);
-        const cardColor = card.getColor() as CardColorsType;
-        const cardCost = card.getCost();
-        if (cardColor === ORANGE) return;
-        if (this.#board && this.#board.hasEnoughColorPointsByColor(cardColor, cardCost)) {
-            this.#board.removeColorPoints(cardColor, cardCost);
-        }
         if (this.#events.onDebitPoint) this.#events.onDebitPoint(cardId);
     }
 
@@ -222,11 +210,6 @@ export class SelectMode {
     }
 
     #creditPointsById(cardId: string): void {
-        const card = this.#getCardById(cardId);
-        const cardColor = card.getColor() as CardColorsType;
-        const cardCost = card.getCost();
-        if (cardColor === ORANGE) return;
-        if (this.#board && cardCost > 0) this.#board.addColorPoints(cardColor, cardCost);
         if (this.#events.onCreditPoint) this.#events.onCreditPoint(cardId);
     }
 
@@ -247,11 +230,8 @@ export class SelectMode {
     }
 
     #notHaveEnoughPoints(cardId: string): boolean {
-        const card = this.#getCardById(cardId);
-        const cardColor = card.getColor();
-        const cardCost = card.getCost();
-        if (this.#board) {
-            return this.#board.hasEnoughColorPointsByColor(cardColor, cardCost) === false;
+        if (this.#events.onHasEnoughColorPointsByColor) {
+            return this.#events.onHasEnoughColorPointsByColor(cardId) === false;
         }
         return false;
     }

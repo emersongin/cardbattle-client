@@ -176,6 +176,10 @@ export class CardBattlePhase implements Phase {
         this.#board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
     }
 
+    getBoard(): BoardWindow {
+        return this.#board;
+    }
+
     setBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
         this.#board.setBattlePointsWithDuration(config[AP], config[HP], config.onComplete);
     }
@@ -196,7 +200,7 @@ export class CardBattlePhase implements Phase {
         this.#board.removeColorPoints(cardColor, value);
     }
 
-    addBoardPass(): void {
+    setBoardPass(): void {
         this.#board.setPass(true);
     }
 
@@ -329,10 +333,8 @@ export class CardBattlePhase implements Phase {
 
     setSelectModeMultCardset(events: CardsetEvents): void {
         const cardset = this.getCardset();
-        const boardWindow = this.#board;
         if (!cardset) return (events?.onComplete) ? events.onComplete([]) : undefined;
-        if (!boardWindow) return (events?.onComplete) ? events.onComplete([]) : undefined;
-        this.#setSelectModeMultCardset(cardset, events, boardWindow);
+        this.#setSelectModeMultCardset(cardset, events);
     }
 
     destroyCardset(): void {
@@ -572,8 +574,8 @@ export class CardBattlePhase implements Phase {
         cardset.selectModeOne(events);
     }
 
-    #setSelectModeMultCardset(cardset: Cardset, events: CardsetEvents, boardWindow?: BoardWindow): void {
-        cardset.selectModeMany(events, boardWindow);
+    #setSelectModeMultCardset(cardset: Cardset, events: CardsetEvents): void {
+        cardset.selectModeMany(events);
     }
 
     // GENERAL

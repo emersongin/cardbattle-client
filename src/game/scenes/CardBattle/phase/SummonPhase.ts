@@ -4,6 +4,8 @@ import { CardData } from "@/game/objects/CardData";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
+import { ORANGE } from "@/game/constants/colors";
+import { CardColorsType } from "@/game/types/CardColorsType";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -33,6 +35,27 @@ export class SummonPhase extends CardBattlePhase implements Phase {
             ],
             onAllComplete: () => {
                 super.setSelectModeMultCardset({
+                    onHasEnoughColorPointsByColor: (cardId: string) => {
+                        const card = super.getCardset().getCardById(cardId);
+                        const cardColor = card.getColor();
+                        const cardCost = card.getCost();
+                        if (cardColor === ORANGE) return true;
+                        return super.getBoard().hasEnoughColorPointsByColor(cardColor, cardCost);
+                    },
+                    onCreditPoint: (cardId: string) => {
+                        const card = super.getCardset().getCardById(cardId);
+                        const cardColor = card.getColor() as CardColorsType;
+                        const cardCost = card.getCost();
+                        if (cardColor === ORANGE) return;
+                        if (cardCost > 0) super.getBoard().addColorPoints(cardColor, cardCost);
+                    },
+                    onDebitPoint: (cardId: string) => {
+                        const card = super.getCardset().getCardById(cardId);
+                        const cardColor = card.getColor() as CardColorsType;
+                        const cardCost = card.getCost();
+                        if (cardColor === ORANGE) return;
+                        if (cardCost > 0) super.getBoard().removeColorPoints(cardColor, cardCost);
+                    },
                     onChangeIndex: (cardId: string) => this.#onChangeHandCardsetIndex(cardId),
                     onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
                 });

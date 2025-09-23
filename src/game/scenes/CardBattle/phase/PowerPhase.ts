@@ -30,8 +30,10 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #goPlay(): Promise<void> {
-        await this.#resetPlay();
-        await this.#createCommandWindow();
+        await Promise.all([
+            this.#resetPlay(),
+            this.#createCommandWindow()
+        ]);
         super.openCommandWindow()
     }
 
@@ -49,26 +51,21 @@ export abstract class PowerPhase extends CardBattlePhase {
                 {
                     description: 'Yes',
                     disabled: !await this.cardBattle.hasPowerCardInHand(this.scene.room.playerId),
-                    onSelect: () => super.closeGameBoard({ onComplete: () => this.#createHandZone() })
+                    onSelect: () => {
+                        super.closeGameBoard({ 
+                            onComplete: () => this.#createHandZone() 
+                        });
+                    }
                 },
                 {
                     description: 'No',
-                    onSelect: () => this.#onPassPlay()
+                    onSelect: async () => {
+                        await this.cardBattle.pass(this.scene.room.playerId);
+                        super.setBoardPass();
+                        this.#nextPlay();
+                    }
                 }
             ]);
-            resolve();
-        });
-    }
-
-    async #onPassPlay(): Promise<void> {
-        await this.#passPlay();
-        this.#nextPlay();
-    }
-
-    #passPlay(): Promise<void> {
-        return new Promise<void>(async (resolve) => {
-            await this.cardBattle.pass(this.scene.room.playerId);
-            super.addBoardPass();
             resolve();
         });
     }
@@ -90,38 +87,33 @@ export abstract class PowerPhase extends CardBattlePhase {
             this.#goPlay();
             return;
         }
-        super.createWaitingWindow('Waiting for opponent to play...');
-        super.openAllWindows({
-            onComplete: async () => {
-                await this.cardBattle.listenOpponentPlay(
-                    this.scene.room.playerId, 
-                    (opponentPlay: PowerCardPlayData) => this.#loadOpponentPlay(
-                            opponentPlay.pass, 
-                            opponentPlay.powerAction?.powerCard
-                        )
-                );
-            }
-        });
+        this.#listanOpponentPlay();
     }
 
-    async #loadOpponentPlay(pass: boolean, powerCard?: CardData): Promise<void> {
-        super.closeAllWindows({ 
-            onComplete: async () => {
-                super.addOpponentBoardPass();
-                if (pass) {
-                    this.#nextPlay();
-                    return;
-                }
-                if (!await this.cardBattle.isPowerfieldLimitReached()) {
-                    await this.#resetPlay();
-                }
-                if (!pass && powerCard) {
-                    this.#playPowerCard(powerCard, () => {
-                        this.removeOpponentBoardZonePoints(HAND, 1);
-                        this.#loadPlayAndMovePowerCardToField();
-                    });
-                }
-        }})
+    #listanOpponentPlay() {
+        super.createWaitingWindow('Waiting for opponent to play...');
+        const onLoadPlay = async (opponentPlay: PowerCardPlayData) => {
+            const { pass, powerAction } = opponentPlay;
+            super.addOpponentBoardPass();
+            if (pass) {
+                super.closeAllWindows({ onComplete: () => this.#nextPlay() });
+                return;
+            }
+            if (await this.cardBattle.isPowerfieldLimitReached() === false) {
+                await this.#resetPlay();
+            }
+            if (powerAction?.powerCard) {
+                this.#playPowerCard(powerAction.powerCard, () => {
+                    this.removeOpponentBoardZonePoints(HAND, 1);
+                    this.#loadPlayAndMovePowerCardToField();
+                });
+            }
+        };
+        super.openAllWindows({
+            onComplete: () => {
+                this.cardBattle.listenOpponentPlay(this.scene.room.playerId, onLoadPlay);
+            }
+        });
     }
 
     async #createHandZone(): Promise<void> {
@@ -139,7 +131,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                 (config?: TweenConfig) => super.openCardset({ ...config, faceUp: true }),
             ],
             onAllComplete: () => {
-                super.setSelectModeMultCardset({
+                super.setSelectModeOnceCardset({
                     onChangeIndex: (cardId: string) => this.#onChangeHandCardsetIndex(cardId),
                     onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
                     onLeave: () => this.#onLeaveHand(),
@@ -199,7 +191,8 @@ export abstract class PowerPhase extends CardBattlePhase {
             // action:{} config...
         }
         await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
-        await this.#passPlay();
+        await this.cardBattle.pass(this.scene.room.playerId);
+        super.setBoardPass();
         if (!await this.cardBattle.isPowerfieldLimitReached()) {
             super.removeOpponentBoardPass();
         }

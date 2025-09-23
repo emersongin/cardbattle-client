@@ -7,7 +7,6 @@ import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
 import { PositionConfig } from "../Card/animations/types/PositionConfig";
-import { BoardWindow } from "../BoardWindow/BoardWindow";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -183,9 +182,9 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode.create(events, selectionsNumber);
     }
 
-    selectModeMany(events: CardsetEvents, board?: BoardWindow): void {
+    selectModeMany(events: CardsetEvents): void {
         const selectionsNumber = 0;
-        this.#selectMode.create(events, selectionsNumber, board);
+        this.#selectMode.create(events, selectionsNumber);
     }
 
     #createCards(cardsData: CardData[], faceUp: boolean = false): void {
