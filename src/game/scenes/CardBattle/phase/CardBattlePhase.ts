@@ -579,7 +579,10 @@ export class CardBattlePhase implements Phase {
     }
 
     // GENERAL
-    async createGameBoard(config?: TweenConfig & { isShowBattlePoints?: boolean }): Promise<void> {
+    async createGameBoard(config?: TweenConfig & { 
+        isShowBattlePoints?: boolean, 
+        isNotCreatePowerCards?: boolean 
+    }): Promise<void> {
         const board = await this.cardBattle.getBoard(this.scene.room.playerId);
         const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
@@ -594,7 +597,7 @@ export class CardBattlePhase implements Phase {
             const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
             promises.push(this.createOpponentBoard(opponentBoardData));
         }
-        if (powerCards) promises.push(this.createPowerCardset({ cards: powerCards }));
+        if (!config?.isNotCreatePowerCards && powerCards) promises.push(this.createPowerCardset({ cards: powerCards }));
         if (battleCards) promises.push(this.createCardset(battleCards));
         if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
         await Promise.all(promises);

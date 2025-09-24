@@ -159,7 +159,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                 (config?: TweenConfig) => super.closeCardset(config),
             ],
             onAllComplete: async () => {
-                await super.createGameBoard();
+                await super.createGameBoard({ isNotCreatePowerCards: true });
                 super.openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
             },
         });
