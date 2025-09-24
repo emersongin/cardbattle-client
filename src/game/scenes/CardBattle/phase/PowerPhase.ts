@@ -18,7 +18,6 @@ export abstract class PowerPhase extends CardBattlePhase {
             this.resumePhase();
             return;
         }
-        await super.createGameBoard();
         this.startPhase();
     }
 
@@ -54,7 +53,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                     disabled: !await this.cardBattle.hasPowerCardInHand(this.scene.room.playerId),
                     onSelect: () => {
                         super.closeGameBoard({ 
-                            onComplete: () => this.#createHandZone() 
+                            onComplete: () => this.createHandZone() 
                         });
                     }
                 },
@@ -69,6 +68,18 @@ export abstract class PowerPhase extends CardBattlePhase {
             ]);
             resolve();
         });
+    }
+
+    openHandZone(): void {
+        const onComplete = () => {
+            super.openAllWindows();
+            super.setSelectModeOnceCardset({
+                onChangeIndex: (card: Card) => this.#onChangeCardsetIndex(card),
+                onComplete: (cardIds: string[]) => this.#onSelectCardFromCardset(cardIds),
+                onLeave: () => this.#onLeaveHandZone(),
+            });
+        }
+        super.openHandZone({ onComplete });
     }
 
     async #nextPlay(): Promise<void> {
@@ -118,37 +129,13 @@ export abstract class PowerPhase extends CardBattlePhase {
         }
     }
 
-    async #createHandZone(): Promise<void> {
-        super.createHandDisplayWindows();
-        const cards: CardData[] = await this.cardBattle.getCardsFromHandInTheLoadPhase(this.scene.room.playerId);
-        super.createHandCardset(cards);
-        this.#openHandZone();
-    }
-
-    #openHandZone(): void {
-        this.scene.timeline({
-            targets: [
-                (config?: TweenConfig) => super.openBoard(config),
-                (config?: TweenConfig) => super.openCardset({ ...config, faceUp: true }),
-            ],
-            onAllComplete: () => {
-                super.openAllWindows();
-                super.setSelectModeOnceCardset({
-                    onChangeIndex: (card: Card) => this.#onChangeHandCardsetIndex(card),
-                    onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
-                    onLeave: () => this.#onLeaveHand(),
-                });
-            },
-        });
-    }
-
-    #onChangeHandCardsetIndex(card: Card): void {
+    #onChangeCardsetIndex(card: Card): void {
         super.setTextWindowText(card.getName(), 1);
         super.setTextWindowText(card.getDescription(), 2);
         super.setTextWindowText(card.getDetails(), 3);
     }
 
-    #onSelectHandCardsetCard(cardIds: string[]): void {
+    #onSelectCardFromCardset(cardIds: string[]): void {
         const cardset = super.getCardset();
         cardset.highlightCardsByIndexes(cardIds);
         super.createCommandWindowBottom('Complete your choice?', [
@@ -171,8 +158,9 @@ export abstract class PowerPhase extends CardBattlePhase {
                 (config?: TweenConfig) => super.closeBoard(config),
                 (config?: TweenConfig) => super.closeCardset(config),
             ],
-            onAllComplete: () => {
-                this.openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
+            onAllComplete: async () => {
+                await super.createGameBoard();
+                super.openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
             },
         });
     }
@@ -180,36 +168,8 @@ export abstract class PowerPhase extends CardBattlePhase {
     async #loadPowerCardAction(cardId: string): Promise<void> {
         const powerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
         this.#playPowerCard(powerCard, () => {
-            this.removeBoardZonePoints(HAND, 1);
+            super.removeBoardZonePoints(HAND, 1);
             this.#onSetPowerCardAction(powerCard);
-        });
-    }
-
-    async #onSetPowerCardAction(powerCard: CardData): Promise<void> {
-        console.log('Set power card play!');
-        const powerAction = {
-            powerCard,
-            // action:{} config...
-        }
-        await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
-        await this.cardBattle.pass(this.scene.room.playerId);
-        super.setBoardPass();
-        if (!await this.cardBattle.isPowerfieldLimitReached()) {
-            super.removeOpponentBoardPass();
-        }
-        this.#loadPlayAndMovePowerCardToField();
-    }
-
-    #onLeaveHand(): void {
-        this.scene.timeline({
-            targets: [
-                (config?: TweenConfig) => super.closeAllWindows(config),
-                (config?: TweenConfig) => super.closeBoard(config),
-                (config?: TweenConfig) => super.closeCardset(config),
-            ],
-            onAllComplete: () => {
-                this.openGameBoard({ onComplete: () => this.#goPlay() });
-            },
         });
     }
 
@@ -236,7 +196,22 @@ export abstract class PowerPhase extends CardBattlePhase {
         });
     }
 
-    // comportamento de selecção yes ou no, poder ter outros como selecioanr outros cartões do jogo
+    async #onSetPowerCardAction(powerCard: CardData): Promise<void> {
+        console.log('Set power card play!');
+        const powerAction = {
+            powerCard,
+            // action:{} config...
+        }
+        await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
+        await this.cardBattle.pass(this.scene.room.playerId);
+        super.setBoardPass();
+        if (!await this.cardBattle.isPowerfieldLimitReached()) {
+            super.removeOpponentBoardPass();
+        }
+        this.#loadPlayAndMovePowerCardToField();
+    }
+
+        // comportamento de selecção yes ou no, poder ter outros como selecioanr outros cartões do jogo
     // #createPowerCardWindows(powerCard: CardData): void {
     //     super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
     //     super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
@@ -297,6 +272,21 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.scene.timeline(moveConfig);
     }
 
+    #onLeaveHandZone(): void {
+        this.scene.timeline({
+            targets: [
+                (config?: TweenConfig) => super.closeAllWindows(config),
+                (config?: TweenConfig) => super.closeBoard(config),
+                (config?: TweenConfig) => super.closeCardset(config),
+            ],
+            onAllComplete: async () => {
+                await super.createGameBoard();
+                super.openGameBoard({ onComplete: () => this.#goPlay() });
+            },
+        });
+    }
+
     abstract startPhase(): void;
     abstract changeTo(): void;
+    abstract createHandZone(): void;
 }

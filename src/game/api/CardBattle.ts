@@ -52,4 +52,5 @@ export interface CardBattle {
     getOpponentBattleCards: (playerId: string) => Promise<CardData[]>;
     getBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
     getOpponentBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
+    getCardsFromHandInTheCompilePhase: (playerId: string) => Promise<CardData[]>;
 }

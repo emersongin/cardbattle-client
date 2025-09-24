@@ -6,8 +6,8 @@ export class SelectMode {
     #events: CardsetEvents;
     #index: number;
     #selectionsNumber: number;
-    #selectIds: string[] = [];
-    #disabledIds: string[] = [];
+    #selectIds: string[];
+    #disabledIds: string[];
 
     constructor(readonly cardset: Cardset) {}
 
@@ -15,6 +15,8 @@ export class SelectMode {
         this.#events = events;
         this.#index = 0;
         this.#selectionsNumber = selectionsNumber;
+        this.#selectIds = [];
+        this.#disabledIds = [];
         this.#addDisabledCards();
         this.enable();
     }

@@ -338,7 +338,7 @@ export class CardBattlePhase implements Phase {
     }
 
     destroyCardset(): void {
-        if (this.#cardset) this.#cardset.destroy();
+        if (this.#cardset) this.#cardset.destroy(true);
     }
 
     // OPPONENT CARDSET
@@ -630,6 +630,19 @@ export class CardBattlePhase implements Phase {
             },
         });
     }
+
+    openHandZone(config?: TweenConfig): void {
+        this.scene.timeline({
+            targets: [
+                (config?: TweenConfig) => this.openBoard(config),
+                (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
+            ],
+            onAllComplete: () => {
+                if (config?.onComplete) config.onComplete();
+            },
+        });
+    }
+
 
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");

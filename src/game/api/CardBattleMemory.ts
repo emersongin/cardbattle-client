@@ -206,7 +206,7 @@ const powerCards = [
 
 const cardsMock = [
     ...battleCards, 
-    // ...powerCards
+    ...powerCards
 ];
 const redDeck = createDeck(cardsMock, 40);
 const greenDeck = createDeck(cardsMock, 40);
@@ -1259,6 +1259,25 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isOpponent(playerId)) {
                     resolve({ [AP]: this.#playerBoard[AP], [HP]: this.#playerBoard[HP] });
                 }
+            }, delayMock);
+        });
+    }
+
+    getCardsFromHandInTheCompilePhase(playerId: string): Promise<CardData[]> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                if (this.#isPlayer(playerId)) {
+                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
+                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
+                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                };
+                if (this.#isOpponent(playerId)) {
+                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
+                    const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
+                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
+                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                };
             }, delayMock);
         });
     }
