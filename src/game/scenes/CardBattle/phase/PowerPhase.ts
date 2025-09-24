@@ -93,28 +93,29 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #listanOpponentPlay() {
         super.createWaitingWindow('Waiting for opponent to play...');
-        const onLoadPlay = async (opponentPlay: PowerCardPlayData) => {
-            const { pass, powerAction } = opponentPlay;
-            super.addOpponentBoardPass();
-            if (pass) {
-                super.closeAllWindows({ onComplete: () => this.#nextPlay() });
-                return;
-            }
-            if (await this.cardBattle.isPowerfieldLimitReached() === false) {
-                await this.#resetPlay();
-            }
-            if (powerAction?.powerCard) {
-                this.#playPowerCard(powerAction.powerCard, () => {
-                    this.removeOpponentBoardZonePoints(HAND, 1);
-                    this.#loadPlayAndMovePowerCardToField();
-                });
-            }
-        };
         super.openAllWindows({
             onComplete: () => {
-                this.cardBattle.listenOpponentPlay(this.scene.room.playerId, onLoadPlay);
+                this.cardBattle.listenOpponentPlay(this.scene.room.playerId, (opponentPlay: PowerCardPlayData) => this.#onListening(opponentPlay));
             }
         });
+    }
+
+    async #onListening(opponentPlay: PowerCardPlayData): Promise<void> {
+        const { pass, powerAction } = opponentPlay;
+        super.addOpponentBoardPass();
+        if (pass) {
+            super.closeAllWindows({ onComplete: () => this.#nextPlay() });
+            return;
+        }
+        if (await this.cardBattle.isPowerfieldLimitReached() === false) {
+            await this.#resetPlay();
+        }
+        if (powerAction?.powerCard) {
+            this.#playPowerCard(powerAction.powerCard, () => {
+                this.removeOpponentBoardZonePoints(HAND, 1);
+                this.#loadPlayAndMovePowerCardToField();
+            });
+        }
     }
 
     async #createHandZone(): Promise<void> {

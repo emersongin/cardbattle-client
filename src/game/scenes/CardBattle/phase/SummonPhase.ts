@@ -40,7 +40,11 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                     onHasEnoughColorPointsByColor: (card: Card) => this.#onHasEnoughColorPointsByColor(card),
                     onCreditPoint: (card: Card) => this.#onCreditPoint(card),
                     onDebitPoint: (card: Card) => this.#onDebitPoint(card),
-                    onComplete: (cardIds: string[]) => this.#onSelectHandCardsetCard(cardIds),
+                    onComplete: (cardIds: string[]) => {
+                        super.getCardset().highlightCardsByIndexes(cardIds);
+                        this.#createCommandWindow(cardIds);
+                        super.openCommandWindow();
+                    },
                 });
             },
         });
@@ -73,52 +77,53 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         if (cardCost > 0) super.getBoard().removeColorPoints(cardColor, cardCost);
     }
 
-    #onSelectHandCardsetCard(cardIds: string[]): void {
+    #createCommandWindow(cardIds: string[]): void {
         const cardset = super.getCardset();
-        cardset.highlightCardsByIndexes(cardIds);
         super.createCommandWindowBottom('Put in field?', [
             {
                 description: 'Yes',
-                onSelect: () => {
-                    super.closeAllWindows();
-                    super.closeBoard();
-                    super.closeCardset({
-                        onComplete: async () => {
-                            await this.cardBattle.setBattleCards(this.scene.room.playerId, cardIds);
-                            if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.room.playerId)) {
-                                this.#createGameBoard();
-                                return;
-                            }
-                            super.createWaitingWindow('Waiting for opponent to set battle cards...');
-                            super.openAllWindows({
-                                onComplete: async () => {
-                                    await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, async () => {
-                                        super.closeAllWindows({ onComplete: () => this.#createGameBoard() });
-                                    });
-                                }
-                            });
-                        }
-                    });
-
-                }
+                onSelect: () => this.#onYes(cardIds)
             },
             {
                 description: 'No',
                 onSelect: () => cardset.restoreSelectMode()
             },
         ]);
-        super.openCommandWindow();
+    }
+
+    #onYes(cardIds: string[]): void {
+        this.scene.timeline({
+            targets: [
+                (config?: TweenConfig) => super.closeAllWindows(config),
+                (config?: TweenConfig) => super.closeBoard(config),
+                (config?: TweenConfig) => super.closeCardset(config),
+            ],
+            onAllComplete: async () => {
+                await this.cardBattle.setBattleCards(this.scene.room.playerId, cardIds);
+                if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.room.playerId)) {
+                    this.#createGameBoard();
+                    return;
+                }
+                super.createWaitingWindow('Waiting for opponent to set battle cards...');
+                super.openAllWindows({
+                    onComplete: async () => {
+                        const ON = async () => {
+                            super.closeAllWindows({ onComplete: () => this.#createGameBoard() });
+                        };
+                        await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, ON);
+                    }
+                });
+            },
+        });
     }
 
     async #createGameBoard(): Promise<void> {
-        super.createGameBoard({
+        super.createGameBoard({ 
             isShowBattlePoints: false,
             onComplete: () => {
-                super.openGameBoard({
+                super.openGameBoard({ 
                     isOpponentCardsetOpen: false,
-                    onComplete: () => {
-                        super.flipOpponentCardset({ onComplete: () => this.#loadBattlePoints() });
-                    }
+                    onComplete: () => super.flipOpponentCardset({ onComplete: () => this.#loadBattlePoints() })
                 });
             }
         });
@@ -127,10 +132,6 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     async #loadBattlePoints(): Promise<void> {
         const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.room.playerId);
         const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.room.playerId);
-
-console.log('battlePoints', battlePoints);
-console.log('opponentBattlePoints', opponentBattlePoints);
-
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),
@@ -150,9 +151,7 @@ console.log('opponentBattlePoints', opponentBattlePoints);
                 throw new Error('Keyboard input is not available in this scene.');
             }
             keyboard.removeAllListeners();
-            this.closeGameBoard({
-                onComplete: () => this.changeToCompilePhase(),
-            });
+            super.closeGameBoard({ onComplete: () => this.changeToCompilePhase() });
         };
         keyboard.once('keydown-ENTER', onKeyDown, this);
     }

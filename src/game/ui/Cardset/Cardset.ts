@@ -142,6 +142,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     highlightCardsByIndexes(cardIds: string[]): void {
         this.getCards().forEach((card: Card) => {
             if (cardIds.includes(card.getId())) {
+                this.bringToTop(card.getUi());
                 card.highlight();
             }
         });
