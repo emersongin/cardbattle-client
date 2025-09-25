@@ -132,8 +132,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 (t?: TweenConfig) => super.setOpponentBoardBattlePointsWithDuration({ ...t, ...opponentBattlePoints }),
             ],
             onAllComplete: () => {
-                this.scene.addListerOnKeydownEnterOnce({
-                    onComplete: async () => {
+                this.scene.addKeyEnterListeningOnce({
+                    onTrigger: async () => {
                         await super.closeGameBoard();
                         this.changeToCompilePhase();
                     }

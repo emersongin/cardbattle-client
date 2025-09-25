@@ -1,13 +1,14 @@
 import { Sizer, Label } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { DisplayUtil } from '@utils/DisplayUtil';
+import { VueScene } from '@/game/scenes/VueScene';
 
 export class CommandWindow extends Sizer {
     private selectedIndex: number = 0;
     private options: Label[];
 
     private constructor(
-        readonly scene: Phaser.Scene,
+        readonly scene: VueScene,
         x: number,
         y: number,
         width: number,
@@ -34,7 +35,7 @@ export class CommandWindow extends Sizer {
         scene.add.existing(this);
     }
 
-    static createBottom(scene: Phaser.Scene, title: string, commands: CommandOption[]) {
+    static createBottom(scene: VueScene, title: string, commands: CommandOption[]) {
         const width = scene.scale.width;
         const height = DisplayUtil.column3of12(scene.scale.height);
         const x = width / 2;
@@ -42,7 +43,7 @@ export class CommandWindow extends Sizer {
         return new CommandWindow(scene, x, y, width, height, title, commands);
     }
 
-    static createCentered(scene: Phaser.Scene, title: string, commands: CommandOption[]) {
+    static createCentered(scene: VueScene, title: string, commands: CommandOption[]) {
         const width = scene.scale.width;
         const height = DisplayUtil.column3of12(scene.scale.height);
         const x = width / 2;
@@ -105,28 +106,15 @@ export class CommandWindow extends Sizer {
     }
 
     #setupKeyboardControls() {
-        const keyboard = this.scene.input.keyboard;
-        if (!keyboard) {
-            throw new Error('Keyboard input not available');
-        }
-
-        keyboard.on('keydown-UP', () => {
-            this.#select(this.selectedIndex - 1);
-        });
-
-        keyboard.on('keydown-DOWN', () => {
-            this.#select(this.selectedIndex + 1);
-        });
-
-        keyboard.on('keydown-ENTER', () => {
-            if (!keyboard) {
-                throw new Error('Keyboard input not available');
+        this.scene.addKeyUpListening({ onTrigger: () => this.#select(this.selectedIndex - 1) });
+        this.scene.addKeyDownListening({ onTrigger: () => this.#select(this.selectedIndex + 1) });
+        this.scene.addKeyEnterListeningOnce({ 
+            onTrigger: () => {
+                if (this.commands[this.selectedIndex].disabled) {
+                    return console.log('Sound disabled command');
+                }
+                this.close(this.commands[this.selectedIndex].onSelect);
             }
-            if (this.commands[this.selectedIndex].disabled) {
-                return console.log('Sound disabled command');
-            }
-            keyboard.removeAllListeners();
-            this.close(this.commands[this.selectedIndex].onSelect);
         });
     }
 

@@ -1,4 +1,3 @@
-import { Scene } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { CardData } from "@objects/CardData";
 import { Card } from "@ui/Card/Card";
@@ -7,6 +6,7 @@ import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
 import { PositionConfig } from "../Card/animations/types/PositionConfig";
+import { VueScene } from "@/game/scenes/VueScene";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -14,7 +14,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     #selectMode: SelectMode;
 
     constructor(
-        readonly scene: Scene, 
+        readonly scene: VueScene, 
         readonly cards: CardData[],
         x: number = 0,
         y: number = 0,
@@ -30,7 +30,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     static create(
-        scene: Scene,
+        scene: VueScene,
         cards: CardData[],
         x: number = 0,
         y: number = 0,

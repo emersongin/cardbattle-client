@@ -2,13 +2,14 @@ import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { TweenConfig } from '@game/types/TweenConfig';
 import { DisplayUtil } from '@utils/DisplayUtil';
 import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
+import { VueScene } from '@/game/scenes/VueScene';
 
 export class TextWindow extends TextBox {
     #onStartClose?: () => void;
     #onClose?: () => void;
 
     private constructor(
-        readonly scene: Phaser.Scene, 
+        readonly scene: VueScene, 
         config: TextWindowConfig
     ) {
         super(scene, {
@@ -46,7 +47,7 @@ export class TextWindow extends TextBox {
         if (onClose) this.#onClose = onClose;
     }
 
-    static createTop(scene: Phaser.Scene, config: Partial<TextWindowConfig>) {
+    static createTop(scene: VueScene, config: Partial<TextWindowConfig>) {
         const { relativeParent } = config;
         const x = scene.cameras.main.centerX;
         let y = DisplayUtil.column1of12(scene.scale.height);
@@ -59,7 +60,7 @@ export class TextWindow extends TextBox {
         return new TextWindow(scene, { ...config, text, x, y, width, height });
     }
 
-    static createCentered(scene: Phaser.Scene, config: Partial<TextWindowConfig>) {
+    static createCentered(scene: VueScene, config: Partial<TextWindowConfig>) {
         const { relativeParent } = config;
         const x = scene.cameras.main.centerX;
         let y = scene.cameras.main.centerY;
@@ -105,18 +106,11 @@ export class TextWindow extends TextBox {
     }
 
     #addOnCompletedListener() {
-        const keyboard = this.scene.input.keyboard;
-        if (!keyboard) {
-            throw new Error('Keyboard input is not available in this scene.');
-        }
-        const onKeyDown = () => {
-            if (!keyboard) {
-                throw new Error('Keyboard input is not available in this scene.');
+        this.scene.addKeyEnterListeningOnce({
+            onTrigger: () => {
+                if (this.#onStartClose) this.#onStartClose();
+                this.close({ onComplete: this.#onClose });
             }
-            keyboard.removeAllListeners();
-            this.close({ onComplete: this.#onClose });
-            if (this.#onStartClose) this.#onStartClose();
-        };
-        keyboard.once('keydown-ENTER', onKeyDown, this);
+        });
     }
 }

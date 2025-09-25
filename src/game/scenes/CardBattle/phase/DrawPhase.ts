@@ -107,8 +107,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 })
             ],
             onAllComplete: () => {
-                this.scene.addListerOnKeydownEnterOnce({
-                    onComplete: async () => {
+                this.scene.addKeyEnterListeningOnce({
+                    onTrigger: async () => {
                         await super.closeGameBoard();
                         this.changeToLoadPhase();
                     }

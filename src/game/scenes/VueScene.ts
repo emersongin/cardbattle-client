@@ -83,18 +83,52 @@ export class VueScene extends Scene {
         });
     }
 
-    addListerOnKeydownEnterOnce(config: TweenConfig): void {
+    addKeyEnterListeningOnce(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-ENTER', config.onTrigger, true);
+    }
+
+    addKeyUpListening(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-UP', config.onTrigger);
+    }
+
+    addKeyRightListening(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-RIGHT', config.onTrigger);
+    }
+
+    addKeyDownListening(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-DOWN', config.onTrigger);
+    }
+
+    addKeyLeftListening(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-LEFT', config.onTrigger);
+    }
+    
+    addKeyEscListeningOnce(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-ESC', config.onTrigger, true);
+    }
+
+    #addKeyboardListening(event: string, callback: () => void, once?: boolean): void {
+        const keyboard = this.#getKeyBoard();
+        const onKeyDown = () => {
+            if (!keyboard) {
+                throw new Error('Keyboard input is not available in this scene.');
+            }   
+            if (once) keyboard.removeAllListeners();
+            callback();
+        };
+        keyboard.once(event, onKeyDown, this);
+    }
+
+    #getKeyBoard(): Phaser.Input.Keyboard.KeyboardPlugin {
         const keyboard = this.input.keyboard;
         if (!keyboard) {
             throw new Error('Keyboard input is not available in this scene.');
         }
-        const onKeyDown = () => {
-            if (!keyboard) {
-                throw new Error('Keyboard input is not available in this scene.');
-            }
-            keyboard.removeAllListeners();
-            if (config.onComplete) config.onComplete();
-        };
-        keyboard.once('keydown-ENTER', onKeyDown, this);
+        return keyboard;
+    }
+
+    removeAllKeyListening(): void {
+        const keyboard = this.#getKeyBoard();
+        keyboard.removeAllListeners();
     }
 }

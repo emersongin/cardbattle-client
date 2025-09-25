@@ -30,7 +30,7 @@ export class SelectMode {
     enable() {
         this.cardset.data.set('selectModeEnabled', true);
         this.#updateCursor();
-        this.#addAllKeyboardListeners();
+        this.#addKeyboardListeners();
     }
 
     #updateCursor(newIndex: number = this.#getCurrentIndex()): void {
@@ -104,48 +104,42 @@ export class SelectMode {
         return this.cardset.getCardById(cardId);
     }
 
-    #addAllKeyboardListeners() {
-        this.#addOnKeydownRightListener();
-        this.#addOnKeydownLeftListener();       
-        this.#addOnKeydownEscListener();
-        this.#addOnKeydownEnterListener();
+    #addKeyboardListeners() {
+        this.#onKeydownRight();
+        this.#onKeydownLeft();       
+        this.#onKeydownEsc();
+        this.#onKeydownEnter();
     }
 
-    #addOnKeydownRightListener(): void {
-        this.#getKeyboard().on('keydown-RIGHT', () => this.#updateCursor(this.#index + 1));
+    #onKeydownRight(): void {
+        this.cardset.scene.addKeyRightListening({ 
+            onTrigger: () => this.#updateCursor(this.#index + 1) 
+        });
     }
 
-    #getKeyboard(): Phaser.Input.Keyboard.KeyboardPlugin {
-        if (!this.cardset.scene.input.keyboard) {
-            throw new Error('Keyboard input is not available in this scene.');
-        }
-        return this.cardset.scene.input.keyboard;
+    #onKeydownLeft(): void {
+        this.cardset.scene.addKeyLeftListening({ 
+            onTrigger: () => this.#updateCursor(this.#index - 1) 
+        });
     }
 
-    #addOnKeydownLeftListener(): void {
-        this.#getKeyboard().on('keydown-LEFT', () => this.#updateCursor(this.#index - 1));
-    }
-
-    #addOnKeydownEscListener(): void {
+    #onKeydownEsc(): void {
         if (!this.#events.onLeave) return;
-        const onKeydownEsc = () => {
-            this.#disable();
-            if (this.#events.onLeave) this.#events.onLeave();
-        }
-        this.#getKeyboard().on('keydown-ESC', onKeydownEsc);
+        this.cardset.scene.addKeyEscListeningOnce({
+            onTrigger: () => {
+                this.#disable();
+                if (this.#events.onLeave) this.#events.onLeave();
+            } 
+        });
     }
 
     #disable() {
         this.cardset.data.set('selectModeEnabled', false);
         this.#deselectCardByIndex(this.#getCurrentIndex());
-        this.#removeAllKeyboardListeners();
+        this.cardset.scene.removeAllKeyListening();
     }
 
-    #removeAllKeyboardListeners() {
-        this.#getKeyboard().removeAllListeners();
-    }
-
-    #addOnKeydownEnterListener(): void {
+    #onKeydownEnter(): void {
         const onKeydownEnter = () => {
             const currentId = this.#getCurrentId();
             if (this.#isCardDisabledById(currentId)) return;
@@ -176,7 +170,7 @@ export class SelectMode {
                 if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
             }
         };
-        this.#getKeyboard().on('keydown-ENTER', onKeydownEnter);
+        this.cardset.scene.addKeyEnterListeningOnce({ onTrigger: onKeydownEnter });
     }
 
     #isOneSelectMode(): boolean {
