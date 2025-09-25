@@ -109,6 +109,7 @@ export class SelectMode {
         this.#onKeydownLeft();       
         this.#onKeydownEsc();
         this.#onKeydownEnter();
+        this.#onKeydownShift();
     }
 
     #onKeydownRight(): void {
@@ -140,17 +141,26 @@ export class SelectMode {
     }
 
     #onKeydownEnter(): void {
-        const onKeydownEnter = () => {
-            const currentId = this.#getCurrentId();
-            if (this.#isCardDisabledById(currentId)) return;
-            if (this.#isOneSelectMode()) {
+        if (this.#isOneSelectMode()) {
+            const onKeydownEnterOnce = () => {
+                const currentId = this.#getCurrentId();
+                if (this.#isCardDisabledById(currentId)) return;
                 this.#selectId(currentId);
                 this.#disable();
+                console.log(this.getIdsSelected());
                 if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
                 return;
-            }
-            // select mode many
+            };
+            this.cardset.scene.addKeyEnterListeningOnce({ onTrigger: onKeydownEnterOnce });
+            return;
+        }
+        const onKeydownEnter = () => {
+            const currentId = this.#getCurrentId();
+            console.log('currentId');
+            if (this.#isCardDisabledById(currentId)) return;
+            console.log('isCardDisabledById');
             if (!this.#isIdSelected(currentId) && this.#notHaveEnoughPoints(currentId)) return;
+            console.log('isIdSelected');
             if (this.#isIdSelected(currentId)) {
                 this.#removeId(currentId);
                 this.#creditPointsById(currentId);
@@ -170,7 +180,18 @@ export class SelectMode {
                 if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
             }
         };
-        this.cardset.scene.addKeyEnterListeningOnce({ onTrigger: onKeydownEnter });
+        this.cardset.scene.addKeyEnterListening({ onTrigger: onKeydownEnter });
+    }
+
+    #onKeydownShift(): void {
+        if (this.#isOneSelectMode()) return;
+        this.cardset.scene.addKeyShiftListeningOnce({ 
+            onTrigger: () => {
+                if (this.getIdsSelected().length === 0) return;
+                this.#disable();
+                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
+            }
+        });
     }
 
     #isOneSelectMode(): boolean {
@@ -262,6 +283,7 @@ export class SelectMode {
             this.cardset.markCardById(cardId);
             this.cardset.disableCardById(cardId);
         });
+        this.#changeIndex(this.cardset.getCardIndexById(lastId));
         this.enable();
     }
 

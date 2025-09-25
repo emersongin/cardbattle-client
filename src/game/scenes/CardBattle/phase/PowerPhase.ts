@@ -129,7 +129,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     #onChangeCardsetIndex(card: Card): void {
-        super.setTextWindowText(card.getName(), 1);
+        super.setTextWindowText(card.getName() + ' ' + card.getId(), 1);
         super.setTextWindowText(card.getDescription(), 2);
         super.setTextWindowText(card.getDetails(), 3);
     }
@@ -176,7 +176,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     async #playPowerCard(powerCard: CardData, onComplete: () => void): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
         const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
-        const cardset = super.createPowerCardset({
+        const cardset = await super.createPowerCardset({
             cards: [...powerCardsFiltered, powerCard], 
             faceUp: true
         });

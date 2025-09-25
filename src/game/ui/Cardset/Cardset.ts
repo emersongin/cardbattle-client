@@ -270,4 +270,9 @@ export class Cardset extends Phaser.GameObjects.Container {
             })
             .play();
     }
+
+    getCardIndexById(cardId: string): number {
+        return this.#cards.findIndex((card: Card) => card.getId() === cardId);
+    }
+
 }

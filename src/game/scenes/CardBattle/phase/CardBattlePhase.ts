@@ -398,13 +398,15 @@ export class CardBattlePhase implements Phase {
     }
 
     // FIELD CARDSET
-    createPowerCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Cardset {
-        this.destroyPowerCardset();
-        const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
-        const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
-        const cardset = Cardset.create(this.scene, config.cards, x, y, config.faceUp);
-        this.#fieldCardset = cardset;
-        return cardset;
+    createPowerCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Promise<Cardset> {
+        return new Promise(resolve => {
+            this.destroyPowerCardset();
+            const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
+            const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
+            const cardset = Cardset.create(this.scene, config.cards, x, y, config.faceUp);
+            this.#fieldCardset = cardset;
+            resolve(cardset);
+        });
     }
 
     getPowerCardset(): Cardset {
@@ -421,6 +423,7 @@ export class CardBattlePhase implements Phase {
 
     openPowerCardset(config?: TweenConfig & { faceUp?: boolean }): void {
         const cardset = this.getPowerCardset();
+        console.log(cardset);
         if (!cardset || cardset.isOpened()) return (config?.onComplete) ? config.onComplete() : undefined;
         const openConfig = { delay: 100 };
         this.#openCardset(cardset, { ...config, ...openConfig });
@@ -444,7 +447,9 @@ export class CardBattlePhase implements Phase {
 
     // SHARED
     #openCardset(cardset: Cardset, config?: TweenConfig, index?: number): void {
+        console.log('cardset', cardset);
         let cardsUis = cardset.getCardsUi();
+        console.log('cardsUis', cardsUis);
         if (index !== undefined) {
             const card = cardset.getCardByIndex(index);
             if (!card) return (config?.onComplete) ? config.onComplete() : undefined;
@@ -606,6 +611,7 @@ export class CardBattlePhase implements Phase {
             if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
             await Promise.all(promises);
             if (config?.onComplete) config.onComplete();
+            console.log('completed createGameBoard');
             resolve();
         });
     }
@@ -616,12 +622,13 @@ export class CardBattlePhase implements Phase {
                 targets: [
                     (t?: TweenConfig) => this.openOpponentBoard(t),
                     (t?: TweenConfig) => this.openBoard(t),
-                    (t?: TweenConfig) => this.openPowerCardset({ faceUp: true, ...t }),
+                    (t?: TweenConfig) => this.openPowerCardset({ ...t, faceUp: true }),
                     (t?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...t }),
-                    (t?: TweenConfig) => this.openCardset({ faceUp: true, ...t })
+                    (t?: TweenConfig) => this.openCardset({ ...t, faceUp: true }),
                 ],
                 onAllComplete: () => {
                     if (config?.onComplete) config.onComplete();
+                    console.log('completed openGameBoard');
                     resolve();
                 },
             });

@@ -83,8 +83,16 @@ export class VueScene extends Scene {
         });
     }
 
+    addKeyEnterListening(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-ENTER', config.onTrigger);
+    }
+
     addKeyEnterListeningOnce(config: { onTrigger: () => void }): void {
         this.#addKeyboardListening('keydown-ENTER', config.onTrigger, true);
+    }
+
+    addKeyShiftListeningOnce(config: { onTrigger: () => void }): void {
+        this.#addKeyboardListening('keydown-SHIFT', config.onTrigger, true);
     }
 
     addKeyUpListening(config: { onTrigger: () => void }): void {
@@ -107,16 +115,19 @@ export class VueScene extends Scene {
         this.#addKeyboardListening('keydown-ESC', config.onTrigger, true);
     }
 
-    #addKeyboardListening(event: string, callback: () => void, once?: boolean): void {
+    #addKeyboardListening(event: string, callback: () => void, once: boolean = false): void {
         const keyboard = this.#getKeyBoard();
         const onKeyDown = () => {
             if (!keyboard) {
                 throw new Error('Keyboard input is not available in this scene.');
-            }   
-            if (once) keyboard.removeAllListeners();
+            }
             callback();
         };
-        keyboard.once(event, onKeyDown, this);
+        if (once) {
+            keyboard.once(event, onKeyDown, this);
+            return;
+        }
+        keyboard.on(event, onKeyDown, this);
     }
 
     #getKeyBoard(): Phaser.Input.Keyboard.KeyboardPlugin {
