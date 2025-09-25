@@ -51,10 +51,9 @@ export abstract class PowerPhase extends CardBattlePhase {
                 {
                     description: 'Yes',
                     disabled: !await this.cardBattle.hasPowerCardInHand(this.scene.room.playerId),
-                    onSelect: () => {
-                        super.closeGameBoard({ 
-                            onComplete: () => this.createHandZone() 
-                        });
+                    onSelect: async () => {
+                        await super.closeGameBoard();
+                        this.createHandZone();
                     }
                 },
                 {
@@ -160,7 +159,8 @@ export abstract class PowerPhase extends CardBattlePhase {
             ],
             onAllComplete: async () => {
                 await super.createGameBoard({ isNotCreatePowerCards: true });
-                super.openGameBoard({ onComplete: () => this.#loadPowerCardAction(cardId) });
+                await super.openGameBoard();
+                this.#loadPowerCardAction(cardId);
             },
         });
     }
@@ -281,7 +281,8 @@ export abstract class PowerPhase extends CardBattlePhase {
             ],
             onAllComplete: async () => {
                 await super.createGameBoard();
-                super.openGameBoard({ onComplete: () => this.#goPlay() });
+                await super.openGameBoard();
+                this.#goPlay()
             },
         });
     }

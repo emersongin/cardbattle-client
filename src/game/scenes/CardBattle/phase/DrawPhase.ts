@@ -107,35 +107,13 @@ export class DrawPhase extends CardBattlePhase implements Phase {
                 })
             ],
             onAllComplete: () => {
-                this.#addOnCompleteListener();
+                this.scene.addListerOnKeydownEnterOnce({
+                    onComplete: async () => {
+                        await super.closeGameBoard();
+                        this.changeToLoadPhase();
+                    }
+                });
             },
-        });
-    }
-
-    #addOnCompleteListener() {
-        const keyboard = this.scene.input.keyboard;
-        if (!keyboard) {
-            throw new Error('Keyboard input is not available in this scene.');
-        }
-        const onKeyDown = () => {
-            if (!keyboard) {
-                throw new Error('Keyboard input is not available in this scene.');
-            }
-            keyboard.removeAllListeners();
-            this.#closeGameBoard();
-        };
-        keyboard.once('keydown-ENTER', onKeyDown, this);
-    }
-
-    #closeGameBoard(): void {
-        this.scene.timeline({
-            targets: [
-                (t?: TweenConfig) => super.closeBoard(t),
-                (t?: TweenConfig) => super.closeOpponentBoard(t),
-                (t?: TweenConfig) => super.closeCardset(t),
-                (t?: TweenConfig) => super.closeOpponentCardset(t),
-            ],
-            onAllComplete: () => this.changeToLoadPhase(),
         });
     }
 

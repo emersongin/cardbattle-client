@@ -11,15 +11,12 @@ export class CompilePhase extends PowerPhase implements Phase {
             textAlign: 'center',
             onClose: async () => {
                 await super.createGameBoard();
-                super.openGameBoard({
-                    onComplete: () => {
-                        super.createTextWindowCentered('Begin Compile Phase', { 
-                            textAlign: 'center', 
-                            onClose: () => super.resumePhase()
-                        });
-                        super.openAllWindows();
-                    }
+                await super.openGameBoard();
+                await super.createTextWindowCentered('Begin Compile Phase', { 
+                    textAlign: 'center', 
+                    onClose: () => super.resumePhase()
                 });
+                super.openAllWindows();
             }
         });
         super.addTextWindow('Select and use a Power Card');

@@ -80,9 +80,12 @@ export class CardBattlePhase implements Phase {
         }
     }
 
-    createTextWindowCentered(title: string, config: Partial<TextWindowConfig>): void {
-        this.destroyAllTextWindows();
-        this.#textWindows[0] = this.#createTextWindowCentered(title, config);
+    createTextWindowCentered(title: string, config: Partial<TextWindowConfig>): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.destroyAllTextWindows();
+            this.#textWindows[0] = this.#createTextWindowCentered(title, config);
+            resolve();
+        });
     }
 
     #createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): TextWindow {
@@ -579,58 +582,67 @@ export class CardBattlePhase implements Phase {
     }
 
     // GENERAL
-    async createGameBoard(config?: TweenConfig & { 
+    createGameBoard(config?: TweenConfig & { 
         isShowBattlePoints?: boolean, 
         isNotCreatePowerCards?: boolean 
     }): Promise<void> {
-        const board = await this.cardBattle.getBoard(this.scene.room.playerId);
-        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-        const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
-        const battleCards: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
-        const opponentBattleCards: CardData[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
-        const promises = [];
-        if (board) {
-            const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
-            promises.push(this.createBoard(boardData));
-        };
-        if (opponentBoard) {
-            const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
-            promises.push(this.createOpponentBoard(opponentBoardData));
-        }
-        if (!config?.isNotCreatePowerCards && powerCards) promises.push(this.createPowerCardset({ cards: powerCards }));
-        if (battleCards) promises.push(this.createCardset(battleCards));
-        if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
-        await Promise.all(promises);
-        if (config?.onComplete) config.onComplete();
-    }
-
-    openGameBoard(config: TweenConfig & { isOpponentCardsetOpen?: boolean }): void {
-        this.scene.timeline({
-            targets: [
-                (t?: TweenConfig) => this.openOpponentBoard(t),
-                (t?: TweenConfig) => this.openBoard(t),
-                (t?: TweenConfig) => this.openPowerCardset({ faceUp: true, ...t }),
-                (t?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...t }),
-                (t?: TweenConfig) => this.openCardset({ faceUp: true, ...t })
-            ],
-            onAllComplete: () => {
-                if (config?.onComplete) config.onComplete();
-            },
+        return new Promise(async resolve => {
+            const board = await this.cardBattle.getBoard(this.scene.room.playerId);
+            const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+            const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
+            const battleCards: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
+            const opponentBattleCards: CardData[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
+            const promises = [];
+            if (board) {
+                const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
+                promises.push(this.createBoard(boardData));
+            };
+            if (opponentBoard) {
+                const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
+                promises.push(this.createOpponentBoard(opponentBoardData));
+            }
+            if (!config?.isNotCreatePowerCards && powerCards) promises.push(this.createPowerCardset({ cards: powerCards }));
+            if (battleCards) promises.push(this.createCardset(battleCards));
+            if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
+            await Promise.all(promises);
+            if (config?.onComplete) config.onComplete();
+            resolve();
         });
     }
 
-    closeGameBoard(config?: TweenConfig): void {
-        this.scene.timeline({
-            targets: [
-                (t?: TweenConfig) => this.closeBoard(t),
-                (t?: TweenConfig) => this.closeOpponentBoard(t),
-                (t?: TweenConfig) => this.closePowerCardset(t),
-                (t?: TweenConfig) => this.closeCardset(t),
-                (t?: TweenConfig) => this.closeOpponentCardset(t),
-            ],
-            onAllComplete: () => {
-                if (config?.onComplete) config.onComplete();
-            },
+    openGameBoard(config?: TweenConfig & { isOpponentCardsetOpen?: boolean }): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.scene.timeline({
+                targets: [
+                    (t?: TweenConfig) => this.openOpponentBoard(t),
+                    (t?: TweenConfig) => this.openBoard(t),
+                    (t?: TweenConfig) => this.openPowerCardset({ faceUp: true, ...t }),
+                    (t?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...t }),
+                    (t?: TweenConfig) => this.openCardset({ faceUp: true, ...t })
+                ],
+                onAllComplete: () => {
+                    if (config?.onComplete) config.onComplete();
+                    resolve();
+                },
+            });
+        });
+    }
+
+    closeGameBoard(config?: TweenConfig): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.scene.timeline({
+                targets: [
+                    (t?: TweenConfig) => this.closeBoard(t),
+                    (t?: TweenConfig) => this.closeOpponentBoard(t),
+                    (t?: TweenConfig) => this.closePowerCardset(t),
+                    (t?: TweenConfig) => this.closeCardset(t),
+                    (t?: TweenConfig) => this.closeOpponentCardset(t),
+                ],
+                onAllComplete: () => {
+                    if (config?.onComplete) config.onComplete();
+                    resolve();
+                },
+            });
         });
     }
 

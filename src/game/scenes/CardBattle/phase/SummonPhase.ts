@@ -118,15 +118,9 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #createGameBoard(): Promise<void> {
-        super.createGameBoard({ 
-            isShowBattlePoints: false,
-            onComplete: () => {
-                super.openGameBoard({ 
-                    isOpponentCardsetOpen: false,
-                    onComplete: () => super.flipOpponentCardset({ onComplete: () => this.#loadBattlePoints() })
-                });
-            }
-        });
+        await super.createGameBoard({ isShowBattlePoints: false });
+        await super.openGameBoard({ isOpponentCardsetOpen: false });
+        super.flipOpponentCardset({ onComplete: () => this.#loadBattlePoints() });
     }
 
     async #loadBattlePoints(): Promise<void> {
@@ -137,23 +131,15 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),
                 (t?: TweenConfig) => super.setOpponentBoardBattlePointsWithDuration({ ...t, ...opponentBattlePoints }),
             ],
-            onAllComplete: () => this.#addOnCompleteListener(),
-        });
-    }
-
-    #addOnCompleteListener() {
-        const keyboard = this.scene.input.keyboard;
-        if (!keyboard) {
-            throw new Error('Keyboard input is not available in this scene.');
-        }
-        const onKeyDown = () => {
-            if (!keyboard) {
-                throw new Error('Keyboard input is not available in this scene.');
+            onAllComplete: () => {
+                this.scene.addListerOnKeydownEnterOnce({
+                    onComplete: async () => {
+                        await super.closeGameBoard();
+                        this.changeToCompilePhase();
+                    }
+                });
             }
-            keyboard.removeAllListeners();
-            super.closeGameBoard({ onComplete: () => this.changeToCompilePhase() });
-        };
-        keyboard.once('keydown-ENTER', onKeyDown, this);
+        });
     }
 
     changeToCompilePhase(): void {

@@ -82,4 +82,19 @@ export class VueScene extends Scene {
             if (timiline.onAllComplete) timiline.onAllComplete();
         });
     }
+
+    addListerOnKeydownEnterOnce(config: TweenConfig): void {
+        const keyboard = this.input.keyboard;
+        if (!keyboard) {
+            throw new Error('Keyboard input is not available in this scene.');
+        }
+        const onKeyDown = () => {
+            if (!keyboard) {
+                throw new Error('Keyboard input is not available in this scene.');
+            }
+            keyboard.removeAllListeners();
+            if (config.onComplete) config.onComplete();
+        };
+        keyboard.once('keydown-ENTER', onKeyDown, this);
+    }
 }
