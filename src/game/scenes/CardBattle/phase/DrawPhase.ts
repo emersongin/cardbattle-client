@@ -139,36 +139,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         });
     }
 
-    changeToChallengePhase(): void {
-        throw new Error("Method not implemented.");
-    }
-    
-    changeToStartPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToDrawPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
     changeToLoadPhase(): void {
         this.scene.changePhase(new LoadPhase(this.scene));
-    }
-
-    changeToTriggerPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToSummonPhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToCompilePhase(): void {
-        throw new Error("Method not implemented.");
-    }
-
-    changeToBattlePhase(): void {
-        throw new Error("Method not implemented.");
     }
 
     destroy(): void {
