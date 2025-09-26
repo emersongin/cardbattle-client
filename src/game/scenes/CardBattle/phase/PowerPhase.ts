@@ -115,17 +115,47 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     async #startPowerCardPlay(cardId: string): Promise<void> {
         const powerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
-        const finishPlayerPlay = () => {
+        const playerPlay = async () => {
+            const config = await this.#createPowerCardConfig(powerCard);
             super.removeBoardZonePoints(HAND, 1);
-            this.#finishPowerCardPlay(powerCard);
+            this.#finishPowerCardPlay(powerCard, config);
         };
-        this.#playPowerCard(powerCard, finishPlayerPlay);
+        this.#playPowerCard(powerCard, playerPlay);
     }
 
-    async #finishPowerCardPlay(powerCard: CardData): Promise<void> {
+    #createPowerCardConfig(powerCard: CardData): void {
+        // super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
+        // super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
+        // super.createCommandWindowBottom('Use this Power Card?', [
+        //     {
+        //         description: 'Yes',
+        //         onSelect: async () => {
+        //             const powerAction = {
+        //                 powerCard,
+        //                 // action:{} config...
+        //             };
+        //             await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
+        //             this.loadPlayAndMovePowerCardToField();
+        //         }
+        //     },
+        //     {
+        //         description: 'No',
+        //         onSelect: () => {
+        //             super.closeAllWindows();
+        //             super.closeOpponentBoard();
+        //             super.closeBoard();
+        //             super.closePowerCardset({ onComplete: () => this.#createHandZone() });
+        //         }
+        //     }
+        // ]);
+        // super.openAllWindows();
+        // super.openCommandWindow();
+    }
+
+    async #finishPowerCardPlay(powerCard: CardData, powerCardConfig: any): Promise<void> {
         const powerAction = {
             powerCard,
-            // action:{} config...
+            config: powerCardConfig
         }
         await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
         await this.cardBattle.pass(this.scene.room.playerId);
@@ -136,7 +166,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.#loadPlayAndMovePowerCardToField();
     }
 
-    async #playPowerCard(powerCard: CardData, onComplete: () => void): Promise<void> {
+    async #playPowerCard(powerCard: CardData, loadPowerActionConfig: () => void): Promise<void> {
         const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
         const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
         const cardset = await super.createPowerCardset({
@@ -153,69 +183,16 @@ export abstract class PowerPhase extends CardBattlePhase {
             onComplete: () => {
                 const card = cardset.getCardByIndex(lastIndex);
                 cardset.selectCardById(card.getId());
-                onComplete(); // show select power action config or not
-                // this.#createPowerCardWindows(powerCard); vai no onComplete
+                loadPowerActionConfig();
             }
         });
     }
-
-    // comportamento de selecção yes ou no, poder ter outros como selecioanr outros cartões do jogo
-    // #createPowerCardWindows(powerCard: CardData): void {
-    //     super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
-    //     super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
-    //     super.createCommandWindowBottom('Use this Power Card?', [
-    //         {
-    //             description: 'Yes',
-    //             onSelect: async () => {
-    //                 const powerAction = {
-    //                     powerCard,
-    //                     // action:{} config...
-    //                 };
-    //                 await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
-    //                 this.loadPlayAndMovePowerCardToField();
-    //             }
-    //         },
-    //         {
-    //             description: 'No',
-    //             onSelect: () => {
-    //                 super.closeAllWindows();
-    //                 super.closeOpponentBoard();
-    //                 super.closeBoard();
-    //                 super.closePowerCardset({ onComplete: () => this.#createHandZone() });
-    //             }
-    //         }
-    //     ]);
-    //     super.openAllWindows();
-    //     super.openCommandWindow();
-    // }
 
     #loadPlayAndMovePowerCardToField(): void {
         super.closeAllWindows();
         super.getPowerCardset().removeAllSelect();
         super.movePowerCardsetToBoard({ onComplete: () => this.#nextPlay() });
     }
-
-    // #movePowerCardToField(): void {
-    //     const totalCards = this.getPowerCardset().getCardsTotal();
-    //     const moveConfig = {
-    //         targets: this.getPowerCardset().getCardsUi(),
-    //         onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
-    //             pause();
-    //             CardActionsBuilder
-    //                 .create(card)
-    //                 .move({
-    //                     xTo: 0 + (index! * CARD_WIDTH),
-    //                     yTo: 0,
-    //                     delay: (index! * 100), 
-    //                     duration: (300 / totalCards) * (totalCards - index!),
-    //                     onComplete: () => resume()
-    //                 })
-    //                 .play();
-    //         },
-    //         onAllComplete: () => ,
-    //     };
-    //     this.scene.timeline(moveConfig);
-    // }
 
     async #nextPlay(): Promise<void> {
         if (await this.cardBattle.isPowerfieldLimitReached()) {
@@ -269,11 +246,11 @@ export abstract class PowerPhase extends CardBattlePhase {
             await this.#resetPlay();
         }
         if (powerAction?.powerCard) {
-            const finishOpponentPlay = () => {
+            const opponentPlayFunction = () => {
                 super.removeOpponentBoardZonePoints(HAND, 1);
                 this.#loadPlayAndMovePowerCardToField();
             };
-            this.#playPowerCard(powerAction.powerCard, finishOpponentPlay);
+            this.#playPowerCard(powerAction.powerCard, opponentPlayFunction);
         }
     }
 
