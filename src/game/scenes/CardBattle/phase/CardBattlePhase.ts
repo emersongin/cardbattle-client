@@ -135,13 +135,21 @@ export class CardBattlePhase implements Phase {
         }
     }
 
-    closeAllWindows(config?: TweenConfig): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
-                if (!index) return window.close(config);
-                window.close();
-            });
-        }
+    closeAllWindows(config?: TweenConfig): Promise<void> {
+        return new Promise<void>(resolve => {
+            if (this.#textWindows.length) {
+                this.#textWindows.forEach((window, index) => {
+                    if (!index) return window.close({ 
+                        ...config, 
+                        onComplete: () => {
+                            if (config?.onComplete) config.onComplete();
+                            resolve();
+                        }
+                    });
+                    window.close();
+                });
+            }
+        });
     }
 
     createWaitingWindow(text: string = 'Waiting for opponent...'): void {
@@ -441,6 +449,12 @@ export class CardBattlePhase implements Phase {
         this.#closeCardset(cardset, config);
     }
 
+    movePowerCardsetToBoard(config?: TweenConfig): void {
+        const cardset = this.getPowerCardset();
+        if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
+        this.#moveCardSetToBoard(cardset, config);
+    }
+
     destroyPowerCardset(): void {
         if (this.#fieldCardset) this.#fieldCardset.destroy();
     }
@@ -653,18 +667,37 @@ export class CardBattlePhase implements Phase {
         });
     }
 
-    openHandZone(config?: TweenConfig): void {
-        this.scene.timeline({
-            targets: [
-                (config?: TweenConfig) => this.openBoard(config),
-                (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
-            ],
-            onAllComplete: () => {
-                if (config?.onComplete) config.onComplete();
-            },
+    openHandZone(config?: TweenConfig): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.scene.timeline({
+                targets: [
+                    (config?: TweenConfig) => this.openBoard(config),
+                    (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
+                ],
+                onAllComplete: () => {
+                    this.openAllWindows();
+                    if (config?.onComplete) config.onComplete();
+                    resolve();
+                },
+            });
         });
     }
 
+    closeHandZone(config?: TweenConfig): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.scene.timeline({
+                targets: [
+                    (config?: TweenConfig) => this.closeAllWindows(config),
+                    (config?: TweenConfig) => this.closeBoard(config),
+                    (config?: TweenConfig) => this.closeCardset(config),
+                ],
+                onAllComplete: () => {
+                    if (config?.onComplete) config.onComplete();
+                    resolve();
+                },
+            });
+        });
+    }
 
     changeToChallengePhase(): void {
         throw new Error("Method not implemented.");

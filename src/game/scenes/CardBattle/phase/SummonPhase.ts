@@ -12,19 +12,21 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     create(): void {
         super.createTextWindowCentered('Summon Phase', {
             textAlign: 'center',
-            onClose: () => this.#loadSummonPhase()
+            onClose: async () => {
+                await this.#createHandZone();
+                this.#openHandZone();
+            }
         });
         super.addTextWindow('Select and summon battle cards to the field.');
         super.openAllWindows();
     }
 
-    async #loadSummonPhase(): Promise<void> {
+    async #createHandZone(): Promise<void> {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         const cardsData: CardData[] = await this.cardBattle.getCardsFromHandInTheSummonPhase(this.scene.room.playerId);
         super.createBoard(boardData);
         super.createHandCardset(cardsData);
         super.createHandDisplayWindows();
-        this.#openHandZone();
     }
 
     #openHandZone(): void {

@@ -60,7 +60,7 @@ export class CardBattleScene extends VueScene {
         // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
         // COMPILE PHASE
 
-        this.changePhase(new SummonPhase(this));
+        this.changePhase(new LoadPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

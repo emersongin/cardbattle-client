@@ -205,7 +205,7 @@ const powerCards = [
 ];
 
 const cardsMock = [
-    // ...battleCards, 
+    ...battleCards, 
     ...powerCards
 ];
 const redDeck = createDeck(cardsMock, 40);

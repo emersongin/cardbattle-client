@@ -139,6 +139,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.getCardById(cardId).mark();
     }
 
+    removeAllSelect(): void {
+        this.getCards().forEach((card: Card) => {
+            const cardId = card.getId();
+            this.removeAllSelectCardById(cardId);
+        });
+    }
+
     highlightCardsByIndexes(cardIds: string[]): void {
         this.getCards().forEach((card: Card) => {
             if (cardIds.includes(card.getId())) {
