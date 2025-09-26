@@ -40,7 +40,6 @@ export class CardBattleScene extends VueScene {
         // // SUMMON PHASE
         // const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
         // const playerBoard = await this.getCardBattle().getBoard(playerId);
-        // console.log(playerBoard);
         // const playerCardIds = playerCards.filter(card => {
         //     if (card.color === ORANGE) return true;
         //     const colorPoints = playerBoard[card.color];
@@ -61,7 +60,7 @@ export class CardBattleScene extends VueScene {
         // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
         // COMPILE PHASE
 
-        this.changePhase(new LoadPhase(this));
+        this.changePhase(new SummonPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {
