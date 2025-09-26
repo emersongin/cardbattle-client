@@ -147,7 +147,6 @@ export class SelectMode {
                 if (this.#isCardDisabledById(currentId)) return;
                 this.#selectId(currentId);
                 this.#disable();
-                console.log(this.getIdsSelected());
                 if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
                 return;
             };

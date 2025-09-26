@@ -431,7 +431,6 @@ export class CardBattlePhase implements Phase {
 
     openPowerCardset(config?: TweenConfig & { faceUp?: boolean }): void {
         const cardset = this.getPowerCardset();
-        console.log(cardset);
         if (!cardset || cardset.isOpened()) return (config?.onComplete) ? config.onComplete() : undefined;
         const openConfig = { delay: 100 };
         this.#openCardset(cardset, { ...config, ...openConfig });
@@ -461,9 +460,7 @@ export class CardBattlePhase implements Phase {
 
     // SHARED
     #openCardset(cardset: Cardset, config?: TweenConfig, index?: number): void {
-        console.log('cardset', cardset);
         let cardsUis = cardset.getCardsUi();
-        console.log('cardsUis', cardsUis);
         if (index !== undefined) {
             const card = cardset.getCardByIndex(index);
             if (!card) return (config?.onComplete) ? config.onComplete() : undefined;
@@ -479,7 +476,7 @@ export class CardBattlePhase implements Phase {
                 if (config?.faceUp) builder.faceUp();
                 builder
                     .open({
-                        delay: (index! * 100),
+                        delay: (index * 100),
                         onComplete: () => resume()
                     })
                     .play();
@@ -501,7 +498,7 @@ export class CardBattlePhase implements Phase {
                 CardActionsBuilder
                     .create(card)
                     .close({
-                        delay: (index! * 100),
+                        delay: (index * 100),
                         onComplete: () => resume()
                     })
                     .play();
@@ -522,7 +519,7 @@ export class CardBattlePhase implements Phase {
                 pause();
                 CardActionsBuilder
                     .create(card)
-                    .close({ delay: (index! * 200) })
+                    .close({ delay: (index * 200) })
                     .faceUp()
                     .open({ onComplete: () => resume() })
                     .play();
@@ -547,7 +544,7 @@ export class CardBattlePhase implements Phase {
                     .create(card)
                     .flash({
                         color: 0xffffff,
-                        delay: (index! * 200),
+                        delay: (index * 200),
                         onStart: () => {
                             if (config?.onStartEach) config.onStartEach(card);
                         },
@@ -565,7 +562,7 @@ export class CardBattlePhase implements Phase {
     #moveCardSetToBoard(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
-        const totalCards = this.getCardset().getCardsTotal();
+        const totalCards = cardset.getCardsTotal();
         const moveConfig = {
             targets: cardsUis,
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
@@ -574,10 +571,10 @@ export class CardBattlePhase implements Phase {
                     .create(card)
                     .open({ delay: 0, duration: 0 })
                     .move({
-                        xTo: (index! * CARD_WIDTH),
+                        xTo: (index * CARD_WIDTH),
                         yTo: 0,
-                        delay: (index! * 100), 
-                        duration: (300 / totalCards) * (totalCards - index!),
+                        delay: (index * 100), 
+                        duration: (300 / totalCards) * (totalCards - index),
                         onStart: () => {
                             if (config?.onStartEach) config.onStartEach();
                         },
@@ -625,7 +622,6 @@ export class CardBattlePhase implements Phase {
             if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
             await Promise.all(promises);
             if (config?.onComplete) config.onComplete();
-            console.log('completed createGameBoard');
             resolve();
         });
     }
@@ -642,7 +638,6 @@ export class CardBattlePhase implements Phase {
                 ],
                 onAllComplete: () => {
                     if (config?.onComplete) config.onComplete();
-                    console.log('completed openGameBoard');
                     resolve();
                 },
             });
