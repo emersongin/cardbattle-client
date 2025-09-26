@@ -155,11 +155,8 @@ export class SelectMode {
         }
         const onKeydownEnter = () => {
             const currentId = this.#getCurrentId();
-            console.log('currentId');
             if (this.#isCardDisabledById(currentId)) return;
-            console.log('isCardDisabledById');
             if (!this.#isIdSelected(currentId) && this.#notHaveEnoughPoints(currentId)) return;
-            console.log('isIdSelected');
             if (this.#isIdSelected(currentId)) {
                 this.#removeId(currentId);
                 this.#creditPointsById(currentId);

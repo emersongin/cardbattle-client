@@ -249,7 +249,10 @@ export abstract class PowerPhase extends CardBattlePhase {
             onComplete: () => {
                 this.cardBattle.listenOpponentPlay(
                     this.scene.room.playerId, 
-                    (opponentPlay: PowerCardPlayData) => this.#onOpponentPlay(opponentPlay)
+                    async (opponentPlay: PowerCardPlayData) => {
+                        await super.closeAllWindows();
+                        this.#onOpponentPlay(opponentPlay);
+                    }
                 );
             }
         });
@@ -259,7 +262,6 @@ export abstract class PowerPhase extends CardBattlePhase {
         const { pass, powerAction } = opponentPlay;
         super.addOpponentBoardPass();
         if (pass) {
-            await super.closeAllWindows();
             this.#nextPlay();
             return;
         }
