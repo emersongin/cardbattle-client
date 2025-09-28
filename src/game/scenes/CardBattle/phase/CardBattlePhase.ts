@@ -611,11 +611,11 @@ export class CardBattlePhase implements Phase {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
-                    (t?: TweenConfig) => this.openOpponentBoard(t),
-                    (t?: TweenConfig) => this.openBoard(t),
-                    (t?: TweenConfig) => this.openPowerCardset({ ...t, faceUp: true }),
-                    (t?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...t }),
-                    (t?: TweenConfig) => this.openCardset({ ...t, faceUp: true }),
+                    (config?: TweenConfig) => this.openOpponentBoard(config),
+                    (config?: TweenConfig) => this.openBoard(config),
+                    (config?: TweenConfig) => this.openPowerCardset({ ...config, faceUp: true }),
+                    (config?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...config }),
+                    (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
                 ],
                 onAllComplete: () => {
                     if (config?.onComplete) config.onComplete();
@@ -629,11 +629,11 @@ export class CardBattlePhase implements Phase {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
-                    (t?: TweenConfig) => this.closeBoard(t),
-                    (t?: TweenConfig) => this.closeOpponentBoard(t),
-                    (t?: TweenConfig) => this.closePowerCardset(t),
-                    (t?: TweenConfig) => this.closeCardset(t),
-                    (t?: TweenConfig) => this.closeOpponentCardset(t),
+                    (config?: TweenConfig) => this.closeBoard(config),
+                    (config?: TweenConfig) => this.closeOpponentBoard(config),
+                    (config?: TweenConfig) => this.closePowerCardset(config),
+                    (config?: TweenConfig) => this.closeCardset(config),
+                    (config?: TweenConfig) => this.closeOpponentCardset(config),
                 ],
                 onAllComplete: () => {
                     if (config?.onComplete) config.onComplete();
