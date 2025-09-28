@@ -113,18 +113,21 @@ export class CommandWindow extends Sizer {
                 if (this.commands[this.selectedIndex].disabled) {
                     return console.log('Sound disabled command');
                 }
-                this.close(this.commands[this.selectedIndex].onSelect);
+                this.#close(this.commands[this.selectedIndex].onSelect);
             }
         });
     }
 
-    close(onSelect: () => Promise<void> | void) {
+    #close(onSelect: () => Promise<void> | void) {
         this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',
-            onComplete: async () => await onSelect()
+            onComplete: async () => {
+                await onSelect()
+                this.destroy();
+            }
         });
     }
 

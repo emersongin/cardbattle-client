@@ -184,6 +184,7 @@ export class BoardWindow extends Sizer {
             ease: 'Back.easeIn',
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
+                this.destroy();
             }
         });
     }

@@ -48,6 +48,12 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
+    showCards(): void {
+        this.getCards().forEach((card: Card) => {
+            card.setOpened();
+        });
+    }
+
     setCardAtPosition(index: number, x: number = 0, y: number = 0): void {
         if (!this.isValidIndex(index)) {
             throw new Error(`Cardset: index ${index} is out of bounds.`);

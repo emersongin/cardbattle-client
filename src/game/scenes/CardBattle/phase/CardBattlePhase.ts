@@ -48,15 +48,8 @@ export class CardBattlePhase implements Phase {
 
     // TEXT WINDOWS
     createTextWindowTop(text: string, config: Partial<TextWindowConfig>): void {
-        this.destroyAllTextWindows();
+        this.#textWindows = [];
         this.#textWindows[0] = this.#createTextWindowTop(text, config);
-    }
-
-    destroyAllTextWindows(): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach(window => window.destroy());
-            this.#textWindows = [];
-        }
     }
 
     #createTextWindowTop(text: string, config: Partial<TextWindowConfig>): TextWindow {
@@ -64,15 +57,13 @@ export class CardBattlePhase implements Phase {
             textAlign: config.textAlign || 'left',
             textColor: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
-            onStartClose: () => {
-                this.#closeAllChildWindows();
-            },
+            onStartClose: () => this.#onStartCloseAllChildrenWindows(),
             onClose: config.onClose
         };
         return TextWindow.createTop(this.scene, { ...windowConfig, text });
     }
 
-    #closeAllChildWindows(): void {
+    #onStartCloseAllChildrenWindows(): void {
         if (this.#textWindows.length) {
             this.#textWindows.forEach((window, index) => {
                 if (index > 0) window.close({ onComplete: () => window.destroy()})
@@ -82,7 +73,7 @@ export class CardBattlePhase implements Phase {
 
     createTextWindowCentered(title: string, config: Partial<TextWindowConfig>): Promise<void> {
         return new Promise<void>(resolve => {
-            this.destroyAllTextWindows();
+            this.#textWindows = [];
             this.#textWindows[0] = this.#createTextWindowCentered(title, config);
             resolve();
         });
@@ -94,12 +85,23 @@ export class CardBattlePhase implements Phase {
             textColor: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
             marginTop: config.marginTop || 0,
-            onStartClose: () => {
-                this.#closeAllChildWindows();
-            },
+            onStartClose: () => this.#onStartCloseAllChildrenWindows(),
             onClose: config.onClose
         };
         return TextWindow.createCentered(this.scene, { ...windowConfig, text });
+    }
+
+    createWaitingWindow(text: string = 'Waiting for opponent...'): void {
+        this.createTextWindowCentered(text, { textAlign: 'center' });
+    }
+
+    createHandDisplayWindows(): void {
+        this.createTextWindowTop('Your Hand', {
+            textAlign: 'center',
+        });
+        this.addTextWindow('...', { marginTop: 32 });
+        this.addTextWindow('...');
+        this.addTextWindow('...');
     }
 
     addTextWindow(title: string, config?: Partial<TextWindowConfig>): void {
@@ -152,19 +154,6 @@ export class CardBattlePhase implements Phase {
         });
     }
 
-    createWaitingWindow(text: string = 'Waiting for opponent...'): void {
-        this.createTextWindowCentered(text, { textAlign: 'center' });
-    }
-
-    createHandDisplayWindows(): void {
-        this.createTextWindowTop('Your Hand', {
-            textAlign: 'center',
-        });
-        this.addTextWindow('...', { marginTop: 32 });
-        this.addTextWindow('...');
-        this.addTextWindow('...');
-    }
-
     // COMMAND WINDOW
     createCommandWindowCentered(title: string, options: CommandOption[]): void {
         this.#commandWindow = CommandWindow.createCentered(this.scene, title, options);
@@ -176,10 +165,6 @@ export class CardBattlePhase implements Phase {
 
     openCommandWindow(): void {
         this.#commandWindow.open();
-    }
-
-    destroyCommandWindow(): void {
-        if (this.#commandWindow) this.#commandWindow.destroy();
     }
 
     // PLAYER BOARD
@@ -227,10 +212,6 @@ export class CardBattlePhase implements Phase {
         this.#board.close(config);
     }
 
-    destroyBoard(): void {
-        if (this.#board) this.#board.destroy();
-    }
-
     // OPPONENT BOARD
     createOpponentBoard(opponentBoardData: BoardWindowData): void {
         this.#opponentBoard = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
@@ -271,34 +252,30 @@ export class CardBattlePhase implements Phase {
     closeOpponentBoard(config?: TweenConfig): void {
         this.#opponentBoard.close(config);
     }
-
-    destroyOpponentBoard(): void {
-        if (this.#opponentBoard) this.#opponentBoard.destroy();
-    }
     
     // PLAYER CARDSET
-    createCardset(cards: CardData[]): Promise<Cardset> {
+    createCardset(cards: CardData[]): Promise<void> {
         return new Promise(resolve => {
-            this.destroyCardset();
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
             const y = (this.#board.y - (this.#board.height / 2)) - CARD_HEIGHT - 10; 
             const cardset = Cardset.create(this.scene, cards, x, y);
             cardset.setCardsInLinePosition();
             cardset.setCardsClosed();
             this.#cardset = cardset;
-            resolve(cardset);
+            resolve();
         });
     }
 
-    createHandCardset(cards: CardData[]): Cardset {
-        this.destroyCardset();
-        const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
-        const y = this.scene.cameras.main.centerY; 
-        const cardset = Cardset.create(this.scene, cards, x, y);
-        cardset.setCardsInLinePosition();
-        cardset.setCardsClosed();
-        this.#cardset = cardset;
-        return cardset;
+    createHandCardset(cards: CardData[]): Promise<void> {
+        return new Promise(resolve => {
+            const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
+            const y = this.scene.cameras.main.centerY; 
+            const cardset = Cardset.create(this.scene, cards, x, y);
+            cardset.setCardsInLinePosition();
+            cardset.setCardsClosed();
+            this.#cardset = cardset;
+            resolve();
+        });
     }
 
     getCardset(): Cardset {
@@ -348,21 +325,16 @@ export class CardBattlePhase implements Phase {
         this.#setSelectModeMultCardset(cardset, events);
     }
 
-    destroyCardset(): void {
-        if (this.#cardset) this.#cardset.destroy(true);
-    }
-
     // OPPONENT CARDSET
-    createOpponentCardset(cards: CardData[]): Promise<Cardset> {
+    createOpponentCardset(cards: CardData[]): Promise<void> {
         return new Promise(resolve => {
-            this.destroyOpponentCardset();
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
             const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
             const cardset = Cardset.create(this.scene, cards, x, y);
             cardset.setCardsInLinePosition();
             cardset.setCardsClosed();
             this.#opponentCardset = cardset;
-            resolve(cardset);
+            resolve();
         });
     }
 
@@ -401,19 +373,23 @@ export class CardBattlePhase implements Phase {
         this.#moveCardSetToBoard(cardset, config);
     }
 
-    destroyOpponentCardset(): void {
-        if (this.#opponentCardset) this.#opponentCardset.destroy();
-    }
-
     // FIELD CARDSET
-    createPowerCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Promise<Cardset> {
+    createPowerCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Promise<void> {
         return new Promise(resolve => {
-            this.destroyPowerCardset();
             const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
             const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
+            
+            if (this.#fieldCardset) {
+                const cards = this.#fieldCardset.getCards()
+                if (cards) cards.forEach(card => card.getUi().destroy());
+                this.#fieldCardset.destroy();
+            }
+
             const cardset = Cardset.create(this.scene, config.cards, x, y, config.faceUp);
+            cardset.setCardsInLinePosition();
+            cardset.setCardsClosed();
             this.#fieldCardset = cardset;
-            resolve(cardset);
+            resolve();
         });
     }
 
@@ -452,10 +428,6 @@ export class CardBattlePhase implements Phase {
         const cardset = this.getPowerCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
         this.#moveCardSetToBoard(cardset, config);
-    }
-
-    destroyPowerCardset(): void {
-        if (this.#fieldCardset) this.#fieldCardset.destroy();
     }
 
     // SHARED
@@ -505,6 +477,7 @@ export class CardBattlePhase implements Phase {
             },
             onAllComplete: () => {
                 if (config?.onComplete) config.onComplete();
+                cardset.destroy();
             }
         };
         this.scene.timeline(closeConfig);
@@ -600,7 +573,7 @@ export class CardBattlePhase implements Phase {
     // GENERAL
     createGameBoard(config?: TweenConfig & { 
         isShowBattlePoints?: boolean, 
-        isNotCreatePowerCards?: boolean 
+        powerCardsFaceUp?: boolean 
     }): Promise<void> {
         return new Promise(async resolve => {
             const board = await this.cardBattle.getBoard(this.scene.room.playerId);
@@ -617,7 +590,15 @@ export class CardBattlePhase implements Phase {
                 const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
                 promises.push(this.createOpponentBoard(opponentBoardData));
             }
-            if (!config?.isNotCreatePowerCards && powerCards) promises.push(this.createPowerCardset({ cards: powerCards }));
+            if (powerCards) promises.push(this.createPowerCardset({ 
+                cards: powerCards,
+                faceUp: config?.isPowerCardsFaceUp ? true : false 
+            }));
+            if (config?.isPowerCardsFaceUp) {
+                const powerCardset = this.getPowerCardset();
+                powerCardset.setCardsInLinePosition();
+                powerCardset.setCardsClosed();
+            }
             if (battleCards) promises.push(this.createCardset(battleCards));
             if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
             await Promise.all(promises);
@@ -724,15 +705,5 @@ export class CardBattlePhase implements Phase {
 
     changeToBattlePhase(): void {
         throw new Error("Method not implemented.");
-    }
-
-    destroy(): void {
-        this.destroyAllTextWindows();
-        this.destroyCommandWindow();
-        this.destroyBoard();
-        this.destroyOpponentBoard();
-        this.destroyCardset();
-        this.destroyOpponentCardset();
-        this.destroyPowerCardset();
     }
 }

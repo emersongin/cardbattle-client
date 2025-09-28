@@ -8,7 +8,7 @@ export class ScaleAnimation {
         if (config.open) {
             this.card.scene.tweens.add({ 
                 targets: this.card.getUi(), 
-                x: card.getOriginX(),
+                x: this.card.getOriginX(),
                 scaleX: 1,
                 ease: 'Linear',
                 onComplete: () => {
@@ -21,11 +21,12 @@ export class ScaleAnimation {
         }
         this.card.scene.tweens.add({ 
             targets: this.card.getUi(), 
-            x: card.getX() + (card.getWidth() / 2),
+            x: this.card.getX() + (this.card.getWidth() / 2),
             scaleX: 0,
             ease: 'Linear',
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
+                this.card.getUi().destroy();
             },
             delay: config?.delay || 0,
             duration: config?.duration || 100,
