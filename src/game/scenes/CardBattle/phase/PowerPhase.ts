@@ -76,6 +76,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.createHandDisplayWindows();
         // open
         await super.openHandZone();
+        super.openAllWindows();
         // start select mode
         super.setSelectModeOnceCardset({
             onChangeIndex: (card: Card) => this.#updateTextWindows(card),

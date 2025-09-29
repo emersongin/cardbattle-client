@@ -622,7 +622,6 @@ export class CardBattlePhase implements Phase {
                     (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
                 ],
                 onAllComplete: () => {
-                    this.openAllWindows();
                     if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
@@ -657,7 +656,6 @@ export class CardBattlePhase implements Phase {
                     (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
                 ],
                 onAllComplete: () => {
-                    this.openAllWindows();
                     if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
