@@ -84,9 +84,4 @@ export class StartPhase extends CardBattlePhase implements Phase {
     changeToDrawPhase(): void {
         this.scene.changePhase(new DrawPhase(this.scene));
     }
-
-    destroy(): void {
-        super.destroyAllTextWindows();
-        super.destroyCommandWindow();
-    }
 }

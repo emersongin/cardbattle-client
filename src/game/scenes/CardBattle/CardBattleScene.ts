@@ -1,16 +1,14 @@
 import { EventBus } from '@game/EventBus';
 import { ORANGE, WHITE } from '@/game/constants/colors';
-import { BATTLE } from '@/game/constants/keys';
 import { RoomData } from '@objects/RoomData';
 import { VueScene } from '@scenes/VueScene';
 import { Phase } from '@scenes/CardBattle/phase/Phase';
-import { ChallengePhase } from '@scenes/CardBattle/phase/ChallengePhase';
-import { StartPhase } from '@scenes/CardBattle/phase/StartPhase';
-import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
+// import { ChallengePhase } from '@scenes/CardBattle/phase/ChallengePhase';
+// import { StartPhase } from '@scenes/CardBattle/phase/StartPhase';
+// import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
 import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
 import { SummonPhase } from './phase/SummonPhase';
 import { CompilePhase } from './phase/CompilePhase';
-import { CardColorsType } from '@/game/types/CardColorsType';
 
 export class CardBattleScene extends VueScene {
     room: RoomData;
@@ -60,7 +58,7 @@ export class CardBattleScene extends VueScene {
         // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
         // COMPILE PHASE
 
-        this.changePhase(new LoadPhase(this));
+        this.changePhase(new SummonPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

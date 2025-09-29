@@ -1,6 +1,5 @@
 export interface Phase {
     create(params?: any): void;
-    destroy?(): void;
     changeToChallengePhase(): void;
     changeToStartPhase(): void;
     changeToDrawPhase(): void;

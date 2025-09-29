@@ -2,16 +2,16 @@ import { TRASH } from "@constants/keys";
 import { PowerActionData } from "@objects/PowerActionData";
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
-import { LoadPhase } from "@scenes/CardBattle/phase/LoadPhase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CompilePhase } from "./CompilePhase";
+import { PowerPhase } from "./PowerPhase";
 
 export class TriggerPhase extends CardBattlePhase implements Phase {
 
     constructor(
         scene: CardBattleScene, 
-        readonly originPhase: LoadPhase | CompilePhase
+        readonly originPhase: PowerPhase
     ) {
         super(scene);
     }
@@ -84,10 +84,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     }
 
     #end(): void {
-        if (this.originPhase !instanceof LoadPhase && this.originPhase !instanceof CompilePhase) {
-            throw new Error("Origin phase not recognized.");
-        }
-        this.changeToLoadPhase();
+        this.scene.changePhase(this.originPhase, true);
     }
 
     changeToChallengePhase(): void {
@@ -103,7 +100,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     }
 
     changeToLoadPhase(): void {
-        this.scene.changePhase(this.originPhase, true);
+        throw new Error("Method not implemented.");
     }
 
     changeToTriggerPhase(): void {
@@ -122,7 +119,4 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
         throw new Error("Method not implemented.");
     }
 
-    destroy(): void {
-        console.log("Trigger Phase destroyed.");
-    }
 }

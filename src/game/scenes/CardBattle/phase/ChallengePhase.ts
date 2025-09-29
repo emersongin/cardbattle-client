@@ -62,9 +62,4 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     changeToStartPhase(): void {
         this.scene.changePhase(new StartPhase(this.scene));
     }
-    
-    destroy(): void {
-        super.destroyAllTextWindows();
-        super.destroyCommandWindow();
-    }
 }

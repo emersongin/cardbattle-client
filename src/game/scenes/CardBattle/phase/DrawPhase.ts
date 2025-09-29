@@ -52,8 +52,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     #createPlayerDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
             const playerCards = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
-            const cardset = await super.createCardset(playerCards);
+            await super.createCardset(playerCards);
             const widthEdge = this.scene.scale.width;
+            const cardset = super.getCardset();
             cardset.setCardsInLinePosition(widthEdge, 0);
             resolve();
         });
@@ -62,8 +63,9 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     #createOpponentDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
             const opponentCards = await this.cardBattle.getOpponentCardsFromHand(this.scene.room.playerId);
-            const cardset = await super.createOpponentCardset(opponentCards);
+            await super.createOpponentCardset(opponentCards);
             const widthEdge = this.scene.scale.width;
+            const cardset = super.getOpponentCardset();
             cardset.setCardsInLinePosition(widthEdge, 0);
             resolve();
         });
@@ -119,13 +121,5 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     changeToLoadPhase(): void {
         this.scene.changePhase(new LoadPhase(this.scene));
-    }
-
-    destroy(): void {
-        super.destroyAllTextWindows();
-        super.destroyBoard();
-        super.destroyOpponentBoard();
-        this.destroyCardset();
-        this.destroyOpponentCardset();
     }
 }
