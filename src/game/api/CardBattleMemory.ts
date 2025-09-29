@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CardBattle } from '@api/CardBattle';
-import { AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
+import { ADD_COLOR_POINTS, AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { CardData } from "@objects/CardData";
@@ -115,7 +115,7 @@ const powerCards = [
     {
         id: 'P1',
         number: 7,
-        name: 'Power Card n° 1',
+        name: 'Add Color Points Power Card n° 1',
         description: 'This is a test power card description.',
         details: 'This card is used for testing power effects.',
         color: RED as CardColorsType,
@@ -123,14 +123,14 @@ const powerCards = [
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-1',
+        powerId: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
     {
         id: 'P2',
         number: 8,
-        name: 'Power Card n° 2',
+        name: 'Add Color Points Power Card n° 2',
         description: 'This is another test power card description.',
         details: 'This card is used for testing power effects.',
         color: GREEN as CardColorsType,
@@ -138,14 +138,14 @@ const powerCards = [
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-2',
+        powerId: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
     {
         id: 'P3',
         number: 9,
-        name: 'Power Card n° 3',
+        name: 'Add Color Points Power Card n° 3',
         description: 'This is yet another test power card description.',
         details: 'This card is used for testing power effects.',
         color: BLUE as CardColorsType,
@@ -153,14 +153,14 @@ const powerCards = [
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-3',
+        powerId: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
     {
         id: 'P4',
         number: 10,
-        name: 'Power Card n° 4',
+        name: 'Add Color Points Power Card n° 4',
         description: 'This is a different test power card description.',
         details: 'This card is used for testing power effects.',
         color: BLACK as CardColorsType,
@@ -168,14 +168,14 @@ const powerCards = [
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-4',
+        powerId: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
     {
         id: 'P5',
         number: 11,
-        name: 'Power Card n° 5',
+        name: 'Add Color Points Power Card n° 5',
         description: 'This is a unique test power card description.',
         details: 'This card is used for testing power effects.',
         color: WHITE as CardColorsType,
@@ -183,14 +183,14 @@ const powerCards = [
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-5',
+        powerId: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
     {
         id: 'P6',
         number: 12,
-        name: 'Power Card n° 6',
+        name: 'Add Color Points Power Card n° 6',
         description: 'This is a special test power card description.',
         details: 'This card is used for testing power effects.',
         color: ORANGE as CardColorsType,
@@ -198,7 +198,7 @@ const powerCards = [
         hp: 0,
         ap: 0,
         typeId: POWER as CardType,
-        powerId: 'power-6',
+        powerId: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     }

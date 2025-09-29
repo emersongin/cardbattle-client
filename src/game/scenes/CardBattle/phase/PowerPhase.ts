@@ -1,4 +1,4 @@
-import { HAND } from "@constants/keys";
+import { ADD_COLOR_POINTS, HAND, REMOVE_COLOR_POINTS } from "@constants/keys";
 import { CARD_WIDTH } from "@constants/default";
 import { CardData } from "@objects/CardData";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
@@ -131,6 +131,16 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     #createPowerCardConfig(powerCard: CardData): void {
+        switch (powerCard.powerId) {
+            case ADD_COLOR_POINTS:
+            case REMOVE_COLOR_POINTS:
+            default:
+                this.#createConfirmPowerCardConfig(powerCard);
+                break;
+        }
+    }
+
+    #createConfirmPowerCardConfig(powerCard: CardData): void {
         super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
         super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
         super.createCommandWindowBottom('Use this Power Card?', [
