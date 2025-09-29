@@ -26,7 +26,7 @@ export class ScaleAnimation {
             ease: 'Linear',
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
-                this.card.getUi().destroy();
+                if (config?.destroy) this.card.getUi().destroy();
             },
             delay: config?.delay || 0,
             duration: config?.duration || 100,

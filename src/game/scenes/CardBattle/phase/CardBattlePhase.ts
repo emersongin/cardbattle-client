@@ -301,19 +301,19 @@ export class CardBattlePhase implements Phase {
     flipPlayerCardset(config?: TweenConfig) {
         const cardset = this.getCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#flipCardSet(cardset, config);
+        this.#flipCardset(cardset, config);
     }
 
     flashPlayerCardset(config: TweenConfig): void {
         const cardset = this.getCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#flashCardSet(cardset, config);
+        this.#flashCardset(cardset, config);
     }
 
     movePlayerCardsetToBoard(config: TweenConfig): void {
         const cardset = this.getCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#moveCardSetToBoard(cardset, config);
+        this.#moveCardsetToBoard(cardset, config);
     }
 
     setSelectModeOnceCardset(events: CardsetEvents): void {
@@ -361,19 +361,19 @@ export class CardBattlePhase implements Phase {
     flipOpponentCardset(config?: TweenConfig): void {
         const cardset = this.getOpponentCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#flipCardSet(cardset, config);
+        this.#flipCardset(cardset, config);
     }
 
     flashOpponentCardset(config?: TweenConfig): void {
         const cardset = this.getOpponentCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#flashCardSet(cardset, config);
+        this.#flashCardset(cardset, config);
     }
 
     moveOpponentCardsetToBoard(config?: TweenConfig): void {
         const cardset = this.getOpponentCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#moveCardSetToBoard(cardset, config);
+        this.#moveCardsetToBoard(cardset, config);
     }
 
     // FIELD CARDSET
@@ -430,7 +430,7 @@ export class CardBattlePhase implements Phase {
     movePowerCardsetToBoard(config?: TweenConfig): void {
         const cardset = this.getPowerCardset();
         if (!cardset) return (config?.onComplete) ? config.onComplete() : undefined;
-        this.#moveCardSetToBoard(cardset, config);
+        this.#moveCardsetToBoard(cardset, config);
     }
 
     // SHARED
@@ -474,6 +474,7 @@ export class CardBattlePhase implements Phase {
                     .create(card)
                     .close({
                         delay: (index * 100),
+                        destroy: true,
                         onComplete: () => resume()
                     })
                     .play();
@@ -486,7 +487,7 @@ export class CardBattlePhase implements Phase {
         this.scene.timeline(closeConfig);
     }
 
-    #flipCardSet(cardset: Cardset, config?: TweenConfig) {
+    #flipCardset(cardset: Cardset, config?: TweenConfig) {
         const cardsUis = cardset.getCardsUi();
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
         const flipConfig: TimelineConfig<CardUi> = {
@@ -507,7 +508,7 @@ export class CardBattlePhase implements Phase {
         this.scene.timeline(flipConfig);
     }
 
-    #flashCardSet(cardset: Cardset, config?: TweenConfig): void {
+    #flashCardset(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
         const flashConfig: TimelineConfig<CardUi> = {
@@ -535,7 +536,7 @@ export class CardBattlePhase implements Phase {
         this.scene.timeline(flashConfig);
     }
 
-    #moveCardSetToBoard(cardset: Cardset, config?: TweenConfig): void {
+    #moveCardsetToBoard(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
         const totalCards = cardset.getCardsTotal();
@@ -610,25 +611,26 @@ export class CardBattlePhase implements Phase {
         });
     }
 
-    openGameBoard(config?: TweenConfig & { isOpponentCardsetOpen?: boolean }): Promise<void> {
+    openGameBoard(generalConfig?: TweenConfig & { isOpponentFaceUp?: boolean }): Promise<void> {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
                     (config?: TweenConfig) => this.openOpponentBoard(config),
                     (config?: TweenConfig) => this.openBoard(config),
                     (config?: TweenConfig) => this.openPowerCardset({ ...config, faceUp: true }),
-                    (config?: TweenConfig) => this.openOpponentCardset({ faceUp: (config?.isOpponentCardsetOpen ?? true), ...config }),
+                    (config?: TweenConfig) => this.openOpponentCardset({ ...config, faceUp: (generalConfig?.isOpponentFaceUp === false ? false : true) }),
                     (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
                 ],
                 onAllComplete: () => {
-                    if (config?.onComplete) config.onComplete();
+                    this.openAllWindows();
+                    if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
             });
         });
     }
 
-    closeGameBoard(config?: TweenConfig): Promise<void> {
+    closeGameBoard(generalConfig?: TweenConfig): Promise<void> {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
@@ -640,14 +642,14 @@ export class CardBattlePhase implements Phase {
                     (config?: TweenConfig) => this.closeAllWindows(config),
                 ],
                 onAllComplete: () => {
-                    if (config?.onComplete) config.onComplete();
+                    if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
             });
         });
     }
 
-    openHandZone(config?: TweenConfig): Promise<void> {
+    openHandZone(generalConfig?: TweenConfig): Promise<void> {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
@@ -656,23 +658,23 @@ export class CardBattlePhase implements Phase {
                 ],
                 onAllComplete: () => {
                     this.openAllWindows();
-                    if (config?.onComplete) config.onComplete();
+                    if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
             });
         });
     }
 
-    closeHandZone(config?: TweenConfig): Promise<void> {
+    closeHandZone(generalConfig?: TweenConfig): Promise<void> {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
-                    (config?: TweenConfig) => this.closeAllWindows(config),
                     (config?: TweenConfig) => this.closeBoard(config),
                     (config?: TweenConfig) => this.closeCardset(config),
+                    (config?: TweenConfig) => this.closeAllWindows(config),
                 ],
                 onAllComplete: () => {
-                    if (config?.onComplete) config.onComplete();
+                    if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
             });

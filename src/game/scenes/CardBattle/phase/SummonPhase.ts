@@ -121,8 +121,10 @@ export class SummonPhase extends CardBattlePhase implements Phase {
 
     async #createGameBoard(): Promise<void> {
         await super.createGameBoard({ isShowBattlePoints: false });
-        await super.openGameBoard({ isOpponentCardsetOpen: false });
-        super.flipOpponentCardset({ onComplete: () => this.#loadBattlePoints() });
+        await super.openGameBoard({ isOpponentFaceUp: false });
+        super.flipOpponentCardset({ 
+            onComplete: () => this.#loadBattlePoints() 
+        });
     }
 
     async #loadBattlePoints(): Promise<void> {
