@@ -643,6 +643,7 @@ export default class CardBattleMemory implements CardBattle {
             this.#playerBoard[WHITE] += this.#playerHand.filter(card => card.color === WHITE).length;
             this.#playerBoard[DECK] = this.#playerDeck.length;
             this.#playerBoard[HAND] = this.#playerHand.length;
+            this.#playerBoard[TRASH] = this.#playerTrash.length;
             this.#setPlayerStep(WAITING_TO_PLAY);
         };
         if (this.#isOpponent(playerId)) {
@@ -653,6 +654,7 @@ export default class CardBattleMemory implements CardBattle {
             this.#opponentBoard[WHITE] += this.#opponentHand.filter(card => card.color === WHITE).length;
             this.#opponentBoard[DECK] = this.#opponentDeck.length;
             this.#opponentBoard[HAND] = this.#opponentHand.length;
+            this.#opponentBoard[TRASH] = this.#opponentTrash.length;
             this.#setOpponentStep(WAITING_TO_PLAY);
         };
     }
@@ -849,6 +851,7 @@ export default class CardBattleMemory implements CardBattle {
                 });
                 if (this.#isPlayer(playerId)) {
                     await this.#removePowerCardInHandById(this.#playerId, powerCardId);
+
                     this.#setPlayerStep(PASS);
                     if (!await this.isPowerfieldLimitReached()) {
                         this.#setOpponentStep(IN_PLAY);
@@ -1015,10 +1018,12 @@ export default class CardBattleMemory implements CardBattle {
             if (update.playerSincronized && update.opponentSincronized) {
                 if (this.#isPlayer(update.playerId)) {
                     this.#playerTrash.push(update.powerAction.powerCard);
+                    this.#playerBoard[TRASH] = this.#playerTrash.length;
                     return;
                 };
                 if (this.#isOpponent(update.playerId)) {
                     this.#opponentTrash.push(update.powerAction.powerCard);
+                    this.#opponentBoard[TRASH] = this.#opponentTrash.length;
                     return;
                 };
             }

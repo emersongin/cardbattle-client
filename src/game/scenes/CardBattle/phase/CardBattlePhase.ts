@@ -139,18 +139,21 @@ export class CardBattlePhase implements Phase {
 
     closeAllWindows(config?: TweenConfig): Promise<void> {
         return new Promise<void>(resolve => {
-            if (this.#textWindows.length) {
-                this.#textWindows.forEach((window, index) => {
-                    if (!index) return window.close({ 
+            this.#textWindows.forEach((window, index) => {
+                if (!index && window.isOpen()) {
+                    return window.close({ 
                         ...config, 
                         onComplete: () => {
                             if (config?.onComplete) config.onComplete();
                             resolve();
                         }
                     });
-                    window.close();
-                });
-            }
+                } else {
+                    if (config?.onComplete) config.onComplete();
+                    resolve();
+                }
+                window.close();
+            });
         });
     }
 
@@ -634,6 +637,7 @@ export class CardBattlePhase implements Phase {
                     (config?: TweenConfig) => this.closePowerCardset(config),
                     (config?: TweenConfig) => this.closeCardset(config),
                     (config?: TweenConfig) => this.closeOpponentCardset(config),
+                    (config?: TweenConfig) => this.closeAllWindows(config),
                 ],
                 onAllComplete: () => {
                     if (config?.onComplete) config.onComplete();

@@ -105,6 +105,10 @@ export class TextWindow extends TextBox {
         });
     }
 
+    isOpen(): boolean {
+        return this.scaleY === 1;
+    }
+
     #addOnCompletedListener() {
         this.scene.addKeyEnterListeningOnce({
             onTrigger: () => {

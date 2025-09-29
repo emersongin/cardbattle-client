@@ -69,7 +69,6 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     async #changeBattleZoneToHandZone(): Promise<void> {
         await super.closeGameBoard();
-        // super.closeAllWindows();
         // create hand zone
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         await this.createHandZone();
@@ -191,8 +190,8 @@ export abstract class PowerPhase extends CardBattlePhase {
         });
     }
 
-    #loadPlayAndMovePowerCardToField(): void {
-        super.closeAllWindows();
+    async #loadPlayAndMovePowerCardToField(): Promise<void> {
+        await super.closeAllWindows();
         super.getPowerCardset().removeAllSelect();
         super.movePowerCardsetToBoard({ onComplete: () => this.#nextPlay() });
     }
