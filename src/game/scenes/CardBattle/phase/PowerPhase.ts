@@ -148,17 +148,17 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #finishPowerCardPlay(powerCard: CardData, powerCardConfig: any): Promise<void> {
-        const powerAction = {
-            powerCard,
-            config: powerCardConfig
-        }
+        await super.closeAllWindows();
+        // make power card play and remove hand point
+        const powerAction = { powerCard, config: powerCardConfig };
         await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
+        super.removeBoardZonePoints(HAND, 1);
+        // set board pass
         await this.cardBattle.pass(this.scene.room.playerId);
         super.setBoardPass();
-        super.removeBoardZonePoints(HAND, 1);
-        if (!await this.cardBattle.isPowerfieldLimitReached()) {
-            super.removeOpponentBoardPass();
-        }
+        // reset opponent board pass if limit not reached
+        if (!await this.cardBattle.isPowerfieldLimitReached()) super.removeOpponentBoardPass();
+        // move power card to field
         this.#loadPlayAndMovePowerCardToField();
     }
 
@@ -191,7 +191,6 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #loadPlayAndMovePowerCardToField(): Promise<void> {
-        await super.closeAllWindows();
         super.getPowerCardset().removeAllSelect();
         super.movePowerCardsetToBoard({ onComplete: () => this.#nextPlay() });
     }
@@ -248,7 +247,8 @@ export abstract class PowerPhase extends CardBattlePhase {
             await this.#resetPlay();
         }
         if (powerAction?.powerCard) {
-            const opponentPlayFunction = () => {
+            const opponentPlayFunction = async () => {
+                await super.closeAllWindows();
                 super.removeOpponentBoardZonePoints(HAND, 1);
                 this.#loadPlayAndMovePowerCardToField();
             };
