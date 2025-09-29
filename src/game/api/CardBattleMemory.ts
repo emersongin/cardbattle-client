@@ -770,13 +770,13 @@ export default class CardBattleMemory implements CardBattle {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
                     const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                    resolve([...powerCards, ...battleCardsDisabled]);
                 };
                 if (this.#isOpponent(playerId)) {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
                     const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                    resolve([...powerCards, ...battleCardsDisabled]);
                 };
             }, delayMock);
         });
@@ -1079,14 +1079,14 @@ export default class CardBattleMemory implements CardBattle {
                     const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: !this.#hasEnoughPointsByColorAndCost(card.color, card.cost, this.#playerBoard) }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
                     const powerCardsDisabled = powerCards.map(card => ({ ...card, disabled: true }));
-                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCardsDisabled]));
+                    resolve([...battleCardsDisabled, ...powerCardsDisabled]);
                 };
                 if (this.#isOpponent(playerId)) {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
                     const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: !this.#hasEnoughPointsByColorAndCost(card.color, card.cost, this.#opponentBoard) }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
                     const powerCardsDisabled = powerCards.map(card => ({ ...card, disabled: true }));
-                    resolve(ArrayUtil.shuffle([...powerCardsDisabled, ...battleCardsDisabled]));
+                    resolve([...battleCardsDisabled, ...powerCardsDisabled]);
                 };
             }, delayMock);
         });
@@ -1275,13 +1275,13 @@ export default class CardBattleMemory implements CardBattle {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
                     const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                    resolve([...powerCards, ...battleCardsDisabled]);
                 };
                 if (this.#isOpponent(playerId)) {
                     const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
                     const battleCardsDisabled = battleCards.map(card => ({ ...card, disabled: true }));
                     const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    resolve(ArrayUtil.shuffle([...battleCardsDisabled, ...powerCards]));
+                    resolve([...powerCards, ...battleCardsDisabled]);
                 };
             }, delayMock);
         });
