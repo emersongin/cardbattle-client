@@ -36,6 +36,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.data.set('selected', false);
         this.data.set('marked', false);
         this.data.set('highlight', false);
+        this.data.set('banned', false);
     }
 
     getSelectedLayer(): Phaser.GameObjects.Container {
@@ -130,6 +131,10 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.staticData.id;
     }
 
+    getNumber(): number {
+        return this.staticData.number;
+    }
+
     getName(): string {
         return this.staticData.name;
     }
@@ -144,6 +149,26 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     getColor(): CardColorsType {
         return this.staticData.color;
+    }
+
+    getImageName(): string {
+        return this.staticData.imageName;
+    }
+
+    getAp(): number {
+        return this.data.get('ap');
+    }
+
+    getHp(): number {
+        return this.data.get('hp');
+    }
+
+    getTypeId(): CardType {
+        return this.staticData.typeId;
+    }
+
+    getPowerId(): string {
+        return this.staticData.powerId;
     }
 
     getCost(): number {
