@@ -6,7 +6,7 @@ import { TweenConfig } from "@/game/types/TweenConfig";
 export class TextWindows {
     #textWindows: TextWindow[] = [];
 
-    private constructor(readonly scene: VueScene) {}
+    constructor(readonly scene: VueScene) {}
 
     #empty(): void {
         this.#textWindows = [];
@@ -38,7 +38,6 @@ export class TextWindows {
     }
 
     #createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): TextWindow {
-        this.#empty();
         const windowConfig = {
             textAlign: config.textAlign || 'left',
             textColor: config.textColor || '#ffffff',

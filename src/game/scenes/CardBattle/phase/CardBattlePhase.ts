@@ -40,6 +40,7 @@ export class CardBattlePhase implements Phase {
         
     constructor(readonly scene: CardBattleScene) {
         this.cardBattle = scene.getCardBattle();
+        this.#textWindows = new TextWindows(scene);
     }
 
     create(_p?: any): void {
@@ -48,14 +49,14 @@ export class CardBattlePhase implements Phase {
 
     // TEXT WINDOWS
     createTextWindowTop(text: string, config: Partial<TextWindowConfig>): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.#textWindows.createTextWindowTop(text, config);
             resolve();
         });
     }
 
     createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.#textWindows.createTextWindowCentered(text, config);
             resolve();
         });
@@ -85,7 +86,7 @@ export class CardBattlePhase implements Phase {
     }
 
     closeAllWindows(config?: TweenConfig): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.#textWindows.closeAllWindows({ ...config, 
                 onComplete: () => {
                     if (config?.onComplete) config.onComplete();
@@ -543,7 +544,7 @@ export class CardBattlePhase implements Phase {
     }
 
     openGameBoard(generalConfig?: TweenConfig): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.scene.timeline({
                 targets: [
                     (config?: TweenConfig) => this.openOpponentBoard(config),
@@ -561,7 +562,7 @@ export class CardBattlePhase implements Phase {
     }
 
     closeGameBoard(generalConfig?: TweenConfig): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.scene.timeline({
                 targets: [
                     (config?: TweenConfig) => this.closeBoard(config),
@@ -580,7 +581,7 @@ export class CardBattlePhase implements Phase {
     }
 
     openHandZone(generalConfig?: TweenConfig): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.scene.timeline({
                 targets: [
                     (config?: TweenConfig) => this.openBoard(config),
@@ -595,7 +596,7 @@ export class CardBattlePhase implements Phase {
     }
 
     closeHandZone(generalConfig?: TweenConfig): Promise<void> {
-        return new Promise<void>(resolve => {
+        return new Promise(resolve => {
             this.scene.timeline({
                 targets: [
                     (config?: TweenConfig) => this.closeBoard(config),
