@@ -1,9 +1,20 @@
 import { BoardWindowData } from "@objects/BoardWindowData";
-import { UpdateConfig } from "@/game/ui/BoardWindow/animations/types/UpdateConfig";
 import { BoardWindow } from "@ui/BoardWindow/BoardWindow";
-import { BoardUpdateConfig } from "./types/BoardUpdateConfig";
 import { AP, DECK, HAND, HP, PASS, TRASH, WINS } from "@/game/constants/keys";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
+import { TweenConfig } from "@/game/types/TweenConfig";
+
+export type UpdateConfig = {
+    target: BoardWindowData;
+    from: number;
+    to: number;
+    onUpdate: (tween: Phaser.Tweens.Tween) => void;
+} & TweenConfig;
+
+export type BoardUpdateConfig = {
+    fromTarget: BoardWindowData, 
+    toTarget: BoardWindowData,
+} & TweenConfig;
 export class UpdateAnimation {
     
     constructor(
