@@ -57,13 +57,13 @@ export class TextWindows {
         config.relativeParent = this.#getLastTextWindow();
         config.onStartClose = () => {}; // null
         const textFormatted = this.#breakTextWithoutCuttingWords(text, 60);
-        this.#textWindows.push(this.#createTextWindowCentered(textFormatted.text, config));
+        this.#textWindows.push(this.#createTextWindowCentered(textFormatted, config));
     }
 
     #breakTextWithoutCuttingWords(
         text: string,
         maxLength: number
-    ): { text: string; lines: number } {
+    ): string {
         const words = text.split(" ");
         let line = "";
         const resultLines: string[] = [];
@@ -78,10 +78,7 @@ export class TextWindows {
         if (line) {
             resultLines.push(line);
         }
-        return {
-            text: resultLines.join("\n"),
-            lines: resultLines.length,
-        };
+        return resultLines.join("\n");
     }
 
     #getLastTextWindow(): TextWindow {
