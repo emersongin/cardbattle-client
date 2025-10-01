@@ -1,8 +1,7 @@
 import { Sizer, Label } from 'phaser3-rex-plugins/templates/ui/ui-components';
-import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { DisplayUtil } from '@utils/DisplayUtil';
 import { VueScene } from '@/game/scenes/VueScene';
-
+import { CommandOption } from './CommandOption';
 export class CommandWindow extends Sizer {
     private selectedIndex: number = 0;
     private options: Label[];
