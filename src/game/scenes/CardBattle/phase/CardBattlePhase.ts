@@ -73,8 +73,8 @@ export class CardBattlePhase implements Phase {
         this.addTextWindow('...');
     }
 
-    addTextWindow(title: string, config?: Partial<TextWindowConfig>): void {
-        this.#textWindows.addTextWindow(title, config);
+    addTextWindow(text: string, config?: Partial<TextWindowConfig>): void {
+        this.#textWindows.addTextWindow(text, config);
     }
 
     setTextWindowText(text: string, index: number): void {
@@ -97,12 +97,12 @@ export class CardBattlePhase implements Phase {
     }
 
     // COMMAND WINDOW
-    createCommandWindowCentered(title: string, options: CommandOption[]): void {
-        this.#commandWindow = CommandWindow.createCentered(this.scene, title, options);
+    createCommandWindowCentered(text: string, options: CommandOption[]): void {
+        this.#commandWindow = CommandWindow.createCentered(this.scene, text, options);
     }
 
-    createCommandWindowBottom(title: string, options: CommandOption[]): void {
-        this.#commandWindow = CommandWindow.createBottom(this.scene, title, options);
+    createCommandWindowBottom(text: string, options: CommandOption[]): void {
+        this.#commandWindow = CommandWindow.createBottom(this.scene, text, options);
     }
 
     openCommandWindow(): void {

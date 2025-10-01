@@ -56,7 +56,36 @@ export class TextWindows {
         if (!config) config = {};
         config.relativeParent = this.#getLastTextWindow();
         config.onStartClose = () => {}; // null
-        this.#textWindows.push(this.#createTextWindowCentered(text, config));
+        const textFormatted = this.#breakTextWithoutCuttingWords(text, 60);
+        config.marginTop = config.marginTop || 1;
+        this.#textWindows.push(this.#createTextWindowCentered(textFormatted.text, config));
+    }
+
+    #breakTextWithoutCuttingWords(
+        text: string,
+        maxLength: number
+    ): { text: string; lines: number } {
+        const words = text.split(" ");
+        let line = "";
+        const resultLines: string[] = [];
+
+        for (const word of words) {
+            if ((line + (line ? " " : "") + word).length <= maxLength) {
+            line += (line ? " " : "") + word;
+            } else {
+            resultLines.push(line);
+            line = word;
+            }
+        }
+
+        if (line) {
+            resultLines.push(line);
+        }
+
+        return {
+            text: resultLines.join("\n"),
+            lines: resultLines.length,
+        };
     }
 
     #getLastTextWindow(): TextWindow {
