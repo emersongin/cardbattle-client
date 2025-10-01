@@ -16,7 +16,7 @@ export class TextWindow extends TextBox {
             x: config.x,
             y: config.y,
             width: config.width,
-            height: 0, //testing
+            height: config.height,
             background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 4, 0x222222),
             text: scene.add.text(0, 0, config.text, {
                 fontSize: '24px',
@@ -34,13 +34,19 @@ export class TextWindow extends TextBox {
         this.layout();
         this.setScale(1, 0);
         this.setStartClose(config.onStartClose);
+        this.#setYPositionByHeight(config.height);
         this.#setOnClose(config.onClose);
         scene.add.existing(this);
+        
     }
 
     setStartClose(onStartClose?: () => void): void {
         if (typeof onStartClose !== 'function') return;
         this.#onStartClose = onStartClose;
+    }
+
+    #setYPositionByHeight(height: number): void {
+        this.y = this.y + ((this.height - (height ?? 0)) / 2);
     }
 
     #setOnClose(onClose?: () => void): void {

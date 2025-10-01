@@ -57,7 +57,6 @@ export class TextWindows {
         config.relativeParent = this.#getLastTextWindow();
         config.onStartClose = () => {}; // null
         const textFormatted = this.#breakTextWithoutCuttingWords(text, 60);
-        config.marginTop = config.marginTop || 1;
         this.#textWindows.push(this.#createTextWindowCentered(textFormatted.text, config));
     }
 
@@ -68,7 +67,6 @@ export class TextWindows {
         const words = text.split(" ");
         let line = "";
         const resultLines: string[] = [];
-
         for (const word of words) {
             if ((line + (line ? " " : "") + word).length <= maxLength) {
             line += (line ? " " : "") + word;
@@ -77,11 +75,9 @@ export class TextWindows {
             line = word;
             }
         }
-
         if (line) {
             resultLines.push(line);
         }
-
         return {
             text: resultLines.join("\n"),
             lines: resultLines.length,
