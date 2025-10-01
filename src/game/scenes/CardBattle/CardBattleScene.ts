@@ -3,9 +3,9 @@ import { ORANGE, WHITE } from '@/game/constants/colors';
 import { RoomData } from '@objects/RoomData';
 import { VueScene } from '@scenes/VueScene';
 import { Phase } from '@scenes/CardBattle/phase/Phase';
-// import { ChallengePhase } from '@scenes/CardBattle/phase/ChallengePhase';
-// import { StartPhase } from '@scenes/CardBattle/phase/StartPhase';
-// import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
+import { ChallengePhase } from '@scenes/CardBattle/phase/ChallengePhase';
+import { StartPhase } from '@scenes/CardBattle/phase/StartPhase';
+import { DrawPhase } from '@scenes/CardBattle/phase/DrawPhase';
 import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
 import { SummonPhase } from './phase/SummonPhase';
 import { CompilePhase } from './phase/CompilePhase';
@@ -30,13 +30,14 @@ export class CardBattleScene extends VueScene {
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
         // START PHASE
         await this.getCardBattle().setFolder(playerId, 'f3');
-        // // DRAW PHASE
+        // DRAW PHASE
         await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
-        // // LOAD PHASE
-        await this.getCardBattle().setReadyDrawCards(opponentId);
-        await this.getCardBattle().setReadyDrawCards(playerId);
-        // // SUMMON PHASE
-        // const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
+        // LOAD PHASE
+        // await this.getCardBattle().setReadyDrawCards(opponentId);
+        // await this.getCardBattle().setReadyDrawCards(playerId);
+        // SUMMON PHASE
+        // COMPILE PHASE
+        // const playerCards = await this.getCardBattle().getCardsFromHandInTheSummonPhase(playerId);
         // const playerBoard = await this.getCardBattle().getBoard(playerId);
         // const playerCardIds = playerCards.filter(card => {
         //     if (card.color === ORANGE) return true;
@@ -46,7 +47,7 @@ export class CardBattleScene extends VueScene {
         //     return true;
         // }).map(card => card.id);
         // await this.getCardBattle().setBattleCards(playerId, playerCardIds);
-        // const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
+        // const opponentCards = await this.getCardBattle().getCardsFromHandInTheSummonPhase(opponentId);
         // const opponentBoard = await this.getCardBattle().getBoard(opponentId);
         // const opponentCardIds = opponentCards.filter(card => {
         //     if (card.color === ORANGE) return true;
@@ -56,9 +57,8 @@ export class CardBattleScene extends VueScene {
         //     return true;
         // }).map(card => card.id);
         // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
-        // COMPILE PHASE
 
-        this.changePhase(new LoadPhase(this));
+        this.changePhase(new DrawPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

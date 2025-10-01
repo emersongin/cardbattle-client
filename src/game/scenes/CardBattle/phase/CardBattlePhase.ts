@@ -381,13 +381,11 @@ export class CardBattlePhase implements Phase {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
             const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
-            
             if (this.#fieldCardset) {
                 const cards = this.#fieldCardset.getCards()
                 if (cards) cards.forEach(card => card.getUi().destroy());
                 this.#fieldCardset.destroy();
             }
-
             const cardset = Cardset.create(this.scene, cards, x, y);
             cardset.setCardsInLinePosition();
             cardset.setCardsClosed();
@@ -408,7 +406,7 @@ export class CardBattlePhase implements Phase {
         this.getPowerCardset().removeCardById(cardId);
     }
 
-    openPowerCardset(config?: TweenConfig & { faceUp?: boolean }): void {
+    openPowerCardset(config?: TweenConfig): void {
         const cardset = this.getPowerCardset();
         if (!cardset || cardset.isOpened()) return (config?.onComplete) ? config.onComplete() : undefined;
         const openConfig = { delay: 100 };
@@ -448,7 +446,7 @@ export class CardBattlePhase implements Phase {
                 pause();
                 const builder = CardActionsBuilder
                     .create(card);
-                if (config?.faceUp) builder.faceUp();
+                // if (config?.faceUp) builder.faceUp();
                 builder
                     .open({
                         delay: (index * 100),
@@ -577,14 +575,17 @@ export class CardBattlePhase implements Phase {
     // GENERAL
     createGameBoard(config?: TweenConfig & { 
         isShowBattlePoints?: boolean, 
-        isPowerCardsFaceUp?: boolean 
+        isOpponentBattleCardsFaceDown?: boolean,
     }): Promise<void> {
         return new Promise(async resolve => {
             const board = await this.cardBattle.getBoard(this.scene.room.playerId);
             const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
             const powerCards: CardDataWithState[] = await this.cardBattle.getFieldPowerCards();
             const battleCards: CardDataWithState[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
-            const opponentBattleCards: CardDataWithState[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
+            let opponentBattleCards: CardDataWithState[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
+            if (config?.isOpponentBattleCardsFaceDown) {
+                opponentBattleCards = opponentBattleCards.map(card => ({ ...card, faceUp: false }) );
+            }            
             const promises = [];
             if (board) {
                 const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
@@ -595,11 +596,6 @@ export class CardBattlePhase implements Phase {
                 promises.push(this.createOpponentBoard(opponentBoardData));
             }
             if (powerCards) promises.push(this.createPowerCardset(powerCards));
-            if (config?.isPowerCardsFaceUp) {
-                const powerCardset = this.getPowerCardset();
-                powerCardset.setCardsInLinePosition();
-                powerCardset.setCardsClosed();
-            }
             if (battleCards) promises.push(this.createCardset(battleCards));
             if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));
             await Promise.all(promises);
@@ -608,14 +604,14 @@ export class CardBattlePhase implements Phase {
         });
     }
 
-    openGameBoard(generalConfig?: TweenConfig & { isOpponentFaceUp?: boolean }): Promise<void> {
+    openGameBoard(generalConfig?: TweenConfig): Promise<void> {
         return new Promise<void>(resolve => {
             this.scene.timeline({
                 targets: [
                     (config?: TweenConfig) => this.openOpponentBoard(config),
                     (config?: TweenConfig) => this.openBoard(config),
-                    (config?: TweenConfig) => this.openPowerCardset({ ...config, faceUp: true }),
-                    (config?: TweenConfig) => this.openOpponentCardset({ ...config, faceUp: (generalConfig?.isOpponentFaceUp === false ? false : true) }),
+                    (config?: TweenConfig) => this.openPowerCardset({ ...config }),
+                    (config?: TweenConfig) => this.openOpponentCardset({ ...config }),
                     (config?: TweenConfig) => this.openCardset({ ...config, faceUp: true }),
                 ],
                 onAllComplete: () => {

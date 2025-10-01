@@ -738,48 +738,27 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getCardsFromHandInTheDrawPhase(playerId: string): Promise<CardDataWithState[]> {
+    getCardsFromHand(playerId: string): Promise<CardDataWithState[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.map(card => ({ ...card, faceUp: false, disabled: false })));
+                    resolve(this.#playerHand.map(card => ({ ...card, faceUp: true, disabled: false })));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.map(card => ({ ...card, faceUp: false, disabled: false })));
+                    resolve(this.#opponentHand.map(card => ({ ...card, faceUp: true, disabled: false })));
                 };
             }, delayMock);
         });
     }
 
-    getOpponentCardsFromHandInTheDrawPhase(playerId: string): Promise<CardDataWithState[]> {
+    getOpponentCardsFromHand(playerId: string): Promise<CardDataWithState[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#opponentHand.map(card => ({ ...card, faceUp: false, disabled: false })));
+                    resolve(this.#opponentHand.map(card => ({ ...card, faceUp: true, disabled: false })));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#playerHand.map(card => ({ ...card, faceUp: false, disabled: false })));
-                };
-            }, delayMock);
-        });
-    }
-
-    getCardsFromHandInTheLoadPhase(playerId: string): Promise<CardDataWithState[]> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
-                    const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    const powerCardsEnabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: false }));
-                    resolve([...powerCardsEnabled, ...battleCardsDisabled]);
-                };
-                if (this.#isOpponent(playerId)) {
-                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
-                    const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    const powerCardsEnabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: false }));
-                    resolve([...powerCardsEnabled, ...battleCardsDisabled]);
+                    resolve(this.#playerHand.map(card => ({ ...card, faceUp: true, disabled: false })));
                 };
             }, delayMock);
         });
@@ -1075,27 +1054,6 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getCardsFromHandInTheSummonPhase(playerId: string): Promise<CardDataWithState[]> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
-                    const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: !this.#hasEnoughPointsByColorAndCost(card.color, card.cost, this.#playerBoard) }));
-                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    const powerCardsDisabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-                    resolve([...battleCardsDisabled, ...powerCardsDisabled]);
-                };
-                if (this.#isOpponent(playerId)) {
-                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
-                    const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: !this.#hasEnoughPointsByColorAndCost(card.color, card.cost, this.#opponentBoard) }));
-                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    const powerCardsDisabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-                    resolve([...battleCardsDisabled, ...powerCardsDisabled]);
-                };
-            }, delayMock);
-        });
-    }
-
     #hasEnoughPointsByColorAndCost(cardColor: CardColorsType, cardCost: number, boardWindowData: BoardWindowData): boolean {
         if (cardColor === ORANGE) return true;
         switch (cardColor) {
@@ -1268,27 +1226,6 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isOpponent(playerId)) {
                     resolve({ [AP]: this.#playerBoard[AP], [HP]: this.#playerBoard[HP] });
                 }
-            }, delayMock);
-        });
-    }
-
-    getCardsFromHandInTheCompilePhase(playerId: string): Promise<CardDataWithState[]> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
-                    const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    const powerCardsEnabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: false }));
-                    resolve([...powerCardsEnabled, ...battleCardsDisabled]);
-                };
-                if (this.#isOpponent(playerId)) {
-                    const battleCards = this.#playerHand.filter(card => card.typeId === BATTLE);
-                    const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-                    const powerCards = this.#playerHand.filter(card => card.typeId === POWER);
-                    const powerCardsEnabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: false }));
-                    resolve([...powerCardsEnabled, ...battleCardsDisabled]);
-                };
             }, delayMock);
         });
     }

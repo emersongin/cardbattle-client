@@ -26,9 +26,8 @@ export interface CardBattle {
     listenOpponentDrawCards(playerId: string, callback: (isReady: boolean) => void): Promise<void>;
     getBoard: (playerId: string) => Promise<BoardWindowData>;
     getOpponentBoard: (playerId: string) => Promise<BoardWindowData>;
-    getCardsFromHandInTheDrawPhase: (playerId: string) => Promise<CardDataWithState[]>;
-    getOpponentCardsFromHandInTheDrawPhase: (playerId: string) => Promise<CardDataWithState[]>;
-    getCardsFromHandInTheLoadPhase: (playerId: string) => Promise<CardDataWithState[]>;
+    getCardsFromHand: (playerId: string) => Promise<CardDataWithState[]>;
+    getOpponentCardsFromHand: (playerId: string) => Promise<CardDataWithState[]>;
     isStartPlaying: (playerId: string) => Promise<boolean>;
     setPlaying: (playerId: string) => Promise<void>;
     pass(playerId: string): Promise<void>;
@@ -45,7 +44,6 @@ export interface CardBattle {
     setPowerActionCompleted: (playerId: string, powerCardId: string) => Promise<void>;
     hasPowerCardUpdates: (playerId: string) => Promise<boolean>;
     listenOpponentPowerActionUpdates: (playerId: string, callback: (isEnd: boolean) => void) => Promise<void>;
-    getCardsFromHandInTheSummonPhase: (playerId: string) => Promise<CardDataWithState[]>;
     setBattleCards: (playerId: string, cardIds: string[]) => Promise<void>;
     isOpponentBattleCardsSet: (playerId: string) => Promise<boolean>;
     listenOpponentBattleCardsSet: (playerId: string, callback: (isSet: boolean) => void) => Promise<void>;
@@ -53,5 +51,4 @@ export interface CardBattle {
     getOpponentBattleCards: (playerId: string) => Promise<CardDataWithState[]>;
     getBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
     getOpponentBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
-    getCardsFromHandInTheCompilePhase: (playerId: string) => Promise<CardDataWithState[]>;
 }

@@ -7,6 +7,7 @@ import { ORANGE } from "@/game/constants/colors";
 import { CardColorsType } from "@/game/types/CardColorsType";
 import { Card } from "@/game/ui/Card/Card";
 import { CardDataWithState } from "@/game/objects/CardDataWithState";
+import { BATTLE, POWER } from "@/game/constants/keys";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -23,9 +24,13 @@ export class SummonPhase extends CardBattlePhase implements Phase {
 
     async #createHandZone(): Promise<void> {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
-        const cardsData: CardDataWithState[] = await this.cardBattle.getCardsFromHandInTheSummonPhase(this.scene.room.playerId);
         super.createBoard(boardData);
-        super.createHandCardset(cardsData);
+        const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
+        const battleCards = cards.filter(card => card.typeId === BATTLE);
+        const battleCardsToSummon = battleCards.map(card => ({ ...card, faceUp: true, disabled: !this.#onHasEnoughColorPointsByColor(card.color, card.cost) }));
+        const powerCards = cards.filter(card => card.typeId === POWER);
+        const powerCardsDisabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: true }));
+        super.createHandCardset([...battleCardsToSummon, ...powerCardsDisabled]);
         super.createHandDisplayWindows();
     }
 
@@ -39,7 +44,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 super.openAllWindows();
                 super.setSelectModeMultCardset({
                     onChangeIndex: (card: Card) => this.#onChangeHandCardsetIndex(card),
-                    onHasEnoughColorPointsByColor: (card: Card) => this.#onHasEnoughColorPointsByColor(card),
+                    onHasEnoughColorPointsByColor: (card: Card) => this.#onHasEnoughColorPointsByColor(card.getColor(), card.getCost()),
                     onCreditPoint: (card: Card) => this.#onCreditPoint(card),
                     onDebitPoint: (card: Card) => this.#onDebitPoint(card),
                     onComplete: (cardIds: string[]) => {
@@ -58,9 +63,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.setTextWindowText(card.getDetails(), 3);
     }
     
-    #onHasEnoughColorPointsByColor(card: Card): boolean {
-        const cardColor = card.getColor();
-        const cardCost = card.getCost();
+    #onHasEnoughColorPointsByColor(cardColor: CardColorsType, cardCost: number): boolean {
         if (cardColor === ORANGE) return true;
         return super.getBoard().hasEnoughColorPointsByColor(cardColor, cardCost);
     }
@@ -120,8 +123,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #createGameBoard(): Promise<void> {
-        await super.createGameBoard({ isShowBattlePoints: false });
-        await super.openGameBoard({ isOpponentFaceUp: false });
+        await super.createGameBoard({ isShowBattlePoints: false, isOpponentBattleCardsFaceDown: true });
+        await super.openGameBoard();
         super.flipOpponentCardset({ 
             onComplete: () => this.#loadBattlePoints() 
         });
