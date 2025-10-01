@@ -18,7 +18,7 @@ export class SelectMode {
         this.#selectIds = [];
         this.#disabledIds = [];
         this.#addDisabledCards();
-        this.enable();
+        this.#enable();
     }
 
     #addDisabledCards(): void {
@@ -27,7 +27,7 @@ export class SelectMode {
         });
     }
 
-    enable() {
+    #enable() {
         this.cardset.data.set('selectModeEnabled', true);
         this.#updateCursor();
         this.#addKeyboardListeners();
@@ -280,7 +280,7 @@ export class SelectMode {
             this.cardset.disableCardById(cardId);
         });
         this.#changeIndex(this.cardset.getCardIndexById(lastId));
-        this.enable();
+        this.#enable();
     }
 
     #isManySelectMode(): boolean {
