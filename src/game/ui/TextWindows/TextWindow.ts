@@ -16,7 +16,7 @@ export class TextWindow extends TextBox {
             x: config.x,
             y: config.y,
             width: config.width,
-            height: config.height,
+            height: 0, //testing
             background: scene.rexUI.add.roundRectangle(0, 0, 0, 0, 4, 0x222222),
             text: scene.add.text(0, 0, config.text, {
                 fontSize: '24px',
@@ -65,7 +65,7 @@ export class TextWindow extends TextBox {
         const x = scene.cameras.main.centerX;
         let y = scene.cameras.main.centerY;
         if (relativeParent) {
-            y = relativeParent.y + relativeParent.height + 2 + (config.marginTop || 0);
+            y = (relativeParent.y + relativeParent.height) + 2 + (config.marginTop || 0);
         }
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);

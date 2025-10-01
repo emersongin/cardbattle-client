@@ -144,7 +144,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #createConfirmPowerCardConfig(powerCard: CardData): void {
         super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
-        super.addTextWindow(`${powerCard.description} ${powerCard.description} ${powerCard.description}`);
+        super.addTextWindow(powerCard.details.repeat(6)); //testing
         super.createCommandWindowBottom('Use this Power Card?', [
             {
                 description: 'Yes',
