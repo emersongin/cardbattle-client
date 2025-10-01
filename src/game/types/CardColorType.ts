@@ -1,6 +1,6 @@
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
 
-export type CardColorsType = 
+export type CardColorType = 
     | typeof RED 
     | typeof GREEN 
     | typeof BLUE 

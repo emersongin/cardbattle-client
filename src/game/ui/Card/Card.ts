@@ -1,7 +1,7 @@
 import { AP, BATTLE, HP, POWER } from "@constants/keys";
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { CardData } from "@objects/CardData";
-import { CardColorsType } from "@game/types/CardColorsType";
+import { CardColorType } from "@game/types/CardColorType";
 import { CardType } from "@game/types/CardType";
 import { CardUi } from "@ui/Card/CardUi";
 import { Cardset } from "@ui/Cardset/Cardset";
@@ -144,16 +144,16 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.staticData.description;
     }
 
-    getDetails(): string {
-        return this.staticData.details;
+    getEffectDescription(): string {
+        return this.staticData.effectDescription;
     }
 
-    getColor(): CardColorsType {
+    getColor(): CardColorType {
         return this.staticData.color;
     }
 
-    getImageName(): string {
-        return this.staticData.imageName;
+    getImage(): string {
+        return this.staticData.image;
     }
 
     getAp(): number {
@@ -164,12 +164,12 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get('hp');
     }
 
-    getTypeId(): CardType {
-        return this.staticData.typeId;
+    getType(): CardType {
+        return this.staticData.type;
     }
 
-    getPowerId(): string {
-        return this.staticData.powerId;
+    getEffectType(): string {
+        return this.staticData.effectType;
     }
 
     getCost(): number {
@@ -177,11 +177,11 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     isBattleCard(): boolean {
-        return this.staticData.typeId === BATTLE as CardType;
+        return this.staticData.type === BATTLE as CardType;
     }
 
     isPowerCard(): boolean {
-        return this.staticData.typeId === POWER as CardType;
+        return this.staticData.type === POWER as CardType;
     }
 
     setPosition(x: number = this.#ui.x, y: number = this.#ui.y): void {

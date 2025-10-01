@@ -3,11 +3,11 @@ import CardBattleMock from "@mocks/cardset";
 import { describe, it, expect, beforeAll } from "vitest";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { Card } from "@ui/Card/Card";
-import { GREEN } from "@constants/colors";
-import { CardColorsType } from "@/game/types/CardColorsType";
-import { BATTLE } from "@constants/keys";
+import { BLUE, GREEN } from "@constants/colors";
+import { ADD_COLOR_POINTS, BATTLE, POWER } from "@constants/keys";
 import { CardType } from "@game/types/CardType";
 import { VueScene } from "@/game/scenes/VueScene";
+import { CardColorType } from "@/game/types/CardColorType";
 
 describe("Card", () => {
     let sceneMock: VueScene;
@@ -22,35 +22,35 @@ describe("Card", () => {
         cardsetMock = new CardBattleMock.Cardset(sceneMock, [], 0, 0);
     });
 
-    it("Should create a BattleCard.", () => {
+    it("Should create a Battle Card.", () => {
         const card = new Card(sceneMock, cardsetMock, {
             number: 1,
             id: 'ID',
             name: 'Battle Card n° 2',
             description: 'This is another battle card description.',
-            color: GREEN as CardColorsType,
-            imageName: 'card-picture',
-            hp: 6,
+            color: GREEN as CardColorType,
+            image: 'card-picture',
             ap: 4,
-            typeId: BATTLE as CardType,
+            hp: 6,
+            type: BATTLE as CardType,
             cost: 2,
-            powerId: 'none',
-            details: 'This card is used for battle purposes.',
+            effectType: 'none',
+            effectDescription: 'none',
         });
         expect(card).toBeDefined();
+        expect(card.isBattleCard()).toBe(true);
         expect(card.getId()).toBe('ID');
         expect(card.getNumber()).toBe(1);
         expect(card.getName()).toBe('Battle Card n° 2');
         expect(card.getDescription()).toBe('This is another battle card description.');
-        expect(card.getDetails()).toBe('This card is used for battle purposes.');
         expect(card.getColor()).toBe(GREEN);
-        expect(card.getImageName()).toBe('card-picture');
+        expect(card.getImage()).toBe('card-picture');
+        expect(card.getType()).toBe(BATTLE);
         expect(card.getAp()).toBe(4);
         expect(card.getHp()).toBe(6);
-        expect(card.getTypeId()).toBe(BATTLE);
-        expect(card.getPowerId()).toBe('none');
         expect(card.getCost()).toBe(2);
-        expect(card.isBattleCard()).toBe(true);
+        expect(card.getEffectType()).toBe('none');
+        expect(card.getEffectDescription()).toBe('none');
         expect(card.isSelected()).toBe(false);
         expect(card.isMarked()).toBe(false);
         expect(card.isHighlighted()).toBe(false);
@@ -58,35 +58,35 @@ describe("Card", () => {
         expect(card.isDisabled()).toBe(false);
     });
 
-    it("Should create a BattleCard.", () => {
+    it("Should create a Power Card.", () => {
         const card = new Card(sceneMock, cardsetMock, {
             id: 'ID',
             number: 1,
-            name: 'Battle Card n° 2',
-            description: 'This is another battle card description.',
-            details: 'This card is used for battle purposes.',
-            color: GREEN as CardColorsType,
-            imageName: 'card-picture',
-            hp: 6,
-            ap: 4,
-            typeId: BATTLE as CardType,
-            powerId: 'none',
-            cost: 2,
+            name: 'Power Card n° 3',
+            description: 'This is another power card description.',
+            color: BLUE as CardColorType,
+            image: 'card-picture',
+            type: POWER as CardType,
+            effectType: ADD_COLOR_POINTS,
+            effectDescription: 'Gain 2 points of a color of your choice.',
+            hp: 0,
+            ap: 0,
+            cost: 0,
         });
         expect(card).toBeDefined();
+        expect(card.isPowerCard()).toBe(true);
         expect(card.getId()).toBe('ID');
         expect(card.getNumber()).toBe(1);
-        expect(card.getName()).toBe('Battle Card n° 2');
-        expect(card.getDescription()).toBe('This is another battle card description.');
-        expect(card.getDetails()).toBe('This card is used for battle purposes.');
-        expect(card.getColor()).toBe(GREEN);
-        expect(card.getImageName()).toBe('card-picture');
-        expect(card.getAp()).toBe(4);
-        expect(card.getHp()).toBe(6);
-        expect(card.getTypeId()).toBe(BATTLE);
-        expect(card.getPowerId()).toBe('none');
-        expect(card.getCost()).toBe(2);
-        expect(card.isBattleCard()).toBe(true);
+        expect(card.getName()).toBe('Power Card n° 3');
+        expect(card.getDescription()).toBe('This is another power card description.');
+        expect(card.getColor()).toBe(BLUE);
+        expect(card.getImage()).toBe('card-picture');
+        expect(card.getType()).toBe(POWER);
+        expect(card.getAp()).toBe(0);
+        expect(card.getHp()).toBe(0);
+        expect(card.getCost()).toBe(0);
+        expect(card.getEffectType()).toBe(ADD_COLOR_POINTS);
+        expect(card.getEffectDescription()).toBe('Gain 2 points of a color of your choice.');
         expect(card.isSelected()).toBe(false);
         expect(card.isMarked()).toBe(false);
         expect(card.isHighlighted()).toBe(false);

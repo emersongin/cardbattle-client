@@ -22,9 +22,9 @@ export class CompilePhase extends PowerPhase implements Phase {
 
     async createHandZone(): Promise<void> {
         const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
-        const battleCards = cards.filter(card => card.typeId === BATTLE);
+        const battleCards = cards.filter(card => card.type === BATTLE);
         const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-        const powerCards = cards.filter(card => card.typeId === POWER);
+        const powerCards = cards.filter(card => card.type === POWER);
         const powerCardsEnabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: false }));
         super.createHandCardset([...powerCardsEnabled, ...battleCardsDisabled]);
     }

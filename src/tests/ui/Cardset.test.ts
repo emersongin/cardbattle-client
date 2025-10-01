@@ -3,7 +3,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vite
 import { Cardset } from "@ui/Cardset/Cardset";
 import { VueScene } from "@scenes/VueScene";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
-import { CardColorsType } from "@game/types/CardColorsType";
+import { CardColorType } from "@game/types/CardColorType";
 import { CardType } from "@game/types/CardType";
 import { BATTLE, POWER } from "@constants/keys";
 import { CardData } from "@objects/CardData";
@@ -15,13 +15,13 @@ const cards = [
         number: 1,
         name: 'Test Card',
         description: 'This is a test card description.',
-        details: 'This is a test card details.',
-        color: BLUE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This is a test card effectDescription.',
+        color: BLUE as CardColorType,
+        image: 'card-picture',
         hp: 10,
         ap: 5,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 1
     },
     {
@@ -29,13 +29,13 @@ const cards = [
         number: 1,
         name: 'Test Power Card',
         description: 'This is a test power card description.',
-        details: 'This is a test power card details.',
-        color: RED as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This is a test power card effectDescription.',
+        color: RED as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: 'power-1',
+        type: POWER as CardType,
+        effectType: 'power-1',
         cost: 1
     },
 ];

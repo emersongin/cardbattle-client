@@ -98,7 +98,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     #updateTextWindows(card: Card): void {
         super.setTextWindowText(card.getName() + ' ' + card.getId(), 1);
         super.setTextWindowText(card.getDescription(), 2);
-        super.setTextWindowText(card.getDetails(), 3);
+        super.setTextWindowText(card.getEffectDescription(), 3);
     }
 
     #completeChoice(cardIds: string[]): void {
@@ -133,7 +133,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     #createPowerCardConfig(powerCard: CardData): void {
-        switch (powerCard.powerId) {
+        switch (powerCard.effectType) {
             case ADD_COLOR_POINTS:
             case REMOVE_COLOR_POINTS:
             default:
@@ -144,7 +144,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #createConfirmPowerCardConfig(powerCard: CardData): void {
         super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
-        super.addTextWindow(powerCard.details);
+        super.addTextWindow(powerCard.effectDescription);
         super.createCommandWindowBottom('Use this Power Card?', [
             {
                 description: 'Yes',

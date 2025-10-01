@@ -4,7 +4,7 @@ import { CARD_HEIGHT, CARD_WIDTH } from '@constants/default';
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { TimelineConfig, TimelineEvent } from '@scenes/VueScene';
 import { BoardWindowData } from '@objects/BoardWindowData';
-import { CardColorsType } from '@game/types/CardColorsType';
+import { CardColorType } from '@game/types/CardColorType';
 import { TweenConfig } from '@game/types/TweenConfig';
 import { BoardZonesType } from '@game/types/BoardZonesType';
 import { CommandWindow } from '@ui/CommandWindow/CommandWindow';
@@ -130,11 +130,11 @@ export class CardBattlePhase implements Phase {
         this.#board.removeZonePoints(boardZone, value);
     }
 
-    addBoardColorPoints(cardColor: CardColorsType, value: number): void {
+    addBoardColorPoints(cardColor: CardColorType, value: number): void {
         this.#board.addColorPoints(cardColor, value);
     }
 
-    removeBoardColorPoints(cardColor: CardColorsType, value: number): void {
+    removeBoardColorPoints(cardColor: CardColorType, value: number): void {
         this.#board.removeColorPoints(cardColor, value);
     }
 
@@ -171,11 +171,11 @@ export class CardBattlePhase implements Phase {
         this.#opponentBoard.removeZonePoints(boardZone, value);
     }
 
-    addOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
+    addOpponentBoardColorPoints(cardColor: CardColorType, value: number): void {
         this.#opponentBoard.addColorPoints(cardColor, value);
     }
 
-    removeOpponentBoardColorPoints(cardColor: CardColorsType, value: number): void {
+    removeOpponentBoardColorPoints(cardColor: CardColorType, value: number): void {
         this.#opponentBoard.removeColorPoints(cardColor, value);
     }
 

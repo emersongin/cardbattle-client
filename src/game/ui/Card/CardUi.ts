@@ -66,7 +66,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     setImage(): void {
         const faceUp = this.card.data.get('faceUp');
         if (faceUp) {
-            this.image.setTexture(this.card.staticData.imageName);
+            this.image.setTexture(this.card.staticData.image);
         } else {
             this.image.setTexture('cardback');
         }
@@ -101,7 +101,7 @@ export class CardUi extends Phaser.GameObjects.Container {
             this.#setEmptyDisplay();
             return
         } 
-        const { typeId: cardTypeId } = this.card.staticData;
+        const { type: cardTypeId } = this.card.staticData;
         if (cardTypeId === BATTLE as CardType) {
             this.setPointsDisplay(ap, hp);
         } else if (cardTypeId === POWER as CardType) {

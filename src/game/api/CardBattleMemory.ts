@@ -10,7 +10,7 @@ import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
 import { PowerActionUpdatesData } from '@objects/PowerActionUpdatesData';
-import { CardColorsType } from '@game/types/CardColorsType';
+import { CardColorType } from '@game/types/CardColorType';
 import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
@@ -25,13 +25,13 @@ const battleCards = [
         number: 1,
         name: 'Battle Card n° 1',
         description: 'This is a battle card description.',
-        details: 'This card is used for battle purposes.',
-        color: RED as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for battle purposes.',
+        color: RED as CardColorType,
+        image: 'card-picture',
         hp: 5,
         ap: 5,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 2,
         disabled: false
     },
@@ -40,13 +40,13 @@ const battleCards = [
         number: 2,
         name: 'Battle Card n° 2',
         description: 'This is another battle card description.',
-        details: 'This card is used for battle purposes.',
-        color: GREEN as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for battle purposes.',
+        color: GREEN as CardColorType,
+        image: 'card-picture',
         hp: 6,
         ap: 4,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 2,
         disabled: false
     },
@@ -55,13 +55,13 @@ const battleCards = [
         number: 3,
         name: 'Battle Card n° 3',
         description: 'This is yet another battle card description.',
-        details: 'This card is used for battle purposes.',
-        color: BLUE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for battle purposes.',
+        color: BLUE as CardColorType,
+        image: 'card-picture',
         hp: 4,
         ap: 6,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 2,
         disabled: false
     },
@@ -70,13 +70,13 @@ const battleCards = [
         number: 4,
         name: 'Battle Card n° 4',
         description: 'This is a different battle card description.',
-        details: 'This card is used for battle purposes.',
-        color: BLACK as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for battle purposes.',
+        color: BLACK as CardColorType,
+        image: 'card-picture',
         hp: 7,
         ap: 3,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 2,
         disabled: false
     },
@@ -85,13 +85,13 @@ const battleCards = [
         number: 5,
         name: 'Battle Card n° 5',
         description: 'This is a unique battle card description.',
-        details: 'This card is used for battle purposes.',
-        color: WHITE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for battle purposes.',
+        color: WHITE as CardColorType,
+        image: 'card-picture',
         hp: 3,
         ap: 7,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 2,
         disabled: false
     },
@@ -100,13 +100,13 @@ const battleCards = [
         number: 6,
         name: 'Battle Card n° 6',
         description: 'This is a special battle card description.',
-        details: 'This card is used for battle purposes.',
-        color: ORANGE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for battle purposes.',
+        color: ORANGE as CardColorType,
+        image: 'card-picture',
         hp: 8,
         ap: 2,
-        typeId: BATTLE as CardType,
-        powerId: 'none',
+        type: BATTLE as CardType,
+        effectType: 'none',
         cost: 0,
         disabled: false
     }
@@ -118,13 +118,13 @@ const powerCards = [
         number: 7,
         name: 'Add Color Points Power Card n° 1',
         description: 'This is a test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: RED as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for testing power effects.',
+        color: RED as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: ADD_COLOR_POINTS,
+        type: POWER as CardType,
+        effectType: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
@@ -133,13 +133,13 @@ const powerCards = [
         number: 8,
         name: 'Add Color Points Power Card n° 2',
         description: 'This is another test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: GREEN as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for testing power effects.',
+        color: GREEN as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: ADD_COLOR_POINTS,
+        type: POWER as CardType,
+        effectType: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
@@ -148,13 +148,13 @@ const powerCards = [
         number: 9,
         name: 'Add Color Points Power Card n° 3',
         description: 'This is yet another test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: BLUE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for testing power effects.',
+        color: BLUE as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: ADD_COLOR_POINTS,
+        type: POWER as CardType,
+        effectType: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
@@ -163,13 +163,13 @@ const powerCards = [
         number: 10,
         name: 'Add Color Points Power Card n° 4',
         description: 'This is a different test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: BLACK as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for testing power effects.',
+        color: BLACK as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: ADD_COLOR_POINTS,
+        type: POWER as CardType,
+        effectType: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
@@ -178,13 +178,13 @@ const powerCards = [
         number: 11,
         name: 'Add Color Points Power Card n° 5',
         description: 'This is a unique test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: WHITE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for testing power effects.',
+        color: WHITE as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: ADD_COLOR_POINTS,
+        type: POWER as CardType,
+        effectType: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     },
@@ -193,13 +193,13 @@ const powerCards = [
         number: 12,
         name: 'Add Color Points Power Card n° 6',
         description: 'This is a special test power card description.',
-        details: 'This card is used for testing power effects.',
-        color: ORANGE as CardColorsType,
-        imageName: 'card-picture',
+        effectDescription: 'This card is used for testing power effects.',
+        color: ORANGE as CardColorType,
+        image: 'card-picture',
         hp: 0,
         ap: 0,
-        typeId: POWER as CardType,
-        powerId: ADD_COLOR_POINTS,
+        type: POWER as CardType,
+        effectType: ADD_COLOR_POINTS,
         cost: 1,
         disabled: false
     }
@@ -804,10 +804,10 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.find(card => card.id === cardId && card.typeId === POWER) as CardData);
+                    resolve(this.#playerHand.find(card => card.id === cardId && card.type === POWER) as CardData);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.find(card => card.id === cardId && card.typeId === POWER) as CardData);
+                    resolve(this.#opponentHand.find(card => card.id === cardId && card.type === POWER) as CardData);
                 };
             }, delayMock);
         });
@@ -906,7 +906,7 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    const powerCard = this.#opponentHand.find(card => card.typeId === POWER);
+                    const powerCard = this.#opponentHand.find(card => card.type === POWER);
                     if (counter === 0 && powerCard) {
                         counter++;
                         const powerAction = { powerCard } as PowerActionData;
@@ -942,10 +942,10 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.some(card => card.typeId === POWER));
+                    resolve(this.#playerHand.some(card => card.type === POWER));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.some(card => card.typeId === POWER));
+                    resolve(this.#opponentHand.some(card => card.type === POWER));
                 };
             }, delayMock);
         });
@@ -1054,7 +1054,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    #hasEnoughPointsByColorAndCost(cardColor: CardColorsType, cardCost: number, boardWindowData: BoardWindowData): boolean {
+    #hasEnoughPointsByColorAndCost(cardColor: CardColorType, cardCost: number, boardWindowData: BoardWindowData): boolean {
         if (cardColor === ORANGE) return true;
         switch (cardColor) {
             case RED:
@@ -1076,7 +1076,7 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    const cards = this.#playerHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
+                    const cards = this.#playerHand.filter(card => cardIds.includes(card.id) && card.type === BATTLE);
                     this.#removeBoardPointsByBattleCards(cards, this.#playerBoard);
                     this.#playerBattleCardset = cards;
                     this.#playerHand = this.#playerHand.filter(card => !cardIds.includes(card.id));
@@ -1086,7 +1086,7 @@ export default class CardBattleMemory implements CardBattle {
                     this.#setPlayerStep(BATTLE_CARDS_SET);
                 }
                 if (this.#isOpponent(playerId)) {
-                    const cards = this.#opponentHand.filter(card => cardIds.includes(card.id) && card.typeId === BATTLE);
+                    const cards = this.#opponentHand.filter(card => cardIds.includes(card.id) && card.type === BATTLE);
                     this.#removeBoardPointsByBattleCards(cards, this.#opponentBoard);
                     this.#opponentBattleCardset = cards;
                     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
@@ -1160,7 +1160,7 @@ export default class CardBattleMemory implements CardBattle {
                     // mock
                     let boardOpponentClone = { ...this.#opponentBoard };
                     const cardIds = this.#opponentHand.filter(card => {
-                        if (card.typeId !== BATTLE) return false;
+                        if (card.type !== BATTLE) return false;
                         if (this.#hasEnoughPointsByColorAndCost(card.color, card.cost, boardOpponentClone)) { 
                             this.#removeBoardPointsByBattleCards([card], boardOpponentClone);
                             return true;

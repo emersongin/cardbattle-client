@@ -4,7 +4,7 @@ import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { ORANGE } from "@/game/constants/colors";
-import { CardColorsType } from "@/game/types/CardColorsType";
+import { CardColorType } from "@/game/types/CardColorType";
 import { Card } from "@/game/ui/Card/Card";
 import { CardDataWithState } from "@/game/objects/CardDataWithState";
 import { BATTLE, POWER } from "@/game/constants/keys";
@@ -26,9 +26,9 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         super.createBoard(boardData);
         const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
-        const battleCards = cards.filter(card => card.typeId === BATTLE);
+        const battleCards = cards.filter(card => card.type === BATTLE);
         const battleCardsToSummon = battleCards.map(card => ({ ...card, faceUp: true, disabled: !this.#onHasEnoughColorPointsByColor(card.color, card.cost) }));
-        const powerCards = cards.filter(card => card.typeId === POWER);
+        const powerCards = cards.filter(card => card.type === POWER);
         const powerCardsDisabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: true }));
         super.createHandCardset([...battleCardsToSummon, ...powerCardsDisabled]);
         super.createHandDisplayWindows();
@@ -60,23 +60,23 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     #onChangeHandCardsetIndex(card: Card): void {
         super.setTextWindowText(card.getName(), 1);
         super.setTextWindowText(card.getDescription(), 2);
-        super.setTextWindowText(card.getDetails(), 3);
+        super.setTextWindowText(card.getEffectDescription(), 3);
     }
     
-    #onHasEnoughColorPointsByColor(cardColor: CardColorsType, cardCost: number): boolean {
+    #onHasEnoughColorPointsByColor(cardColor: CardColorType, cardCost: number): boolean {
         if (cardColor === ORANGE) return true;
         return super.getBoard().hasEnoughColorPointsByColor(cardColor, cardCost);
     }
 
     #onCreditPoint(card: Card): void {
-        const cardColor = card.getColor() as CardColorsType;
+        const cardColor = card.getColor() as CardColorType;
         const cardCost = card.getCost();
         if (cardColor === ORANGE) return;
         if (cardCost > 0) super.getBoard().addColorPoints(cardColor, cardCost);
     }
 
     #onDebitPoint(card: Card): void {
-        const cardColor = card.getColor() as CardColorsType;
+        const cardColor = card.getColor() as CardColorType;
         const cardCost = card.getCost();
         if (cardColor === ORANGE) return;
         if (cardCost > 0) super.getBoard().removeColorPoints(cardColor, cardCost);

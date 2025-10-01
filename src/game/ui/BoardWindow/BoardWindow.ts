@@ -4,7 +4,7 @@ import { AP, DECK, HAND, HP, PASS, TRASH, WINS } from "@constants/keys";
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { DisplayUtil } from "@utils/DisplayUtil";
 import { BoardZonesType } from "@game/types/BoardZonesType";
-import { CardColorsType } from "@game/types/CardColorsType";
+import { CardColorType } from "@game/types/CardColorType";
 import { TweenConfig } from "@game/types/TweenConfig";
 import { UpdateAnimation } from "@ui/BoardWindow/animations/UpdateAnimation";
 
@@ -214,7 +214,7 @@ export class BoardWindow extends Sizer {
         return 0;
     }
 
-    hasEnoughColorPointsByColor(cardColor: CardColorsType, cost: number): boolean {
+    hasEnoughColorPointsByColor(cardColor: CardColorType, cost: number): boolean {
         if (cardColor === RED) return this.#getColorPointsByColor(cardColor) - cost >= 0;
         if (cardColor === GREEN) return this.#getColorPointsByColor(cardColor) - cost >= 0;
         if (cardColor === BLUE) return this.#getColorPointsByColor(cardColor) - cost >= 0;
@@ -223,7 +223,7 @@ export class BoardWindow extends Sizer {
         return false;
     }
 
-    #getColorPointsByColor(cardColor: CardColorsType): number {
+    #getColorPointsByColor(cardColor: CardColorType): number {
         if (cardColor === RED) return this.#getData('redPoints');
         if (cardColor === GREEN) return this.#getData('greenPoints');
         if (cardColor === BLUE) return this.#getData('bluePoints');
@@ -282,17 +282,17 @@ export class BoardWindow extends Sizer {
         if (boardZone === WINS) this.data.set('numberOfWins', value);
     }
 
-    addColorPoints(cardColor: CardColorsType, value: number): void {
+    addColorPoints(cardColor: CardColorType, value: number): void {
         const lastValue = this.#getColorPointsByColor(cardColor);
         this.#setColorPoints(cardColor, (lastValue + value));
     }
 
-    removeColorPoints(cardColor: CardColorsType, value: number): void {
+    removeColorPoints(cardColor: CardColorType, value: number): void {
         const lastValue = this.#getColorPointsByColor(cardColor);
         this.#setColorPoints(cardColor, (lastValue - value));
     }
 
-    #setColorPoints(cardColor: CardColorsType, value: number): void {
+    #setColorPoints(cardColor: CardColorType, value: number): void {
         const fromTarget = {} as Partial<BoardWindowData>;
         const toTarget = {} as Partial<BoardWindowData>;
         if (cardColor === RED) {
