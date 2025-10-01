@@ -1,7 +1,7 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { PowerPhase } from "./PowerPhase";
 import { BattlePhase } from "./BattlePhase";
-import { CardData } from "@/game/objects/CardData";
+import { CardDataWithState } from "@/game/objects/CardDataWithState";
 
 export class CompilePhase extends PowerPhase implements Phase {
 
@@ -20,7 +20,7 @@ export class CompilePhase extends PowerPhase implements Phase {
     }
 
     async createHandZone(): Promise<void> {
-        const cards: CardData[] = await this.cardBattle.getCardsFromHandInTheCompilePhase(this.scene.room.playerId);
+        const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHandInTheCompilePhase(this.scene.room.playerId);
         super.createHandCardset(cards);
     }
 

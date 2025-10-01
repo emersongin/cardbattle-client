@@ -13,11 +13,13 @@ export class Card extends Phaser.GameObjects.GameObject {
         readonly scene: Phaser.Scene, 
         readonly cardset: Cardset,
         readonly staticData: CardData,
-        faceUp: boolean = false
+        faceUp: boolean = false,
+        disabled: boolean = false
     ) {
         super(scene, 'Card');
         this.#setStartData();
-        this.data.set('faceUp', faceUp);
+        this.data.set('faceUp', faceUp || false);
+        this.data.set('disabled', disabled || false);
         this.#ui = new CardUi(this.scene, this);
         this.cardset.add(this.#ui);
     }
@@ -31,7 +33,6 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.updateOrigin();
         this.data.set('ap', this.staticData.ap);
         this.data.set('hp', this.staticData.hp);
-        this.data.set('disabled', this.staticData.disabled || false);
         this.data.set('closed', false);
         this.data.set('selected', false);
         this.data.set('marked', false);

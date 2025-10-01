@@ -4,7 +4,6 @@ import { CARD_HEIGHT, CARD_WIDTH } from '@constants/default';
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { TimelineConfig, TimelineEvent } from '@scenes/VueScene';
 import { BoardWindowData } from '@objects/BoardWindowData';
-import { CardData } from '@objects/CardData';
 import { CardColorsType } from '@game/types/CardColorsType';
 import { TweenConfig } from '@game/types/TweenConfig';
 import { BoardZonesType } from '@game/types/BoardZonesType';
@@ -21,6 +20,7 @@ import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { ORANGE } from "@/game/constants/colors";
 import { Phase } from "./Phase";
 import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
+import { CardDataWithState } from "@/game/objects/CardDataWithState";
 
 export type AlignType = 
     | typeof LEFT 
@@ -257,7 +257,7 @@ export class CardBattlePhase implements Phase {
     }
     
     // PLAYER CARDSET
-    createCardset(cards: CardData[]): Promise<void> {
+    createCardset(cards: CardDataWithState[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
             const y = (this.#board.y - (this.#board.height / 2)) - CARD_HEIGHT - 10; 
@@ -269,7 +269,7 @@ export class CardBattlePhase implements Phase {
         });
     }
 
-    createHandCardset(cards: CardData[]): Promise<void> {
+    createHandCardset(cards: CardDataWithState[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
             const y = this.scene.cameras.main.centerY; 
@@ -329,7 +329,7 @@ export class CardBattlePhase implements Phase {
     }
 
     // OPPONENT CARDSET
-    createOpponentCardset(cards: CardData[]): Promise<void> {
+    createOpponentCardset(cards: CardDataWithState[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
             const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
@@ -377,7 +377,7 @@ export class CardBattlePhase implements Phase {
     }
 
     // FIELD CARDSET
-    createPowerCardset(config: { cards: CardData[], faceUp?: boolean } = { cards: [], faceUp: false }): Promise<void> {
+    createPowerCardset(cards: CardDataWithState[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
             const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
@@ -388,7 +388,7 @@ export class CardBattlePhase implements Phase {
                 this.#fieldCardset.destroy();
             }
 
-            const cardset = Cardset.create(this.scene, config.cards, x, y, config.faceUp);
+            const cardset = Cardset.create(this.scene, cards, x, y);
             cardset.setCardsInLinePosition();
             cardset.setCardsClosed();
             this.#fieldCardset = cardset;
@@ -577,14 +577,14 @@ export class CardBattlePhase implements Phase {
     // GENERAL
     createGameBoard(config?: TweenConfig & { 
         isShowBattlePoints?: boolean, 
-        powerCardsFaceUp?: boolean 
+        isPowerCardsFaceUp?: boolean 
     }): Promise<void> {
         return new Promise(async resolve => {
             const board = await this.cardBattle.getBoard(this.scene.room.playerId);
             const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-            const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
-            const battleCards: CardData[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
-            const opponentBattleCards: CardData[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
+            const powerCards: CardDataWithState[] = await this.cardBattle.getFieldPowerCards();
+            const battleCards: CardDataWithState[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
+            const opponentBattleCards: CardDataWithState[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
             const promises = [];
             if (board) {
                 const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
@@ -594,10 +594,7 @@ export class CardBattlePhase implements Phase {
                 const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
                 promises.push(this.createOpponentBoard(opponentBoardData));
             }
-            if (powerCards) promises.push(this.createPowerCardset({ 
-                cards: powerCards,
-                faceUp: config?.isPowerCardsFaceUp ? true : false 
-            }));
+            if (powerCards) promises.push(this.createPowerCardset(powerCards));
             if (config?.isPowerCardsFaceUp) {
                 const powerCardset = this.getPowerCardset();
                 powerCardset.setCardsInLinePosition();

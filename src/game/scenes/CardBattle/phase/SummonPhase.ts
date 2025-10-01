@@ -1,12 +1,12 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
-import { CardData } from "@/game/objects/CardData";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { ORANGE } from "@/game/constants/colors";
 import { CardColorsType } from "@/game/types/CardColorsType";
 import { Card } from "@/game/ui/Card/Card";
+import { CardDataWithState } from "@/game/objects/CardDataWithState";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -23,7 +23,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
 
     async #createHandZone(): Promise<void> {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
-        const cardsData: CardData[] = await this.cardBattle.getCardsFromHandInTheSummonPhase(this.scene.room.playerId);
+        const cardsData: CardDataWithState[] = await this.cardBattle.getCardsFromHandInTheSummonPhase(this.scene.room.playerId);
         super.createBoard(boardData);
         super.createHandCardset(cardsData);
         super.createHandDisplayWindows();

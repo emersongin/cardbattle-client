@@ -6,13 +6,14 @@ export type CardData = {
     number: number;
     name: string;
     description: string;
-    details: string;
     color: CardColorsType;
     imageName: string;
+    typeId: CardType;
+    // battle card
     hp: number;
     ap: number;
-    typeId: CardType;
-    powerId: string;
     cost: number;
-    disabled: boolean;
+    // power card
+    powerId: string;
+    details: string;
 } 

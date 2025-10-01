@@ -4,7 +4,6 @@ import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
-import { CompilePhase } from "./CompilePhase";
 import { PowerPhase } from "./PowerPhase";
 
 export class TriggerPhase extends CardBattlePhase implements Phase {

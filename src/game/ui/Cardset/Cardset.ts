@@ -1,5 +1,4 @@
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
-import { CardData } from "@objects/CardData";
 import { Card } from "@ui/Card/Card";
 import { CardUi } from "@ui/Card/CardUi";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
@@ -7,6 +6,7 @@ import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
 import { PositionConfig } from "../Card/animations/types/PositionConfig";
 import { VueScene } from "@/game/scenes/VueScene";
+import { CardDataWithState } from "@/game/objects/CardDataWithState";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -15,28 +15,26 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     constructor(
         readonly scene: VueScene, 
-        readonly cards: CardData[],
+        readonly cards: CardDataWithState[],
         x: number = 0,
-        y: number = 0,
-        faceUp: boolean = false
+        y: number = 0
     ) {
         super(scene, x, y);
         this.setDataEnabled();
         this.data.set('selectModeEnabled', false);
         this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.#selectMode = new SelectMode(this);
-        this.#createCards(cards, faceUp);
+        this.#createCards(cards);
         this.scene.add.existing(this);
     }
 
     static create(
         scene: VueScene,
-        cards: CardData[],
+        cards: CardDataWithState[],
         x: number = 0,
-        y: number = 0,
-        faceUp: boolean = false
+        y: number = 0
     ): Cardset {
-        return new Cardset(scene, cards, x, y, faceUp);
+        return new Cardset(scene, cards, x, y);
     }
 
     setCardsInLinePosition(x: number = 0, y: number = 0): void {
@@ -201,9 +199,9 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode.create(events, selectionsNumber);
     }
 
-    #createCards(cardsData: CardData[], faceUp: boolean = false): void {
-        const cards = cardsData.map((cardData: CardData) => {
-            const card = new Card(this.scene, this, cardData, faceUp);
+    #createCards(cardsData: CardDataWithState[]): void {
+        const cards = cardsData.map((cardData: CardDataWithState) => {
+            const card = new Card(this.scene, this, cardData, cardData.faceUp, cardData.disabled);
             return card;
         });
         this.#cards = cards;

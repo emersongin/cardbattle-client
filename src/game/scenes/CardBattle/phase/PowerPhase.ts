@@ -6,6 +6,7 @@ import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
 import { Card } from "@/game/ui/Card/Card";
 import { TriggerPhase } from "./TriggerPhase";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
+import { CardDataWithState } from "@/game/objects/CardDataWithState";
 
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -175,12 +176,9 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     async #playPowerCard(powerCard: CardData, loadPowerActionConfig: () => void): Promise<void> {
         // create power cardset
-        const powerCards: CardData[] = await this.cardBattle.getFieldPowerCards();
+        const powerCards: CardDataWithState[] = await this.cardBattle.getFieldPowerCards();
         const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
-        await super.createPowerCardset({
-            cards: [...powerCardsFiltered, powerCard], 
-            faceUp: true
-        });
+        await super.createPowerCardset([...powerCardsFiltered, { ...powerCard, faceUp: true, disabled: false }]);
         // show power cardset last state
         const cardset = super.getPowerCardset();
         cardset.setCardsInLinePosition();

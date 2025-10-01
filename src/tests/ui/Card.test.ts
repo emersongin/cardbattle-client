@@ -22,7 +22,43 @@ describe("Card", () => {
         cardsetMock = new CardBattleMock.Cardset(sceneMock, [], 0, 0);
     });
 
-    it("should create a BattleCard/PowerCard.", () => {
+    it("Should create a BattleCard.", () => {
+        const card = new Card(sceneMock, cardsetMock, {
+            number: 1,
+            id: 'ID',
+            name: 'Battle Card n° 2',
+            description: 'This is another battle card description.',
+            color: GREEN as CardColorsType,
+            imageName: 'card-picture',
+            hp: 6,
+            ap: 4,
+            typeId: BATTLE as CardType,
+            cost: 2,
+            powerId: 'none',
+            details: 'This card is used for battle purposes.',
+        });
+        expect(card).toBeDefined();
+        expect(card.getId()).toBe('ID');
+        expect(card.getNumber()).toBe(1);
+        expect(card.getName()).toBe('Battle Card n° 2');
+        expect(card.getDescription()).toBe('This is another battle card description.');
+        expect(card.getDetails()).toBe('This card is used for battle purposes.');
+        expect(card.getColor()).toBe(GREEN);
+        expect(card.getImageName()).toBe('card-picture');
+        expect(card.getAp()).toBe(4);
+        expect(card.getHp()).toBe(6);
+        expect(card.getTypeId()).toBe(BATTLE);
+        expect(card.getPowerId()).toBe('none');
+        expect(card.getCost()).toBe(2);
+        expect(card.isBattleCard()).toBe(true);
+        expect(card.isSelected()).toBe(false);
+        expect(card.isMarked()).toBe(false);
+        expect(card.isHighlighted()).toBe(false);
+        expect(card.isBanned()).toBe(false);
+        expect(card.isDisabled()).toBe(false);
+    });
+
+    it("Should create a BattleCard.", () => {
         const card = new Card(sceneMock, cardsetMock, {
             id: 'ID',
             number: 1,
@@ -36,7 +72,6 @@ describe("Card", () => {
             typeId: BATTLE as CardType,
             powerId: 'none',
             cost: 2,
-            disabled: false
         });
         expect(card).toBeDefined();
         expect(card.getId()).toBe('ID');
