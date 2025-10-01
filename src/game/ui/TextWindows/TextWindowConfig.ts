@@ -1,6 +1,6 @@
 
 import { LEFT, CENTER, RIGHT } from "@/game/constants/keys";
-import { TextWindow } from "@ui/TextWindow/TextWindow";
+import { TextWindow } from "@ui/TextWindows/TextWindow";
 
 export type TextWindowConfig = {
     text: string,

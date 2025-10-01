@@ -7,7 +7,6 @@ import { BoardWindowData } from '@objects/BoardWindowData';
 import { CardColorsType } from '@game/types/CardColorsType';
 import { TweenConfig } from '@game/types/TweenConfig';
 import { BoardZonesType } from '@game/types/BoardZonesType';
-import { TextWindow } from '@ui/TextWindow/TextWindow';
 import { CommandWindow } from '@ui/CommandWindow/CommandWindow';
 import { BoardWindow } from '@ui/BoardWindow/BoardWindow';
 import { Cardset } from '@ui/Cardset/Cardset';
@@ -15,12 +14,13 @@ import { Card } from '@ui/Card/Card';
 import { CardUi } from '@ui/Card/CardUi';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
-import { TextWindowConfig } from '@ui/TextWindow/TextWindowConfig';
+import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { ORANGE } from "@/game/constants/colors";
 import { Phase } from "./Phase";
 import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
 import { CardDataWithState } from "@/game/objects/CardDataWithState";
+import { TextWindows } from "@/game/ui/TextWindows/TextWindows";
 
 export type AlignType = 
     | typeof LEFT 
@@ -30,7 +30,7 @@ export type AlignType =
 export class CardBattlePhase implements Phase {
     protected cardBattle: CardBattle;
 
-    #textWindows: TextWindow[] = [];
+    #textWindows: TextWindows;
     #commandWindow: CommandWindow;
     #board: BoardWindow;
     #opponentBoard: BoardWindow;
@@ -47,48 +47,18 @@ export class CardBattlePhase implements Phase {
     }
 
     // TEXT WINDOWS
-    createTextWindowTop(text: string, config: Partial<TextWindowConfig>): void {
-        this.#textWindows = [];
-        this.#textWindows[0] = this.#createTextWindowTop(text, config);
-    }
-
-    #createTextWindowTop(text: string, config: Partial<TextWindowConfig>): TextWindow {
-        const windowConfig = {
-            textAlign: config.textAlign || 'left',
-            textColor: config.textColor || '#ffffff',
-            relativeParent: config.relativeParent,
-            onStartClose: () => this.#onStartCloseAllChildrenWindows(),
-            onClose: config.onClose
-        };
-        return TextWindow.createTop(this.scene, { ...windowConfig, text });
-    }
-
-    #onStartCloseAllChildrenWindows(): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
-                if (index > 0) window.close({ onComplete: () => window.destroy()})
-            });
-        }
-    }
-
-    createTextWindowCentered(title: string, config: Partial<TextWindowConfig>): Promise<void> {
+    createTextWindowTop(text: string, config: Partial<TextWindowConfig>): Promise<void> {
         return new Promise<void>(resolve => {
-            this.#textWindows = [];
-            this.#textWindows[0] = this.#createTextWindowCentered(title, config);
+            this.#textWindows.createTextWindowTop(text, config);
             resolve();
         });
     }
 
-    #createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): TextWindow {
-        const windowConfig = {
-            textAlign: config.textAlign || 'left',
-            textColor: config.textColor || '#ffffff',
-            relativeParent: config.relativeParent,
-            marginTop: config.marginTop || 0,
-            onStartClose: () => this.#onStartCloseAllChildrenWindows(),
-            onClose: config.onClose
-        };
-        return TextWindow.createCentered(this.scene, { ...windowConfig, text });
+    createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): Promise<void> {
+        return new Promise<void>(resolve => {
+            this.#textWindows.createTextWindowCentered(text, config);
+            resolve();
+        });
     }
 
     createWaitingWindow(text: string = 'Waiting for opponent...'): void {
@@ -96,63 +66,31 @@ export class CardBattlePhase implements Phase {
     }
 
     createHandDisplayWindows(): void {
-        this.createTextWindowTop('Your Hand', {
-            textAlign: 'center',
-        });
+        this.createTextWindowTop('Your Hand', { textAlign: 'center' });
         this.addTextWindow('...', { marginTop: 32 });
         this.addTextWindow('...');
         this.addTextWindow('...');
     }
 
     addTextWindow(title: string, config?: Partial<TextWindowConfig>): void {
-        if (!this.#textWindows.length) {
-            throw new Error('You should create a text window first.');
-        }
-        if (!config) config = {};
-        config.relativeParent = this.#getLastTextWindow();
-        config.onStartClose = () => {}; // null
-        this.#textWindows.push(this.#createTextWindowCentered(title, config));
-    }
-
-    #getLastTextWindow(): TextWindow {
-        return this.#textWindows[this.#textWindows.length - 1];
+        this.#textWindows.addTextWindow(title, config);
     }
 
     setTextWindowText(text: string, index: number): void {
-        if (!this.#textWindows.length) {
-            throw new Error('You should create a text window first.');
-        }
-        if (index < 0 || index >= this.#textWindows.length) {
-            throw new Error(`TextWindow: index ${index} is out of bounds.`);
-        }
-        this.#textWindows[index].setText(text);
+        this.#textWindows.setTextWindowText(text, index);
     }
 
     openAllWindows(config?: TweenConfig): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
-                if (!index) return window.open(config);
-                window.open();
-            });
-        }
+        this.#textWindows.openAllWindows(config);
     }
 
     closeAllWindows(config?: TweenConfig): Promise<void> {
         return new Promise<void>(resolve => {
-            this.#textWindows.forEach((window, index) => {
-                if (!index && window.isOpen()) {
-                    return window.close({ 
-                        ...config, 
-                        onComplete: () => {
-                            if (config?.onComplete) config.onComplete();
-                            resolve();
-                        }
-                    });
-                } else {
+            this.#textWindows.closeAllWindows({ ...config, 
+                onComplete: () => {
                     if (config?.onComplete) config.onComplete();
                     resolve();
-                }
-                window.close();
+                } 
             });
         });
     }
