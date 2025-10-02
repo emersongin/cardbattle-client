@@ -7,6 +7,7 @@ import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
 import { BattlePointsData } from "../objects/BattlePointsData";
 import { CardDataWithState } from "../objects/CardDataWithState";
+import { PowerCardData } from "../objects/PowerCardData";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
@@ -31,7 +32,7 @@ export interface CardBattle {
     isStartPlaying: (playerId: string) => Promise<boolean>;
     setPlaying: (playerId: string) => Promise<void>;
     pass(playerId: string): Promise<void>;
-    getPowerCardById: (playerId: string, cardId: string) => Promise<CardData>;
+    getPowerCardById: (playerId: string, cardId: string) => Promise<PowerCardData>;
     getFieldPowerCards: () => Promise<CardDataWithState[]>;
     makePowerCardPlay: (playerId: string, powerAction: PowerActionData) => Promise<void>;
     isPowerfieldLimitReached: () => Promise<boolean>;

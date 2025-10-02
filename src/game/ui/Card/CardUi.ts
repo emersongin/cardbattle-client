@@ -1,8 +1,6 @@
 import Phaser from "phaser";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
-import { BATTLE, POWER } from "@constants/keys";
-import { CardType } from "@game/types/CardType";
 import { Card } from "@ui/Card/Card";
 
 export class CardUi extends Phaser.GameObjects.Container {
@@ -91,20 +89,20 @@ export class CardUi extends Phaser.GameObjects.Container {
             fontStyle: 'bold',
         });
         this.display = display;
-        this.setDisplay(this.card.staticData.ap, this.card.staticData.hp);
+        this.setDisplay();
         this.add(this.display);
     }
 
-    setDisplay(ap?: number, hp?: number): void {
+    setDisplay(): void {
         const faceUp = this.card.data.get('faceUp');
         if (!this.display || !faceUp) {
             this.#setEmptyDisplay();
             return
         } 
         const { type: cardTypeId } = this.card.staticData;
-        if (cardTypeId === BATTLE as CardType) {
-            this.setPointsDisplay(ap, hp);
-        } else if (cardTypeId === POWER as CardType) {
+        if (Card.isBattleCardData(this.card.staticData)) {
+            this.setPointsDisplay(this.card.staticData.ap, this.card.staticData.hp);
+        } else if (Card.isPowerCardData(this.card.staticData)) {
             this.#setPowerDisplay();
         } else {
             throw new Error(`Unknown card type id: ${cardTypeId}`);
@@ -135,7 +133,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     #createDisabledLayer(): void {
         const disabledLayer = this.scene.add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
         disabledLayer.setOrigin(0, 0);
-        disabledLayer.setVisible(this.card.staticData.disabled || false);
+        disabledLayer.setVisible(this.card.isDisabled() || false);
         this.disabledLayer = disabledLayer;
         this.add(this.disabledLayer);
     }

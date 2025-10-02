@@ -30,12 +30,10 @@ describe("Card", () => {
             description: 'This is another battle card description.',
             color: GREEN as CardColorType,
             image: 'card-picture',
+            type: BATTLE as CardType,
             ap: 4,
             hp: 6,
-            type: BATTLE as CardType,
             cost: 2,
-            effectType: 'none',
-            effectDescription: 'none',
         });
         expect(card).toBeDefined();
         expect(card.isBattleCard()).toBe(true);
@@ -48,14 +46,14 @@ describe("Card", () => {
         expect(card.getType()).toBe(BATTLE);
         expect(card.getAp()).toBe(4);
         expect(card.getHp()).toBe(6);
-        expect(card.getCost()).toBe(2);
-        expect(card.getEffectType()).toBe('none');
-        expect(card.getEffectDescription()).toBe('none');
         expect(card.isSelected()).toBe(false);
         expect(card.isMarked()).toBe(false);
         expect(card.isHighlighted()).toBe(false);
         expect(card.isBanned()).toBe(false);
         expect(card.isDisabled()).toBe(false);
+        expect(card.getCost()).toBe(2);
+        expect(() => card.getEffectType()).toThrow("This is not a power card");
+        expect(() => card.getEffectDescription()).toThrow("This is not a power card");
     });
 
     it("Should create a Power Card.", () => {
@@ -69,10 +67,10 @@ describe("Card", () => {
             type: POWER as CardType,
             effectType: ADD_COLOR_POINTS,
             effectDescription: 'Gain 2 points of a color of your choice.',
-            hp: 0,
-            ap: 0,
-            cost: 0,
         });
+        expect(() => card.getAp()).toThrow("This is not a battle card.");
+        expect(() => card.getHp()).toThrow("This is not a battle card.");
+        expect(() => card.getCost()).toThrow("This is not a battle card.");
         expect(card).toBeDefined();
         expect(card.isPowerCard()).toBe(true);
         expect(card.getId()).toBe('ID');
@@ -82,9 +80,6 @@ describe("Card", () => {
         expect(card.getColor()).toBe(BLUE);
         expect(card.getImage()).toBe('card-picture');
         expect(card.getType()).toBe(POWER);
-        expect(card.getAp()).toBe(0);
-        expect(card.getHp()).toBe(0);
-        expect(card.getCost()).toBe(0);
         expect(card.getEffectType()).toBe(ADD_COLOR_POINTS);
         expect(card.getEffectDescription()).toBe('Gain 2 points of a color of your choice.');
         expect(card.isSelected()).toBe(false);

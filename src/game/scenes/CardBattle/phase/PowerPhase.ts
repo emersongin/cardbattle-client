@@ -7,6 +7,7 @@ import { Card } from "@/game/ui/Card/Card";
 import { TriggerPhase } from "./TriggerPhase";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { CardDataWithState } from "@/game/objects/CardDataWithState";
+import { PowerCardData } from "@/game/objects/PowerCardData";
 
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -125,14 +126,14 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #startPowerCardPlay(cardId: string): Promise<void> {
-        const powerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
+        const powerCard: PowerCardData = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
         const playerPlay = () => this.#createPowerCardConfig(powerCard);
         //mock
         // const playerPlay = () => this.#finishPowerCardPlay(powerCard, true);
         this.#playPowerCard(powerCard, playerPlay);
     }
 
-    #createPowerCardConfig(powerCard: CardData): void {
+    #createPowerCardConfig(powerCard: PowerCardData): void {
         switch (powerCard.effectType) {
             case ADD_COLOR_POINTS:
             case REMOVE_COLOR_POINTS:
@@ -142,13 +143,13 @@ export abstract class PowerPhase extends CardBattlePhase {
         }
     }
 
-    #createConfirmPowerCardConfig(powerCard: CardData): void {
-        super.createTextWindowTop(powerCard.name, { textAlign: 'center' });
-        super.addTextWindow(powerCard.effectDescription);
+    #createConfirmPowerCardConfig(card: PowerCardData): void {
+        super.createTextWindowTop(card.name, { textAlign: 'center' });
+        super.addTextWindow(card.effectDescription);
         super.createCommandWindowBottom('Use this Power Card?', [
             {
                 description: 'Yes',
-                onSelect: async () => this.#finishPowerCardPlay(powerCard, true)
+                onSelect: async () => this.#finishPowerCardPlay(card, true)
             },
             {
                 description: 'No',

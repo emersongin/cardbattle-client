@@ -4,10 +4,10 @@ import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { ORANGE } from "@/game/constants/colors";
-import { CardColorType } from "@/game/types/CardColorType";
 import { Card } from "@/game/ui/Card/Card";
 import { CardDataWithState } from "@/game/objects/CardDataWithState";
-import { BATTLE, POWER } from "@/game/constants/keys";
+import { POWER } from "@/game/constants/keys";
+import { CardColorType } from "@/game/types/CardColorType";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -26,7 +26,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         super.createBoard(boardData);
         const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
-        const battleCards = cards.filter(card => card.type === BATTLE);
+        const battleCards = cards.filter(card => Card.isBattleCardData(card));
         const battleCardsToSummon = battleCards.map(card => ({ ...card, faceUp: true, disabled: !this.#onHasEnoughColorPointsByColor(card.color, card.cost) }));
         const powerCards = cards.filter(card => card.type === POWER);
         const powerCardsDisabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: true }));

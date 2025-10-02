@@ -1,5 +1,5 @@
-import { CardColorType } from "@game/types/CardColorType";
 import { CardType } from "@game/types/CardType";
+import { CardColorType } from "../types/CardColorType";
 
 export type CardData = {
     id: string;
@@ -9,11 +9,4 @@ export type CardData = {
     color: CardColorType;
     image: string;
     type: CardType;
-    // battle
-    ap: number;
-    hp: number;
-    cost: number;
-    // power
-    effectType: string;
-    effectDescription: string;
 } 

@@ -1,10 +1,12 @@
 import { AP, BATTLE, HP, POWER } from "@constants/keys";
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
-import { CardData } from "@objects/CardData";
-import { CardColorType } from "@game/types/CardColorType";
 import { CardType } from "@game/types/CardType";
 import { CardUi } from "@ui/Card/CardUi";
 import { Cardset } from "@ui/Cardset/Cardset";
+import { CardColorType } from "@/game/types/CardColorType";
+import { BattleCardData } from "@/game/objects/BattleCardData";
+import { PowerCardData } from "@/game/objects/PowerCardData";
+import { CardData } from "@/game/objects/CardData";
 
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
@@ -12,7 +14,7 @@ export class Card extends Phaser.GameObjects.GameObject {
     constructor(
         readonly scene: Phaser.Scene, 
         readonly cardset: Cardset,
-        readonly staticData: CardData,
+        readonly staticData: BattleCardData | PowerCardData,
         faceUp: boolean = false,
         disabled: boolean = false
     ) {
@@ -31,13 +33,23 @@ export class Card extends Phaser.GameObjects.GameObject {
     #setStartData(): void {
         this.setDataEnabled();
         this.updateOrigin();
-        this.data.set('ap', this.staticData.ap);
-        this.data.set('hp', this.staticData.hp);
+        if (Card.isBattleCardData(this.staticData)) {
+            this.data.set('ap', this.staticData.ap);
+            this.data.set('hp', this.staticData.hp);
+        }
         this.data.set('closed', false);
         this.data.set('selected', false);
         this.data.set('marked', false);
         this.data.set('highlight', false);
         this.data.set('banned', false);
+    }
+
+    static isBattleCardData(card: CardData): card is BattleCardData {
+        return (card as BattleCardData).ap !== undefined && (card as BattleCardData).hp !== undefined && (card as BattleCardData).cost !== undefined;
+    }
+
+    static isPowerCardData(card: CardData): card is PowerCardData {
+        return (card as PowerCardData).effectType !== undefined && (card as PowerCardData).effectDescription !== undefined;
     }
 
     getSelectedLayer(): Phaser.GameObjects.Container {
@@ -145,6 +157,9 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     getEffectDescription(): string {
+        if (Card.isBattleCardData(this.staticData)) {
+            throw new Error("This is not a power card.");
+        }
         return this.staticData.effectDescription;
     }
 
@@ -157,10 +172,16 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     getAp(): number {
+        if (Card.isPowerCardData(this.staticData)) {
+            throw new Error("This is not a battle card.");
+        }
         return this.data.get('ap');
     }
 
     getHp(): number {
+        if (Card.isPowerCardData(this.staticData)) {
+            throw new Error("This is not a battle card.");
+        }
         return this.data.get('hp');
     }
 
@@ -169,10 +190,16 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     getEffectType(): string {
+        if (Card.isBattleCardData(this.staticData)) {
+            throw new Error("This is not a power card.");
+        }
         return this.staticData.effectType;
     }
 
     getCost(): number {
+        if (Card.isPowerCardData(this.staticData)) {
+            throw new Error("This is not a battle card.");
+        }
         return this.staticData.cost;
     }
 

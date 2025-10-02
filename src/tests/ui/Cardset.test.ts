@@ -3,11 +3,11 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach, vi } from "vite
 import { Cardset } from "@ui/Cardset/Cardset";
 import { VueScene } from "@scenes/VueScene";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
-import { CardColorType } from "@game/types/CardColorType";
 import { CardType } from "@game/types/CardType";
 import { BATTLE, POWER } from "@constants/keys";
 import { CardData } from "@objects/CardData";
 import { ColorsPointsData } from "@objects/CardsFolderData";
+import { CardColorType } from "@/game/types/CardColorType";
 
 const cards = [
     {

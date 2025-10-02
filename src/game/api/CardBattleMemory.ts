@@ -10,12 +10,14 @@ import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
 import { PowerActionUpdatesData } from '@objects/PowerActionUpdatesData';
-import { CardColorType } from '@game/types/CardColorType';
 import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
 import { BattlePointsData } from '../objects/BattlePointsData';
 import { CardDataWithState } from '../objects/CardDataWithState';
+import { CardColorType } from '../types/CardColorType';
+import { BattleCardData } from '../objects/BattleCardData';
+import { PowerCardData } from '../objects/PowerCardData';
 
 const delayMock = 100;
 
@@ -25,30 +27,24 @@ const battleCards = [
         number: 1,
         name: 'Battle Card n° 1',
         description: 'This is a battle card description.',
-        effectDescription: 'This card is used for battle purposes.',
         color: RED as CardColorType,
         image: 'card-picture',
-        hp: 5,
         ap: 5,
+        hp: 5,
         type: BATTLE as CardType,
-        effectType: 'none',
         cost: 2,
-        disabled: false
     },
     {
         id: 'B2',
         number: 2,
         name: 'Battle Card n° 2',
         description: 'This is another battle card description.',
-        effectDescription: 'This card is used for battle purposes.',
         color: GREEN as CardColorType,
         image: 'card-picture',
-        hp: 6,
         ap: 4,
+        hp: 6,
         type: BATTLE as CardType,
-        effectType: 'none',
         cost: 2,
-        disabled: false
     },
     {
         id: 'B3',
@@ -118,90 +114,66 @@ const powerCards = [
         number: 7,
         name: 'Add Color Points Power Card n° 1',
         description: 'This is a test power card description.',
-        effectDescription: 'This card is used for testing power effects.',
         color: RED as CardColorType,
         image: 'card-picture',
-        hp: 0,
-        ap: 0,
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
-        cost: 1,
-        disabled: false
+        effectDescription: 'This card is used for testing power effects.',
     },
     {
         id: 'P2',
         number: 8,
         name: 'Add Color Points Power Card n° 2',
         description: 'This is another test power card description.',
-        effectDescription: 'This card is used for testing power effects.',
         color: GREEN as CardColorType,
         image: 'card-picture',
-        hp: 0,
-        ap: 0,
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
-        cost: 1,
-        disabled: false
+        effectDescription: 'This card is used for testing power effects.',
     },
     {
         id: 'P3',
         number: 9,
         name: 'Add Color Points Power Card n° 3',
         description: 'This is yet another test power card description.',
-        effectDescription: 'This card is used for testing power effects.',
         color: BLUE as CardColorType,
         image: 'card-picture',
-        hp: 0,
-        ap: 0,
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
-        cost: 1,
-        disabled: false
+        effectDescription: 'This card is used for testing power effects.',
     },
     {
         id: 'P4',
         number: 10,
         name: 'Add Color Points Power Card n° 4',
         description: 'This is a different test power card description.',
-        effectDescription: 'This card is used for testing power effects.',
         color: BLACK as CardColorType,
         image: 'card-picture',
-        hp: 0,
-        ap: 0,
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
-        cost: 1,
-        disabled: false
+        effectDescription: 'This card is used for testing power effects.',
     },
     {
         id: 'P5',
         number: 11,
         name: 'Add Color Points Power Card n° 5',
         description: 'This is a unique test power card description.',
-        effectDescription: 'This card is used for testing power effects.',
         color: WHITE as CardColorType,
         image: 'card-picture',
-        hp: 0,
-        ap: 0,
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
-        cost: 1,
-        disabled: false
+        effectDescription: 'This card is used for testing power effects.',
     },
     {
         id: 'P6',
         number: 12,
         name: 'Add Color Points Power Card n° 6',
         description: 'This is a special test power card description.',
-        effectDescription: 'This card is used for testing power effects.',
         color: ORANGE as CardColorType,
         image: 'card-picture',
-        hp: 0,
-        ap: 0,
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
-        cost: 1,
-        disabled: false
+        effectDescription: 'This card is used for testing power effects.',
     }
 ];
 
@@ -800,14 +772,14 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getPowerCardById(playerId: string, cardId: string): Promise<CardData> {
+    getPowerCardById(playerId: string, cardId: string): Promise<PowerCardData> {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.find(card => card.id === cardId && card.type === POWER) as CardData);
+                    resolve(this.#playerHand.find(card => card.id === cardId && card.type === POWER) as PowerCardData);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.find(card => card.id === cardId && card.type === POWER) as CardData);
+                    resolve(this.#opponentHand.find(card => card.id === cardId && card.type === POWER) as PowerCardData);
                 };
             }, delayMock);
         });
@@ -1076,7 +1048,7 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    const cards = this.#playerHand.filter(card => cardIds.includes(card.id) && card.type === BATTLE);
+                    const cards = this.#playerHand.filter(card => cardIds.includes(card.id)) as BattleCardData[];
                     this.#removeBoardPointsByBattleCards(cards, this.#playerBoard);
                     this.#playerBattleCardset = cards;
                     this.#playerHand = this.#playerHand.filter(card => !cardIds.includes(card.id));
@@ -1086,7 +1058,7 @@ export default class CardBattleMemory implements CardBattle {
                     this.#setPlayerStep(BATTLE_CARDS_SET);
                 }
                 if (this.#isOpponent(playerId)) {
-                    const cards = this.#opponentHand.filter(card => cardIds.includes(card.id) && card.type === BATTLE);
+                    const cards = this.#opponentHand.filter(card => cardIds.includes(card.id)) as BattleCardData[];
                     this.#removeBoardPointsByBattleCards(cards, this.#opponentBoard);
                     this.#opponentBattleCardset = cards;
                     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
@@ -1100,7 +1072,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    #removeBoardPointsByBattleCards(cards: CardData[], boardWindowData: BoardWindowData): void {
+    #removeBoardPointsByBattleCards(cards: BattleCardData[], boardWindowData: BoardWindowData): void {
         cards.forEach(card => {
             switch (card.color) {
                 case RED:
@@ -1126,18 +1098,26 @@ export default class CardBattleMemory implements CardBattle {
 
     #getBattlePointsFromBattleCards(playerId: string): BattlePointsData {
         if (this.#isPlayer(playerId)) {
-            const battleCards = this.#playerBattleCardset;
+            const battleCards = this.#playerBattleCardset.filter((card: CardData) => {
+                if (this.#isBattleCardData(card)) return true;
+            }) as BattleCardData[];
             const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
             const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
             return { [AP]: apTotal, [HP]: hpTotal };
         }
         if (this.#isOpponent(playerId)) {
-            const battleCards = this.#opponentBattleCardset;
+            const battleCards = this.#opponentBattleCardset.filter((card: CardData) => {
+                if (this.#isBattleCardData(card)) return true;
+            }) as BattleCardData[];
             const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
             const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
             return { [AP]: apTotal, [HP]: hpTotal };
         }
         return { [AP]: 0, [HP]: 0 };
+    }
+
+    #isBattleCardData(card: CardData): card is BattleCardData {
+        return (card as BattleCardData).ap !== undefined && (card as BattleCardData).hp !== undefined;
     }
 
     isOpponentBattleCardsSet(playerId: string): Promise<boolean> {
@@ -1159,13 +1139,14 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     // mock
                     let boardOpponentClone = { ...this.#opponentBoard };
-                    const cardIds = this.#opponentHand.filter(card => {
-                        if (card.type !== BATTLE) return false;
+                    const battleCards = this.#opponentHand.filter((card: CardData) => {
+                        if (!this.#isBattleCardData(card)) return;
                         if (this.#hasEnoughPointsByColorAndCost(card.color, card.cost, boardOpponentClone)) { 
                             this.#removeBoardPointsByBattleCards([card], boardOpponentClone);
                             return true;
                         }
-                    }).map(card => card.id);
+                    });
+                    const cardIds = battleCards.map(card => card.id);
                     this.setBattleCards(this.#opponentId, cardIds);
                     // mock
                     callback(this.#isOpponentStep(BATTLE_CARDS_SET));
@@ -1177,6 +1158,10 @@ export default class CardBattleMemory implements CardBattle {
             }, delayMock);
         });
     }
+
+    // #isPowerCardData(card: CardData): card is PowerCardData {
+    //     return (card as PowerCardData).effectType !== undefined && (card as PowerCardData).effectDescription !== undefined;
+    // }
 
     getBattleCards(playerId: string): Promise<CardDataWithState[]> {
         return new Promise((resolve) => {
