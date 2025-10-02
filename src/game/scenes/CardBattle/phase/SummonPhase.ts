@@ -44,7 +44,12 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 super.openAllWindows();
                 super.setSelectModeMultCardset({
                     onChangeIndex: (card: Card) => this.#onChangeHandCardsetIndex(card),
-                    onHasEnoughColorPointsByColor: (card: Card) => this.#onHasEnoughColorPointsByColor(card.getColor(), card.getCost()),
+                    onHasEnoughColorPointsByColor: (card: Card) => {
+                        if (Card.isBattleCardData(card.staticData)) {
+                            return this.#onHasEnoughColorPointsByColor(card.getColor(), card.getCost())
+                        }
+                        return false;
+                    },
                     onCreditPoint: (card: Card) => this.#onCreditPoint(card),
                     onDebitPoint: (card: Card) => this.#onDebitPoint(card),
                     onComplete: (cardIds: string[]) => {
@@ -60,6 +65,10 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     #onChangeHandCardsetIndex(card: Card): void {
         super.setTextWindowText(card.getName(), 1);
         super.setTextWindowText(card.getDescription(), 2);
+        if (Card.isBattleCardData(card.staticData)) {
+            super.setTextWindowText('...', 3);
+            return;
+        }
         super.setTextWindowText(card.getEffectDescription(), 3);
     }
     

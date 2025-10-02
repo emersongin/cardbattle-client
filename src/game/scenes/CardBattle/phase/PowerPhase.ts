@@ -99,6 +99,10 @@ export abstract class PowerPhase extends CardBattlePhase {
     #updateTextWindows(card: Card): void {
         super.setTextWindowText(card.getName() + ' ' + card.getId(), 1);
         super.setTextWindowText(card.getDescription(), 2);
+        if (Card.isBattleCardData(card.staticData)) {
+            super.setTextWindowText('...', 3);
+            return;
+        }
         super.setTextWindowText(card.getEffectDescription(), 3);
     }
 

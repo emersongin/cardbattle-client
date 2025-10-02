@@ -45,11 +45,14 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     static isBattleCardData(card: CardData): card is BattleCardData {
-        return (card as BattleCardData).ap !== undefined && (card as BattleCardData).hp !== undefined && (card as BattleCardData).cost !== undefined;
+        return (card as BattleCardData).ap !== undefined 
+            && (card as BattleCardData).hp !== undefined 
+            && (card as BattleCardData).cost !== undefined;
     }
 
     static isPowerCardData(card: CardData): card is PowerCardData {
-        return (card as PowerCardData).effectType !== undefined && (card as PowerCardData).effectDescription !== undefined;
+        return (card as PowerCardData).effectType !== undefined 
+            && (card as PowerCardData).effectDescription !== undefined;
     }
 
     getSelectedLayer(): Phaser.GameObjects.Container {
