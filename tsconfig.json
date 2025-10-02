@@ -23,6 +23,7 @@
         "noFallthroughCasesInSwitch": true,
         "strictPropertyInitialization": false,
         "baseUrl": "src",
+        "ignoreDeprecations": "6.0",
         "paths": {
             "@/*": ["*"],
             "@game/*": ["game/*"],
