@@ -606,7 +606,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #shufflePlayerDeck(): void {
-        this.#playerDeck = ArrayUtil.shuffle(this.#playerDeck);
+        this.#playerDeck = ArrayUtil.shuffle<Card>(this.#playerDeck);
     }
 
     #drawPlayerCards(): void {
@@ -614,7 +614,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #shuffleOpponentDeck(): void {
-        this.#opponentDeck = ArrayUtil.shuffle(this.#opponentDeck);
+        this.#opponentDeck = ArrayUtil.shuffle<Card>(this.#opponentDeck);
     }
 
     #drawOpponentCards(): void {
@@ -915,7 +915,7 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    const powerCard = this.#opponentHand.find(card => card.type === POWER);
+                    const powerCard = this.#opponentHand.find(card => card instanceof PowerCard) as PowerCard;
                     if (counter === 0 && powerCard) {
                         counter++;
                         const powerAction = { powerCard } as PowerActionData;
@@ -951,10 +951,10 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.some(card => card.type === POWER));
+                    resolve(this.#playerHand.some(card => card instanceof PowerCard));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.some(card => card.type === POWER));
+                    resolve(this.#opponentHand.some(card => card instanceof PowerCard));
                 };
             }, delayMock);
         });

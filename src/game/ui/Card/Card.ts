@@ -141,11 +141,13 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     faceUp(): void {
         this.data.set(FACE_UP, true);
+        this.setImage();
         this.setDisplay();
     }
 
     faceDown(): void {
         this.data.set(FACE_UP, false);
+        this.setImage();
         this.setDisplay();
     }
 
@@ -254,6 +256,7 @@ export class Card extends Phaser.GameObjects.GameObject {
             this.#ui.setImage(this.staticData.image);
             return;
         }
+        console.log('setting back image');
         this.#ui.setImage('cardback');
     }
 }

@@ -29,6 +29,10 @@ export class BattleCard extends Card {
         return this.staticData.cost;
     }
 
+    setDisplay(): void {
+        this.setDisplayPoints(this.getAp(), this.getHp());
+    }
+
     setDisplayPoints(ap: number = 0, hp: number = 0): void {
         const apText = ap.toString().padStart(2, "0"); 
         const hpText = hp.toString().padStart(2, "0");

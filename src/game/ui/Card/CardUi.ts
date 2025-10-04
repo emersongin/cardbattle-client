@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { Card } from "@ui/Card/Card";
+import { VueScene } from "@/game/scenes/VueScene";
 
 export class CardUi extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -10,10 +11,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     disabledLayer: Phaser.GameObjects.Rectangle;
     selectedLayer: Phaser.GameObjects.Container;
 
-    constructor(
-        readonly scene: Phaser.Scene,
-        readonly card: Card
-    ) {
+    constructor(readonly scene: VueScene, readonly card: Card) {
         super(scene);
         this.setSize(CARD_WIDTH, CARD_HEIGHT);
         this.#createLayers();
@@ -57,6 +55,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     #createImage(): void {
         const image = this.scene.add.image(0, 0, 'empty');
         this.image = image;
+        this.#adjustImagePosition();
         this.add(this.image);
     }
 
