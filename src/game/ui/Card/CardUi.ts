@@ -64,7 +64,6 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     setImage(imageName: string): void {
-        if (!this.scene) return;
         this.image.setTexture(imageName);
         this.#adjustImagePosition();
     }

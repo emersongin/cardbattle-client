@@ -22,7 +22,7 @@ import { BattlePointsData } from '../objects/BattlePointsData';
 
 const delayMock = 100;
 
-const battleCards = [
+const battleCardsMock = [
     {
         id: 'B1',
         number: 1,
@@ -109,7 +109,7 @@ const battleCards = [
     }
 ];
 
-const powerCards = [
+const powerCardsMock = [
     {
         id: 'P1',
         number: 7,
@@ -197,8 +197,8 @@ const powerCards = [
 ];
 
 const cardsMock = [
-    ...battleCards, 
-    ...powerCards
+    ...battleCardsMock, 
+    ...powerCardsMock
 ] as CardData[];
 const redDeck = createDeck(cardsMock, 40);
 const greenDeck = createDeck(cardsMock, 40);
@@ -706,6 +706,20 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
+                    console.log({
+                        [AP]: this.#opponentBoard[AP],
+                        [HP]: this.#opponentBoard[HP],
+                        [RED]: this.#opponentBoard[RED],
+                        [GREEN]: this.#opponentBoard[GREEN],
+                        [BLUE]: this.#opponentBoard[BLUE],
+                        [BLACK]: this.#opponentBoard[BLACK],
+                        [WHITE]: this.#opponentBoard[WHITE],
+                        [HAND]: this.#opponentBoard[HAND],
+                        [DECK]: this.#opponentBoard[DECK],
+                        [TRASH]: this.#opponentBoard[TRASH],
+                        [WINS]: this.#opponentBoard[WINS],
+                        [PASS]: this.#opponentBoard[PASS]
+                    });
                     resolve({
                         [AP]: this.#opponentBoard[AP],
                         [HP]: this.#opponentBoard[HP],
@@ -1088,6 +1102,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     setBattleCards(playerId: string, cardIds: string[]): Promise<void> {
+        console.log(cardIds);
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
@@ -1102,7 +1117,7 @@ export default class CardBattleMemory implements CardBattle {
                 }
                 if (this.#isOpponent(playerId)) {
                     const cards = this.#opponentHand.filter(card => cardIds.includes(card.id)) as CardData[];
-                    this.#removeBoardPointsByBattleCards(battleCards, this.#opponentBoard);
+                    this.#removeBoardPointsByBattleCards(cards, this.#opponentBoard);
                     this.#opponentBattleCardset = cards;
                     this.#opponentHand = this.#opponentHand.filter(card => !cardIds.includes(card.id));
                     const battePoints = this.#getBattlePointsFromBattleCards(this.#opponentId);
@@ -1142,15 +1157,24 @@ export default class CardBattleMemory implements CardBattle {
     #getBattlePointsFromBattleCards(playerId: string): BattlePointsData {
         if (this.#isPlayer(playerId)) {
             const apTotal = this.#playerBattleCardset.reduce((sum, card) => sum + card.ap, 0);
-            const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
-            return { [AP]: apTotal, [HP]: hpTotal };
+            const hpTotal = this.#playerBattleCardset.reduce((sum, card) => sum + card.hp, 0);
+            return { 
+                [AP]: apTotal, 
+                [HP]: hpTotal 
+            };
         }
         if (this.#isOpponent(playerId)) {
-            const apTotal = battleCards.reduce((sum, card) => sum + card.ap, 0);
-            const hpTotal = battleCards.reduce((sum, card) => sum + card.hp, 0);
-            return { [AP]: apTotal, [HP]: hpTotal };
+            const apTotal = this.#opponentBattleCardset.reduce((sum, card) => sum + card.ap, 0);
+            const hpTotal = this.#opponentBattleCardset.reduce((sum, card) => sum + card.hp, 0);
+            return { 
+                [AP]: apTotal, 
+                [HP]: hpTotal 
+            };
         }
-        return { [AP]: 0, [HP]: 0 };
+        return { 
+            [AP]: 0, 
+            [HP]: 0 
+        };
     }
 
     isOpponentBattleCardsSet(playerId: string): Promise<boolean> {
@@ -1181,6 +1205,7 @@ export default class CardBattleMemory implements CardBattle {
                             this.#removeBoardPointsByBattleCards([card], boardOpponentClone);
                             return true;
                         }
+                        return false;
                     });
                     const cardIds = battleCards.map(card => card.id);
                     this.setBattleCards(this.#opponentId, cardIds);
