@@ -745,10 +745,14 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.map(card => this.#createCardByType(card)));
+                    const cards = this.#playerHand.map(card => this.#createCardByType(card))
+                    cards.forEach(card => this.#enableCard(card));
+                    resolve(cards);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.map(card => this.#createCardByType(card)));
+                    const cards = this.#opponentHand.map(card => this.#createCardByType(card))
+                    cards.forEach(card => this.#enableCard(card));
+                    resolve(cards);
                 };
             }, delayMock);
         });
@@ -953,10 +957,10 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve(this.#playerHand.some(card => card instanceof PowerCard));
+                    resolve(this.#playerHand.some(card => card.type === POWER));
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve(this.#opponentHand.some(card => card instanceof PowerCard));
+                    resolve(this.#opponentHand.some(card => card.type === POWER));
                 };
             }, delayMock);
         });
@@ -1011,12 +1015,12 @@ export default class CardBattleMemory implements CardBattle {
         this.#powerActionUpdates = this.#powerActionUpdates.filter(update => {
             if (update.playerSincronized && update.opponentSincronized) {
                 if (this.#isPlayer(update.playerId)) {
-                    this.#playerTrash.push(update.powerAction.powerCard);
+                    // this.#playerTrash.push(update.powerAction.powerCard);
                     this.#playerBoard[TRASH] = this.#playerTrash.length;
                     return;
                 };
                 if (this.#isOpponent(update.playerId)) {
-                    this.#opponentTrash.push(update.powerAction.powerCard);
+                    // this.#opponentTrash.push(update.powerAction.powerCard);
                     this.#opponentBoard[TRASH] = this.#opponentTrash.length;
                     return;
                 };
@@ -1190,10 +1194,6 @@ export default class CardBattleMemory implements CardBattle {
             }, delayMock);
         });
     }
-
-    // #isPowerCardData(card: CardData): card is PowerCardData {
-    //     return (card as PowerCardData).effectType !== undefined && (card as PowerCardData).effectDescription !== undefined;
-    // }
 
     getBattleCards(playerId: string): Promise<BattleCard[]> {
         return new Promise((resolve) => {
