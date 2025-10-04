@@ -1,4 +1,4 @@
-import { P } from "@/game/constants/keys";
+import { P } from "@game/constants/keys";
 import { Card } from "./Card";
 
 export class PowerCard extends Card {

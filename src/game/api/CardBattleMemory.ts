@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CardBattle } from '@api/CardBattle';
-import { ADD_COLOR_POINTS, AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
+import { NONE, ADD_COLOR_POINTS, AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { CardData } from "@objects/CardData";
@@ -14,7 +14,6 @@ import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
 import { CardColorType } from '../types/CardColorType';
-import { NONE } from 'phaser';
 import { Card } from '../ui/Card/Card';
 import { PowerCard } from '../ui/Card/PowerCard';
 import { BattleCard } from '../ui/Card/BattleCard';

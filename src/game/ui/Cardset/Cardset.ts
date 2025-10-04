@@ -200,6 +200,7 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     #setCards(cards: Card[]): void {
         this.#cards = cards;
+        this.#cards.forEach((card: Card) => card.addToCardset(this));
     }
 
     preUpdate(): void {

@@ -2,12 +2,13 @@ import PhaserMock from "@mocks/phaser";
 import CardBattleMock from "@mocks/cardset";
 import { describe, it, expect, beforeAll } from "vitest";
 import { Cardset } from "@ui/Cardset/Cardset";
-import { Card } from "@ui/Card/Card";
 import { BLUE, GREEN } from "@constants/colors";
-import { ADD_COLOR_POINTS, BATTLE, POWER } from "@constants/keys";
+import { ADD_COLOR_POINTS, BATTLE, POWER, NONE } from "@constants/keys";
 import { CardType } from "@game/types/CardType";
-import { VueScene } from "@/game/scenes/VueScene";
-import { CardColorType } from "@/game/types/CardColorType";
+import { VueScene } from "@game/scenes/VueScene";
+import { CardColorType } from "@game/types/CardColorType";
+import { BattleCard } from "@game/ui/Card/BattleCard";
+import { PowerCard } from "@game/ui/Card/PowerCard";
 
 describe("Card", () => {
     let sceneMock: VueScene;
@@ -23,7 +24,7 @@ describe("Card", () => {
     });
 
     it("Should create a Battle Card.", () => {
-        const card = new Card(sceneMock, cardsetMock, {
+        const card = new BattleCard(sceneMock, {
             number: 1,
             id: 'ID',
             name: 'Battle Card n° 2',
@@ -34,9 +35,10 @@ describe("Card", () => {
             ap: 4,
             hp: 6,
             cost: 2,
+            effectType: NONE,
+            effectDescription: 'none',
         });
         expect(card).toBeDefined();
-        expect(card.isBattleCard()).toBe(true);
         expect(card.getId()).toBe('ID');
         expect(card.getNumber()).toBe(1);
         expect(card.getName()).toBe('Battle Card n° 2');
@@ -52,12 +54,10 @@ describe("Card", () => {
         expect(card.isBanned()).toBe(false);
         expect(card.isDisabled()).toBe(false);
         expect(card.getCost()).toBe(2);
-        expect(() => card.getEffectType()).toThrow("This is not a power card");
-        expect(() => card.getEffectDescription()).toThrow("This is not a power card");
     });
 
     it("Should create a Power Card.", () => {
-        const card = new Card(sceneMock, cardsetMock, {
+        const card = new PowerCard(sceneMock, {
             id: 'ID',
             number: 1,
             name: 'Power Card n° 3',
@@ -67,12 +67,11 @@ describe("Card", () => {
             type: POWER as CardType,
             effectType: ADD_COLOR_POINTS,
             effectDescription: 'Gain 2 points of a color of your choice.',
+            ap: 0,
+            hp: 0,
+            cost: 0,
         });
-        expect(() => card.getAp()).toThrow("This is not a battle card.");
-        expect(() => card.getHp()).toThrow("This is not a battle card.");
-        expect(() => card.getCost()).toThrow("This is not a battle card.");
         expect(card).toBeDefined();
-        expect(card.isPowerCard()).toBe(true);
         expect(card.getId()).toBe('ID');
         expect(card.getNumber()).toBe(1);
         expect(card.getName()).toBe('Power Card n° 3');
