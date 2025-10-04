@@ -24,7 +24,7 @@ export class CardUi extends Phaser.GameObjects.Container {
         this.#createImage();
         this.#createDisplay();
         this.#createDisabledLayer();
-        this.#createSelectedLayer(); // Default color for selected layer
+        this.#createSelectedLayer();
     }
 
     #createBackground(): void {
@@ -89,45 +89,11 @@ export class CardUi extends Phaser.GameObjects.Container {
             fontStyle: 'bold',
         });
         this.display = display;
-        this.setDisplay();
         this.add(this.display);
     }
 
-    setDisplay(): void {
-        const faceUp = this.card.data.get('faceUp');
-        if (!this.display || !faceUp) {
-            this.#setEmptyDisplay();
-            return
-        } 
-        const { type: cardTypeId } = this.card.staticData;
-        if (Card.isBattleCardData(this.card.staticData)) {
-            this.setPointsDisplay(this.card.staticData.ap, this.card.staticData.hp);
-        } else if (Card.isPowerCardData(this.card.staticData)) {
-            this.#setPowerDisplay();
-        } else {
-            throw new Error(`Unknown card type id: ${cardTypeId}`);
-        }
-    }
-
-    #setEmptyDisplay() {
-        this.#setDisplayText('');
-    }
-
-    #setDisplayText(text: string): void {
-        if (!this.display) {
-            throw new Error('Display is not initialized.');
-        }
+    setDisplayText(text: string): void {
         this.display.setText(text);
-    }
-
-    setPointsDisplay(ap: number = 0, hp: number = 0): void {
-        const apText = ap.toString().padStart(2, "0"); 
-        const hpText = hp.toString().padStart(2, "0");
-        this.#setDisplayText(`${apText}/${hpText}`);
-    }
-
-    #setPowerDisplay() {
-        this.#setDisplayText('P');
     }
 
     #createDisabledLayer(): void {

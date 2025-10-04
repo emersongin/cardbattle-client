@@ -19,8 +19,9 @@ import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { ORANGE } from "@/game/constants/colors";
 import { Phase } from "./Phase";
 import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
-import { CardDataWithState } from "@/game/objects/CardDataWithState";
 import { TextWindows } from "@/game/ui/TextWindows/TextWindows";
+import { PowerCard } from "@/game/ui/Card/PowerCard";
+import { BattleCard } from "@/game/ui/Card/BattleCard";
 
 export type AlignType = 
     | typeof LEFT 
@@ -196,7 +197,7 @@ export class CardBattlePhase implements Phase {
     }
     
     // PLAYER CARDSET
-    createCardset(cards: CardDataWithState[]): Promise<void> {
+    createCardset(cards: Card[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
             const y = (this.#board.y - (this.#board.height / 2)) - CARD_HEIGHT - 10; 
@@ -208,7 +209,7 @@ export class CardBattlePhase implements Phase {
         });
     }
 
-    createHandCardset(cards: CardDataWithState[]): Promise<void> {
+    createHandCardset(cards: Card[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
             const y = this.scene.cameras.main.centerY; 
@@ -268,7 +269,7 @@ export class CardBattlePhase implements Phase {
     }
 
     // OPPONENT CARDSET
-    createOpponentCardset(cards: CardDataWithState[]): Promise<void> {
+    createOpponentCardset(cards: Card[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
             const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
@@ -316,7 +317,7 @@ export class CardBattlePhase implements Phase {
     }
 
     // FIELD CARDSET
-    createPowerCardset(cards: CardDataWithState[]): Promise<void> {
+    createPowerCardset(cards: PowerCard[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - ((CARD_WIDTH * 3) / 2));
             const y = (this.scene.cameras.main.centerY - (CARD_HEIGHT / 2));
@@ -519,11 +520,11 @@ export class CardBattlePhase implements Phase {
         return new Promise(async resolve => {
             const board = await this.cardBattle.getBoard(this.scene.room.playerId);
             const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-            const powerCards: CardDataWithState[] = await this.cardBattle.getFieldPowerCards();
-            const battleCards: CardDataWithState[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
-            let opponentBattleCards: CardDataWithState[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
+            const powerCards: PowerCard[] = await this.cardBattle.getFieldPowerCards();
+            const battleCards: BattleCard[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
+            let opponentBattleCards: BattleCard[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
             if (config?.isOpponentBattleCardsFaceDown) {
-                opponentBattleCards = opponentBattleCards.map(card => ({ ...card, faceUp: false }) );
+                opponentBattleCards.forEach(card => card.faceDown());
             }            
             const promises = [];
             if (board) {

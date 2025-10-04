@@ -1,14 +1,11 @@
 import { ADD_COLOR_POINTS, HAND, REMOVE_COLOR_POINTS } from "@constants/keys";
 import { CARD_WIDTH } from "@constants/default";
-import { CardData } from "@objects/CardData";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
 import { Card } from "@/game/ui/Card/Card";
 import { TriggerPhase } from "./TriggerPhase";
 import { BoardWindowData } from "@/game/objects/BoardWindowData";
-import { CardDataWithState } from "@/game/objects/CardDataWithState";
-import { PowerCardData } from "@/game/objects/PowerCardData";
-
+import { PowerCard } from "@/game/ui/Card/PowerCard";
 export abstract class PowerPhase extends CardBattlePhase {
 
     async create(goToPlays: boolean = false): Promise<void> {
@@ -99,11 +96,11 @@ export abstract class PowerPhase extends CardBattlePhase {
     #updateTextWindows(card: Card): void {
         super.setTextWindowText(card.getName() + ' ' + card.getId(), 1);
         super.setTextWindowText(card.getDescription(), 2);
-        if (Card.isBattleCardData(card.staticData)) {
-            super.setTextWindowText('...', 3);
+        if (card instanceof PowerCard) {
+            super.setTextWindowText(card.getEffectDescription(), 3);
             return;
         }
-        super.setTextWindowText(card.getEffectDescription(), 3);
+        super.setTextWindowText('...', 3);
     }
 
     #completeChoice(cardIds: string[]): void {
@@ -130,26 +127,26 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #startPowerCardPlay(cardId: string): Promise<void> {
-        const powerCard: PowerCardData = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
-        const playerPlay = () => this.#createPowerCardConfig(powerCard);
+        const card: PowerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
+        const playerPlay = () => this.#createPowerCardConfig(card);
         //mock
         // const playerPlay = () => this.#finishPowerCardPlay(powerCard, true);
-        this.#playPowerCard(powerCard, playerPlay);
+        this.#playPowerCard(card, playerPlay);
     }
 
-    #createPowerCardConfig(powerCard: PowerCardData): void {
-        switch (powerCard.effectType) {
+    #createPowerCardConfig(card: PowerCard): void {
+        switch (card.getEffectType()) {
             case ADD_COLOR_POINTS:
             case REMOVE_COLOR_POINTS:
             default:
-                this.#createConfirmPowerCardConfig(powerCard);
+                this.#createConfirmPowerCardConfig(card);
                 break;
         }
     }
 
-    #createConfirmPowerCardConfig(card: PowerCardData): void {
+    #createConfirmPowerCardConfig(card: PowerCard): void {
         super.createTextWindowTop(card.name, { textAlign: 'center' });
-        super.addTextWindow(card.effectDescription);
+        super.addTextWindow(card.getEffectDescription());
         super.createCommandWindowBottom('Use this Power Card?', [
             {
                 description: 'Yes',
@@ -164,10 +161,13 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openCommandWindow();
     }
 
-    async #finishPowerCardPlay(powerCard: CardData, powerCardConfig: any): Promise<void> {
+    async #finishPowerCardPlay(powerCard: PowerCard, powerCardConfig: any): Promise<void> {
         await super.closeAllWindows();
         // make power card play and remove hand point
-        const powerAction = { powerCard, config: powerCardConfig };
+        const powerAction = { 
+            powerCard, 
+            config: powerCardConfig 
+        };
         await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
         super.removeBoardZonePoints(HAND, 1);
         // set board pass
@@ -179,11 +179,13 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.#loadPlayAndMovePowerCardToField();
     }
 
-    async #playPowerCard(powerCard: CardData, loadPowerActionConfig: () => void): Promise<void> {
+    async #playPowerCard(powerCard: PowerCard, loadPowerActionConfig: () => void): Promise<void> {
         // create power cardset
-        const powerCards: CardDataWithState[] = await this.cardBattle.getFieldPowerCards();
-        const powerCardsFiltered = powerCards.filter(card => card.id !== powerCard.id);
-        await super.createPowerCardset([...powerCardsFiltered, { ...powerCard, faceUp: true, disabled: false }]);
+        const powerCards: PowerCard[] = await this.cardBattle.getFieldPowerCards();
+        const powerCardsFiltered = powerCards.filter(card => card.getId() !== powerCard.getId());
+        powerCard.faceUp();
+        powerCard.enable();
+        await super.createPowerCardset([...powerCardsFiltered, powerCard]);
         // show power cardset last state
         const cardset = super.getPowerCardset();
         cardset.setCardsInLinePosition();

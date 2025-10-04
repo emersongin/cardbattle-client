@@ -1,0 +1,46 @@
+import { AP, HP } from "@constants/keys";
+import { BattlePointsData } from "@/game/objects/BattlePointsData";
+import { Card } from "./Card";
+
+export class BattleCard extends Card {
+
+    setStartData(): void {
+        super.setStartData();
+        this.setAp(this.staticData.ap);
+        this.setHp(this.staticData.hp);
+    }
+
+    getAllData(): BattlePointsData {
+        return { 
+            [AP]: this.data.get(AP), 
+            [HP]: this.data.get(HP),
+        };
+    }
+
+    getAp(): number {
+        return this.data.get(AP);
+    }
+
+    getHp(): number {
+        return this.data.get(HP);
+    }
+
+    getCost(): number {
+        return this.staticData.cost;
+    }
+
+    setDisplayPoints(ap: number = 0, hp: number = 0): void {
+        const apText = ap.toString().padStart(2, "0"); 
+        const hpText = hp.toString().padStart(2, "0");
+        super.setDisplay(`${apText}/${hpText}`);
+    }
+
+    setAp(ap: number): void {
+        this.data.set(AP, ap);
+    }
+
+    setHp(hp: number): void {
+        this.data.set(HP, hp);
+    }
+
+}

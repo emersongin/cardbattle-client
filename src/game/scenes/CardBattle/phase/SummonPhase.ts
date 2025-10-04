@@ -5,9 +5,9 @@ import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { ORANGE } from "@/game/constants/colors";
 import { Card } from "@/game/ui/Card/Card";
-import { CardDataWithState } from "@/game/objects/CardDataWithState";
-import { POWER } from "@/game/constants/keys";
 import { CardColorType } from "@/game/types/CardColorType";
+import { BattleCard } from "@/game/ui/Card/BattleCard";
+import { PowerCard } from "@/game/ui/Card/PowerCard";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -25,12 +25,20 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     async #createHandZone(): Promise<void> {
         const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
         super.createBoard(boardData);
-        const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
-        const battleCards = cards.filter(card => Card.isBattleCardData(card));
-        const battleCardsToSummon = battleCards.map(card => ({ ...card, faceUp: true, disabled: !this.#onHasEnoughColorPointsByColor(card.color, card.cost) }));
-        const powerCards = cards.filter(card => card.type === POWER);
-        const powerCardsDisabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: true }));
-        super.createHandCardset([...battleCardsToSummon, ...powerCardsDisabled]);
+        const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
+        const battleCards = cards.filter(card => card instanceof BattleCard);
+        battleCards.forEach(card => {
+            card.faceUp();
+            if (!this.#onHasEnoughColorPointsByColor(card.getColor(), card.getCost())) {
+                card.disable();
+            }
+        });
+        const powerCards = cards.filter(card => card instanceof PowerCard);
+        powerCards.forEach(card => {
+            card.faceUp();
+            card.disable();
+        });
+        super.createHandCardset([...battleCards, ...powerCards]);
         super.createHandDisplayWindows();
     }
 
@@ -44,14 +52,11 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 super.openAllWindows();
                 super.setSelectModeMultCardset({
                     onChangeIndex: (card: Card) => this.#onChangeHandCardsetIndex(card),
-                    onHasEnoughColorPointsByColor: (card: Card) => {
-                        if (Card.isBattleCardData(card.staticData)) {
-                            return this.#onHasEnoughColorPointsByColor(card.getColor(), card.getCost())
-                        }
-                        return false;
+                    onHasEnoughColorPointsByColor: (card: BattleCard) => {
+                        return this.#onHasEnoughColorPointsByColor(card.getColor(), card.getCost());
                     },
-                    onCreditPoint: (card: Card) => this.#onCreditPoint(card),
-                    onDebitPoint: (card: Card) => this.#onDebitPoint(card),
+                    onCreditPoint: (card: BattleCard) => this.#onCreditPoint(card),
+                    onDebitPoint: (card: BattleCard) => this.#onDebitPoint(card),
                     onComplete: (cardIds: string[]) => {
                         super.getCardset().highlightCardsByIndexes(cardIds);
                         this.#createCommandWindow(cardIds);
@@ -65,11 +70,11 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     #onChangeHandCardsetIndex(card: Card): void {
         super.setTextWindowText(card.getName(), 1);
         super.setTextWindowText(card.getDescription(), 2);
-        if (Card.isBattleCardData(card.staticData)) {
-            super.setTextWindowText('...', 3);
+        if (card instanceof PowerCard) {
+            super.setTextWindowText(card.getEffectDescription(), 3);
             return;
         }
-        super.setTextWindowText(card.getEffectDescription(), 3);
+        super.setTextWindowText('...', 3);
     }
     
     #onHasEnoughColorPointsByColor(cardColor: CardColorType, cardCost: number): boolean {
@@ -77,14 +82,14 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         return super.getBoard().hasEnoughColorPointsByColor(cardColor, cardCost);
     }
 
-    #onCreditPoint(card: Card): void {
+    #onCreditPoint(card: BattleCard): void {
         const cardColor = card.getColor() as CardColorType;
         const cardCost = card.getCost();
         if (cardColor === ORANGE) return;
         if (cardCost > 0) super.getBoard().addColorPoints(cardColor, cardCost);
     }
 
-    #onDebitPoint(card: Card): void {
+    #onDebitPoint(card: BattleCard): void {
         const cardColor = card.getColor() as CardColorType;
         const cardCost = card.getCost();
         if (cardColor === ORANGE) return;

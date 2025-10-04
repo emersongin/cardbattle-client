@@ -16,7 +16,7 @@ const phaserRef = ref();
 
 // Event emitted from the PhaserGame component
 const currentScene = (scene: VueScene) => {
-    const cardBattle = new CardBattleMemory();
+    const cardBattle = new CardBattleMemory(scene);
     scene.setCardBattle(cardBattle);
 }
 

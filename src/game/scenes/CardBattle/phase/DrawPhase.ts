@@ -52,7 +52,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     #createPlayerDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
             const playerCards = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
-            await super.createCardset(playerCards.map(card => ({ ...card, faceUp: false })));
+            playerCards.forEach(card => card.faceDown());
+            await super.createCardset(playerCards);
             const widthEdge = this.scene.scale.width;
             const cardset = super.getCardset();
             cardset.setCardsInLinePosition(widthEdge, 0);
@@ -63,7 +64,8 @@ export class DrawPhase extends CardBattlePhase implements Phase {
     #createOpponentDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
             const opponentCards = await this.cardBattle.getOpponentCardsFromHand(this.scene.room.playerId);
-            await super.createOpponentCardset(opponentCards.map(card => ({ ...card, faceUp: false })));
+            opponentCards.forEach(card => card.faceDown());
+            await super.createOpponentCardset(opponentCards);
             const widthEdge = this.scene.scale.width;
             const cardset = super.getOpponentCardset();
             cardset.setCardsInLinePosition(widthEdge, 0);

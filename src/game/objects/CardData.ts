@@ -9,4 +9,9 @@ export type CardData = {
     color: CardColorType;
     image: string;
     type: CardType;
+    ap: number;
+    hp: number;
+    cost: number;
+    effectType: string;
+    effectDescription: string;
 } 

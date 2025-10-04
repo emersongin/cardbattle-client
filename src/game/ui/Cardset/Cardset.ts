@@ -6,9 +6,6 @@ import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
 import { PositionConfig } from "../Card/animations/types/PositionConfig";
 import { VueScene } from "@/game/scenes/VueScene";
-import { CardDataWithState } from "@/game/objects/CardDataWithState";
-import { BattleCardData } from "@/game/objects/BattleCardData";
-import { PowerCardData } from "@/game/objects/PowerCardData";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
@@ -17,7 +14,7 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     constructor(
         readonly scene: VueScene, 
-        readonly cards: CardDataWithState[],
+        readonly cards: Card[],
         x: number = 0,
         y: number = 0
     ) {
@@ -26,13 +23,13 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.data.set('selectModeEnabled', false);
         this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.#selectMode = new SelectMode(this);
-        this.#createCards(cards);
+        this.#setCards(cards);
         this.scene.add.existing(this);
     }
 
     static create(
         scene: VueScene,
-        cards: CardDataWithState[],
+        cards: Card[],
         x: number = 0,
         y: number = 0
     ): Cardset {
@@ -201,17 +198,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#selectMode.create(events, selectionsNumber);
     }
 
-    #createCards(cardsData: CardDataWithState[]): void {
-        const cards = cardsData.map((cardData: CardDataWithState) => {
-            const card = new Card(
-                this.scene, 
-                this, 
-                cardData as unknown as BattleCardData | PowerCardData, 
-                cardData.faceUp, 
-                cardData.disabled
-            );
-            return card;
-        });
+    #setCards(cards: Card[]): void {
         this.#cards = cards;
     }
 

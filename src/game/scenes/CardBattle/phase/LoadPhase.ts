@@ -1,8 +1,8 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { SummonPhase } from "@scenes/CardBattle/phase/SummonPhase";
 import { PowerPhase } from "./PowerPhase";
-import { CardDataWithState } from "@/game/objects/CardDataWithState";
 import { BATTLE, POWER } from "@/game/constants/keys";
+import { Card } from "@/game/ui/Card/Card";
 
 export class LoadPhase extends PowerPhase implements Phase {
 
@@ -21,12 +21,18 @@ export class LoadPhase extends PowerPhase implements Phase {
     }
 
     async createHandZone(): Promise<void> {
-        const cards: CardDataWithState[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
+        const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
         const battleCards = cards.filter(card => card.type === BATTLE);
-        const battleCardsDisabled = battleCards.map(card => ({ ...card, faceUp: true, disabled: true }));
+        battleCards.forEach(card => {
+            card.faceUp();
+            card.disable();
+        });
         const powerCards = cards.filter(card => card.type === POWER);
-        const powerCardsEnabled = powerCards.map(card => ({ ...card, faceUp: true, disabled: false }));
-        super.createHandCardset([...powerCardsEnabled, ...battleCardsDisabled]);
+        powerCards.forEach(card => {
+            card.faceUp();
+            card.enable();
+        });
+        super.createHandCardset([...powerCards, ...battleCards]);
     }
 
     changeTo(): void {
