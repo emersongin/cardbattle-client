@@ -56,10 +56,7 @@ export class CardActionsBuilder {
                 this.card.setDisplayPoints(this.card.getAp(), this.card.getHp());
                 return;
             }
-            if (this.card instanceof PowerCard) {
-                this.card.setDisplayPowerCard();
-                return;
-            }
+            this.card.setDisplay();
         };
         const config = { onComplete };
         this.#addMove({ name: 'faceup', config });

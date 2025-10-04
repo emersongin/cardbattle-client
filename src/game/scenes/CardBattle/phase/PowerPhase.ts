@@ -127,11 +127,11 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #startPowerCardPlay(cardId: string): Promise<void> {
-        const card: PowerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
-        const playerPlay = () => this.#createPowerCardConfig(card);
+        const powerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
+        const playerPlay = () => this.#createPowerCardConfig(powerCard);
         //mock
         // const playerPlay = () => this.#finishPowerCardPlay(powerCard, true);
-        this.#playPowerCard(card, playerPlay);
+        this.#playPowerCard(powerCard, playerPlay);
     }
 
     #createPowerCardConfig(card: PowerCard): void {

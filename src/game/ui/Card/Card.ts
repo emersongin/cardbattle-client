@@ -2,9 +2,9 @@ import { BANNED, CLOSED, DISABLED, FACE_UP, HIGHLIGHTED, MARKED, ORIGIN_X, ORIGI
 import { CardType } from "@game/types/CardType";
 import { CardUi } from "@ui/Card/CardUi";
 import { Cardset } from "@ui/Cardset/Cardset";
-import { CardColorType } from "@/game/types/CardColorType";
-import { CardData } from "@/game/objects/CardData";
-import { VueScene } from "@/game/scenes/VueScene";
+import { CardColorType } from "@game/types/CardColorType";
+import { CardData } from "@game/objects/CardData";
+import { VueScene } from "@game/scenes/VueScene";
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
     #cardset: Cardset;

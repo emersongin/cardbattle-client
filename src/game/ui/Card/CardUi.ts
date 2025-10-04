@@ -2,7 +2,7 @@ import Phaser from "phaser";
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from "@constants/colors";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { Card } from "@ui/Card/Card";
-import { VueScene } from "@/game/scenes/VueScene";
+import { VueScene } from "@game/scenes/VueScene";
 
 export class CardUi extends Phaser.GameObjects.Container {
     background: Phaser.GameObjects.Rectangle;
@@ -27,7 +27,7 @@ export class CardUi extends Phaser.GameObjects.Container {
 
     #createBackground(): void {
         const backgroundColor = this.getBackgroundColor();
-        const backgroundRect = this.scene.add.rectangle(0, 0, this.width, this.height, backgroundColor);
+        const backgroundRect = this.getScene().add.rectangle(0, 0, this.width, this.height, backgroundColor);
         backgroundRect.setOrigin(0, 0);
         this.background = backgroundRect;
         this.add(this.background);
@@ -53,13 +53,18 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #createImage(): void {
-        const image = this.scene.add.image(0, 0, 'empty');
+        const image = this.getScene().add.image(0, 0, 'empty');
         this.image = image;
         this.#adjustImagePosition();
         this.add(this.image);
     }
 
+    getScene(): VueScene {
+        return this.scene || this.card.scene as VueScene;
+    }
+
     setImage(imageName: string): void {
+        if (!this.scene) return;
         this.image.setTexture(imageName);
         this.#adjustImagePosition();
     }
@@ -76,7 +81,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #createDisplay(): void {
-        const display = this.scene.add.text(this.width - 80, this.height - 32, '', {
+        const display = this.getScene().add.text(this.width - 80, this.height - 32, '', {
             fontSize: '24px',
             color: (this.card.staticData.color === WHITE) ? '#000' : '#fff',
             fontStyle: 'bold',
@@ -86,11 +91,12 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     setDisplayText(text: string): void {
+        if (!this.display) return;
         this.display.setText(text);
     }
 
     #createDisabledLayer(): void {
-        const disabledLayer = this.scene.add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
+        const disabledLayer = this.getScene().add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
         disabledLayer.setOrigin(0, 0);
         disabledLayer.setVisible(this.card.isDisabled() || false);
         this.disabledLayer = disabledLayer;
@@ -98,7 +104,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #createSelectedLayer(): void {
-        const selectedLayer = this.scene.add.container(0, 0);
+        const selectedLayer = this.getScene().add.container(0, 0);
         selectedLayer.setVisible(false);
         this.selectedLayer = selectedLayer;
         this.add(this.selectedLayer);
@@ -121,7 +127,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {
-        const g = this.scene.add.graphics();
+        const g = this.getScene().add.graphics();
         g.lineStyle(thickness, color);
         g.strokeRect(x, y, w, h);
         return g;
