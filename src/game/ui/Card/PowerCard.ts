@@ -11,7 +11,7 @@ export class PowerCard extends Card {
         return this.staticData.effectType;
     }
 
-    setDisplay(): void {
+    setDisplayPowerCard(): void {
         super.setDisplay(P);
     }
 

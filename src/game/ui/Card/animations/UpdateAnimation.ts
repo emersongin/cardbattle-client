@@ -1,18 +1,18 @@
-import { Card } from "@ui/Card/Card";
 import { BattlePointsData } from "@/game/objects/BattlePointsData";
 import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
 import { AP, HP } from "@/game/constants/keys";
+import { BattleCard } from "../BattleCard";
 
 export class UpdateAnimation {
     
-    constructor(readonly card: Card, toTarget: BattlePointsData) {
+    constructor(readonly card: BattleCard, toTarget: BattlePointsData) {
         const fromTarget: BattlePointsData = this.card.getAllData();
         const apPoints = this.#createUpdate(fromTarget, fromTarget[AP], toTarget[AP],
             (tween: Phaser.Tweens.Tween) => {
                 fromTarget[AP] = Math.round(tween.getValue() ?? 0);
                 const ap = Math.round(fromTarget[AP]);
                 const hp = Math.round(fromTarget[HP]);
-                this.card.setPointsDisplay(ap, hp);
+                this.card.setDisplayPoints(ap, hp);
             },
             () => this.card.setAp(toTarget[AP])
         );
@@ -21,7 +21,7 @@ export class UpdateAnimation {
                 fromTarget[HP] = Math.round(tween.getValue() ?? 0);
                 const ap = Math.round(fromTarget[AP]);
                 const hp = Math.round(fromTarget[HP]);
-                this.card.setPointsDisplay(ap, hp);
+                this.card.setDisplayPoints(ap, hp);
             },
             () => this.card.setHp(toTarget[HP])
         );

@@ -90,6 +90,10 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get(DISABLED);
     }
 
+    isFaceUp(): boolean {
+        return this.data.get(FACE_UP);
+    }
+
     enable(): void {
         if (!this.#ui.disabledLayer) return;
         this.data.set(DISABLED, false);
@@ -243,5 +247,13 @@ export class Card extends Phaser.GameObjects.GameObject {
             return;
         }
         this.#ui.setDisplayText(text);
+    }
+
+    setImage(): void {
+        if (this.isFaceUp()) {
+            this.#ui.setImage(this.staticData.image);
+            return;
+        }
+        this.#ui.setImage('cardback');
     }
 }

@@ -10,6 +10,8 @@ import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@/game/types/TweenConfig";
+import { BattleCard } from "./BattleCard";
+import { PowerCard } from "./PowerCard";
 
 export class CardActionsBuilder {
     #moves: CardAnimation[] = [];
@@ -48,9 +50,16 @@ export class CardActionsBuilder {
 
     faceUp(): CardActionsBuilder {
         const onComplete = () => {
-            this.card.data.set('faceUp', true);
-            this.card.getUi().setImage();
-            this.card.getUi().setDisplay(this.card.data.get('ap'), this.card.data.get('hp'));
+            this.card.faceUp();
+            this.card.setImage();
+            if (this.card instanceof BattleCard) {
+                this.card.setDisplayPoints(this.card.getAp(), this.card.getHp());
+                return;
+            }
+            if (this.card instanceof PowerCard) {
+                this.card.setDisplayPowerCard();
+                return;
+            }
         };
         const config = { onComplete };
         this.#addMove({ name: 'faceup', config });

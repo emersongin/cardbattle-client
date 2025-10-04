@@ -1,6 +1,7 @@
 import { Card } from "@ui/Card/Card";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
+import { BattleCard } from "../Card/BattleCard";
 
 export class SelectMode {
     #events: CardsetEvents;
@@ -98,6 +99,11 @@ export class SelectMode {
         const cardId = card.getId();
         this.cardset.selectCardById(cardId);
         this.cardset.moveCardById(cardId, { yTo: -12, duration: 10 });
+    }
+
+    #getBattleCardById(cardId: string): BattleCard {
+        const card = this.cardset.getCardById(cardId) as BattleCard;
+        return card;
     }
 
     #getCardById(cardId: string): Card {
@@ -210,7 +216,7 @@ export class SelectMode {
     }
 
     #debitPointsById(cardId: string): void {
-        if (this.#events.onDebitPoint) this.#events.onDebitPoint(this.#getCardById(cardId));
+        if (this.#events.onDebitPoint) this.#events.onDebitPoint(this.#getBattleCardById(cardId));
     }
 
     #removeId(cardId: string): void {
@@ -223,7 +229,7 @@ export class SelectMode {
     }
 
     #creditPointsById(cardId: string): void {
-        if (this.#events.onCreditPoint) this.#events.onCreditPoint(this.#getCardById(cardId));
+        if (this.#events.onCreditPoint) this.#events.onCreditPoint(this.#getBattleCardById(cardId));
     }
 
     #disableCardsWithoutEnoughPoints(): void {
@@ -244,7 +250,7 @@ export class SelectMode {
 
     #notHaveEnoughPoints(cardId: string): boolean {
         if (this.#events.onHasEnoughColorPointsByColor) {
-            return this.#events.onHasEnoughColorPointsByColor(this.#getCardById(cardId)) === false;
+            return this.#events.onHasEnoughColorPointsByColor(this.#getBattleCardById(cardId)) === false;
         }
         return false;
     }
