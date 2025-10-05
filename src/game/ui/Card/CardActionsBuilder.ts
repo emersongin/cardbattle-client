@@ -11,7 +11,6 @@ import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { BattleCard } from "./BattleCard";
-import { PowerCard } from "./PowerCard";
 
 export class CardActionsBuilder {
     #moves: CardAnimation[] = [];
