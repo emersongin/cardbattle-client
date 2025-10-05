@@ -841,10 +841,26 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
+    getOpponentPowerCardById(playerId: string, cardId: string): Promise<PowerCard> {
+        return new Promise((resolve) => {
+            setTimeout(async () => {
+                if (this.#isPlayer(playerId)) {
+                    const powerCardData = this.#opponentHand.find(card => card.id === cardId) as CardData;
+                    resolve(this.#createCardByType(powerCardData) as PowerCard);
+                };
+                if (this.#isOpponent(playerId)) {
+                    const powerCardData = this.#playerHand.find(card => card.id === cardId) as CardData;
+                    resolve(this.#createCardByType(powerCardData) as PowerCard);
+                };
+            }, delayMock);
+        });
+    }
+
     getFieldPowerCards(): Promise<PowerCard[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const powerCards = this.#powerActionUpdates.map((update) => update.powerAction.powerCard);
+                const powerCardsData = this.#powerActionUpdates.map((update) => update.powerAction.powerCard);
+                const powerCards = powerCardsData.map(card => this.#createCardByType(card) as PowerCard);
                 powerCards.forEach(card => this.#enableCard(card));
                 resolve(powerCards);
             }, delayMock);
@@ -854,7 +870,7 @@ export default class CardBattleMemory implements CardBattle {
     makePowerCardPlay(playerId: string, powerAction: PowerActionData): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
-                const powerCardId = powerAction.powerCard.getId();
+                const powerCardId = powerAction.powerCard.id;
                 this.#powerActionUpdates.push({
                     playerId,
                     powerAction,
@@ -935,7 +951,7 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    const powerCard = this.#opponentHand.find(card => card instanceof PowerCard) as PowerCard;
+                    const powerCard = this.#opponentHand.find(card => card.type === POWER) as CardData;
                     if (counter === 0 && powerCard) {
                         counter++;
                         const powerAction = { powerCard } as PowerActionData;
@@ -1010,13 +1026,13 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.getId() === powerCardId);
+                    const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.id === powerCardId);
                     if (update) update.playerSincronized = true;
                     // mock
                     if (update) update.opponentSincronized = true;
                 };
                 if (this.#isOpponent(playerId)) {
-                    const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.getId() === powerCardId);
+                    const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.id === powerCardId);
                     if (update) update.opponentSincronized = true;
                 };
                 this.#removePowerCardSincronized();

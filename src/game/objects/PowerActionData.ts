@@ -1,6 +1,6 @@
-import { PowerCard } from "../ui/Card/PowerCard";
+import { CardData } from "./CardData";
 
 export type PowerActionData = {
-    powerCard: PowerCard;
+    powerCard: CardData;
     // action:{} config...
 }

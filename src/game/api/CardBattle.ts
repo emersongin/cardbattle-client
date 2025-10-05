@@ -40,6 +40,7 @@ export interface CardBattle {
     setPlaying: (playerId: string) => Promise<void>;
     pass(playerId: string): Promise<void>;
     getPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
+    getOpponentPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
     getFieldPowerCards: () => Promise<PowerCard[]>;
     
     makePowerCardPlay: (playerId: string, powerAction: PowerActionData) => Promise<void>;
