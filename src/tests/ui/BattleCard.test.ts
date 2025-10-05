@@ -8,7 +8,6 @@ import { CardColorType } from "@game/types/CardColorType";
 import { CardData } from "@game/objects/CardData";
 import { BLUE } from "@game/constants/colors";
 import { BATTLE, NONE, POWER } from "@game/constants/keys";
-import { PowerCard } from "@game/ui/Card/PowerCard";
 import { BattleCard } from "@game/ui/Card/BattleCard";
 
 describe("BattleCard.test", () => {
