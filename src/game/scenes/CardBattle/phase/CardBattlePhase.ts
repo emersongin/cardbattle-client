@@ -111,8 +111,8 @@ export class CardBattlePhase implements Phase {
     }
 
     // PLAYER BOARD
-    createBoard(boardData: BoardWindowData): void {
-        this.#board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
+    addBoard(boardData: BoardWindow): void {
+        this.#board = boardData;
     }
 
     getBoard(): BoardWindow {
@@ -156,8 +156,8 @@ export class CardBattlePhase implements Phase {
     }
 
     // OPPONENT BOARD
-    createOpponentBoard(opponentBoardData: BoardWindowData): void {
-        this.#opponentBoard = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
+    addOpponentBoard(boardData: BoardWindow): void {
+        this.#opponentBoard = boardData;
     }
 
     setOpponentBoardBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
@@ -529,11 +529,11 @@ export class CardBattlePhase implements Phase {
             const promises = [];
             if (board) {
                 const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
-                promises.push(this.createBoard(boardData));
+                promises.push(this.addBoard(board));
             };
             if (opponentBoard) {
                 const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
-                promises.push(this.createOpponentBoard(opponentBoardData));
+                promises.push(this.addOpponentBoard(opponentBoard));
             }
             if (powerCards) promises.push(this.createPowerCardset(powerCards));
             if (battleCards) promises.push(this.createCardset(battleCards));

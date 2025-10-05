@@ -1,25 +1,25 @@
-import { BoardWindowData } from "@objects/BoardWindowData";
 import { LoadPhase } from "@scenes/CardBattle/phase/LoadPhase";
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { DECK, HAND } from "@/game/constants/keys";
 import { TweenConfig } from "@/game/types/TweenConfig";
+import { BoardWindow } from "@/game/ui/BoardWindow/BoardWindow";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        const opponentBoardData = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-        const playerBoardData = await this.cardBattle.getBoard(this.scene.room.playerId);
+        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+        const playerBoard = await this.cardBattle.getBoard(this.scene.room.playerId);
         await this.cardBattle.setReadyDrawCards(this.scene.room.playerId);
         if (await this.cardBattle.isOpponentReadyDrawCards(this.scene.room.playerId)) {
-            this.#loadDrawPhase(playerBoardData, opponentBoardData);
+            this.#loadDrawPhase(playerBoard, opponentBoard);
             return;
         }
         this.#createOpponentDrawCardsWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
                 await this.cardBattle.listenOpponentDrawCards(this.scene.room.playerId, async () => {
-                    super.closeAllWindows({ onComplete: () => this.#loadDrawPhase(playerBoardData, opponentBoardData) });
+                    super.closeAllWindows({ onComplete: () => this.#loadDrawPhase(playerBoard, opponentBoard) });
                 });
             }
         });
@@ -29,11 +29,11 @@ export class DrawPhase extends CardBattlePhase implements Phase {
         super.createWaitingWindow('Waiting for opponent to draw cards...');
     }
 
-    #loadDrawPhase(playerBoardData: BoardWindowData, opponentBoardData: BoardWindowData): void {
+    #loadDrawPhase(playerBoard: BoardWindow, opponentBoard: BoardWindow): void {
         this.#createDrawPhaseWindows(async () => {
             await Promise.all([
-                super.createOpponentBoard(opponentBoardData),
-                super.createBoard(playerBoardData),
+                super.addOpponentBoard(opponentBoard),
+                super.addBoard(playerBoard),
                 this.#createOpponentDrawCardset(),
                 this.#createPlayerDrawCardset()
             ]);

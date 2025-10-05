@@ -8,6 +8,7 @@ import { Card } from "../ui/Card/Card";
 import { PowerCard } from "../ui/Card/PowerCard";
 import { BattleCard } from "../ui/Card/BattleCard";
 import { CommandOption } from "../ui/CommandWindow/CommandOption";
+import { BoardWindow } from "../ui/BoardWindow/BoardWindow";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
@@ -15,9 +16,7 @@ export interface CardBattle {
     listenOpponentJoined: (playerId: string, callback: (isOpponentJoined?: boolean) => void) => Promise<void>;
     joinRoom: (roomId: string) => Promise<RoomData>;
     getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
-
     getFoldersOptions: (playerId: string) => Promise<CommandOption[]>;
-    
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;
     listenOpponentDeckSet: (playerId: string, callback: (isDeckSet?: boolean) => void) => Promise<void>;
@@ -28,8 +27,8 @@ export interface CardBattle {
     setReadyDrawCards: (playerId: string) => Promise<void>;
     listenOpponentDrawCards(playerId: string, callback: (isReady: boolean) => void): Promise<void>;
     
-    getBoard: (playerId: string) => Promise<BoardWindowData>;
-    getOpponentBoard: (playerId: string) => Promise<BoardWindowData>;
+    getBoard: (playerId: string) => Promise<BoardWindow>;
+    getOpponentBoard: (playerId: string) => Promise<BoardWindow>;
 
     getCardsFromHand: (playerId: string) => Promise<Card[]>;
     getOpponentCardsFromHand: (playerId: string) => Promise<Card[]>;

@@ -4,8 +4,8 @@ import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
 import { Card } from "@/game/ui/Card/Card";
 import { TriggerPhase } from "./TriggerPhase";
-import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { PowerCard } from "@/game/ui/Card/PowerCard";
+import { BoardWindow } from "@/game/ui/BoardWindow/BoardWindow";
 export abstract class PowerPhase extends CardBattlePhase {
 
     async create(goToPlays: boolean = false): Promise<void> {
@@ -59,7 +59,8 @@ export abstract class PowerPhase extends CardBattlePhase {
                         await this.cardBattle.pass(this.scene.room.playerId);
                         super.setBoardPass();
                         this.#nextPlay();
-                    }
+                    },
+                    disabled: false
                 }
             ]);
             resolve();
@@ -69,9 +70,8 @@ export abstract class PowerPhase extends CardBattlePhase {
     async #changeBattleZoneToHandZone(): Promise<void> {
         await super.closeGameBoard();
         // create hand zone
-        const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
+        await this.cardBattle.getBoard(this.scene.room.playerId) as BoardWindow;
         await this.createHandZone();
-        super.createBoard(boardData);
         super.createHandDisplayWindows();
         // open
         await super.openHandZone();
@@ -116,11 +116,13 @@ export abstract class PowerPhase extends CardBattlePhase {
                             this.#startPowerCardPlay(cardId as string);
                         }
                     });
-                }
+                },
+                disabled: false
             },
             {
                 description: 'No',
-                onSelect: () => handCardset.restoreSelectMode()
+                onSelect: () => handCardset.restoreSelectMode(),
+                disabled: false
             },
         ]);
         super.openCommandWindow();
@@ -150,11 +152,13 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.createCommandWindowBottom('Use this Power Card?', [
             {
                 description: 'Yes',
-                onSelect: async () => this.#finishPowerCardPlay(card, true)
+                onSelect: async () => this.#finishPowerCardPlay(card, true),
+                disabled: false
             },
             {
                 description: 'No',
-                onSelect: () => this.#changeBattleZoneToHandZone()
+                onSelect: () => this.#changeBattleZoneToHandZone(),
+                disabled: false
             }
         ]);
         super.openAllWindows();

@@ -20,6 +20,7 @@ import { BattleCard } from '../ui/Card/BattleCard';
 import { VueScene } from '../scenes/VueScene';
 import { BattlePointsData } from '../objects/BattlePointsData';
 import { CommandOption } from '../ui/CommandWindow/CommandOption';
+import { BoardWindow } from '../ui/BoardWindow/BoardWindow';
 
 const delayMock = 100;
 
@@ -680,11 +681,11 @@ export default class CardBattleMemory implements CardBattle {
         };
     }
     
-    getBoard(playerId: string): Promise<BoardWindowData> {
+    getBoard(playerId: string): Promise<BoardWindow> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve({
+                    const boardData = {
                         [AP]: this.#playerBoard[AP],
                         [HP]: this.#playerBoard[HP],
                         [RED]: this.#playerBoard[RED],
@@ -697,10 +698,12 @@ export default class CardBattleMemory implements CardBattle {
                         [TRASH]: this.#playerBoard[TRASH],
                         [WINS]: this.#playerBoard[WINS],
                         [PASS]: this.#playerBoard[PASS]
-                    });
+                    };
+                    const board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
+                    resolve(board);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve({
+                    const opponentBoardData = {
                         [AP]: this.#opponentBoard[AP],
                         [HP]: this.#opponentBoard[HP],
                         [RED]: this.#opponentBoard[RED],
@@ -713,17 +716,19 @@ export default class CardBattleMemory implements CardBattle {
                         [TRASH]: this.#opponentBoard[TRASH],
                         [WINS]: this.#opponentBoard[WINS],
                         [PASS]: this.#opponentBoard[PASS]
-                    });
+                    };
+                    const board = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
+                    resolve(board);
                 };
             }, delayMock);
         });
     }
     
-    getOpponentBoard(playerId: string): Promise<BoardWindowData> {
+    getOpponentBoard(playerId: string): Promise<BoardWindow> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    resolve({
+                    const opponentBoardData = {
                         [AP]: this.#opponentBoard[AP],
                         [HP]: this.#opponentBoard[HP],
                         [RED]: this.#opponentBoard[RED],
@@ -736,10 +741,12 @@ export default class CardBattleMemory implements CardBattle {
                         [TRASH]: this.#opponentBoard[TRASH],
                         [WINS]: this.#opponentBoard[WINS],
                         [PASS]: this.#opponentBoard[PASS]
-                    });
+                    };
+                    const board = BoardWindow.createTopReverse(this.scene, opponentBoardData, 0xDE3C5A);
+                    resolve(board);
                 };
                 if (this.#isOpponent(playerId)) {
-                    resolve({
+                    const boardData = {
                         [AP]: this.#playerBoard[AP],
                         [HP]: this.#playerBoard[HP],
                         [RED]: this.#playerBoard[RED],
@@ -752,7 +759,9 @@ export default class CardBattleMemory implements CardBattle {
                         [TRASH]: this.#playerBoard[TRASH],
                         [WINS]: this.#playerBoard[WINS],
                         [PASS]: this.#playerBoard[PASS]
-                    });
+                    };
+                    const board = BoardWindow.createBottom(this.scene, boardData, 0x3C64DE);
+                    resolve(board);
                 };
             }, delayMock);
         });
