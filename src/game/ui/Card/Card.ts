@@ -5,8 +5,6 @@ import { Cardset } from "@ui/Cardset/Cardset";
 import { CardColorType } from "@game/types/CardColorType";
 import { CardData } from "@game/objects/CardData";
 import { VueScene } from "@game/scenes/VueScene";
-import { PowerCard } from "./PowerCard";
-import { BattleCard } from "./BattleCard";
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
     #cardset: Cardset;

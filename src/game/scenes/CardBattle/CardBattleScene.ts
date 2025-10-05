@@ -1,5 +1,5 @@
 import { EventBus } from '@game/EventBus';
-import { ORANGE, WHITE } from '@/game/constants/colors';
+import { ORANGE, WHITE } from '@game/constants/colors';
 import { RoomData } from '@objects/RoomData';
 import { VueScene } from '@scenes/VueScene';
 import { Phase } from '@scenes/CardBattle/phase/Phase';
@@ -10,7 +10,7 @@ import { LoadPhase } from '@scenes/CardBattle/phase/LoadPhase';
 import { SummonPhase } from './phase/SummonPhase';
 import { CompilePhase } from './phase/CompilePhase';
 import Card from 'phaser3-rex-plugins/plugins/gameobjects/mesh/perspective/card/Card';
-import { CardColorType } from '@/game/types/CardColorType';
+import { CardColorType } from '@game/types/CardColorType';
 
 export class CardBattleScene extends VueScene {
     room: RoomData;

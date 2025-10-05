@@ -1,13 +1,13 @@
-import { CardData } from "@/game/objects/CardData";
-import { VueScene } from "@/game/scenes/VueScene";
+import { CardData } from "@game/objects/CardData";
+import { VueScene } from "@game/scenes/VueScene";
 import { Card } from "./Card";
-import { BATTLE, POWER } from "@/game/constants/keys";
+import { BATTLE, POWER } from "@game/constants/keys";
 import { PowerCard } from "./PowerCard";
 import { BattleCard } from "./BattleCard";
 
 export class CardFactory {
 
-    static createByType(card: CardData, scene: VueScene): Card {
+    static createByType(scene: VueScene, card: CardData): Card {
         if (card.type === POWER) {
             return new PowerCard(scene, card);
         }

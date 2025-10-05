@@ -1,11 +1,11 @@
 import { ADD_COLOR_POINTS, HAND, REMOVE_COLOR_POINTS } from "@constants/keys";
 import { CARD_WIDTH } from "@constants/default";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
-import { PowerCardPlayData } from "@/game/objects/PowerCardPlayData";
-import { Card } from "@/game/ui/Card/Card";
+import { PowerCardPlayData } from "@game/objects/PowerCardPlayData";
+import { Card } from "@game/ui/Card/Card";
 import { TriggerPhase } from "./TriggerPhase";
-import { PowerCard } from "@/game/ui/Card/PowerCard";
-import { BoardWindow } from "@/game/ui/BoardWindow/BoardWindow";
+import { PowerCard } from "@game/ui/Card/PowerCard";
+import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 export abstract class PowerPhase extends CardBattlePhase {
 
     async create(goToPlays: boolean = false): Promise<void> {

@@ -1,9 +1,9 @@
 import { LoadPhase } from "@scenes/CardBattle/phase/LoadPhase";
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
-import { DECK, HAND } from "@/game/constants/keys";
-import { TweenConfig } from "@/game/types/TweenConfig";
-import { BoardWindow } from "@/game/ui/BoardWindow/BoardWindow";
+import { DECK, HAND } from "@game/constants/keys";
+import { TweenConfig } from "@game/types/TweenConfig";
+import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 
 export class DrawPhase extends CardBattlePhase implements Phase {
 

@@ -1,9 +1,9 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { SummonPhase } from "@scenes/CardBattle/phase/SummonPhase";
 import { PowerPhase } from "./PowerPhase";
-import { Card } from "@/game/ui/Card/Card";
-import { BattleCard } from "@/game/ui/Card/BattleCard";
-import { PowerCard } from "@/game/ui/Card/PowerCard";
+import { Card } from "@game/ui/Card/Card";
+import { BattleCard } from "@game/ui/Card/BattleCard";
+import { PowerCard } from "@game/ui/Card/PowerCard";
 
 export class LoadPhase extends PowerPhase implements Phase {
 

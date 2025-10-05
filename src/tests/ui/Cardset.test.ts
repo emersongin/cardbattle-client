@@ -6,8 +6,8 @@ import { BLUE, RED } from "@constants/colors";
 import { CardType } from "@game/types/CardType";
 import { BATTLE, POWER } from "@constants/keys";
 import { CardData } from "@objects/CardData";
-import { CardColorType } from "@/game/types/CardColorType";
-import { CardFactory } from "@/game/ui/Card/CardFactory";
+import { CardColorType } from "@game/types/CardColorType";
+import { CardFactory } from "@game/ui/Card/CardFactory";
 
 const cardsDummy = [
     {

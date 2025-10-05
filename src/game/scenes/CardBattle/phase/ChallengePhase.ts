@@ -2,7 +2,7 @@ import { OpponentData } from "@objects/OpponentData";
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { StartPhase } from "@scenes/CardBattle/phase/StartPhase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
-import { CommandOption } from "@/game/ui/CommandWindow/CommandOption";
+import { CommandOption } from "@game/ui/CommandWindow/CommandOption";
 
 export class ChallengePhase extends CardBattlePhase implements Phase {
 

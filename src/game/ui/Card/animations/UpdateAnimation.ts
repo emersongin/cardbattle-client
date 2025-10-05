@@ -1,6 +1,6 @@
 import { BattlePoints } from "@game/objects/BattlePoints";
 import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
-import { AP, HP } from "@/game/constants/keys";
+import { AP, HP } from "@game/constants/keys";
 import { BattleCard } from "../BattleCard";
 
 export class UpdateAnimation {

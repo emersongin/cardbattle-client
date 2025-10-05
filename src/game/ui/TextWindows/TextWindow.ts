@@ -2,7 +2,7 @@ import { TextBox } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { TweenConfig } from '@game/types/TweenConfig';
 import { DisplayUtil } from '@utils/DisplayUtil';
 import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
-import { VueScene } from '@/game/scenes/VueScene';
+import { VueScene } from '@game/scenes/VueScene';
 
 export class TextWindow extends TextBox {
     #onStartClose?: () => void;

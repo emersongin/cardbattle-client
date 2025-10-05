@@ -15,12 +15,12 @@ import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
 import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
 import { BattlePoints } from "@game/objects/BattlePoints";
-import { ORANGE } from "@/game/constants/colors";
+import { ORANGE } from "@game/constants/colors";
 import { Phase } from "./Phase";
-import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
-import { TextWindows } from "@/game/ui/TextWindows/TextWindows";
-import { PowerCard } from "@/game/ui/Card/PowerCard";
-import { BattleCard } from "@/game/ui/Card/BattleCard";
+import { CardsetEvents } from "@game/ui/Cardset/CardsetEvents";
+import { TextWindows } from "@game/ui/TextWindows/TextWindows";
+import { PowerCard } from "@game/ui/Card/PowerCard";
+import { BattleCard } from "@game/ui/Card/BattleCard";
 
 export type AlignType = 
     | typeof LEFT 

@@ -1,13 +1,13 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
-import { TweenConfig } from "@/game/types/TweenConfig";
-import { ORANGE } from "@/game/constants/colors";
-import { Card } from "@/game/ui/Card/Card";
-import { CardColorType } from "@/game/types/CardColorType";
-import { BattleCard } from "@/game/ui/Card/BattleCard";
-import { PowerCard } from "@/game/ui/Card/PowerCard";
-import { BoardWindow } from "@/game/ui/BoardWindow/BoardWindow";
+import { TweenConfig } from "@game/types/TweenConfig";
+import { ORANGE } from "@game/constants/colors";
+import { Card } from "@game/ui/Card/Card";
+import { CardColorType } from "@game/types/CardColorType";
+import { BattleCard } from "@game/ui/Card/BattleCard";
+import { PowerCard } from "@game/ui/Card/PowerCard";
+import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {

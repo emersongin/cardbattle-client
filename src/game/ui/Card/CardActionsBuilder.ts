@@ -9,7 +9,7 @@ import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
 import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
-import { TweenConfig } from "@/game/types/TweenConfig";
+import { TweenConfig } from "@game/types/TweenConfig";
 import { BattleCard } from "./BattleCard";
 
 export class CardActionsBuilder {

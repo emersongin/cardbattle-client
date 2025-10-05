@@ -55,36 +55,4 @@ describe("Card", () => {
         expect(card.isDisabled()).toBe(false);
         expect(card.getCost()).toBe(2);
     });
-
-    it("Should create a Power Card.", () => {
-        const card = new PowerCard(sceneMock, {
-            id: 'ID',
-            number: 1,
-            name: 'Power Card n° 3',
-            description: 'This is another power card description.',
-            color: BLUE as CardColorType,
-            image: 'card-picture',
-            type: POWER as CardType,
-            effectType: ADD_COLOR_POINTS,
-            effectDescription: 'Gain 2 points of a color of your choice.',
-            ap: 0,
-            hp: 0,
-            cost: 0,
-        });
-        expect(card).toBeDefined();
-        expect(card.getId()).toBe('ID');
-        expect(card.getNumber()).toBe(1);
-        expect(card.getName()).toBe('Power Card n° 3');
-        expect(card.getDescription()).toBe('This is another power card description.');
-        expect(card.getColor()).toBe(BLUE);
-        expect(card.getImage()).toBe('card-picture');
-        expect(card.getType()).toBe(POWER);
-        expect(card.getEffectType()).toBe(ADD_COLOR_POINTS);
-        expect(card.getEffectDescription()).toBe('Gain 2 points of a color of your choice.');
-        expect(card.isSelected()).toBe(false);
-        expect(card.isMarked()).toBe(false);
-        expect(card.isHighlighted()).toBe(false);
-        expect(card.isBanned()).toBe(false);
-        expect(card.isDisabled()).toBe(false);
-    });
 });

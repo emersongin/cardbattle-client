@@ -498,7 +498,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #createCardByType(card: CardData): Card {
-        return CardFactory.createByType(this.scene, card);
+        return CardFactory.@(this.scene, card);
     }
 
     isOpponentDeckSet(playerId: string): Promise<boolean> {

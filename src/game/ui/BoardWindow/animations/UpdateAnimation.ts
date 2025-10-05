@@ -1,8 +1,8 @@
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { BoardWindow } from "@ui/BoardWindow/BoardWindow";
-import { AP, DECK, HAND, HP, PASS, TRASH, WINS } from "@/game/constants/keys";
-import { BLACK, BLUE, GREEN, RED, WHITE } from "@/game/constants/colors";
-import { TweenConfig } from "@/game/types/TweenConfig";
+import { AP, DECK, HAND, HP, PASS, TRASH, WINS } from "@game/constants/keys";
+import { BLACK, BLUE, GREEN, RED, WHITE } from "@game/constants/colors";
+import { TweenConfig } from "@game/types/TweenConfig";
 
 export type UpdateConfig = {
     target: BoardWindowData;

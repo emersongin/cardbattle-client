@@ -5,7 +5,7 @@ import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
 import { PositionConfig } from "../Card/animations/types/PositionConfig";
-import { VueScene } from "@/game/scenes/VueScene";
+import { VueScene } from "@game/scenes/VueScene";
 
 export class Cardset extends Phaser.GameObjects.Container {
     #cards: Card[] = [];
