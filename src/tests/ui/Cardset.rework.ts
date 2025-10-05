@@ -1,44 +1,44 @@
-import Phaser from "@mocks/phaser";
-import { describe, beforeAll, beforeEach, afterEach } from "vitest";
-import { Cardset } from "@ui/Cardset/Cardset";
-import { VueScene } from "@scenes/VueScene";
-import { BLUE, RED } from "@constants/colors";
-import { CardType } from "@game/types/CardType";
-import { BATTLE, POWER } from "@constants/keys";
-import { CardData } from "@objects/CardData";
-import { CardColorType } from "@game/types/CardColorType";
-import { CardFactory } from "@game/ui/Card/CardFactory";
+// import Phaser from "@mocks/phaser";
+// import { describe, beforeAll, beforeEach, afterEach } from "vitest";
+// import { Cardset } from "@ui/Cardset/Cardset";
+// import { VueScene } from "@scenes/VueScene";
+// import { BLUE, RED } from "@constants/colors";
+// import { CardType } from "@game/types/CardType";
+// import { BATTLE, POWER } from "@constants/keys";
+// import { CardData } from "@objects/CardData";
+// import { CardColorType } from "@game/types/CardColorType";
+// import { CardFactory } from "@game/ui/Card/CardFactory";
 
-const cardsDummy = [
-    {
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        number: 1,
-        name: 'Test Card',
-        description: 'This is a test card description.',
-        effectDescription: 'This is a test card effectDescription.',
-        color: BLUE as CardColorType,
-        image: 'card-picture',
-        hp: 10,
-        ap: 5,
-        type: BATTLE as CardType,
-        effectType: 'none',
-        cost: 1
-    },
-    {
-        id: '123e4567-e89b-12d3-a456-426614174444',
-        number: 1,
-        name: 'Test Power Card',
-        description: 'This is a test power card description.',
-        effectDescription: 'This is a test power card effectDescription.',
-        color: RED as CardColorType,
-        image: 'card-picture',
-        hp: 0,
-        ap: 0,
-        type: POWER as CardType,
-        effectType: 'power-1',
-        cost: 1
-    },
-];
+// const cardsDummy = [
+//     {
+//         id: '123e4567-e89b-12d3-a456-426614174000',
+//         number: 1,
+//         name: 'Test Card',
+//         description: 'This is a test card description.',
+//         effectDescription: 'This is a test card effectDescription.',
+//         color: BLUE as CardColorType,
+//         image: 'card-picture',
+//         hp: 10,
+//         ap: 5,
+//         type: BATTLE as CardType,
+//         effectType: 'none',
+//         cost: 1
+//     },
+//     {
+//         id: '123e4567-e89b-12d3-a456-426614174444',
+//         number: 1,
+//         name: 'Test Power Card',
+//         description: 'This is a test power card description.',
+//         effectDescription: 'This is a test power card effectDescription.',
+//         color: RED as CardColorType,
+//         image: 'card-picture',
+//         hp: 0,
+//         ap: 0,
+//         type: POWER as CardType,
+//         effectType: 'power-1',
+//         cost: 1
+//     },
+// ];
 // const eventsMock = {
 //     onChangeIndex: vi.fn(),
 //     onMarked: vi.fn(),
@@ -54,44 +54,44 @@ const cardsDummy = [
 //     [ORANGE]: 0
 // };
 
-function duplicate(cards: CardData[], number: number) {
-    const duplicatedCards: CardData[] = [];
-    for (let i = 0; i < number; i++) {
-        duplicatedCards.push(...cards);
-    }
-    return duplicatedCards;
-}
+// function duplicate(cards: CardData[], number: number) {
+//     const duplicatedCards: CardData[] = [];
+//     for (let i = 0; i < number; i++) {
+//         duplicatedCards.push(...cards);
+//     }
+//     return duplicatedCards;
+// }
 
-function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
-    const keyboard = scene.input.keyboard;
-    if (!keyboard) {
-        throw new Error("Keyboard input is not available in the scene.");
-    }
-    return keyboard;
-}
+// function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
+//     const keyboard = scene.input.keyboard;
+//     if (!keyboard) {
+//         throw new Error("Keyboard input is not available in the scene.");
+//     }
+//     return keyboard;
+// }
 
-describe("MockScene", () => {
-    let scene: VueScene;
-    let cardset: Cardset;
+// describe("MockScene", () => {
+    // let scene: VueScene;
+    // let cardset: Cardset;
 
-    beforeAll(() => {
-        scene = new Phaser.Scene({
-            key: "MockScene",
-            active: true,
-            visible: true,
-        }) as VueScene;
-    });
+    // beforeAll(() => {
+    //     scene = new Phaser.Scene({
+    //         key: "MockScene",
+    //         active: true,
+    //         visible: true,
+    //     }) as VueScene;
+    // });
 
-    beforeEach(() => {
-        const cardsData: CardData[] = duplicate(cardsDummy, 3);
-        const cards = cardsData.map(card => CardFactory.createByType(scene, card));
-        cardset = new Cardset(scene, cards);
-    });
+    // beforeEach(() => {
+    //     const cardsData: CardData[] = duplicate(cardsDummy, 3);
+    //     const cards = cardsData.map(card => CardFactory.createByType(scene, card));
+    //     cardset = new Cardset(scene, cards);
+    // });
 
-    afterEach(() => {
-        const keyboard = getKeyboard(scene);
-        keyboard.removeAllListeners();
-    });
+    // afterEach(() => {
+    //     const keyboard = getKeyboard(scene);
+    //     keyboard.removeAllListeners();
+    // });
 
     // it("Deve criar um conjunto de cartões estático.", () => {
     //     expect(cardset).toBeDefined();
@@ -172,4 +172,4 @@ describe("MockScene", () => {
     //     const selectIndexes = cardset.getSelectIndexes();
     //     expect(selectIndexes.length).toBe(0);
     // });
-});
+// });

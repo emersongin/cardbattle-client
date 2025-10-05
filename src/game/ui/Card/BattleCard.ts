@@ -1,8 +1,22 @@
-import { AP, HP } from "@constants/keys";
+import { CardData } from "@/game/objects/CardData";
+import { VueScene } from "@/game/scenes/VueScene";
+import { AP, BATTLE, HP } from "@constants/keys";
 import { BattlePoints } from "@game/objects/BattlePoints";
 import { Card } from "@ui/Card/Card";
 
 export class BattleCard extends Card {
+
+    constructor(
+        readonly scene: VueScene,
+        staticData: CardData,
+        isStartFaceUp: boolean = false,
+        isStartDisabled: boolean = false
+    ) {
+        super(scene, staticData, isStartFaceUp, isStartDisabled);
+        if (this.staticData.type !== BATTLE) {
+            throw new Error("invalid card type!");
+        }
+    }
 
     setStartData(): void {
         super.setStartData();

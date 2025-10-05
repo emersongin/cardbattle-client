@@ -10,7 +10,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { BattleCard } from "@game/ui/Card/BattleCard";
 import { PowerCard } from "@game/ui/Card/PowerCard";
 
-describe("Card", () => {
+describe("CardFactory.test", () => {
     let sceneMock: VueScene;
 
     beforeAll(() => {
@@ -21,7 +21,7 @@ describe("Card", () => {
         }) as VueScene;
     });
 
-    it("Must create a Battle Card with these data.", () => {
+    it("Should create a Battle Card with these data.", () => {
         const battleCardData = {
             id: 'B1',
             number: 1,
@@ -36,14 +36,14 @@ describe("Card", () => {
             effectType: NONE,
             effectDescription: 'none',
         } as CardData;
-        const card = CardFactory.createByType(sceneMock, battleCardData) as BattleCard;
-        expect(card instanceof BattleCard).toBe(true);
-        expect(card.getAp()).toBe(5);
-        expect(card.getHp()).toBe(5);
-        expect(card.getCost()).toBe(2);
+        const battleCard = CardFactory.createByType(sceneMock, battleCardData) as BattleCard;
+        expect(battleCard instanceof BattleCard).toBe(true);
+        expect(battleCard.getAp()).toBe(5);
+        expect(battleCard.getHp()).toBe(5);
+        expect(battleCard.getCost()).toBe(2);
     });
 
-    it("Must create a Power Card with these data.", () => {
+    it("Should create a Power Card with these data.", () => {
         const battleCardData = {
             id: 'B1',
             number: 1,
@@ -58,9 +58,9 @@ describe("Card", () => {
             effectType: NONE,
             effectDescription: 'none',
         } as CardData;
-        const card = CardFactory.createByType(sceneMock, battleCardData) as PowerCard;
-        expect(card instanceof PowerCard).toBe(true);
-        expect(card.getEffectType()).toBe(NONE);
-        expect(card.getEffectDescription()).toBe('none');
+        const powerCard = CardFactory.createByType(sceneMock, battleCardData) as PowerCard;
+        expect(powerCard instanceof PowerCard).toBe(true);
+        expect(powerCard.getEffectType()).toBe(NONE);
+        expect(powerCard.getEffectDescription()).toBe('none');
     });
 });
