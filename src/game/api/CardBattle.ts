@@ -16,7 +16,7 @@ export interface CardBattle {
     joinRoom: (roomId: string) => Promise<RoomData>;
     getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
 
-    getFoldersOptions: (playerId?: string) => Promise<CommandOption<string>[]>;
+    getFoldersOptions: (playerId: string) => Promise<CommandOption[]>;
     
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;

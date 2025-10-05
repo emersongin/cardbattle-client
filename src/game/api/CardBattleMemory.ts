@@ -436,7 +436,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getFoldersOptions(): Promise<CommandOption<string>[]> {
+    getFoldersOptions(playerId: string): Promise<CommandOption[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const foldersData: CardsFolderData[] = folders.map(folder => ({
@@ -462,7 +462,9 @@ export default class CardBattleMemory implements CardBattle {
                 });
                 const options = folderDescriptions.map(folder => ({
                     description: `${folder.name} ${folder.description}`,
-                    onSelect: async () => { return folder.id; },
+                    onSelect: async () => { 
+                        await this.setFolder(playerId, folder.id); 
+                    },
                     disabled: false
                 }));
                 resolve(options);

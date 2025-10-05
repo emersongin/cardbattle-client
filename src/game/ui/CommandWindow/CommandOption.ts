@@ -1,5 +1,5 @@
-export type CommandOption<T> = {
+export type CommandOption = {
     description: string;
-    onSelect: () => Promise<T | void> | T | void;
     disabled: boolean;
+    onSelect: () => void | Promise<void>;
 }

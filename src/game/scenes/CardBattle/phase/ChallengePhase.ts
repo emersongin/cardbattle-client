@@ -30,7 +30,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
                     textAlign: 'center', 
                     textColor: '#fff',
                     onClose: async () => {
-                        this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions());
+                        this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions(this.scene.room.playerId));
                         super.openCommandWindow();
                     }  
                 });
@@ -40,11 +40,11 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         );
     }
 
-    #createFoldersCommandWindow(options: CommandOption<string>[]): void {
+    #createFoldersCommandWindow(options: CommandOption[]): void {
         options = options.map(option => {
-            const folderId = option.onSelect() as string;
+            const setFolder = option.onSelect;
             option.onSelect = async () => {
-                await this.cardBattle.setFolder(this.scene.room.playerId, folderId);
+                await setFolder();
                 this.changeToStartPhase();
             }
             return option;
