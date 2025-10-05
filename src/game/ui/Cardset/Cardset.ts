@@ -38,7 +38,7 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     setCardsInLinePosition(x: number = 0, y: number = 0): void {
         this.getCards().forEach((card: Card, index: number) => {
-            let padding = Math.max(0, Math.abs(this.width / this.#cards.length));
+            let padding = Math.max(0, Math.abs(this.width / this.getCards().length));
             if (padding > card.getWidth()) padding = card.getWidth();
             card.setPosition(x + (padding * index), y);
             card.updateOrigin();
@@ -66,11 +66,11 @@ export class Cardset extends Phaser.GameObjects.Container {
         if (!this.isValidIndex(index)) {
             throw new Error(`Cardset: index ${index} is out of bounds.`);
         }
-        return this.#cards[index];
+        return this.getCards()[index];
     }
 
     getCardById(cardId: string): Card {
-        return this.#cards.find((card: Card) => card.getId() === cardId) as Card;
+        return this.getCards().find((card: Card) => card.getId() === cardId) as Card;
     }
 
     getCardsByFromTo(start: number, end: number): Card[] {
@@ -79,7 +79,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         if (start > end) {
             throw new Error(`Cardset: start index ${start} cannot be greater than end index ${end}.`);
         }
-        return this.#cards.slice(start, end + 1);
+        return this.getCards().slice(start, end + 1);
     }
 
     getCardsTotal(): number {
@@ -185,7 +185,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     isValidIndex(index: number) {
-        return index >= 0 && index <= this.#cards.length - 1;
+        return index >= 0 && index <= this.getCards().length - 1;
     }
 
     selectModeOne(events: CardsetEvents): void {
@@ -200,7 +200,7 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     #setCards(cards: Card[]): void {
         this.#cards = cards;
-        this.#cards.forEach((card: Card) => card.addToCardset(this));
+        this.getCards().forEach((card: Card) => card.addToCardset(this));
     }
 
     preUpdate(): void {
@@ -248,12 +248,12 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     removeCardById(cardId: string): void {
-        const cardIndex = this.#cards.findIndex((card: Card) => card.getId() === cardId);
+        const cardIndex = this.getCards().findIndex((card: Card) => card.getId() === cardId);
         if (cardIndex === -1) {
             throw new Error(`Cardset: card with id ${cardId} not found.`);
         }
-        this.remove(this.#cards[cardIndex].getUi(), true);
-        this.#cards.splice(cardIndex, 1);
+        this.remove(this.getCards()[cardIndex].getUi(), true);
+        this.getCards().splice(cardIndex, 1);
     }
 
     isSelectModeEnabled(): boolean {
@@ -279,7 +279,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     getCardIndexById(cardId: string): number {
-        return this.#cards.findIndex((card: Card) => card.getId() === cardId);
+        return this.getCards().findIndex((card: Card) => card.getId() === cardId);
     }
 
 }
