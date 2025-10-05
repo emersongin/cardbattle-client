@@ -3,7 +3,6 @@ import { LEFT, CENTER, RIGHT, AP, HP } from '@constants/keys';
 import { CARD_HEIGHT, CARD_WIDTH } from '@constants/default';
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { TimelineConfig, TimelineEvent } from '@scenes/VueScene';
-import { BoardWindowData } from '@objects/BoardWindowData';
 import { CardColorType } from '@game/types/CardColorType';
 import { TweenConfig } from '@game/types/TweenConfig';
 import { BoardZonesType } from '@game/types/BoardZonesType';
@@ -15,7 +14,7 @@ import { CardUi } from '@ui/Card/CardUi';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
 import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
-import { BattlePointsData } from "@/game/objects/BattlePointsData";
+import { BattlePoints } from "@game/objects/BattlePoints";
 import { ORANGE } from "@/game/constants/colors";
 import { Phase } from "./Phase";
 import { CardsetEvents } from "@/game/ui/Cardset/CardsetEvents";
@@ -119,7 +118,7 @@ export class CardBattlePhase implements Phase {
         return this.#board;
     }
 
-    setBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
+    setBattlePointsWithDuration(config: TweenConfig & BattlePoints): void {
         this.#board.setBattlePointsWithDuration(config[AP], config[HP], config.onComplete);
     }
 
@@ -160,7 +159,7 @@ export class CardBattlePhase implements Phase {
         this.#opponentBoard = boardData;
     }
 
-    setOpponentBoardBattlePointsWithDuration(config: TweenConfig & BattlePointsData): void {
+    setOpponentBoardBattlePointsWithDuration(config: TweenConfig & BattlePoints): void {
         this.#opponentBoard.setBattlePointsWithDuration(config[AP], config[HP], config.onComplete);
     }
 

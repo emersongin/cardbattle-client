@@ -1,9 +1,8 @@
-import { BoardWindowData } from "@objects/BoardWindowData";
 import { OpponentData } from "@objects/OpponentData";
 import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
-import { BattlePointsData } from "../objects/BattlePointsData";
+import { BattlePoints } from "@objects/BattlePoints";
 import { Card } from "../ui/Card/Card";
 import { PowerCard } from "../ui/Card/PowerCard";
 import { BattleCard } from "../ui/Card/BattleCard";
@@ -52,7 +51,6 @@ export interface CardBattle {
     listenOpponentBattleCardsSet: (playerId: string, callback: (isSet: boolean) => void) => Promise<void>;
     getBattleCards: (playerId: string) => Promise<BattleCard[]>;
     getOpponentBattleCards: (playerId: string) => Promise<BattleCard[]>;
-    
-    getBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
-    getOpponentBattlePointsFromBoard: (playerId: string) => Promise<BattlePointsData>;
+    getBattlePointsFromBoard: (playerId: string) => Promise<BattlePoints>;
+    getOpponentBattlePointsFromBoard: (playerId: string) => Promise<BattlePoints>;
 }

@@ -18,7 +18,7 @@ import { Card } from '../ui/Card/Card';
 import { PowerCard } from '../ui/Card/PowerCard';
 import { BattleCard } from '../ui/Card/BattleCard';
 import { VueScene } from '../scenes/VueScene';
-import { BattlePointsData } from '../objects/BattlePointsData';
+import { BattlePoints } from '../objects/BattlePoints';
 import { CommandOption } from '../ui/CommandWindow/CommandOption';
 import { BoardWindow } from '../ui/BoardWindow/BoardWindow';
 
@@ -1203,7 +1203,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    #getBattlePointsFromBattleCards(playerId: string): BattlePointsData {
+    #getBattlePointsFromBattleCards(playerId: string): BattlePoints {
         if (this.#isPlayer(playerId)) {
             const apTotal = this.#playerBattleCardset.reduce((sum, card) => sum + card.ap, 0);
             const hpTotal = this.#playerBattleCardset.reduce((sum, card) => sum + card.hp, 0);
@@ -1303,7 +1303,7 @@ export default class CardBattleMemory implements CardBattle {
         }); 
     }
 
-    getBattlePointsFromBoard(playerId: string): Promise<BattlePointsData> {
+    getBattlePointsFromBoard(playerId: string): Promise<BattlePoints> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
@@ -1316,7 +1316,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getOpponentBattlePointsFromBoard(playerId: string): Promise<BattlePointsData> {
+    getOpponentBattlePointsFromBoard(playerId: string): Promise<BattlePoints> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {

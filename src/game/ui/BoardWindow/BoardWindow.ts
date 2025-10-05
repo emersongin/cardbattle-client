@@ -232,7 +232,7 @@ export class BoardWindow extends Sizer {
         return 0;
     }
 
-    setBattlePoints(attackPoints: number, healthPoints: number, onComplete?: () => void): void {
+    setBattlePoints(attackPoints: number, healthPoints: number): void {
         this.data.set(AP, attackPoints);
         this.data.set(HP, healthPoints);
         const fromTarget = this.getAllData();

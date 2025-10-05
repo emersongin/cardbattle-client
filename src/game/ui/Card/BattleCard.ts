@@ -1,5 +1,5 @@
 import { AP, HP } from "@constants/keys";
-import { BattlePointsData } from "@/game/objects/BattlePointsData";
+import { BattlePoints } from "@game/objects/BattlePoints";
 import { Card } from "./Card";
 
 export class BattleCard extends Card {
@@ -10,7 +10,7 @@ export class BattleCard extends Card {
         this.setHp(this.staticData.hp);
     }
 
-    getAllData(): BattlePointsData {
+    getAllData(): BattlePoints {
         return { 
             [AP]: this.data.get(AP), 
             [HP]: this.data.get(HP),
