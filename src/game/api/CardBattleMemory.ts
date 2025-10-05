@@ -18,9 +18,10 @@ import { Card } from '../ui/Card/Card';
 import { PowerCard } from '../ui/Card/PowerCard';
 import { BattleCard } from '../ui/Card/BattleCard';
 import { VueScene } from '../scenes/VueScene';
-import { BattlePoints } from '../objects/BattlePoints';
 import { CommandOption } from '../ui/CommandWindow/CommandOption';
 import { BoardWindow } from '../ui/BoardWindow/BoardWindow';
+import { BattlePoints } from '../objects/BattlePoints';
+import { CardFactory } from '../ui/Card/CardFactory';
 
 const delayMock = 100;
 
@@ -497,13 +498,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #createCardByType(card: CardData): Card {
-        if (card.type === POWER) {
-            return new PowerCard(this.scene, card);
-        }
-        if (card.type === BATTLE) {
-            return new BattleCard(this.scene, card);
-        }
-        throw new Error('Card type not recognized');
+        return CardFactory.createByType(card, this.scene);
     }
 
     isOpponentDeckSet(playerId: string): Promise<boolean> {

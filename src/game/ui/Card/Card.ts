@@ -1,10 +1,12 @@
-import { BANNED, CLOSED, DISABLED, FACE_UP, HIGHLIGHTED, MARKED, ORIGIN_X, ORIGIN_Y, SELECTED } from "@constants/keys";
+import { BANNED, BATTLE, CLOSED, DISABLED, FACE_UP, HIGHLIGHTED, MARKED, ORIGIN_X, ORIGIN_Y, POWER, SELECTED } from "@constants/keys";
 import { CardType } from "@game/types/CardType";
 import { CardUi } from "@ui/Card/CardUi";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { CardColorType } from "@game/types/CardColorType";
 import { CardData } from "@game/objects/CardData";
 import { VueScene } from "@game/scenes/VueScene";
+import { PowerCard } from "./PowerCard";
+import { BattleCard } from "./BattleCard";
 export class Card extends Phaser.GameObjects.GameObject {
     #ui: CardUi;
     #cardset: Cardset;
@@ -22,7 +24,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.#ui = new CardUi(this.scene, this);
         this.setDisplay();
     }
-    
+        
     addToCardset(cardset: Cardset): void {
         this.#cardset = cardset;
         this.#cardset.add(this.#ui);

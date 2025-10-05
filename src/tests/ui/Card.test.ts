@@ -5,10 +5,10 @@ import { Cardset } from "@ui/Cardset/Cardset";
 import { BLUE, GREEN } from "@constants/colors";
 import { ADD_COLOR_POINTS, BATTLE, POWER, NONE } from "@constants/keys";
 import { CardType } from "@game/types/CardType";
-import { VueScene } from "@game/scenes/VueScene";
+import { VueScene } from "@scenes/VueScene";
 import { CardColorType } from "@game/types/CardColorType";
-import { BattleCard } from "@game/ui/Card/BattleCard";
-import { PowerCard } from "@game/ui/Card/PowerCard";
+import { BattleCard } from "@ui/Card/BattleCard";
+import { PowerCard } from "@ui/Card/PowerCard";
 
 describe("Card", () => {
     let sceneMock: VueScene;

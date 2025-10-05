@@ -1,6 +1,6 @@
 import { AP, HP } from "@constants/keys";
 import { BattlePoints } from "@game/objects/BattlePoints";
-import { Card } from "./Card";
+import { Card } from "@ui/Card/Card";
 
 export class BattleCard extends Card {
 
