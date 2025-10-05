@@ -84,7 +84,7 @@ describe("MockScene", () => {
 
     beforeEach(() => {
         const cardsData: CardData[] = duplicate(cardsDummy, 3);
-        const cards = cardsData.map(card => CardFactory.createByType(card, scene));
+        const cards = cardsData.map(card => CardFactory.createByType(scene, card));
         cardset = new Cardset(scene, cards);
     });
 

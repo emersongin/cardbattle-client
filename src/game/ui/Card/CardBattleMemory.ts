@@ -13,15 +13,15 @@ import { PowerActionUpdatesData } from '@objects/PowerActionUpdatesData';
 import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
-import { CardColorType } from '../types/CardColorType';
-import { Card } from '../ui/Card/Card';
-import { PowerCard } from '../ui/Card/PowerCard';
-import { BattleCard } from '../ui/Card/BattleCard';
-import { VueScene } from '../scenes/VueScene';
-import { CommandOption } from '../ui/CommandWindow/CommandOption';
-import { BoardWindow } from '../ui/BoardWindow/BoardWindow';
-import { BattlePoints } from '../objects/BattlePoints';
-import { CardFactory } from '../ui/Card/CardFactory';
+import { CardColorType } from '@game/types/CardColorType';
+import { VueScene } from '@game/scenes/VueScene';
+import { CommandOption } from '@ui/CommandWindow/CommandOption';
+import { CardFactory } from '@ui/Card/CardFactory';
+import { Card } from '@ui/Card/Card';
+import { PowerCard } from '@ui/Card/PowerCard';
+import { BattleCard } from '@ui/Card/BattleCard';
+import { BoardWindow } from '@ui/BoardWindow/BoardWindow';
+import { BattlePoints } from '@game/objects/BattlePoints';
 
 const delayMock = 100;
 
@@ -498,7 +498,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #createCardByType(card: CardData): Card {
-        return CardFactory.@(this.scene, card);
+        return CardFactory.createByType(this.scene, card);
     }
 
     isOpponentDeckSet(playerId: string): Promise<boolean> {
