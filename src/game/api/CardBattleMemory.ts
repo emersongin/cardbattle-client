@@ -830,11 +830,11 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    const powerCardData = this.#playerHand.find(card => card.id === cardId) as CardData;
+                    const powerCardData = this.#playerHand.find(card => card.id === cardId && card.type === POWER) as CardData;
                     resolve(this.#createCardByType(powerCardData) as PowerCard);
                 };
                 if (this.#isOpponent(playerId)) {
-                    const powerCardData = this.#opponentHand.find(card => card.id === cardId) as CardData;
+                    const powerCardData = this.#opponentHand.find(card => card.id === cardId && card.type === POWER) as CardData;
                     resolve(this.#createCardByType(powerCardData) as PowerCard);
                 };
             }, delayMock);
@@ -845,12 +845,38 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    const powerCardData = this.#opponentHand.find(card => card.id === cardId) as CardData;
-                    resolve(this.#createCardByType(powerCardData) as PowerCard);
+                    console.log(this.#powerActionUpdates, cardId);
+                    const powerUpdates = this.#powerActionUpdates.find(updates => {
+                        const { powerCard } = updates.powerAction;
+                        if (
+                            this.#opponentId !== playerId
+                            && powerCard.id === cardId 
+                            && powerCard.type === POWER
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    }) as PowerActionUpdatesData;
+                    const { powerCard } = powerUpdates.powerAction;
+                    console.log(powerCard);
+                    resolve(this.#createCardByType(powerCard) as PowerCard);
                 };
                 if (this.#isOpponent(playerId)) {
-                    const powerCardData = this.#playerHand.find(card => card.id === cardId) as CardData;
-                    resolve(this.#createCardByType(powerCardData) as PowerCard);
+                    console.log(this.#powerActionUpdates, cardId);
+                    const powerUpdates = this.#powerActionUpdates.find(updates => {
+                        const { powerCard } = updates.powerAction;
+                        if (
+                            this.#playerId !== playerId
+                            && powerCard.id === cardId 
+                            && powerCard.type === POWER
+                        ) {
+                            return true;
+                        }
+                        return false;
+                    }) as PowerActionUpdatesData;
+                    const { powerCard } = powerUpdates.powerAction;
+                    console.log(powerCard);
+                    resolve(this.#createCardByType(powerCard) as PowerCard);
                 };
             }, delayMock);
         });

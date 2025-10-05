@@ -262,13 +262,15 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (await this.cardBattle.isPowerfieldLimitReached() === false) {
             await this.#resetPlay();
         }
-        if (powerAction?.powerCard.id) {
+        if (powerAction?.powerCard?.id) {
             const opponentPlayFunction = async () => {
                 await super.closeAllWindows();
                 super.removeOpponentBoardZonePoints(HAND, 1);
                 this.#loadPlayAndMovePowerCardToField();
             };
             const powerCard = await this.cardBattle.getOpponentPowerCardById(this.scene.room.playerId, powerAction.powerCard.id);
+            console.log(powerCard);
+
             this.#playPowerCard(powerCard, opponentPlayFunction);
         }
     }
