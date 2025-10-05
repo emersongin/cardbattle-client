@@ -23,7 +23,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
         await this.cardBattle.listenNextPowerCard(
             this.scene.room.playerId,
             (powerAction: PowerActionData, belongToPlayer: boolean) => {
-                const powerCardId = powerAction.powerCard.getId();
+                const powerCardId = powerAction.powerCard.id;
                 const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
                 CardActionsBuilder.create(powerCard)
                     .expand()

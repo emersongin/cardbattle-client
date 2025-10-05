@@ -110,7 +110,8 @@ export class CommandWindow extends Sizer {
         this.scene.addKeyEnterListeningOnce({ 
             onTrigger: () => {
                 if (this.commands[this.selectedIndex].disabled) {
-                    return console.log('Sound disabled command');
+                    console.log('Sound disabled command');
+                    return;
                 }
                 this.#close(this.commands[this.selectedIndex].onSelect);
             }

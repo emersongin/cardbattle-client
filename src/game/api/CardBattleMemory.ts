@@ -706,20 +706,6 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {
-                    console.log({
-                        [AP]: this.#opponentBoard[AP],
-                        [HP]: this.#opponentBoard[HP],
-                        [RED]: this.#opponentBoard[RED],
-                        [GREEN]: this.#opponentBoard[GREEN],
-                        [BLUE]: this.#opponentBoard[BLUE],
-                        [BLACK]: this.#opponentBoard[BLACK],
-                        [WHITE]: this.#opponentBoard[WHITE],
-                        [HAND]: this.#opponentBoard[HAND],
-                        [DECK]: this.#opponentBoard[DECK],
-                        [TRASH]: this.#opponentBoard[TRASH],
-                        [WINS]: this.#opponentBoard[WINS],
-                        [PASS]: this.#opponentBoard[PASS]
-                    });
                     resolve({
                         [AP]: this.#opponentBoard[AP],
                         [HP]: this.#opponentBoard[HP],
@@ -845,7 +831,6 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    console.log(this.#powerActionUpdates, cardId);
                     const powerUpdates = this.#powerActionUpdates.find(updates => {
                         const { powerCard } = updates.powerAction;
                         if (
@@ -858,11 +843,9 @@ export default class CardBattleMemory implements CardBattle {
                         return false;
                     }) as PowerActionUpdatesData;
                     const { powerCard } = powerUpdates.powerAction;
-                    console.log(powerCard);
                     resolve(this.#createCardByType(powerCard) as PowerCard);
                 };
                 if (this.#isOpponent(playerId)) {
-                    console.log(this.#powerActionUpdates, cardId);
                     const powerUpdates = this.#powerActionUpdates.find(updates => {
                         const { powerCard } = updates.powerAction;
                         if (
@@ -875,7 +858,6 @@ export default class CardBattleMemory implements CardBattle {
                         return false;
                     }) as PowerActionUpdatesData;
                     const { powerCard } = powerUpdates.powerAction;
-                    console.log(powerCard);
                     resolve(this.#createCardByType(powerCard) as PowerCard);
                 };
             }, delayMock);
@@ -1144,7 +1126,6 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     setBattleCards(playerId: string, cardIds: string[]): Promise<void> {
-        console.log(cardIds);
         return new Promise((resolve) => {
             setTimeout(() => {
                 if (this.#isPlayer(playerId)) {

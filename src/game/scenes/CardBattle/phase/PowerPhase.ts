@@ -269,8 +269,6 @@ export abstract class PowerPhase extends CardBattlePhase {
                 this.#loadPlayAndMovePowerCardToField();
             };
             const powerCard = await this.cardBattle.getOpponentPowerCardById(this.scene.room.playerId, powerAction.powerCard.id);
-            console.log(powerCard);
-
             this.#playPowerCard(powerCard, opponentPlayFunction);
         }
     }
