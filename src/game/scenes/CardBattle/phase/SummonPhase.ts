@@ -1,6 +1,5 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
-import { BoardWindowData } from "@/game/objects/BoardWindowData";
 import { CompilePhase } from "@scenes/CardBattle/phase/CompilePhase";
 import { TweenConfig } from "@/game/types/TweenConfig";
 import { ORANGE } from "@/game/constants/colors";
@@ -8,6 +7,7 @@ import { Card } from "@/game/ui/Card/Card";
 import { CardColorType } from "@/game/types/CardColorType";
 import { BattleCard } from "@/game/ui/Card/BattleCard";
 import { PowerCard } from "@/game/ui/Card/PowerCard";
+import { BoardWindow } from "@/game/ui/BoardWindow/BoardWindow";
 export class SummonPhase extends CardBattlePhase implements Phase {
 
     create(): void {
@@ -23,8 +23,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #createHandZone(): Promise<void> {
-        const boardData: BoardWindowData = await this.cardBattle.getBoard(this.scene.room.playerId);
-        super.createBoard(boardData);
+        const board: BoardWindow = await this.cardBattle.getBoard(this.scene.room.playerId);
+        super.addBoard(board);
         const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
         const battleCards = cards.filter(card => card instanceof BattleCard);
         battleCards.forEach(card => {
@@ -101,11 +101,13 @@ export class SummonPhase extends CardBattlePhase implements Phase {
         super.createCommandWindowBottom('Put in field?', [
             {
                 description: 'Yes',
-                onSelect: () => this.#onYes(cardIds)
+                onSelect: () => this.#onYes(cardIds),
+                disabled: false
             },
             {
                 description: 'No',
-                onSelect: () => cardset.restoreSelectMode()
+                onSelect: () => cardset.restoreSelectMode(),
+                disabled: false
             },
         ]);
     }

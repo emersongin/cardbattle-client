@@ -527,14 +527,12 @@ export class CardBattlePhase implements Phase {
                 opponentBattleCards.forEach(card => card.faceDown());
             }            
             const promises = [];
-            if (board) {
-                const boardData = (config?.isShowBattlePoints ?? true) ? board : { ...board, [AP]: 0, [HP]: 0 };
-                promises.push(this.addBoard(board));
-            };
-            if (opponentBoard) {
-                const opponentBoardData = (config?.isShowBattlePoints ?? true) ? opponentBoard : { ...opponentBoard, [AP]: 0, [HP]: 0 };
-                promises.push(this.addOpponentBoard(opponentBoard));
+            if (config?.isShowBattlePoints === false) {
+                board.setBattlePoints(0, 0);
+                opponentBoard.setBattlePoints(0, 0);
             }
+            promises.push(this.addBoard(board));
+            promises.push(this.addOpponentBoard(opponentBoard));
             if (powerCards) promises.push(this.createPowerCardset(powerCards));
             if (battleCards) promises.push(this.createCardset(battleCards));
             if (opponentBattleCards) promises.push(this.createOpponentCardset(opponentBattleCards));

@@ -70,7 +70,8 @@ export abstract class PowerPhase extends CardBattlePhase {
     async #changeBattleZoneToHandZone(): Promise<void> {
         await super.closeGameBoard();
         // create hand zone
-        await this.cardBattle.getBoard(this.scene.room.playerId) as BoardWindow;
+        const board = await this.cardBattle.getBoard(this.scene.room.playerId) as BoardWindow;
+        super.addBoard(board);
         await this.createHandZone();
         super.createHandDisplayWindows();
         // open
