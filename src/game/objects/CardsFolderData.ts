@@ -13,4 +13,5 @@ export type CardsFolderData = {
     id: string;
     name: string;
     colorsPoints: ColorsPointsData;
+    numCards: number;
 };

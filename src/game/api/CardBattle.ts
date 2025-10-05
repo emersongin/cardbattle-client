@@ -1,5 +1,4 @@
 import { BoardWindowData } from "@objects/BoardWindowData";
-import { CardsFolderData } from "@objects/CardsFolderData";
 import { OpponentData } from "@objects/OpponentData";
 import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
@@ -8,18 +7,16 @@ import { BattlePointsData } from "../objects/BattlePointsData";
 import { Card } from "../ui/Card/Card";
 import { PowerCard } from "../ui/Card/PowerCard";
 import { BattleCard } from "../ui/Card/BattleCard";
+import { CommandOption } from "../ui/CommandWindow/CommandOption";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
-    
     isOpponentJoined(playerId: string): Promise<boolean>;
     listenOpponentJoined: (playerId: string, callback: (isOpponentJoined?: boolean) => void) => Promise<void>;
-    
     joinRoom: (roomId: string) => Promise<RoomData>;
-    
     getOpponentData: (playerId: string, callback: (opponent: OpponentData) => void) => Promise<void>;
 
-    getFolders: (playerId?: string) => Promise<CardsFolderData[]>;
+    getFoldersOptions: (playerId?: string) => Promise<CommandOption<string>[]>;
     
     setFolder: (playerId: string, folderId: string) => Promise<boolean>;
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;

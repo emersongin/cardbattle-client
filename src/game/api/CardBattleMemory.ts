@@ -19,6 +19,7 @@ import { PowerCard } from '../ui/Card/PowerCard';
 import { BattleCard } from '../ui/Card/BattleCard';
 import { VueScene } from '../scenes/VueScene';
 import { BattlePointsData } from '../objects/BattlePointsData';
+import { CommandOption } from '../ui/CommandWindow/CommandOption';
 
 const delayMock = 100;
 
@@ -435,7 +436,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getFolders(): Promise<CardsFolderData[]> {
+    getFoldersOptions(): Promise<CommandOption<string>[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const foldersData: CardsFolderData[] = folders.map(folder => ({
@@ -448,9 +449,23 @@ export default class CardBattleMemory implements CardBattle {
                         BLACK: folder.deck.filter(card => card.color === BLACK).length,
                         WHITE: folder.deck.filter(card => card.color === WHITE).length,
                         ORANGE: folder.deck.filter(card => card.color === ORANGE).length
-                    }
+                    },
+                    numCards: folder.deck.length
                 }));
-                resolve(foldersData);
+                const padValue = 16;
+                const folderDescriptions = foldersData.map(folder => {
+                    return {
+                        id: folder.id,
+                        name: folder.name.padEnd(padValue),
+                        description: `${Object.entries(folder.colorsPoints).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`
+                    };
+                });
+                const options = folderDescriptions.map(folder => ({
+                    description: `${folder.name} ${folder.description}`,
+                    onSelect: async () => { return folder.id; },
+                    disabled: false
+                }));
+                resolve(options);
             }, delayMock);
         });
     }

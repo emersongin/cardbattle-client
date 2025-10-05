@@ -1,8 +1,8 @@
 import { OpponentData } from "@objects/OpponentData";
-import { CardsFolderData } from "@objects/CardsFolderData";
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { StartPhase } from "@scenes/CardBattle/phase/StartPhase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
+import { CommandOption } from "@/game/ui/CommandWindow/CommandOption";
 
 export class ChallengePhase extends CardBattlePhase implements Phase {
 
@@ -30,7 +30,7 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
                     textAlign: 'center', 
                     textColor: '#fff',
                     onClose: async () => {
-                        this.#createFoldersCommandWindow(await this.cardBattle.getFolders());
+                        this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions());
                         super.openCommandWindow();
                     }  
                 });
@@ -40,22 +40,15 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
         );
     }
 
-    #createFoldersCommandWindow(folders: CardsFolderData[]): void {
-        const padValue = 16;
-        const folderDescriptions = folders.map(folder => {
-            return {
-                id: folder.id,
-                name: folder.name.padEnd(padValue),
-                description: `${Object.entries(folder.colorsPoints).map(([color, points]) => `${color}: ${points.toString().padStart(2, "0")}`).join(', ')}`
-            };
-        });
-        const options = folderDescriptions.map(folder => ({
-            description: `${folder.name} ${folder.description}`,
-            onSelect: async () => {
-                await this.cardBattle.setFolder(this.scene.room.playerId, folder.id);
+    #createFoldersCommandWindow(options: CommandOption<string>[]): void {
+        options = options.map(option => {
+            const folderId = option.onSelect() as string;
+            option.onSelect = async () => {
+                await this.cardBattle.setFolder(this.scene.room.playerId, folderId);
                 this.changeToStartPhase();
             }
-        }));
+            return option;
+        });
         super.createCommandWindowCentered('Choose your folder', options);
     }
 
