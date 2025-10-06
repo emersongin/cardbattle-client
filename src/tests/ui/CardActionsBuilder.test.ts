@@ -42,11 +42,11 @@ describe("CardActionsBuilder.test", () => {
     it("should close the card.", () => {
         const card = new BattleCard(sceneMock, battleCardData);
         const builder = CardActionsBuilder.create(card);
-        const spy = vi.spyOn(builder, "close");
+        const closeCardMock = () => card.setClosed();
+        sceneMock.tweens.add = vi.fn().mockImplementationOnce(closeCardMock);
         builder
             .close({ delay: 0, duration: 0 })
             .play();
-        expect(spy).toHaveBeenCalled();
-        expect(builder.getCurrentAction() instanceof ScaleAnimation).toBe(true);
+        expect(card.isClosed()).toBe(true);
     });
 });
