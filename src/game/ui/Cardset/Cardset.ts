@@ -269,10 +269,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         CardActionsBuilder
             .create(card)
             .move({
-                xFrom: config?.xFrom ?? card.getX(),
-                yFrom: config?.yFrom ?? card.getY(),
-                xTo: config?.xTo ?? card.getX(),
-                yTo: config?.yTo ?? card.getY(),
+                fromX: config?.xFrom ?? card.getX(),
+                fromY: config?.yFrom ?? card.getY(),
+                toX: config?.xTo ?? card.getX(),
+                toY: config?.yTo ?? card.getY(),
                 duration: config?.duration || 0,
             })
             .play();

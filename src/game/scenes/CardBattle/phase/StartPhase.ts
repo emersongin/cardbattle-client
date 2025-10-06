@@ -59,14 +59,16 @@ export class StartPhase extends CardBattlePhase implements Phase {
                 onSelect: async () => {
                     await this.cardBattle.setMiniGameChoice(this.scene.room.playerId, WHITE);
                     this.#createResultWindow(WHITE);
-                }
+                },
+                disabled: false,
             },
             {
                 description: 'option: Draw black card',
                 onSelect: async () => {
                     await this.cardBattle.setMiniGameChoice(this.scene.room.playerId, BLACK);
                     this.#createResultWindow(BLACK);
-                }
+                },
+                disabled: false,
             },
         ];
         ArrayUtil.shuffle(options);

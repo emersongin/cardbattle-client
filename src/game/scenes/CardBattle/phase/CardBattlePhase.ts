@@ -485,8 +485,8 @@ export class CardBattlePhase implements Phase {
                     .create(card)
                     .open({ delay: 0, duration: 0 })
                     .move({
-                        xTo: (index * CARD_WIDTH),
-                        yTo: 0,
+                        toX: (index * CARD_WIDTH),
+                        toY: 0,
                         delay: (index * 100), 
                         duration: (300 / totalCards) * (totalCards - index),
                         onStart: () => {

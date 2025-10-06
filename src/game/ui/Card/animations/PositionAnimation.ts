@@ -7,14 +7,14 @@ export class PositionAnimation {
     constructor(readonly card: Card, config: PositionConfig) {
         const tweens = [
             { 
-                x: config?.xFrom || this.card.getX() || 0, 
-                y: config?.yFrom || this.card.getY() || 0, 
+                x: config?.fromX || this.card.getX() || 0, 
+                y: config?.fromY || this.card.getY() || 0, 
                 delay: 0,
                 duration: 0 
             },
             {
-                x: config.xTo, 
-                y: config.yTo,
+                x: config.toX, 
+                y: config.toY,
                 delay: config?.delay || 0,
                 duration: config?.duration || 500,
                 onStart: config?.onStart,

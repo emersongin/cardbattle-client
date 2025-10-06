@@ -1,8 +1,8 @@
 import { TweenConfig } from "@game/types/TweenConfig";
 
 export type PositionConfig = {
-    xTo: number, 
-    yTo: number, 
-    xFrom?: number, 
-    yFrom?: number
+    toX: number, 
+    toY: number, 
+    fromX?: number, 
+    fromY?: number
 } & TweenConfig;
