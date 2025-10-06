@@ -10,7 +10,7 @@ import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@game/types/TweenConfig";
 import { BattleCard } from "./BattleCard";
-import { CardAction, CardAnimation } from "@ui/Card/animations/types/CardAction";
+import { CardAction, CardActionConfig, CardAnimation } from "@ui/Card/animations/types/CardAction";
 import { EXPAND_ANIMATION, FACE_UP_ANIMATION, FLASH_ANIMATION, 
     POSITION_ANIMATION, SCALE_ANIMATION, SHRINK_ANIMATION } from "@game/constants/keys";
 
@@ -35,7 +35,7 @@ export class CardActionsBuilder {
     }
 
     open(config: TweenConfig): CardActionsBuilder {
-        const onComplete = () => this.card.data.set('closed', false);
+        const onComplete = () => this.card.setOpened();
         config.open = true;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
         this.#addAction({ name: SCALE_ANIMATION, config });
@@ -83,22 +83,24 @@ export class CardActionsBuilder {
         return this;
     }
 
-    #addAction(moveOrAnimation: CardAction): void {
-        if (this.#actions.length > 0) {
-            this.#addOnCompleteToLastAction(() => {
-                this.#runActions(moveOrAnimation);
-            });
-            this.#actions.push(moveOrAnimation);
+    #addAction(action: CardAction): void {
+        if (this.#hasActions()) {
+            this.#addOnCompleteToLastAction(() => this.#runAction(action));
+            this.#actions.push(action);
             return;
         }
-        this.#actions.push(moveOrAnimation);
+        this.#actions.push(action);
     }
 
-    #runActions(moveOrAnimation?: CardAction): void {
-        if (this.#actions.length > 0 && !moveOrAnimation) {
-            moveOrAnimation = this.#actions[0];
+    #hasActions(): boolean {
+        return this.#actions.length > 0;
+    }
+
+    #runAction(action?: CardAction): void {
+        if (this.#hasActions() && !action) {
+            action = this.#actions[0];
         }
-        const { name, config } = moveOrAnimation as CardAction;
+        const { name, config } = action as CardAction;
         switch (name) {
             case POSITION_ANIMATION:
                 this.#currentAction = new PositionAnimation(this.card, config as PositionConfig);
@@ -119,23 +121,27 @@ export class CardActionsBuilder {
                 if (config?.onComplete) config.onComplete();
                 break;
             default:
-                throw new Error(`Unknown move or animation: ${name}`);
+                throw new Error(`Unknown action: ${name}`);
         }
     }
 
     #addOnCompleteToLastAction(onComplete: () => void): void {
-        if (this.#actions.length === 0) return;
+        if (this.#hasActions() === false) return;
         const { name, config } = this.#getLastAction();
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
         this.#replaceLastAction({ name, config });
     }
 
     #replaceLastAction(cardAnimation: CardAction): void {
-        this.#actions[this.#actions.length - 1] = cardAnimation;
+        this.#actions[this.#getLastIndex()] = cardAnimation;
+    }
+
+    #getLastIndex(): number {
+        return this.#actions.length - 1;
     }
 
     #getLastAction(): CardAction {
-        return this.#actions[this.#actions.length - 1];
+        return this.#actions[this.#getLastIndex()];
     }
 
     #mergeOnComplete(onComplete: () => void, original?: () => void): () => void {
@@ -145,11 +151,11 @@ export class CardActionsBuilder {
         };
     }
 
-    play(config?: ExpandConfig | FlashConfig | PositionConfig): void {
+    play(config?: CardActionConfig): void {
         if (config?.onComplete) {
             this.#addOnCompleteToLastAction(config.onComplete);
         }
-        this.#runActions();
+        this.#runAction();
     }
 
     getCurrentAction(): CardAnimation {

@@ -54,7 +54,8 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     setOpened(): void {
-        this.data.set(CLOSED, true);
+        this.data.set(CLOSED, false);
+        this.#setX(this.getX() - (this.getWidth() / 2));
         this.setScaleX(1);
     }
 

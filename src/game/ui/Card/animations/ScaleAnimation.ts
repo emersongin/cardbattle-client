@@ -12,7 +12,7 @@ export class ScaleAnimation {
                 scaleX: 1,
                 ease: 'Linear',
                 onComplete: () => {
-                    if (config.onComplete) config.onComplete();
+                    if (config?.onComplete) config.onComplete();
                 },
                 delay: config?.delay || 0,
                 duration: config?.duration || 100,
