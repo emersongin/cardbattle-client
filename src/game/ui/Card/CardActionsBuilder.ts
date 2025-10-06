@@ -25,11 +25,7 @@ export class CardActionsBuilder {
     }
 
     move(config: PositionConfig): CardActionsBuilder {
-        if (!config) config = { 
-            xTo: this.card.getX(), 
-            yTo: this.card.getY(), 
-            onComplete: () => {} 
-        };
+        if (!config.onComplete) config.onComplete = () => {};
         this.#addAction({ name: POSITION_ANIMATION, config });
         return this;
     }
