@@ -40,7 +40,7 @@ export class CardActionsBuilder {
     }
 
     close(config: TweenConfig): CardActionsBuilder {
-        const onComplete = () => this.card.data.set('closed', true);
+        const onComplete = () => this.card.setClosed();
         config.open = false;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
         this.#addMove({ name: ScaleAnimation.name, config });

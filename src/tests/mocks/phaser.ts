@@ -59,10 +59,10 @@ export type KeyboardPluginMock = {
 const PhaserMock = {
     GameObjects: {
         Container: MockContainer,
-        Rectangle: MockGameObject,
-        Image: MockGameObject,
-        Text: MockText,
         Graphics: MockGraphics,
+        Image: MockGameObject,
+        Rectangle: MockGameObject,
+        Text: MockText,
     },
     Tweens: {
         Tween: MockTween,
@@ -74,15 +74,16 @@ const PhaserMock = {
     },
     Scene: class {
         tweens = {
-            chain: vi.fn()
+            add: vi.fn(() => new MockTween()),
+            chain: vi.fn(),
         };
         add = {
+            container: vi.fn((x: number, y: number) => new MockContainer(this, x, y)),
+            existing: vi.fn((obj: any) => obj),
+            graphics: vi.fn(() => new MockGraphics()),
             image: vi.fn(() => new MockGameObject()),
             rectangle: vi.fn(() => new MockGameObject()),
             text: vi.fn(() => new MockText()),
-            graphics: vi.fn(() => new MockGraphics()),
-            container: vi.fn((x: number, y: number) => new MockContainer(this, x, y)),
-            existing: vi.fn((obj: any) => obj),
         };
         children = {
             bringToTop: vi.fn(),

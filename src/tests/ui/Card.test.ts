@@ -1,7 +1,5 @@
 import PhaserMock from "@mocks/phaser";
-import CardBattleMock from "@mocks/cardset";
 import { describe, it, expect, beforeAll } from "vitest";
-import { Cardset } from "@ui/Cardset/Cardset";
 import { CardType } from "@game/types/CardType";
 import { VueScene } from "@scenes/VueScene";
 import { CardColorType } from "@game/types/CardColorType";
@@ -12,7 +10,6 @@ import { BATTLE, NONE } from "@game/constants/keys";
 
 describe("Card.test", () => {
     let sceneMock: VueScene;
-    let cardsetMock: Cardset;
     const cardData = {
         id: 'ID',
         number: 1,
@@ -34,7 +31,6 @@ describe("Card.test", () => {
             active: true,
             visible: true,
         }) as VueScene;
-        cardsetMock = new CardBattleMock.Cardset(sceneMock, [], 0, 0);
     });
 
     it("should start the card data.", () => {
@@ -58,5 +54,17 @@ describe("Card.test", () => {
         expect(card.isMarked()).toBe(false);
         expect(card.isHighlighted()).toBe(false);
         expect(card.isBanned()).toBe(false);
+    });
+
+    it("should flip the card face up.", () => {
+        const card = new Card(sceneMock, cardData);
+        card.faceUp();
+        expect(card.isFaceUp()).toBe(true);
+    });
+
+    it("should disable the card.", () => {
+        const card = new Card(sceneMock, cardData);
+        card.disable();
+        expect(card.isDisabled()).toBe(true);
     });
 });
