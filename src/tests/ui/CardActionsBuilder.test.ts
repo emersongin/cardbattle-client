@@ -10,7 +10,6 @@ import { BATTLE, NONE } from "@game/constants/keys";
 import { CardType } from "@game/types/CardType";
 import { CardData } from "@game/objects/CardData";
 import { BattleCard } from "@game/ui/Card/BattleCard";
-import { ScaleAnimation } from "@game/ui/Card/animations/ScaleAnimation";
 
 describe("CardActionsBuilder.test", () => {
     let sceneMock: VueScene;
@@ -42,8 +41,7 @@ describe("CardActionsBuilder.test", () => {
     it("should close the card.", () => {
         const card = new BattleCard(sceneMock, battleCardData);
         const builder = CardActionsBuilder.create(card);
-        const closeCardMock = () => card.setClosed();
-        sceneMock.tweens.add = vi.fn().mockImplementationOnce(closeCardMock);
+        sceneMock.tweens.add = vi.fn().mockImplementationOnce((config) => config?.onComplete());
         builder
             .close({ delay: 0, duration: 0 })
             .play();
