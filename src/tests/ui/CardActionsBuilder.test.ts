@@ -1,5 +1,5 @@
 import PhaserMock from "@mocks/phaser";
-import { describe, it, expect, beforeAll, vi } from "vitest";
+import { describe, it, expect, beforeAll, vi, beforeEach } from "vitest";
 import { VueScene } from "@scenes/VueScene";
 import { CardActionsBuilder } from "@game/ui/Card/CardActionsBuilder";
 import { CardColorType } from "@game/types/CardColorType";
@@ -7,7 +7,7 @@ import { BLUE } from "@game/constants/colors";
 import { BATTLE, NONE } from "@game/constants/keys";
 import { CardType } from "@game/types/CardType";
 import { CardData } from "@game/objects/CardData";
-import { BattleCard } from "@game/ui/Card/BattleCard";
+import { Card } from "@game/ui/Card/Card";
 
 describe("CardActionsBuilder.test", () => {
     let sceneMock: VueScene;
@@ -25,7 +25,7 @@ describe("CardActionsBuilder.test", () => {
         effectType: NONE,
         effectDescription: 'none.',
     } as CardData;
-    let card: BattleCard;
+    let card: Card;
 
     beforeAll(() => {
         sceneMock = new PhaserMock.Scene({
@@ -33,11 +33,16 @@ describe("CardActionsBuilder.test", () => {
             active: true,
             visible: true,
         }) as VueScene;
-        card = new BattleCard(sceneMock, battleCardData);
+    });
+
+    beforeEach(() => {
+        card = new Card(sceneMock, battleCardData);
     });
 
     it("should close the card.", () => {
         const builder = CardActionsBuilder.create(card);
+        const cardX = card.getX();
+        const cardWidth = card.getWidth();
         let scaleX = 0;
         let ease = '';
         let delay = 0;
@@ -52,6 +57,7 @@ describe("CardActionsBuilder.test", () => {
         builder
             .close({ delay: 0, duration: 0 })
             .play();
+        expect(card.getX()).toBe(cardX + (cardWidth / 2));
         expect(card.isClosed()).toBe(true);
         expect(scaleX).toBe(0);
         expect(ease).toBe('Linear');
@@ -60,6 +66,7 @@ describe("CardActionsBuilder.test", () => {
     });
 
     it("should open the card.", () => {
+        const cardOriginX = card.getX();
         card.setClosed();
         const builder = CardActionsBuilder.create(card);
         let scaleX = 0;
@@ -77,6 +84,7 @@ describe("CardActionsBuilder.test", () => {
         builder
             .open({ delay: 0, duration: 0 })
             .play();
+        expect(card.getX()).toBe(cardOriginX);
         expect(card.isOpened()).toBe(true);
         expect(scaleX).toBe(1);
         expect(ease).toBe('Linear');
