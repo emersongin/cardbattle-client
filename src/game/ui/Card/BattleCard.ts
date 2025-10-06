@@ -1,5 +1,5 @@
-import { CardData } from "@/game/objects/CardData";
-import { VueScene } from "@/game/scenes/VueScene";
+import { CardData } from "@game/objects/CardData";
+import { VueScene } from "@game/scenes/VueScene";
 import { AP, BATTLE, HP } from "@constants/keys";
 import { BattlePoints } from "@game/objects/BattlePoints";
 import { Card } from "@ui/Card/Card";

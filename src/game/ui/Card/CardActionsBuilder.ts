@@ -4,16 +4,19 @@ import { ExpandAnimation } from "@ui/Card/animations/ExpandAnimation";
 import { ShrinkAnimation } from "@ui/Card/animations/ShrinkAnimation";
 import { PositionAnimation } from "@ui/Card/animations/PositionAnimation";
 import { ScaleAnimation } from "@ui/Card/animations/ScaleAnimation";
-import { CardAnimation } from "@ui/Card/animations/types/CardAnimation";
 import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
 import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@game/types/TweenConfig";
 import { BattleCard } from "./BattleCard";
+import { CardAction, CardAnimation } from "@ui/Card/animations/types/CardAction";
+import { EXPAND_ANIMATION, FACE_UP_ANIMATION, FLASH_ANIMATION, 
+    POSITION_ANIMATION, SCALE_ANIMATION, SHRINK_ANIMATION } from "@game/constants/keys";
 
 export class CardActionsBuilder {
-    #moves: CardAnimation[] = [];
+    #actions: CardAction[] = [];
+    #currentAction: CardAnimation;
 
     private constructor(readonly card: Card) {}
 
@@ -27,7 +30,7 @@ export class CardActionsBuilder {
             yTo: this.card.getY(), 
             onComplete: () => {} 
         };
-        this.#addMove({ name: PositionAnimation.name, config });
+        this.#addAction({ name: POSITION_ANIMATION, config });
         return this;
     }
 
@@ -35,7 +38,7 @@ export class CardActionsBuilder {
         const onComplete = () => this.card.data.set('closed', false);
         config.open = true;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
-        this.#addMove({ name: ScaleAnimation.name, config });
+        this.#addAction({ name: SCALE_ANIMATION, config });
         return this;
     }
 
@@ -43,7 +46,7 @@ export class CardActionsBuilder {
         const onComplete = () => this.card.setClosed();
         config.open = false;
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
-        this.#addMove({ name: ScaleAnimation.name, config });
+        this.#addAction({ name: SCALE_ANIMATION, config });
         return this;
     }
 
@@ -58,61 +61,61 @@ export class CardActionsBuilder {
             this.card.setDisplay();
         };
         const config = { onComplete };
-        this.#addMove({ name: 'faceup', config });
+        this.#addAction({ name: FACE_UP_ANIMATION, config });
         return this;
     }
 
     expand(config?: ExpandConfig): CardActionsBuilder {
         if (!config) config = { onComplete: () => {} };
-        this.#addMove({ name: ExpandAnimation.name, config });
+        this.#addAction({ name: EXPAND_ANIMATION, config });
         return this;
     }
 
     shrink(config?: ExpandConfig): CardActionsBuilder {
         if (!config) config = { onComplete: () => {} };
-        this.#addMove({ name: ShrinkAnimation.name, config });
+        this.#addAction({ name: SHRINK_ANIMATION, config });
         return this;
     }
 
     flash(config?: FlashConfig): CardActionsBuilder {
         if (!config) config = { color: 0xffffff, onComplete: () => {} };
-        this.#addMove({ name: FlashAnimation.name, config });
+        this.#addAction({ name: FLASH_ANIMATION, config });
         return this;
     }
 
-    #addMove(moveOrAnimation: CardAnimation): void {
-        if (this.#moves.length > 0) {
-            this.#addOnCompleteToLastMove(() => {
-                this.#runMoves(moveOrAnimation);
+    #addAction(moveOrAnimation: CardAction): void {
+        if (this.#actions.length > 0) {
+            this.#addOnCompleteToLastAction(() => {
+                this.#runActions(moveOrAnimation);
             });
-            this.#moves.push(moveOrAnimation);
+            this.#actions.push(moveOrAnimation);
             return;
         }
-        this.#moves.push(moveOrAnimation);
+        this.#actions.push(moveOrAnimation);
     }
 
-    #runMoves(moveOrAnimation?: CardAnimation): void {
-        if (this.#moves.length > 0 && !moveOrAnimation) {
-            moveOrAnimation = this.#moves[0];
+    #runActions(moveOrAnimation?: CardAction): void {
+        if (this.#actions.length > 0 && !moveOrAnimation) {
+            moveOrAnimation = this.#actions[0];
         }
-        const {name, config} = moveOrAnimation as CardAnimation;
+        const { name, config } = moveOrAnimation as CardAction;
         switch (name) {
-            case PositionAnimation.name:
-                new PositionAnimation(this.card, config as PositionConfig);
+            case POSITION_ANIMATION:
+                this.#currentAction = new PositionAnimation(this.card, config as PositionConfig);
                 break;
-            case ScaleAnimation.name:
-                new ScaleAnimation(this.card, config as ScaleConfig);
+            case SCALE_ANIMATION:
+                this.#currentAction = new ScaleAnimation(this.card, config as ScaleConfig);
                 break;
-            case ExpandAnimation.name:
-                new ExpandAnimation(this.card, config as ExpandConfig);
+            case EXPAND_ANIMATION:
+                this.#currentAction = new ExpandAnimation(this.card, config as ExpandConfig);
                 break;
-            case ShrinkAnimation.name:
-                new ShrinkAnimation(this.card, config as ExpandConfig);
+            case SHRINK_ANIMATION:
+                this.#currentAction = new ShrinkAnimation(this.card, config as ExpandConfig);
                 break;
-            case FlashAnimation.name:
-                new FlashAnimation(this.card, config as FlashConfig);
+            case FLASH_ANIMATION:
+                this.#currentAction = new FlashAnimation(this.card, config as FlashConfig);
                 break;
-            case 'faceup':
+            case FACE_UP_ANIMATION:
                 if (config?.onComplete) config.onComplete();
                 break;
             default:
@@ -120,19 +123,19 @@ export class CardActionsBuilder {
         }
     }
 
-    #addOnCompleteToLastMove(onComplete: () => void): void {
-        if (this.#moves.length === 0) return;
-        const { name, config } = this.#getLastMove();
+    #addOnCompleteToLastAction(onComplete: () => void): void {
+        if (this.#actions.length === 0) return;
+        const { name, config } = this.#getLastAction();
         config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete);
-        this.#replaceLastMove({ name, config });
+        this.#replaceLastAction({ name, config });
     }
 
-    #replaceLastMove(cardAnimation: CardAnimation): void {
-        this.#moves[this.#moves.length - 1] = cardAnimation;
+    #replaceLastAction(cardAnimation: CardAction): void {
+        this.#actions[this.#actions.length - 1] = cardAnimation;
     }
 
-    #getLastMove(): CardAnimation {
-        return this.#moves[this.#moves.length - 1];
+    #getLastAction(): CardAction {
+        return this.#actions[this.#actions.length - 1];
     }
 
     #mergeOnComplete(onComplete: () => void, original?: () => void): () => void {
@@ -144,8 +147,12 @@ export class CardActionsBuilder {
 
     play(config?: ExpandConfig | FlashConfig | PositionConfig): void {
         if (config?.onComplete) {
-            this.#addOnCompleteToLastMove(config.onComplete);
+            this.#addOnCompleteToLastAction(config.onComplete);
         }
-        this.#runMoves();
+        this.#runActions();
+    }
+
+    getCurrentAction(): CardAnimation {
+        return this.#currentAction;
     }
 }
