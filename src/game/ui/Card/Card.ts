@@ -17,11 +17,12 @@ export class Card extends Phaser.GameObjects.GameObject {
         isStartDisabled: boolean = false
     ) {
         super(scene, Card.name);
-        this.staticData = Object.freeze({ ...staticData });
         this.setStartData();
+        this.staticData = Object.freeze({ ...staticData });
+        this.#ui = new CardUi(this.scene, this);
         this.data.set(FACE_UP, isStartFaceUp || false);
         this.data.set(DISABLED, isStartDisabled || false);
-        this.#ui = new CardUi(this.scene, this);
+        this.updateOrigin();
         this.setDisplay();
     }
         
@@ -32,12 +33,13 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     setStartData(): void {
         this.setDataEnabled();
-        this.updateOrigin();
         this.data.set(CLOSED, false);
         this.data.set(SELECTED, false);
         this.data.set(MARKED, false);
         this.data.set(HIGHLIGHTED, false);
         this.data.set(BANNED, false);
+        this.data.set(ORIGIN_X, 0);
+        this.data.set(ORIGIN_Y, 0);
     }
 
     updateOrigin(x?: number, y?: number): void {
@@ -45,12 +47,14 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.#setOriginY(y);
     }
 
-    #setOriginX(value: number = this.#ui?.x || 0): void {
+    #setOriginX(value: number = this.getX()): void {
         this.data.set(ORIGIN_X, value);
+        this.#setX(value);
     }
 
-    #setOriginY(value: number = this.#ui?.y || 0): void {
+    #setOriginY(value: number = this.getY()): void {
         this.data.set(ORIGIN_Y, value);
+        this.#setY(value);
     }
 
     setOpened(): void {
@@ -206,11 +210,11 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     getX(): number {
-        return this.#ui.x;
+        return this.#ui.x || 0;
     }
 
     getY(): number {
-        return this.#ui.y;
+        return this.#ui.y || 0;
     }
 
     getWidth(): number {
@@ -244,6 +248,10 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     setScaleX(scaleX: number): void {
         this.#ui.scaleX = scaleX;
+    }
+
+    setScaleY(scaleY: number): void {
+        this.#ui.scaleY = scaleY;
     }
 
     setDisplay(text: string = ''): void {

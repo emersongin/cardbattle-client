@@ -12,6 +12,7 @@ export class ScaleAnimation {
                 scaleX: 1,
                 ease: 'Linear',
                 onComplete: () => {
+                    this.card.setOpened();
                     if (config?.onComplete) config.onComplete();
                 },
                 delay: config?.delay || 0,
@@ -25,8 +26,9 @@ export class ScaleAnimation {
             scaleX: 0,
             ease: 'Linear',
             onComplete: () => {
-                if (config?.onComplete) config.onComplete();
+                this.card.setClosed();
                 if (config?.destroy) this.card.getUi().destroy();
+                if (config?.onComplete) config.onComplete();
             },
             delay: config?.delay || 0,
             duration: config?.duration || 100,

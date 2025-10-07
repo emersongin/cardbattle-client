@@ -9,7 +9,6 @@ import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@game/types/TweenConfig";
-import { BattleCard } from "./BattleCard";
 import { CardAction, CardActionConfig, CardAnimation } from "@ui/Card/animations/types/CardAction";
 import { EXPAND_ANIMATION, FACE_UP_ANIMATION, FLASH_ANIMATION, 
     POSITION_ANIMATION, SCALE_ANIMATION, SHRINK_ANIMATION } from "@game/constants/keys";
@@ -25,57 +24,37 @@ export class CardActionsBuilder {
     }
 
     move(config: PositionConfig): CardActionsBuilder {
-        if (!config.onComplete) config.onComplete = () => {};
-        this.#addAction({ name: POSITION_ANIMATION, config });
+        this.#addAction({ name: POSITION_ANIMATION, config: config });
         return this;
     }
 
-    open(config: TweenConfig): CardActionsBuilder {
-        const onComplete = () => this.card.setOpened();
-        config.open = true;
-        config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
-        this.#addAction({ name: SCALE_ANIMATION, config });
+    open(config: ScaleConfig = { open: true, delay: 0, duration: 0 }): CardActionsBuilder {
+        this.#addAction({ name: SCALE_ANIMATION, config: config });
         return this;
     }
 
-    close(config: TweenConfig): CardActionsBuilder {
-        const onComplete = () => this.card.setClosed();
-        config.open = false;
-        config.onComplete = this.#mergeOnComplete(onComplete, config?.onComplete || (() => {}));
-        this.#addAction({ name: SCALE_ANIMATION, config });
+    close(config: ScaleConfig = { open: false, delay: 0, duration: 0 }): CardActionsBuilder {
+        this.#addAction({ name: SCALE_ANIMATION, config: config });
         return this;
     }
 
-    faceUp(): CardActionsBuilder {
-        const onComplete = () => {
-            this.card.faceUp();
-            this.card.setImage();
-            if (this.card instanceof BattleCard) {
-                this.card.setDisplayPoints(this.card.getAp(), this.card.getHp());
-                return;
-            }
-            this.card.setDisplay();
-        };
-        const config = { onComplete };
-        this.#addAction({ name: FACE_UP_ANIMATION, config });
+    faceUp(config: TweenConfig = {}): CardActionsBuilder {
+        this.#addAction({ name: FACE_UP_ANIMATION, config: config });
         return this;
     }
 
-    expand(config?: ExpandConfig): CardActionsBuilder {
-        if (!config) config = { onComplete: () => {} };
-        this.#addAction({ name: EXPAND_ANIMATION, config });
+    expand(config: ExpandConfig): CardActionsBuilder {
+        this.#addAction({ name: EXPAND_ANIMATION, config: config });
         return this;
     }
 
-    shrink(config?: ExpandConfig): CardActionsBuilder {
-        if (!config) config = { onComplete: () => {} };
-        this.#addAction({ name: SHRINK_ANIMATION, config });
+    shrink(config: ExpandConfig): CardActionsBuilder {
+        this.#addAction({ name: SHRINK_ANIMATION, config: config });
         return this;
     }
 
-    flash(config?: FlashConfig): CardActionsBuilder {
-        if (!config) config = { color: 0xffffff, onComplete: () => {} };
-        this.#addAction({ name: FLASH_ANIMATION, config });
+    flash(config: FlashConfig): CardActionsBuilder {
+        this.#addAction({ name: FLASH_ANIMATION, config: config });
         return this;
     }
 
@@ -114,11 +93,16 @@ export class CardActionsBuilder {
                 this.#currentAction = new FlashAnimation(this.card, config as FlashConfig);
                 break;
             case FACE_UP_ANIMATION:
-                if (config?.onComplete) config.onComplete();
+                this.#faceUpAction(config as TweenConfig);
                 break;
             default:
                 throw new Error(`Unknown action: ${name}`);
         }
+    }
+
+    #faceUpAction(config?: TweenConfig): void {
+        this.card.faceUp();
+        if (config?.onComplete) config.onComplete();
     }
 
     #addOnCompleteToLastAction(onComplete: () => void): void {
