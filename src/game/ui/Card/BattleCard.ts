@@ -20,8 +20,8 @@ export class BattleCard extends Card {
 
     setStartData(): void {
         super.setStartData();
-        this.setAp(this.staticData.ap);
-        this.setHp(this.staticData.hp);
+        this.setAp(super.staticData.ap);
+        this.setHp(super.staticData.hp);
     }
 
     getAllData(): BattlePoints {

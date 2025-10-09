@@ -5,18 +5,16 @@ import { CardColorType } from "@game/types/CardColorType";
 import { CardData } from "@game/objects/CardData";
 import { VueScene } from "@game/scenes/VueScene";
 export class Card extends Phaser.GameObjects.GameObject {
-    public readonly staticData: Readonly<CardData>;
     #ui: CardUi;
 
     constructor(
         readonly scene: VueScene,
-        staticData: CardData,
+        readonly staticData: CardData,
         isStartFaceUp: boolean = false,
         isStartDisabled: boolean = false
     ) {
         super(scene, Card.name);
-        this.#setStartData();
-        this.staticData = Object.freeze({ ...staticData });
+        this.setStartData();
         this.#ui = new CardUi(this.scene, this);
         this.data.set(FACE_UP, isStartFaceUp || false);
         this.data.set(DISABLED, isStartDisabled || false);
@@ -24,7 +22,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.setDisplay();
     }
 
-    #setStartData(): void {
+    setStartData(): void {
         this.setDataEnabled();
         this.data.set(CLOSED, false);
         this.data.set(SELECTED, false);

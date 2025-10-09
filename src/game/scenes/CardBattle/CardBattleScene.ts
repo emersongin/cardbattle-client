@@ -33,10 +33,10 @@ export class CardBattleScene extends VueScene {
         const { playerId: opponentId }: RoomData = await this.getCardBattle().joinRoom(roomId);
         
         // START PHASE
-        // await this.getCardBattle().setFolder(playerId, 'f3');
+        await this.getCardBattle().setFolder(playerId, 'f3');
         
         // DRAW PHASE
-        // await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
+        await this.getCardBattle().setMiniGameChoice(playerId, WHITE);
         
         // LOAD PHASE
         // await this.getCardBattle().setReadyDrawCards(opponentId);
@@ -67,7 +67,7 @@ export class CardBattleScene extends VueScene {
         // }).map(card => card.staticData.id);
         // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
 
-        this.changePhase(new ChallengePhase(this));
+        this.changePhase(new DrawPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {
