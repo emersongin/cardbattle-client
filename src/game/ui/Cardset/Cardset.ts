@@ -41,7 +41,6 @@ export class Cardset extends Phaser.GameObjects.Container {
             let padding = Math.max(0, Math.abs(this.width / this.getCards().length));
             if (padding > card.getWidth()) padding = card.getWidth();
             card.setPosition(x + (padding * index), y);
-            card.setOrigin();
         });
     }
 
@@ -51,7 +50,6 @@ export class Cardset extends Phaser.GameObjects.Container {
         }
         const card = this.getCardByIndex(index);
         card.setPosition(x, y);
-        card.setOrigin();
     }
 
     getCards(): Card[] {
@@ -153,9 +151,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     showCards(): void {
-        this.getCards().forEach((card: Card) => {
-            card.setOpened();
-        });
+        this.getCards().forEach((card: Card) => card.setOpened());
     }
 
     openAllCardsDominoMovement(): void {

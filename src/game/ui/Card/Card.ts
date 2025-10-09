@@ -20,7 +20,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.#ui = new CardUi(this.scene, this);
         this.data.set(FACE_UP, isStartFaceUp || false);
         this.data.set(DISABLED, isStartDisabled || false);
-        this.setOrigin();
+        this.setPosition();
         this.setDisplay();
     }
 
@@ -35,19 +35,27 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.data.set(ORIGIN_Y, 0);
     }
 
-    setOrigin(x?: number, y?: number): void {
+    setPosition(x?: number, y?: number): void {
+        this.setX(x);
+        this.setY(y);
         this.#setOriginX(x);
         this.#setOriginY(y);
     }
 
+    setX(x: number = this.getX()): void {
+        this.#ui.x = x;
+    }
+
+    setY(y: number = this.getY()): void {
+        this.#ui.y = y;
+    }
+
     #setOriginX(value: number = this.getX()): void {
         this.data.set(ORIGIN_X, value);
-        this.setX(value);
     }
 
     #setOriginY(value: number = this.getY()): void {
         this.data.set(ORIGIN_Y, value);
-        this.setY(value);
     }
 
     setOpened(): void {
@@ -86,6 +94,10 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get(HIGHLIGHTED);
     }
 
+    isEnabled(): boolean {
+        return !this.data.get(DISABLED);
+    }
+
     isDisabled(): boolean {
         return this.data.get(DISABLED);
     }
@@ -94,16 +106,38 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.data.get(FACE_UP);
     }
 
+    isFaceDown(): boolean {
+        return !this.data.get(FACE_UP);
+    }
+
+    isDisabledLayerVisible(): boolean {
+        return this.#ui.isDisabledLayerVisible();
+    }
+
+    isSelectedLayerVisible(): boolean {
+        return this.#ui.getSelectedLayer().visible;
+    }
+
     enable(): void {
-        if (!this.#ui.disabledLayer) return;
         this.data.set(DISABLED, false);
-        this.#ui.disabledLayer.setVisible(false);
+        this.#ui.setDisabledLayerVisible(false);
     }
 
     disable(): void {
-        if (!this.#ui.disabledLayer) return;
         this.data.set(DISABLED, true);
-        this.#ui.disabledLayer.setVisible(true);
+        this.#ui.setDisabledLayerVisible(true);
+    }
+
+    faceUp(): void {
+        this.data.set(FACE_UP, true);
+        this.setImage();
+        this.setDisplay();
+    }
+
+    faceDown(): void {
+        this.data.set(FACE_UP, false);
+        this.setImage();
+        this.setDisplay();
     }
 
     select(): void {
@@ -137,18 +171,6 @@ export class Card extends Phaser.GameObjects.GameObject {
     unmark(): void {
         this.data.set(MARKED, false);
         this.#ui.setSelectedLayerVisible(false);
-    }
-
-    faceUp(): void {
-        this.data.set(FACE_UP, true);
-        this.setImage();
-        this.setDisplay();
-    }
-
-    faceDown(): void {
-        this.data.set(FACE_UP, false);
-        this.setImage();
-        this.setDisplay();
     }
 
     highlight(): void {
@@ -231,20 +253,11 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     getSelectedLayer(): Phaser.GameObjects.Container {
-        return this.#ui.selectedLayer;
+        return this.#ui.getSelectedLayer();
     }
 
-    setPosition(x: number = this.#ui.x, y: number = this.#ui.y): void {
-        this.setX(x);
-        this.setY(y);
-    }
-
-    setX(x: number): void {
-        this.#ui.x = x;
-    }
-
-    setY(y: number): void {
-        this.#ui.y = y;
+    getSelectedLayerColor(): number {
+        return this.#ui.getSelectedLayerColor();
     }
 
     setScaleX(scaleX: number): void {

@@ -25,22 +25,30 @@ class MockText extends MockGameObject {
 }
 
 class MockGraphics extends MockGameObject {
+    defaultStrokeColor = 0xffffff;
+    thickness = 0;
     clear = vi.fn();
     fillStyle = vi.fn();
     fillRect = vi.fn();
-    lineStyle = vi.fn();
+    lineStyle = vi.fn((thickness: number, color: number) => {
+        this.defaultStrokeColor = color;
+        this.thickness = thickness;
+    })
     strokeRect = vi.fn();
 }
 
 class MockContainer extends MockGameObject {
+    visible: boolean = false;
+    list: any[] = [] as Phaser.GameObjects.Graphics[];
     constructor(readonly scene: any, readonly x: number = 0, readonly y: number = 0) {
         super();
     };
-    add = vi.fn();
+    add = vi.fn((obj: any) => { this.list.push(obj); return obj; });
     remove = vi.fn();
     removeAll = vi.fn();
     bringToTop = vi.fn();
     sendToBack = vi.fn();
+    setVisible = vi.fn((visible: boolean) => { this.visible = visible; });
 }
 
 class MockTween {
