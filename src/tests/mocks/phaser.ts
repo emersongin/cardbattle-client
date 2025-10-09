@@ -2,11 +2,14 @@ import { vi } from "vitest";
 import Phaser from "phaser";
 
 class MockGameObject {
+    visible: boolean = false;
     setOrigin = vi.fn();
     setPosition = vi.fn();
     setScale = vi.fn();
     setAlpha = vi.fn();
-    setVisible = vi.fn();
+    setVisible = vi.fn((visible: boolean) => { this.visible = visible; });
+    getVisible = vi.fn(() => this.visible);
+    getWidth = vi.fn(() => 100);
     setInteractive = vi.fn();
     destroy = vi.fn();
     on = vi.fn();

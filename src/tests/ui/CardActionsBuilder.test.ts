@@ -8,6 +8,10 @@ import { BATTLE, NONE } from "@game/constants/keys";
 import { CardType } from "@game/types/CardType";
 import { CardData } from "@game/objects/CardData";
 import { Card } from "@game/ui/Card/Card";
+import { FlashConfig } from "@/game/ui/Card/animations/types/FlashConfig";
+import { ExpandConfig } from "@/game/ui/Card/animations/types/ExpandConfig";
+import { PositionConfig } from "@/game/ui/Card/animations/types/PositionConfig";
+import { ScaleConfig } from "@/game/ui/Card/animations/types/ScaleConfig";
 
 describe("CardActionsBuilder.test", () => {
     let sceneMock: VueScene;
@@ -39,32 +43,6 @@ describe("CardActionsBuilder.test", () => {
         card = new Card(sceneMock, battleCardData);
     });
 
-    it("should close the card.", () => {
-        const builder = CardActionsBuilder.create(card);
-        const cardX = card.getX();
-        const cardWidth = card.getWidth();
-        let scaleX = 0;
-        let ease = '';
-        let delay = 0;
-        let duration = 0;
-        sceneMock.tweens.add = vi.fn().mockImplementation((config) => {
-            scaleX = config.scaleX as number;
-            ease = config.ease as string;
-            delay = config.delay as number;
-            duration = config.duration as number;
-            config?.onComplete();
-        });
-        builder
-            .close()
-            .play();
-        expect(card.getX()).toBe(cardX + (cardWidth / 2));
-        expect(card.isClosed()).toBe(true);
-        expect(scaleX).toBe(0);
-        expect(ease).toBe('Linear');
-        expect(delay).toBe(0);
-        expect(duration).toBe(100);
-    });
-
     it("should open the card.", () => {
         const cardOriginX = card.getX();
         card.setClosed();
@@ -73,13 +51,12 @@ describe("CardActionsBuilder.test", () => {
         let ease = '';
         let delay = 0;
         let duration = 0;
-        sceneMock.tweens.add = vi.fn().mockImplementation((config) => {
-            console.log(config.onComplete);
+        sceneMock.tweens.add = vi.fn().mockImplementation((config: ScaleConfig) => {
             scaleX = config.scaleX as number;
             ease = config.ease as string;
             delay = config.delay as number;
             duration = config.duration as number;
-            config.onComplete();
+            if (config?.onComplete) config.onComplete();
         });
         builder
             .open()
@@ -87,6 +64,32 @@ describe("CardActionsBuilder.test", () => {
         expect(card.getX()).toBe(cardOriginX);
         expect(card.isOpened()).toBe(true);
         expect(scaleX).toBe(1);
+        expect(ease).toBe('Linear');
+        expect(delay).toBe(0);
+        expect(duration).toBe(100);
+    });
+
+    it("should close the card.", () => {
+        const builder = CardActionsBuilder.create(card);
+        const cardX = card.getX();
+        const cardWidth = card.getWidth();
+        let scaleX = 0;
+        let ease = '';
+        let delay = 0;
+        let duration = 0;
+        sceneMock.tweens.add = vi.fn().mockImplementation((config: ScaleConfig) => {
+            scaleX = config.scaleX as number;
+            ease = config.ease as string;
+            delay = config.delay as number;
+            duration = config.duration as number;
+            if (config?.onComplete) config.onComplete();
+        });
+        builder
+            .close()
+            .play();
+        expect(card.getX()).toBe(cardX + (cardWidth / 2));
+        expect(card.isClosed()).toBe(true);
+        expect(scaleX).toBe(0);
         expect(ease).toBe('Linear');
         expect(delay).toBe(0);
         expect(duration).toBe(100);
@@ -106,7 +109,7 @@ describe("CardActionsBuilder.test", () => {
         let fromY = 0;
         let toX = 0;
         let toY = 0;
-        sceneMock.tweens.chain = vi.fn().mockImplementation((config) => {
+        sceneMock.tweens.chain = vi.fn().mockImplementation((config: PositionConfig) => {
             const { tweens } = config;
             fromX = tweens[0].x as number;
             fromY = tweens[0].y as number;
@@ -129,4 +132,48 @@ describe("CardActionsBuilder.test", () => {
         expect(card.getOriginX()).toBe(toX);
         expect(card.getOriginY()).toBe(toY);
     });
+
+    it("should expand the card.", () => {
+        const builder = CardActionsBuilder.create(card);
+        sceneMock.tweens.add = vi.fn().mockImplementation((config: ExpandConfig) => {
+            if (config?.onComplete) config.onComplete();
+        });
+        builder
+            .expand()
+            .play();
+        expect(card.getScaleX()).toBe(1.5);
+        expect(card.getScaleY()).toBe(1.5);
+        expect(card.getX()).toBe(card.getOriginX() - (card.getWidth() * 0.25));
+        expect(card.getY()).toBe(card.getOriginY() - (card.getHeight() * 0.25));
+    });
+
+    it("should throw a color flash on the card.", () => {
+        const builder = CardActionsBuilder.create(card);
+        let visible = false;
+        sceneMock.tweens.add = vi.fn().mockImplementation((config: FlashConfig) => {
+            if (config?.onStart) config.onStart();
+            visible = config.targets.getVisible();
+        });
+        builder
+            .flash({ color: 0xff0000 })
+            .play();
+        expect(visible).toBe(true);
+        // should test the color too
+    });
+
+    it("should shrink the card.", () => {
+        const builder = CardActionsBuilder.create(card);
+        sceneMock.tweens.add = vi.fn().mockImplementation((config: ExpandConfig) => {
+            if (config?.onComplete) config.onComplete();
+        });
+        builder
+            .shrink()
+            .play();
+        expect(card.getScaleX()).toBe(0);
+        expect(card.getScaleY()).toBe(0);
+        expect(card.getX()).toBe(card.getOriginX() + (card.getWidth() / 2));
+        expect(card.getY()).toBe(card.getOriginY() + (card.getHeight() / 2));
+    });
+
+    // should test play method
 });

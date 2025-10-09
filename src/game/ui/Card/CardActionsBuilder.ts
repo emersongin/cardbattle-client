@@ -9,13 +9,12 @@ import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
 import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@game/types/TweenConfig";
-import { CardAction, CardActionConfig, CardAnimation } from "@ui/Card/animations/types/CardAction";
+import { CardAction, CardActionConfig } from "@ui/Card/animations/types/CardAction";
 import { EXPAND_ANIMATION, FACE_UP_ANIMATION, FLASH_ANIMATION, 
     POSITION_ANIMATION, SCALE_ANIMATION, SHRINK_ANIMATION } from "@game/constants/keys";
 
 export class CardActionsBuilder {
     #actions: CardAction[] = [];
-    #currentAction: CardAnimation;
 
     private constructor(readonly card: Card) {}
 
@@ -43,17 +42,17 @@ export class CardActionsBuilder {
         return this;
     }
 
-    expand(config: ExpandConfig): CardActionsBuilder {
+    expand(config: ExpandConfig = {}): CardActionsBuilder {
         this.#addAction({ name: EXPAND_ANIMATION, config: config });
         return this;
     }
 
-    shrink(config: ExpandConfig): CardActionsBuilder {
+    shrink(config: ExpandConfig = {}): CardActionsBuilder {
         this.#addAction({ name: SHRINK_ANIMATION, config: config });
         return this;
     }
 
-    flash(config: FlashConfig): CardActionsBuilder {
+    flash(config: FlashConfig = { color: 0xffffff}): CardActionsBuilder {
         this.#addAction({ name: FLASH_ANIMATION, config: config });
         return this;
     }
@@ -78,19 +77,19 @@ export class CardActionsBuilder {
         const { name, config } = action as CardAction;
         switch (name) {
             case POSITION_ANIMATION:
-                this.#currentAction = new PositionAnimation(this.card, config as PositionConfig);
+                new PositionAnimation(this.card, config as PositionConfig);
                 break;
             case SCALE_ANIMATION:
-                this.#currentAction = new ScaleAnimation(this.card, config as ScaleConfig);
+                new ScaleAnimation(this.card, config as ScaleConfig);
                 break;
             case EXPAND_ANIMATION:
-                this.#currentAction = new ExpandAnimation(this.card, config as ExpandConfig);
+                new ExpandAnimation(this.card, config as ExpandConfig);
                 break;
             case SHRINK_ANIMATION:
-                this.#currentAction = new ShrinkAnimation(this.card, config as ExpandConfig);
+                new ShrinkAnimation(this.card, config as ExpandConfig);
                 break;
             case FLASH_ANIMATION:
-                this.#currentAction = new FlashAnimation(this.card, config as FlashConfig);
+                new FlashAnimation(this.card, config as FlashConfig);
                 break;
             case FACE_UP_ANIMATION:
                 this.#faceUpAction(config as TweenConfig);
@@ -138,7 +137,4 @@ export class CardActionsBuilder {
         this.#runAction();
     }
 
-    getCurrentAction(): CardAnimation {
-        return this.#currentAction;
-    }
 }

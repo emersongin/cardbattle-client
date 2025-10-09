@@ -49,23 +49,23 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     #setOriginX(value: number = this.getX()): void {
         this.data.set(ORIGIN_X, value);
-        this.#setX(value);
+        this.setX(value);
     }
 
     #setOriginY(value: number = this.getY()): void {
         this.data.set(ORIGIN_Y, value);
-        this.#setY(value);
+        this.setY(value);
     }
 
     setOpened(): void {
         this.data.set(CLOSED, false);
-        this.#setX(this.getOriginX());
+        this.setX(this.getOriginX());
         this.setScaleX(1);
     }
 
     setClosed(): void {
         this.data.set(CLOSED, true);
-        this.#setX(this.getOriginX() + (this.getWidth() / 2));
+        this.setX(this.getOriginX() + (this.getWidth() / 2));
         this.setScaleX(0);
     }
 
@@ -225,6 +225,14 @@ export class Card extends Phaser.GameObjects.GameObject {
         return this.#ui.height;
     }
 
+    getScaleX(): number {
+        return this.#ui.scaleX;
+    }
+
+    getScaleY(): number {
+        return this.#ui.scaleY;
+    }
+
     getBackgroundColor(): number {
         return this.#ui.getBackgroundColor();
     }
@@ -234,15 +242,15 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     setPosition(x: number = this.#ui.x, y: number = this.#ui.y): void {
-        this.#setX(x);
-        this.#setY(y);
+        this.setX(x);
+        this.setY(y);
     }
 
-    #setX(x: number): void {
+    setX(x: number): void {
         this.#ui.x = x;
     }
 
-    #setY(y: number): void {
+    setY(y: number): void {
         this.#ui.y = y;
     }
 

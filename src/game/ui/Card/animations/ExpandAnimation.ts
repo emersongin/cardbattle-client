@@ -17,7 +17,8 @@ export class ExpandAnimation {
             delay: config?.delay || 200,
             duration: config?.duration || 200,
             onComplete: () => {
-                this.card.updateOrigin(toX, toY);
+                this.card.setX(toX);
+                this.card.setY(toY);
                 this.card.setScaleX(1.5);
                 this.card.setScaleY(1.5);
                 if (config?.onComplete) config.onComplete();

@@ -16,7 +16,8 @@ export class ShrinkAnimation {
             delay: config?.delay || 100,
             duration: config?.duration || 100,
             onComplete: () => {
-                this.card.updateOrigin(toX, toY);
+                this.card.setX(toX);
+                this.card.setY(toY);
                 this.card.setScaleX(0);
                 this.card.setScaleY(0);
                 if (config?.onComplete) config.onComplete();

@@ -5,9 +5,8 @@ export class FlashAnimation {
     #flashLayer: Phaser.GameObjects.Rectangle;
     
     constructor(readonly card: Card, config: FlashConfig) {
-        this.#createFlashLayer(config.color || 0xffffff);
         this.card.scene.tweens.add({
-            targets: this.#flashLayer,
+            targets: this.#createFlashLayer(config.color || 0xffffff),
             alpha: 0,
             delay: config?.delay || 100,
             duration: config?.duration || 600,
@@ -24,11 +23,12 @@ export class FlashAnimation {
         });
     }
 
-    #createFlashLayer(color: number = 0xffffff): void {
+    #createFlashLayer(color: number = 0xffffff): Phaser.GameObjects.Rectangle {
         const flashLayer = this.card.scene.add.rectangle(0, 0, this.card.getWidth(), this.card.getHeight(), color, 1);
         flashLayer.setOrigin(0, 0);
         flashLayer.setVisible(false);
         this.#flashLayer = flashLayer;
         this.card.getUi().add(this.#flashLayer);
+        return this.#flashLayer;
     }
 }
