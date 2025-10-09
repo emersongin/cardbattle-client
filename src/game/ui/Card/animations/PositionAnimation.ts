@@ -19,7 +19,7 @@ export class PositionAnimation {
                 duration: config?.duration || 500,
                 onStart: config?.onStart,
                 onComplete: () => {
-                    this.card.updateOrigin(config.toX, config.toY);
+                    this.card.setOrigin(config.toX, config.toY);
                     if (config.onComplete) config.onComplete();
                 }
             }

@@ -1,14 +1,12 @@
 import { BANNED, CLOSED, DISABLED, FACE_UP, HIGHLIGHTED, MARKED, ORIGIN_X, ORIGIN_Y, SELECTED } from "@constants/keys";
 import { CardType } from "@game/types/CardType";
 import { CardUi } from "@ui/Card/CardUi";
-import { Cardset } from "@ui/Cardset/Cardset";
 import { CardColorType } from "@game/types/CardColorType";
 import { CardData } from "@game/objects/CardData";
 import { VueScene } from "@game/scenes/VueScene";
 export class Card extends Phaser.GameObjects.GameObject {
     public readonly staticData: Readonly<CardData>;
     #ui: CardUi;
-    #cardset: Cardset;
 
     constructor(
         readonly scene: VueScene,
@@ -17,21 +15,16 @@ export class Card extends Phaser.GameObjects.GameObject {
         isStartDisabled: boolean = false
     ) {
         super(scene, Card.name);
-        this.setStartData();
+        this.#setStartData();
         this.staticData = Object.freeze({ ...staticData });
         this.#ui = new CardUi(this.scene, this);
         this.data.set(FACE_UP, isStartFaceUp || false);
         this.data.set(DISABLED, isStartDisabled || false);
-        this.updateOrigin();
+        this.setOrigin();
         this.setDisplay();
     }
-        
-    addToCardset(cardset: Cardset): void {
-        this.#cardset = cardset;
-        this.#cardset.add(this.#ui);
-    }
 
-    setStartData(): void {
+    #setStartData(): void {
         this.setDataEnabled();
         this.data.set(CLOSED, false);
         this.data.set(SELECTED, false);
@@ -42,7 +35,7 @@ export class Card extends Phaser.GameObjects.GameObject {
         this.data.set(ORIGIN_Y, 0);
     }
 
-    updateOrigin(x?: number, y?: number): void {
+    setOrigin(x?: number, y?: number): void {
         this.#setOriginX(x);
         this.#setOriginY(y);
     }
