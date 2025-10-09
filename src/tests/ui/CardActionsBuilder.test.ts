@@ -59,7 +59,7 @@ describe("CardActionsBuilder.test", () => {
             if (config?.onComplete) config.onComplete();
         });
         builder
-            .open()
+            .open({ delay: 0, duration: 0 })
             .play();
         expect(card.getX()).toBe(cardOriginX);
         expect(card.isOpened()).toBe(true);
@@ -85,7 +85,7 @@ describe("CardActionsBuilder.test", () => {
             if (config?.onComplete) config.onComplete();
         });
         builder
-            .close()
+            .close({ delay: 0, duration: 0 })
             .play();
         expect(card.getX()).toBe(cardX + (cardWidth / 2));
         expect(card.isClosed()).toBe(true);
