@@ -5,9 +5,10 @@ import { VueScene } from "@scenes/VueScene";
 import { CardColorType } from "@game/types/CardColorType";
 import { Card } from "@game/ui/Card/Card";
 import { CardData } from "@game/objects/CardData";
-import { BLUE } from "@game/constants/colors";
+import { BLUE, BLUE_COLOR } from "@game/constants/colors";
 import { BATTLE, NONE } from "@game/constants/keys";
 import { CardUi } from "@game/ui/Card/CardUi";
+import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
 
 describe("Card.test", () => {
     let sceneMock: VueScene;
@@ -49,10 +50,11 @@ describe("Card.test", () => {
         expect(card.getOriginX()).toBe(0);
         expect(card.getOriginY()).toBe(0);
         expect(card.getUi()).toBeInstanceOf(CardUi);
-        expect(card.getWidth()).toBe(card.getUi().width);
-        expect(card.getHeight()).toBe(card.getUi().height);
+        expect(card.getWidth()).toBe(CARD_WIDTH);
+        expect(card.getHeight()).toBe(CARD_HEIGHT);
         expect(card.getScaleX()).toBe(1);
         expect(card.getScaleY()).toBe(1);
+        expect(card.getBackgroundColor()).toBe(BLUE_COLOR);
     });
 
     it("should start the card with these states.", () => {
@@ -70,6 +72,13 @@ describe("Card.test", () => {
         const card = new Card(sceneMock, cardData);
         card.faceUp();
         expect(card.isFaceUp()).toBe(true);
+    });
+
+    it("should flip the card face down.", () => {
+        const card = new Card(sceneMock, cardData);
+        card.faceUp();
+        card.faceDown();
+        expect(card.isFaceUp()).toBe(false);
     });
 
     it("should disable the card.", () => {

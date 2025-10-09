@@ -36,10 +36,10 @@ export class Card extends Phaser.GameObjects.GameObject {
     }
 
     setPosition(x?: number, y?: number): void {
-        this.setX(x);
-        this.setY(y);
         this.#setOriginX(x);
         this.#setOriginY(y);
+        this.setX(x);
+        this.setY(y);
     }
 
     setX(x: number = this.getX()): void {
@@ -130,14 +130,30 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     faceUp(): void {
         this.data.set(FACE_UP, true);
-        this.setImage();
+        this.#setImage();
         this.setDisplay();
     }
 
     faceDown(): void {
         this.data.set(FACE_UP, false);
-        this.setImage();
+        this.#setImage();
         this.setDisplay();
+    }
+
+    #setImage(): void {
+        if (this.isFaceUp()) {
+            this.#ui.setImage(this.staticData.image);
+            return;
+        }
+        this.#ui.setImage('cardback');
+    }
+
+    setDisplay(text: string = ''): void {
+        if (!this.isFaceUp()) {
+            this.#ui.setDisplayText('');
+            return;
+        }
+        this.#ui.setDisplayText(text);
     }
 
     select(): void {
@@ -266,21 +282,5 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     setScaleY(scaleY: number): void {
         this.#ui.scaleY = scaleY;
-    }
-
-    setDisplay(text: string = ''): void {
-        if (!this.data.get(FACE_UP)) {
-            this.#ui.setDisplayText('');
-            return;
-        }
-        this.#ui.setDisplayText(text);
-    }
-
-    setImage(): void {
-        if (this.isFaceUp()) {
-            this.#ui.setImage(this.staticData.image);
-            return;
-        }
-        this.#ui.setImage('cardback');
     }
 }
