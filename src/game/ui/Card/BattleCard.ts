@@ -8,7 +8,7 @@ export class BattleCard extends Card {
 
     constructor(
         readonly scene: VueScene,
-        staticData: CardData,
+        readonly staticData: CardData,
         isStartFaceUp: boolean = false,
         isStartDisabled: boolean = false
     ) {
@@ -20,8 +20,8 @@ export class BattleCard extends Card {
 
     setStartData(): void {
         super.setStartData();
-        this.setAp(super.staticData.ap);
-        this.setHp(super.staticData.hp);
+        this.setAp(this.staticData.ap);
+        this.setHp(this.staticData.hp);
     }
 
     getAllData(): BattlePoints {

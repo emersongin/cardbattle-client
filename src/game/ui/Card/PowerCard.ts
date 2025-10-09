@@ -7,7 +7,7 @@ export class PowerCard extends Card {
 
     constructor(
         readonly scene: VueScene,
-        staticData: CardData,
+        readonly staticData: CardData,
         isStartFaceUp: boolean = false,
         isStartDisabled: boolean = false
     ) {
