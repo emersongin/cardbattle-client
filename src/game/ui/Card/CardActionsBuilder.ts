@@ -28,11 +28,13 @@ export class CardActionsBuilder {
     }
 
     open(config: ScaleConfig = { open: true, delay: 0, duration: 0 }): CardActionsBuilder {
+        config.open = true;
         this.#addAction({ name: SCALE_ANIMATION, config: config });
         return this;
     }
 
     close(config: ScaleConfig = { open: false, delay: 0, duration: 0 }): CardActionsBuilder {
+        config.open = false;
         this.#addAction({ name: SCALE_ANIMATION, config: config });
         return this;
     }
