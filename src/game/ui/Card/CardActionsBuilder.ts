@@ -72,11 +72,8 @@ export class CardActionsBuilder {
         return this.#actions.length > 0;
     }
 
-    #runAction(action?: CardAction): void {
-        if (this.#hasActions() && !action) {
-            action = this.#actions[0];
-        }
-        const { name, config } = action as CardAction;
+    #runAction(action: CardAction): void {
+        const { name, config } = action;
         switch (name) {
             case POSITION_ANIMATION:
                 new PositionAnimation(this.card, config as PositionConfig);
@@ -136,7 +133,14 @@ export class CardActionsBuilder {
         if (config?.onComplete) {
             this.#addOnCompleteToLastAction(config.onComplete);
         }
-        this.#runAction();
+        this.#runAction(this.#getFirstAction());
+    }
+
+    #getFirstAction(): CardAction {
+        if (!this.#hasActions()) {
+            throw new Error("No actions to play.");
+        }
+        return this.#actions[0];
     }
 
 }

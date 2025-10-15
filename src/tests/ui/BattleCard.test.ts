@@ -1,7 +1,5 @@
 import PhaserMock from "@mocks/phaser";
-import CardBattleMock from "@mocks/cardset";
 import { describe, it, expect, beforeAll } from "vitest";
-import { Cardset } from "@ui/Cardset/Cardset";
 import { CardType } from "@game/types/CardType";
 import { VueScene } from "@scenes/VueScene";
 import { CardColorType } from "@game/types/CardColorType";
@@ -12,7 +10,6 @@ import { BattleCard } from "@game/ui/Card/BattleCard";
 
 describe("BattleCard.test", () => {
     let sceneMock: VueScene;
-    let cardsetMock: Cardset;
     const battleCardData = {
         id: 'ID',
         number: 1,
@@ -34,7 +31,6 @@ describe("BattleCard.test", () => {
             active: true,
             visible: true,
         }) as VueScene;
-        cardsetMock = new CardBattleMock.Cardset(sceneMock, [], 0, 0);
     });
 
     it("should throw error: invalid card type.", () => {

@@ -2,7 +2,18 @@ import { vi } from "vitest";
 import Phaser from "phaser";
 
 class MockGameObject {
-    visible: boolean = false;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    visible: boolean;
+    constructor(x?: number, y?: number, width?: number, height?: number, visible?: boolean) {
+        this.x = x || 0;
+        this.y = y || 0;
+        this.width = width || 0;
+        this.height = height || 0;
+        this.visible = visible || false;
+    };
     setOrigin = vi.fn();
     setPosition = vi.fn();
     setScale = vi.fn();
@@ -19,6 +30,15 @@ class MockGameObject {
     setTexture = vi.fn();
 }
 
+class RectangleMock extends MockGameObject {
+    fillColor: number;
+    alpha: number;
+    constructor(x?: number, y?: number, width?: number, height?: number, fillColor?: number, fillAlpha?: number) {
+        super(x, y, width, height);
+        this.fillColor = fillColor ?? 0xffffff;
+        this.alpha = fillAlpha ?? 1;
+    };
+}
 class MockText extends MockGameObject {
     setText = vi.fn();
     setStyle = vi.fn();
@@ -41,7 +61,7 @@ class MockContainer extends MockGameObject {
     visible: boolean = false;
     list: any[] = [] as Phaser.GameObjects.Graphics[];
     constructor(readonly scene: any, readonly x: number = 0, readonly y: number = 0) {
-        super();
+        super(x, y);
     };
     add = vi.fn((obj: any) => { this.list.push(obj); return obj; });
     remove = vi.fn();
@@ -72,7 +92,7 @@ const PhaserMock = {
         Container: MockContainer,
         Graphics: MockGraphics,
         Image: MockGameObject,
-        Rectangle: MockGameObject,
+        Rectangle: RectangleMock,
         Text: MockText,
     },
     Tweens: {
@@ -89,11 +109,11 @@ const PhaserMock = {
             chain: vi.fn(),
         };
         add = {
-            container: vi.fn((x: number, y: number) => new MockContainer(this, x, y)),
+            container: vi.fn((...args) => new MockContainer(this, ...args)),
             existing: vi.fn((obj: any) => obj),
             graphics: vi.fn(() => new MockGraphics()),
             image: vi.fn(() => new MockGameObject()),
-            rectangle: vi.fn(() => new MockGameObject()),
+            rectangle: vi.fn((...args) => new RectangleMock(...args)),
             text: vi.fn(() => new MockText()),
         };
         children = {

@@ -150,15 +150,17 @@ describe("CardActionsBuilder.test", () => {
     it("should throw a color flash on the card.", () => {
         const builder = CardActionsBuilder.create(card);
         let visible = false;
+        let color = 0;
         sceneMock.tweens.add = vi.fn().mockImplementation((config: FlashConfig) => {
             if (config?.onStart) config.onStart();
-            visible = config.targets.getVisible();
+            visible = config.targets.visible;
+            color = config.targets.fillColor;
         });
         builder
             .flash({ color: 0xff0000 })
             .play();
         expect(visible).toBe(true);
-        // should test the color too
+        expect(color).toBe(0xff0000);
     });
 
     it("should shrink the card.", () => {
