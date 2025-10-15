@@ -1,3 +1,4 @@
+import Phaser from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { Card } from "@ui/Card/Card";
 import { CardUi } from "@ui/Card/CardUi";
@@ -24,6 +25,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.#selectMode = new SelectMode(this);
         this.#setCards(cards);
+        this.#addCards();
         this.scene.add.existing(this);
     }
 
@@ -196,6 +198,9 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     #setCards(cards: Card[]): void {
         this.#cards = cards;
+    }
+
+    #addCards(): void {
         this.getCards().forEach((card: Card) => this.add(card.getUi()));
     }
 
