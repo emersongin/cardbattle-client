@@ -60,7 +60,7 @@ export class SelectMode {
     }
 
     #sendCardsToBackEqualOrLessByIndex(index: number): void {
-        const cards = this.cardset.getCardsByFromTo(0, index);
+        const cards = this.cardset.getCardsBySlice(0, index);
         cards.reverse().forEach((card: Card) => {
             this.cardset.sendToBack(card.getUi());
         });

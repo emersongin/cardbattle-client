@@ -106,7 +106,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #completeChoice(cardIds: string[]): void {
         const handCardset = super.getCardset();
-        handCardset.highlightCardsByIndexes(cardIds);
+        cardIds.forEach(cardId => handCardset.highlightCardsById(cardId));
         super.createCommandWindowBottom('Complete your choice?', [
             {
                 description: 'Yes',
@@ -198,7 +198,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         // set last card position
         const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
         const lastIndex = cardset.getCardsLastIndex();
-        cardset.setCardAtPosition(lastIndex, widthEdge);
+        cardset.setCardAtThePosition(lastIndex, widthEdge);
         cardset.setCardClosedByIndex(lastIndex);
         // show last card (played card)
         super.openCardFromPowerCardsetByIndex(lastIndex, {

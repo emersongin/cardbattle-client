@@ -1,5 +1,6 @@
 import { vi } from "vitest";
 import Phaser from "phaser";
+import { VueScene } from "@/game/scenes/VueScene";
 
 class MockGameObject {
     x: number;
@@ -160,7 +161,27 @@ const PhaserMock = {
                 },
             },
         };
-    },
+        addKeyEnterListening = (config: { onTrigger: () => void }) => {
+            this.input.keyboard.on('keydown-ENTER', config.onTrigger);
+        }
+        addKeyEnterListeningOnce = (config: { onTrigger: () => void }) => {
+            this.input.keyboard.once('keydown-ENTER', config.onTrigger);
+        }
+        addKeyEscListeningOnce = vi.fn();
+        addKeyRightListening = (config: { onTrigger: () => void }) => {
+            this.input.keyboard.on('keydown-RIGHT', config.onTrigger);
+        };
+        addKeyLeftListening = (config: { onTrigger: () => void }) => {
+            this.input.keyboard.on('keydown-LEFT', config.onTrigger);
+        };
+        removeAllKeyListening = () => {
+            this.input.keyboard.removeAllListeners();
+        };
+        addKeyShiftListeningOnce = (config: { onTrigger: () => void }) => {
+            this.input.keyboard.once('keydown-SHIFT', config.onTrigger);
+        };
+        timeline = vi.fn();
+    } as unknown as typeof VueScene,
 };
 
 HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {

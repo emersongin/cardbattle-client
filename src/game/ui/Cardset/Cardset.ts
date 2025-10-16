@@ -13,7 +13,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     #selectedTweens: Phaser.Tweens.Tween[];
     #selectMode: SelectMode;
 
-    constructor(
+    private constructor(
         readonly scene: VueScene, 
         readonly cards: Card[],
         x: number = 0,
@@ -39,14 +39,16 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     setCardsInLinePosition(x: number = 0, y: number = 0): void {
-        this.getCards().forEach((card: Card, index: number) => {
-            let padding = Math.max(0, Math.abs(this.width / this.getCards().length));
-            if (padding > card.getWidth()) padding = card.getWidth();
+        const cards = this.getCards();
+        const numCards = cards.length;
+        let padding = Math.max(0, Math.abs(this.width / numCards));
+        if (padding > CARD_WIDTH) padding = CARD_WIDTH;
+        cards.forEach((card: Card, index: number) => {
             card.setPosition(x + (padding * index), y);
         });
     }
 
-    setCardAtPosition(index: number, x: number = 0, y: number = 0): void {
+    setCardAtThePosition(index: number, x: number = 0, y: number = 0): void {
         if (!this.isValidIndex(index)) {
             throw new Error(`Cardset: index ${index} is out of bounds.`);
         }
@@ -73,9 +75,10 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.getCards().find((card: Card) => card.getId() === cardId) as Card;
     }
 
-    getCardsByFromTo(start: number, end: number): Card[] {
-        if (!this.isValidIndex(start) || !this.isValidIndex(end))
+    getCardsBySlice(start: number, end: number): Card[] {
+        if (!this.isValidIndex(start) || !this.isValidIndex(end)) {
             throw new Error(`Cardset: index ${start} or ${end} is out of bounds.`);
+        }
         if (start > end) {
             throw new Error(`Cardset: start index ${start} cannot be greater than end index ${end}.`);
         }
@@ -117,15 +120,6 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.#stopSelectedTweens();
     }
 
-    removeAllSelectCardById(cardId: string): void {
-        const card = this.getCardById(cardId);
-        card.unhighlight();
-        card.unmark();
-        card.deselect();
-        card.unban();
-        this.#stopSelectedTweens();
-    }
-
     banCardById(cardId: string): void {
         this.removeAllSelectCardById(cardId);
         this.getCardById(cardId).ban();
@@ -136,6 +130,20 @@ export class Cardset extends Phaser.GameObjects.Container {
         this.getCardById(cardId).mark();
     }
 
+    highlightCardsById(cardId: string): void {
+        this.removeAllSelectCardById(cardId);
+        this.getCardById(cardId).highlight();
+    }
+
+    removeAllSelectCardById(cardId: string): void {
+        const card = this.getCardById(cardId);
+        card.unhighlight();
+        card.unmark();
+        card.deselect();
+        card.unban();
+        this.#stopSelectedTweens();
+    }
+
     removeAllSelect(): void {
         this.getCards().forEach((card: Card) => {
             const cardId = card.getId();
@@ -143,40 +151,31 @@ export class Cardset extends Phaser.GameObjects.Container {
         });
     }
 
-    highlightCardsByIndexes(cardIds: string[]): void {
-        this.getCards().forEach((card: Card) => {
-            if (cardIds.includes(card.getId())) {
-                this.bringToTop(card.getUi());
-                card.highlight();
-            }
-        });
-    }
-
     showCards(): void {
         this.getCards().forEach((card: Card) => card.setOpened());
     }
 
-    openAllCardsDominoMovement(): void {
-        this.getCards().forEach((card: Card, index: number) => {
-            const delay = (index * 100);
-            const duration = 100;
-            CardActionsBuilder
-                .create(card)
-                .open({ delay, duration })
-                .play();
-        });
-    }
+    // openAllCardsDominoMovement(): void {
+    //     this.getCards().forEach((card: Card, index: number) => {
+    //         const delay = (index * 100);
+    //         const duration = 100;
+    //         CardActionsBuilder
+    //             .create(card)
+    //             .open({ delay, duration })
+    //             .play();
+    //     });
+    // }
 
-    closeAllCardsDominoMovement(): void {
-        this.getCards().forEach((card: Card, index: number) => {
-            const delay = (index * 100);
-            const duration = 100;
-            CardActionsBuilder
-                .create(card)
-                .close({ delay, duration })
-                .play();
-        });
-    }
+    // closeAllCardsDominoMovement(): void {
+    //     this.getCards().forEach((card: Card, index: number) => {
+    //         const delay = (index * 100);
+    //         const duration = 100;
+    //         CardActionsBuilder
+    //             .create(card)
+    //             .close({ delay, duration })
+    //             .play();
+    //     });
+    // }
 
     restoreSelectMode(): void {
         this.#selectMode.restoreSelectMode();

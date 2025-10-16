@@ -58,7 +58,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                     onCreditPoint: (card: BattleCard) => this.#onCreditPoint(card),
                     onDebitPoint: (card: BattleCard) => this.#onDebitPoint(card),
                     onComplete: (cardIds: string[]) => {
-                        super.getCardset().highlightCardsByIndexes(cardIds);
+                        const handCardset = super.getCardset();
+                        cardIds.forEach(cardId => handCardset.highlightCardsById(cardId));
                         this.#createCommandWindow(cardIds);
                         super.openCommandWindow();
                     },
