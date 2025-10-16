@@ -37,12 +37,7 @@ export class LoadPhase extends PowerPhase implements Phase {
     }
 
     changeTo(): void {
-        this.changeToSummonPhase();
-    }
-
-    changeToSummonPhase(): void {
-        this.closeBoard({ onComplete: () => this.scene.changePhase(new SummonPhase(this.scene)) });
-        this.closeOpponentBoard();
+        this.scene.changePhase(new SummonPhase(this.scene))
     }
 
 }

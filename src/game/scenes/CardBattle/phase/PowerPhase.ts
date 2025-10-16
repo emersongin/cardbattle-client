@@ -226,7 +226,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                 this.changeToTriggerPhase();
                 return;
             }
-            this.changeTo();
+            super.closeGameBoard({ onComplete: () => this.changeTo() });
             return;
         }
         if (await this.cardBattle.isOpponentPassed(this.scene.room.playerId)) {

@@ -37,12 +37,7 @@ export class CompilePhase extends PowerPhase implements Phase {
     }
 
     changeTo(): void {
-        this.changeToBattlePhase();
-    }
-
-    changeToBattlePhase(): void {
-        super.closeBoard({ onComplete: () => this.scene.changePhase(new BattlePhase(this.scene)) });
-        super.closeOpponentBoard();
+        this.scene.changePhase(new BattlePhase(this.scene));
     }
 
 }
