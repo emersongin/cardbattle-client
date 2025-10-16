@@ -1,3 +1,4 @@
+import PhaserMock from "@mocks/phaser";
 import { BLUE } from "@game/constants/colors";
 import { BATTLE, NONE, POWER } from "@game/constants/keys";
 import { CardData } from "@game/objects/CardData";
@@ -5,7 +6,6 @@ import { VueScene } from "@game/scenes/VueScene";
 import { CardColorType } from "@game/types/CardColorType";
 import { CardType } from "@game/types/CardType";
 import { CardFactory } from "@game/ui/Card/CardFactory";
-import PhaserMock from "../mocks/phaser";
 import { beforeAll, describe, expect, it } from "vitest";
 import { BattleCard } from "@game/ui/Card/BattleCard";
 import { PowerCard } from "@game/ui/Card/PowerCard";
