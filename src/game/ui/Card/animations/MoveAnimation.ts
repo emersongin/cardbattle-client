@@ -20,7 +20,6 @@ export class MoveAnimation {
                 scaleX: 1,
                 scaleY: 1,
                 delay: config?.delay || 0,
-                ease: 'Linear',
                 duration: config?.duration || 500,
                 onStart: config?.onStart,
                 onComplete: () => {

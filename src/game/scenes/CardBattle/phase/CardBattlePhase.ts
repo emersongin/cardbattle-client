@@ -476,7 +476,6 @@ export class CardBattlePhase implements Phase {
     #moveCardsetToBoard(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
-        const totalCards = cardset.getCardsTotal();
         const moveConfig = {
             targets: cardsUis,
             onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
@@ -488,7 +487,7 @@ export class CardBattlePhase implements Phase {
                         toX: (index * CARD_WIDTH),
                         toY: 0,
                         delay: (index * 100), 
-                        duration: (300 / totalCards) * (totalCards - index),
+                        duration: 300,
                         onStart: () => {
                             if (config?.onStartEach) config.onStartEach();
                         },
