@@ -7,16 +7,18 @@ export class MoveAnimation {
     constructor(readonly card: Card, config: MoveConfig) {
         const tweens = [
             { 
+                targets: this.card.getUi(),
                 x: config?.fromX || this.card.getX() || 0, 
                 y: config?.fromY || this.card.getY() || 0, 
                 delay: 0,
                 duration: 0 
             },
             {
+                targets: this.card.getUi(),
                 x: config.toX, 
                 y: config.toY,
                 delay: config?.delay || 0,
-                ease: 'sine.inout',
+                ease: 'catmull',
                 duration: config?.duration || 500,
                 onStart: config?.onStart,
                 onComplete: () => {
@@ -24,11 +26,8 @@ export class MoveAnimation {
                     if (config.onComplete) config.onComplete();
                 }
             }
-        ];
-        this.card.scene.tweens.chain({ 
-            targets: this.card.getUi(), 
-            tweens: tweens,
-        });
+        ] as Phaser.Types.Tweens.TweenBuilderConfig[];
+        this.card.scene.tweens.chain({ tweens });
     }
 
 }
