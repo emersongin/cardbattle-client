@@ -8,8 +8,8 @@ import { EXPAND_ANIMATION, FACE_UP_ANIMATION, FLASH_ANIMATION,
 import { FlashAnimation } from "../FlashAnimation";
 import { ExpandAnimation } from "../ExpandAnimation";
 import { ShrinkAnimation } from "../ShrinkAnimation";
-import { MoveAnimation } from "../MoveAnimation";
 import { ScaleAnimation } from "../ScaleAnimation";
+import { MoveAnimation } from "../MoveAnimation";
 
 export type CardAction = {
     name: CardActionName;

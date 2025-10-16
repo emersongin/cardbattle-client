@@ -7,11 +7,11 @@ import { BLUE } from "@game/constants/colors";
 import { BATTLE, NONE } from "@game/constants/keys";
 import { CardType } from "@game/types/CardType";
 import { CardData } from "@game/objects/CardData";
-import { Card } from "@game/ui/Card/Card";
-import { FlashConfig } from "@/game/ui/Card/animations/types/FlashConfig";
-import { ExpandConfig } from "@/game/ui/Card/animations/types/ExpandConfig";
-import { MoveConfig } from "@/game/ui/Card/animations/types/MoveConfig";
-import { ScaleConfig } from "@/game/ui/Card/animations/types/ScaleConfig";
+import { Card } from "@ui/Card/Card";
+import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
+import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
+import { MoveConfig } from "@ui/Card/animations/types/MoveConfig";
+import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 
 describe("CardActionsBuilder.test", () => {
     let sceneMock: VueScene;
