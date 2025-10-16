@@ -2,11 +2,11 @@ import { Card } from "@ui/Card/Card";
 import { FlashAnimation } from "@ui/Card/animations/FlashAnimation";
 import { ExpandAnimation } from "@ui/Card/animations/ExpandAnimation";
 import { ShrinkAnimation } from "@ui/Card/animations/ShrinkAnimation";
-import { PositionAnimation } from "@ui/Card/animations/PositionAnimation";
+import { MoveAnimation } from "@ui/Card/animations/MoveAnimation";
 import { ScaleAnimation } from "@ui/Card/animations/ScaleAnimation";
 import { ExpandConfig } from "@ui/Card/animations/types/ExpandConfig";
 import { FlashConfig } from "@ui/Card/animations/types/FlashConfig";
-import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
+import { MoveConfig } from "@ui/Card/animations/types/MoveConfig";
 import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { TweenConfig } from "@game/types/TweenConfig";
 import { CardAction, CardActionConfig } from "@ui/Card/animations/types/CardAction";
@@ -22,7 +22,7 @@ export class CardActionsBuilder {
         return new CardActionsBuilder(card);
     }
 
-    move(config: PositionConfig): CardActionsBuilder {
+    move(config: MoveConfig): CardActionsBuilder {
         this.#addAction({ name: POSITION_ANIMATION, config: config });
         return this;
     }
@@ -76,7 +76,7 @@ export class CardActionsBuilder {
         const { name, config } = action;
         switch (name) {
             case POSITION_ANIMATION:
-                new PositionAnimation(this.card, config as PositionConfig);
+                new MoveAnimation(this.card, config as MoveConfig);
                 break;
             case SCALE_ANIMATION:
                 new ScaleAnimation(this.card, config as ScaleConfig);

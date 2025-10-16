@@ -1,10 +1,10 @@
 
 import { Card } from "@ui/Card/Card";
-import { PositionConfig } from "@ui/Card/animations/types/PositionConfig";
+import { MoveConfig } from "./types/MoveConfig";
 
-export class PositionAnimation {
+export class MoveAnimation {
 
-    constructor(readonly card: Card, config: PositionConfig) {
+    constructor(readonly card: Card, config: MoveConfig) {
         const tweens = [
             { 
                 x: config?.fromX || this.card.getX() || 0, 

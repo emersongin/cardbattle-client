@@ -10,7 +10,7 @@ import { CardData } from "@game/objects/CardData";
 import { Card } from "@game/ui/Card/Card";
 import { FlashConfig } from "@/game/ui/Card/animations/types/FlashConfig";
 import { ExpandConfig } from "@/game/ui/Card/animations/types/ExpandConfig";
-import { PositionConfig } from "@/game/ui/Card/animations/types/PositionConfig";
+import { MoveConfig } from "@/game/ui/Card/animations/types/MoveConfig";
 import { ScaleConfig } from "@/game/ui/Card/animations/types/ScaleConfig";
 
 describe("CardActionsBuilder.test", () => {
@@ -109,7 +109,7 @@ describe("CardActionsBuilder.test", () => {
         let fromY = 0;
         let toX = 0;
         let toY = 0;
-        sceneMock.tweens.chain = vi.fn().mockImplementation((config: PositionConfig) => {
+        sceneMock.tweens.chain = vi.fn().mockImplementation((config: MoveConfig) => {
             const { tweens } = config;
             fromX = tweens[0].x as number;
             fromY = tweens[0].y as number;

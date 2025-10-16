@@ -5,7 +5,7 @@ import { CardUi } from "@ui/Card/CardUi";
 import { CardActionsBuilder } from "@ui/Card/CardActionsBuilder";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
 import { SelectMode } from "@ui/Cardset/SelectMode";
-import { PositionConfig } from "../Card/animations/types/PositionConfig";
+import { MoveConfig } from "../Card/animations/types/MoveConfig";
 import { VueScene } from "@game/scenes/VueScene";
 
 export class Cardset extends Phaser.GameObjects.Container {
@@ -264,7 +264,7 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.data.get('selectModeEnabled') === false;
     }
 
-    moveCardById(cardId: string, config: Partial<PositionConfig>): void {
+    moveCardById(cardId: string, config: Partial<MoveConfig>): void {
         const card = this.getCardById(cardId);
         CardActionsBuilder
             .create(card)

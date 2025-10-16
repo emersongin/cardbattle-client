@@ -1,6 +1,6 @@
 import { TweenConfig } from "@game/types/TweenConfig";
 
-export type PositionConfig = {
+export type MoveConfig = {
     toX: number, 
     toY: number, 
     fromX?: number, 
