@@ -128,21 +128,21 @@ export class Card extends Phaser.GameObjects.GameObject {
 
     faceUp(): void {
         this.data.set(FACE_UP, true);
-        this.#setImage();
+        this.#setFront();
         this.setDisplay();
+    }
+
+    #setFront(): void {
+        this.#ui.setImage(this.staticData.image);
     }
 
     faceDown(): void {
         this.data.set(FACE_UP, false);
-        this.#setImage();
+        this.#setBack();
         this.setDisplay();
     }
 
-    #setImage(): void {
-        if (this.isFaceUp()) {
-            this.#ui.setImage(this.staticData.image);
-            return;
-        }
+    #setBack(): void {
         this.#ui.setImage('cardback');
     }
 

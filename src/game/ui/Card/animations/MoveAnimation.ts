@@ -16,6 +16,7 @@ export class MoveAnimation {
                 x: config.toX, 
                 y: config.toY,
                 delay: config?.delay || 0,
+                ease: 'sine.inout',
                 duration: config?.duration || 500,
                 onStart: config?.onStart,
                 onComplete: () => {
