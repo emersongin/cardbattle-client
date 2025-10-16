@@ -56,6 +56,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         card.setPosition(x, y);
     }
 
+    setFaceDownAllCards(): void {
+        this.getCards().forEach(card => card.faceDown());
+    }
+
+    setShrinkAllCards(): void {
+        this.getCards().forEach(card => card.setShrinked());
+    }
+
     getCards(): Card[] {
         return this.#cards;
     }
