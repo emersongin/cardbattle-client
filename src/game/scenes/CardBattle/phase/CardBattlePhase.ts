@@ -385,7 +385,6 @@ export class CardBattlePhase implements Phase {
                 pause();
                 const builder = CardActionsBuilder
                     .create(card);
-                // if (config?.faceUp) builder.faceUp();
                 builder
                     .open({
                         delay: (index * 100),
