@@ -52,7 +52,8 @@ export class CardBattleScene extends VueScene {
         const playerCardIds = playerCards.filter(card => {
             const cardColor = card.getColor() as CardColorType;
             const cardType = card.getType();
-            if (cardType === POWER || cardColor === ORANGE) return;
+            if (cardType === POWER) return false;
+            if (cardColor === ORANGE) return true;
             const colorPoints = playerBoard.getAllData()[cardColor];
             if (colorPoints < card.staticData.cost) return false;
             playerBoard.getAllData()[cardColor] = colorPoints - card.staticData.cost;
@@ -64,7 +65,8 @@ export class CardBattleScene extends VueScene {
         const opponentCardIds = opponentCards.filter(card => {
             const cardColor = card.getColor() as CardColorType;
             const cardType = card.getType();
-            if (cardType === POWER || cardColor === ORANGE) return;
+            if (cardType === POWER) return false;
+            if (cardColor === ORANGE) return true;
             const colorPoints = opponentBoard.getAllData()[cardColor];
             if (colorPoints < card.staticData.cost) return false;
             opponentBoard.getAllData()[cardColor] = colorPoints - card.staticData.cost;

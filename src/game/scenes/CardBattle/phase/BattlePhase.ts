@@ -1,5 +1,4 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
-import { ChallengePhase } from "@scenes/CardBattle/phase/ChallengePhase";
 import { CardBattlePhase } from './CardBattlePhase';
 
 export class BattlePhase extends CardBattlePhase implements Phase {
@@ -10,7 +9,7 @@ export class BattlePhase extends CardBattlePhase implements Phase {
             await super.openGameBoard();
             await super.createTextWindowCentered('Card Battle', { 
                 textAlign: 'center', 
-                onClose: () => {}//super.resumePhase()
+                onClose: () => this.#startBattle()
             });
             super.openAllWindows();
         }
@@ -19,7 +18,7 @@ export class BattlePhase extends CardBattlePhase implements Phase {
         super.openAllWindows();
     }
 
-    changeToChallengePhase(): void {
-        this.scene.changePhase(new ChallengePhase(this.scene));
+    #startBattle(): void {
+        
     }
 }

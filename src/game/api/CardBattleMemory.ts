@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CardBattle } from '@api/CardBattle';
-import { NONE, ADD_COLOR_POINTS, AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
+import { ADD_COLOR_POINTS, AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, 
+    HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { CardData } from "@objects/CardData";
@@ -36,9 +37,7 @@ const battleCardsMock = [
         type: BATTLE as CardType,
         ap: 5,
         hp: 5,
-        cost: 2,
-        effectType: NONE,
-        effectDescription: 'none',
+        cost: 0,
     },
     {
         id: 'B2',
@@ -50,9 +49,7 @@ const battleCardsMock = [
         type: BATTLE as CardType,
         ap: 4,
         hp: 6,
-        cost: 2,
-        effectType: NONE,
-        effectDescription: 'none',
+        cost: 0,
     },
     {
         id: 'B3',
@@ -64,9 +61,7 @@ const battleCardsMock = [
         type: BATTLE as CardType,
         hp: 4,
         ap: 6,
-        cost: 2,
-        effectType: NONE,
-        effectDescription: 'none',
+        cost: 0,
     },
     {
         id: 'B4',
@@ -78,9 +73,7 @@ const battleCardsMock = [
         type: BATTLE as CardType,
         hp: 7,
         ap: 3,
-        cost: 2,
-        effectType: NONE,
-        effectDescription: 'none',
+        cost: 0,
     },
     {
         id: 'B5',
@@ -92,9 +85,7 @@ const battleCardsMock = [
         type: BATTLE as CardType,
         hp: 3,
         ap: 7,
-        cost: 2,
-        effectType: NONE,
-        effectDescription: 'none',
+        cost: 0,
     },
     {
         id: 'B6',
@@ -107,8 +98,6 @@ const battleCardsMock = [
         ap: 2,
         hp: 8,
         cost: 0,
-        effectType: NONE,
-        effectDescription: 'none',
     }
 ];
 
@@ -123,9 +112,6 @@ const powerCardsMock = [
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
         effectDescription: 'This card is used for testing power effects.',
-        ap: 0,
-        hp: 0,
-        cost: 0,
     },
     {
         id: 'P2',
@@ -137,9 +123,6 @@ const powerCardsMock = [
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
         effectDescription: 'This card is used for testing power effects.',
-        ap: 0,
-        hp: 0,
-        cost: 0,
     },
     {
         id: 'P3',
@@ -151,9 +134,6 @@ const powerCardsMock = [
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
         effectDescription: 'This card is used for testing power effects.',
-        ap: 0,
-        hp: 0,
-        cost: 0,
     },
     {
         id: 'P4',
@@ -165,9 +145,6 @@ const powerCardsMock = [
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
         effectDescription: 'This card is used for testing power effects.',
-        ap: 0,
-        hp: 0,
-        cost: 0,
     },
     {
         id: 'P5',
@@ -179,9 +156,6 @@ const powerCardsMock = [
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
         effectDescription: 'This card is used for testing power effects.',
-        ap: 0,
-        hp: 0,
-        cost: 0,
     },
     {
         id: 'P6',
@@ -193,9 +167,6 @@ const powerCardsMock = [
         type: POWER as CardType,
         effectType: ADD_COLOR_POINTS,
         effectDescription: 'This card is used for testing power effects.',
-        ap: 0,
-        hp: 0,
-        cost: 0,
     }
 ];
 
@@ -624,6 +595,7 @@ export default class CardBattleMemory implements CardBattle {
 
     #drawPlayerCards(): void {
         const powerCards = this.#playerDeck.filter(card => card.type === POWER).slice(0, 3);
+        console.log(powerCards.length);
         const battleCards = this.#playerDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
         this.#setPlayerHand(drawnCards);
@@ -635,6 +607,7 @@ export default class CardBattleMemory implements CardBattle {
 
     #drawOpponentCards(): void {
         const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 3);
+        console.log(powerCards.length);
         const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
         this.#setOpponentHand(drawnCards);
