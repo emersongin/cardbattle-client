@@ -19,6 +19,7 @@ export class MoveAnimation {
                 y: config.toY,
                 scaleX: 1,
                 scaleY: 1,
+                ease: config?.ease || 'Linear',
                 delay: config?.delay || 0,
                 duration: config?.duration || 500,
                 onStart: config?.onStart,
@@ -27,20 +28,6 @@ export class MoveAnimation {
                     if (config.onComplete) config.onComplete();
                 }
             }
-
-            // {
-            //     targets: this.card.getUi(),
-            //     x: config.toX,
-            //     duration: 200,
-            //     ease: 'Cubic.easeOut', // vai rápido e desacelera no final
-            // },
-            // {
-            //     targets: this.card.getUi(),
-            //     x: this.card.getX(),
-            //     duration: 600,
-            //     ease: 'Cubic.easeIn', // volta suavemente
-            // },
-
         ] as Phaser.Types.Tweens.TweenBuilderConfig[];
         this.card.scene.tweens.chain({ tweens });
     }

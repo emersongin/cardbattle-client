@@ -595,7 +595,6 @@ export default class CardBattleMemory implements CardBattle {
 
     #drawPlayerCards(): void {
         const powerCards = this.#playerDeck.filter(card => card.type === POWER).slice(0, 3);
-        console.log(powerCards.length);
         const battleCards = this.#playerDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
         this.#setPlayerHand(drawnCards);
@@ -607,7 +606,6 @@ export default class CardBattleMemory implements CardBattle {
 
     #drawOpponentCards(): void {
         const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 3);
-        console.log(powerCards.length);
         const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
         this.#setOpponentHand(drawnCards);
