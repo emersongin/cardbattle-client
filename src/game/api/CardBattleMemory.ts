@@ -623,7 +623,10 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #drawPlayerCards(): void {
-        this.#setPlayerHand(this.#playerDeck.splice(0, 6));
+        const powerCards = this.#playerDeck.filter(card => card.type === POWER).slice(0, 3);
+        const battleCards = this.#playerDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
+        const drawnCards = [...powerCards, ...battleCards];
+        this.#setPlayerHand(drawnCards);
     }
 
     #shuffleOpponentDeck(): void {
@@ -631,7 +634,10 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #drawOpponentCards(): void {
-        this.#setOpponentHand(this.#opponentDeck.splice(0, 6));
+        const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 3);
+        const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
+        const drawnCards = [...powerCards, ...battleCards];
+        this.#setOpponentHand(drawnCards);
     }
 
     listenOpponentDrawCards(playerId: string, callback: (isDrawCards: boolean) => void): Promise<void> {
