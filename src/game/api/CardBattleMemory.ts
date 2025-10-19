@@ -996,7 +996,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getPowerActions(playerId: string): Promise<PowerActionData[]> {
+    getPowerActions(): Promise<PowerActionData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 const powerActions = this.#powerActions;
