@@ -16,6 +16,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
         const powerActions = await this.cardBattle.getPowerActions();
+        console.log(powerActions);
         const actions: Promise<boolean>[] = [];
         powerActions.forEach((powerAction) => {
             const powerCardId = powerAction.powerCard.id;

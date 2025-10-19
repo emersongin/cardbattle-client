@@ -212,6 +212,7 @@ export default class CardBattleMemory implements CardBattle {
     #whoPlayMiniGame: string = '';
     #firstPlayer: string = '';
     #powerActions: PowerActionData[] = [];
+    #powerActionsProcessed: PowerActionData[] = [];
     // player is the room creator
     #playerId: string = '';
     #playerStep: string = 'NONE';
@@ -596,6 +597,7 @@ export default class CardBattleMemory implements CardBattle {
         const powerCards = this.#playerDeck.filter(card => card.type === POWER).slice(0, 3);
         const battleCards = this.#playerDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
+        this.#playerDeck = this.#playerDeck.filter(card => !drawnCards.includes(card));
         this.#setPlayerHand(drawnCards);
     }
 
@@ -607,6 +609,7 @@ export default class CardBattleMemory implements CardBattle {
         const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 3);
         const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
+        this.#opponentDeck = this.#opponentDeck.filter(card => !drawnCards.includes(card));
         this.#setOpponentHand(drawnCards);
     }
 
@@ -797,13 +800,16 @@ export default class CardBattleMemory implements CardBattle {
 
     pass(playerId: string): Promise<void> {
         return new Promise((resolve) => {
-            setTimeout(() => {
+            setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
                     this.#setPlayerStep(PASS);
                 };
                 if (this.#isOpponent(playerId)) {
                     this.#setOpponentStep(PASS);
                 };
+                if (await this.allPass()) {
+                    this.#processPowerCardPlays();
+                }
                 resolve();
             }, delayMock);
         });
@@ -879,7 +885,6 @@ export default class CardBattleMemory implements CardBattle {
                 this.#powerActions.push(powerAction);
                 if (this.#isPlayer(playerId)) {
                     await this.#removePowerCardInHandById(this.#playerId, powerCardId);
-
                     this.#setPlayerStep(PASS);
                     if (!await this.isPowerfieldLimitReached()) {
                         this.#setOpponentStep(IN_PLAY);
@@ -892,9 +897,28 @@ export default class CardBattleMemory implements CardBattle {
                         this.#setPlayerStep(IN_PLAY);
                     }
                 };
+                if (await this.allPass()) {
+                    this.#processPowerCardPlays();
+                }
                 resolve();
             }, delayMock);
         });
+    }
+
+    #processPowerCardPlays(): void {
+        const powerActions = this.#powerActions;
+        powerActions.forEach(pa => {
+            if (this.#isPlayer(pa.playerId)) {
+                this.#playerTrash.push(pa.powerCard);
+                this.#playerBoard[TRASH] = this.#playerTrash.length;
+            };
+            if (this.#isOpponent(pa.playerId)) {
+                this.#opponentTrash.push(pa.powerCard);
+                this.#opponentBoard[TRASH] = this.#opponentTrash.length;
+            };
+        });
+        this.#powerActionsProcessed = ArrayUtil.clone(this.#powerActions);
+        this.#powerActions = [];
     }
 
     #removePowerCardInHandById(playerId: string, powerCardId: string): Promise<void> {
@@ -920,7 +944,7 @@ export default class CardBattleMemory implements CardBattle {
     hasPowerCardsInField(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#powerActions.length > 0);
+                resolve(this.#powerActionsProcessed.length > 0);
             }, delayMock);
         });
     }
@@ -998,10 +1022,7 @@ export default class CardBattleMemory implements CardBattle {
 
     getPowerActions(): Promise<PowerActionData[]> {
         return new Promise((resolve) => {
-            setTimeout(() => {
-                const powerActions = this.#powerActions;
-                resolve(powerActions);
-            }, delayMock);
+            setTimeout(() => resolve(this.#powerActionsProcessed), delayMock);
         });
     }
 
@@ -1047,24 +1068,6 @@ export default class CardBattleMemory implements CardBattle {
     //             this.#removePowerCardSincronized();
     //             resolve();
     //         }, delayMock);
-    //     });
-    // }
-
-    // #removePowerCardSincronized(): void {
-    //     this.#powerActions = this.#powerActions.filter(update => {
-    //         if (update.playerSincronized && update.opponentSincronized) {
-    //             if (this.#isPlayer(update.playerId)) {
-    //                 // this.#playerTrash.push(update.powerAction.powerCard);
-    //                 this.#playerBoard[TRASH] = this.#playerTrash.length;
-    //                 return;
-    //             };
-    //             if (this.#isOpponent(update.playerId)) {
-    //                 // this.#opponentTrash.push(update.powerAction.powerCard);
-    //                 this.#opponentBoard[TRASH] = this.#opponentTrash.length;
-    //                 return;
-    //             };
-    //         }
-    //         return !update.playerSincronized || !update.opponentSincronized;
     //     });
     // }
 

@@ -218,15 +218,23 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #nextPlay(): Promise<void> {
-        if (await this.cardBattle.isPowerfieldLimitReached()) {
+        // if (await this.cardBattle.isPowerfieldLimitReached()) {
+        //     this.changeToTriggerPhase();
+        //     return;
+        // }
+        // if (await this.cardBattle.allPass()) {
+        //     if (await this.cardBattle.hasPowerCardsInField()) {
+        //         this.changeToTriggerPhase();
+        //         return;
+        //     }
+        //     super.closeGameBoard({ onComplete: () => this.changeTo() });
+        //     return;
+        // }
+        if (await this.cardBattle.hasPowerCardsInField()) {
             this.changeToTriggerPhase();
             return;
         }
         if (await this.cardBattle.allPass()) {
-            if (await this.cardBattle.hasPowerCardsInField()) {
-                this.changeToTriggerPhase();
-                return;
-            }
             super.closeGameBoard({ onComplete: () => this.changeTo() });
             return;
         }

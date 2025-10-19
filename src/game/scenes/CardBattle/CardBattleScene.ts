@@ -47,36 +47,36 @@ export class CardBattleScene extends VueScene {
         // nothing to do here
         
         // COMPILE PHASE
-        const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
-        const playerBoard = await this.getCardBattle().getBoard(playerId);
-        const playerCardIds = playerCards.filter(card => {
-            const cardColor = card.getColor() as CardColorType;
-            const cardType = card.getType();
-            if (cardType === POWER) return false;
-            if (cardColor === ORANGE) return true;
-            const colorPoints = playerBoard.getAllData()[cardColor];
-            if (colorPoints < card.staticData.cost) return false;
-            playerBoard.getAllData()[cardColor] = colorPoints - card.staticData.cost;
-            return true;
-        }).map(card => card.staticData.id);
-        await this.getCardBattle().setBattleCards(playerId, playerCardIds);
-        const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
-        const opponentBoard = await this.getCardBattle().getBoard(opponentId);
-        const opponentCardIds = opponentCards.filter(card => {
-            const cardColor = card.getColor() as CardColorType;
-            const cardType = card.getType();
-            if (cardType === POWER) return false;
-            if (cardColor === ORANGE) return true;
-            const colorPoints = opponentBoard.getAllData()[cardColor];
-            if (colorPoints < card.staticData.cost) return false;
-            opponentBoard.getAllData()[cardColor] = colorPoints - card.staticData.cost;
-            return true;
-        }).map(card => card.staticData.id);
-        await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
+        // const playerCards = await this.getCardBattle().getCardsFromHand(playerId);
+        // const playerBoard = await this.getCardBattle().getBoard(playerId);
+        // const playerCardIds = playerCards.filter(card => {
+        //     const cardColor = card.getColor() as CardColorType;
+        //     const cardType = card.getType();
+        //     if (cardType === POWER) return false;
+        //     if (cardColor === ORANGE) return true;
+        //     const colorPoints = playerBoard.getAllData()[cardColor];
+        //     if (colorPoints < card.staticData.cost) return false;
+        //     playerBoard.getAllData()[cardColor] = colorPoints - card.staticData.cost;
+        //     return true;
+        // }).map(card => card.staticData.id);
+        // await this.getCardBattle().setBattleCards(playerId, playerCardIds);
+        // const opponentCards = await this.getCardBattle().getCardsFromHand(opponentId);
+        // const opponentBoard = await this.getCardBattle().getBoard(opponentId);
+        // const opponentCardIds = opponentCards.filter(card => {
+        //     const cardColor = card.getColor() as CardColorType;
+        //     const cardType = card.getType();
+        //     if (cardType === POWER) return false;
+        //     if (cardColor === ORANGE) return true;
+        //     const colorPoints = opponentBoard.getAllData()[cardColor];
+        //     if (colorPoints < card.staticData.cost) return false;
+        //     opponentBoard.getAllData()[cardColor] = colorPoints - card.staticData.cost;
+        //     return true;
+        // }).map(card => card.staticData.id);
+        // await this.getCardBattle().setBattleCards(opponentId, opponentCardIds);
 
         // BATTLE PHASE
 
-        this.changePhase(new BattlePhase(this));
+        this.changePhase(new LoadPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {
