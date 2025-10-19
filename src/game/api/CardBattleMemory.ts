@@ -1026,6 +1026,15 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
+    removePowerActions(): Promise<void> {
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                this.#powerActionsProcessed = [];
+                resolve();
+            }, delayMock);
+        });
+    }
+
     // listenNextPowerCard(playerId: string, callback: (powerAction: PowerActionData, belongToPlayer: boolean) => void): Promise<void> {
     //     return new Promise((resolve) => {
     //         setTimeout(() => {
