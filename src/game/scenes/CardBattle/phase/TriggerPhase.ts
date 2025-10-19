@@ -1,5 +1,4 @@
 import { TRASH } from "@constants/keys";
-import { PowerActionData } from "@objects/PowerActionData";
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattleScene } from '@scenes/CardBattle/CardBattleScene';
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
@@ -16,73 +15,104 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     }
 
     async create(): Promise<void> {
-        this.#loadPowerCardUpdates();
-    }
-
-    async #loadPowerCardUpdates(): Promise<void> {
-        await this.cardBattle.listenNextPowerCard(
-            this.scene.room.playerId,
-            (powerAction: PowerActionData, belongToPlayer: boolean) => {
-                const powerCardId = powerAction.powerCard.id;
-                const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
+        const powerActions = await this.cardBattle.getPowerActions(this.scene.room.playerId);
+        const actions: Promise<boolean>[] = [];
+        powerActions.forEach((powerAction) => {
+            const powerCardId = powerAction.powerCard.id;
+            const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
+            const action = new Promise<boolean>(res => {
                 CardActionsBuilder.create(powerCard)
-                    .expand()
-                    .flash()
-                    .shrink()
-                    .play({
-                        onComplete: () => {
-                            CardActionsBuilder
-                                .create(powerCard)
-                                .shrink({ onComplete: async () => {
-                                    await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
+                .expand()
+                .flash()
+                .shrink()
+                .play({
+                    onComplete: () => {
+                        CardActionsBuilder
+                            .create(powerCard)
+                            .shrink({ 
+                                onComplete: async () => {
                                     this.originPhase.removeCardFromPowerCardsetById(powerCardId);
-                                    if (belongToPlayer) {
+                                    if (powerAction.playerId === this.scene.room.playerId) {
                                         this.originPhase.addBoardZonePoints(TRASH, 1);
                                     } else {
                                         this.originPhase.addOpponentBoardZonePoints(TRASH, 1);
                                     }
-                                    this.#next();
-                                }})
-                                .play();
-                        }
-                    });
-            }
-        );
-    }
-
-    async #next(): Promise<void> {
-        if (await this.cardBattle.hasPowerCardUpdates(this.scene.room.playerId)) {
-            this.#loadPowerCardUpdates();
-            return;
-        }
-        if (await this.cardBattle.hasPowerCardsInField()) {
-            this.#createOpponentPowerActionUpdatesWaitingWindow();
-            this.originPhase.openAllWindows({
-                onComplete: async () => {
-                    await this.cardBattle.listenOpponentPowerActionUpdates(
-                        this.scene.room.playerId,
-                        (isEnd: boolean) => {
-                            if (isEnd) {
-                                this.originPhase.closeAllWindows({ 
-                                    onComplete: async () => {
-                                        this.#end();
-                                    }
-                                });
-                            }
-                        }
-                    );
-                }
+                                    res(true);
+                                }
+                            })
+                            .play();
+                    }
+                });
             });
-            return;
-        }
-        this.#end();
+            actions.push(action);
+        });
+        Promise.all(actions).then(() => this.#finish());
     }
 
-    #createOpponentPowerActionUpdatesWaitingWindow(): void {
-        this.originPhase.createWaitingWindow('Waiting for opponent updates...');
-    }
+    // async #loadPowerCardUpdates(): Promise<void> {
+    //     await this.cardBattle.listenNextPowerCard(
+    //         this.scene.room.playerId,
+    //         (powerAction: PowerActionData, belongToPlayer: boolean) => {
+    //             const powerCardId = powerAction.powerCard.id;
+    //             const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
+    //             CardActionsBuilder.create(powerCard)
+    //                 .expand()
+    //                 .flash()
+    //                 .shrink()
+    //                 .play({
+    //                     onComplete: () => {
+    //                         CardActionsBuilder
+    //                             .create(powerCard)
+    //                             .shrink({ onComplete: async () => {
+    //                                 await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
+    //                                 this.originPhase.removeCardFromPowerCardsetById(powerCardId);
+    //                                 if (belongToPlayer) {
+    //                                     this.originPhase.addBoardZonePoints(TRASH, 1);
+    //                                 } else {
+    //                                     this.originPhase.addOpponentBoardZonePoints(TRASH, 1);
+    //                                 }
+    //                                 this.#next();
+    //                             }})
+    //                             .play();
+    //                     }
+    //                 });
+    //         }
+    //     );
+    // }
 
-    #end(): void {
+    // async #next(): Promise<void> {
+        // if (await this.cardBattle.hasPowerCardUpdates(this.scene.room.playerId)) {
+        //     this.#loadPowerCardUpdates();
+        //     return;
+        // }
+        // if (await this.cardBattle.hasPowerCardsInField()) {
+        //     this.#createOpponentPowerActionUpdatesWaitingWindow();
+        //     this.originPhase.openAllWindows({
+        //         onComplete: async () => {
+        //             await this.cardBattle.listenOpponentPowerActionUpdates(
+        //                 this.scene.room.playerId,
+        //                 (isEnd: boolean) => {
+        //                     if (isEnd) {
+        //                         this.originPhase.closeAllWindows({ 
+        //                             onComplete: async () => {
+        //                                 this.#end();
+        //                             }
+        //                         });
+        //                     }
+        //                 }
+        //             );
+        //         }
+        //     });
+        //     return;
+        // }
+        // this.#end();
+    // }
+
+    // #createOpponentPowerActionUpdatesWaitingWindow(): void {
+    //     this.originPhase.createWaitingWindow('Waiting for opponent updates...');
+    // }
+
+    #finish(): void {
         this.scene.changePhase(this.originPhase, true);
     }
 

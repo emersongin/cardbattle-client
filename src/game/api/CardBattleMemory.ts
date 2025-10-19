@@ -10,7 +10,6 @@ import { OpponentData } from "@objects/OpponentData";
 import { PowerActionData } from "@objects/PowerActionData";
 import { PowerCardPlayData } from "@objects/PowerCardPlayData";
 import { RoomData } from "@objects/RoomData";
-import { PowerActionUpdatesData } from '@objects/PowerActionUpdatesData';
 import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
 import { MathUtil } from '@utils/MathUtil';
@@ -212,7 +211,7 @@ export default class CardBattleMemory implements CardBattle {
     #roomId: string = '';
     #whoPlayMiniGame: string = '';
     #firstPlayer: string = '';
-    #powerActionUpdates: PowerActionUpdatesData[] = [];
+    #powerActions: PowerActionData[] = [];
     // player is the room creator
     #playerId: string = '';
     #playerStep: string = 'NONE';
@@ -829,8 +828,8 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
-                    const powerUpdates = this.#powerActionUpdates.find(updates => {
-                        const { powerCard } = updates.powerAction;
+                    const powerAction = this.#powerActions.find(powerAction => {
+                        const { powerCard } = powerAction;
                         if (
                             this.#opponentId !== playerId
                             && powerCard.id === cardId 
@@ -839,13 +838,13 @@ export default class CardBattleMemory implements CardBattle {
                             return true;
                         }
                         return false;
-                    }) as PowerActionUpdatesData;
-                    const { powerCard } = powerUpdates.powerAction;
+                    }) as PowerActionData;
+                    const { powerCard } = powerAction;
                     resolve(this.#createCardByType(powerCard) as PowerCard);
                 };
                 if (this.#isOpponent(playerId)) {
-                    const powerUpdates = this.#powerActionUpdates.find(updates => {
-                        const { powerCard } = updates.powerAction;
+                    const powerAction = this.#powerActions.find(powerAction => {
+                        const { powerCard } = powerAction;
                         if (
                             this.#playerId !== playerId
                             && powerCard.id === cardId 
@@ -854,8 +853,8 @@ export default class CardBattleMemory implements CardBattle {
                             return true;
                         }
                         return false;
-                    }) as PowerActionUpdatesData;
-                    const { powerCard } = powerUpdates.powerAction;
+                    }) as PowerActionData;
+                    const { powerCard } = powerAction;
                     resolve(this.#createCardByType(powerCard) as PowerCard);
                 };
             }, delayMock);
@@ -865,7 +864,7 @@ export default class CardBattleMemory implements CardBattle {
     getFieldPowerCards(): Promise<PowerCard[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const powerCardsData = this.#powerActionUpdates.map((update) => update.powerAction.powerCard);
+                const powerCardsData = this.#powerActions.map(pa => pa.powerCard);
                 const powerCards = powerCardsData.map(card => this.#createCardByType(card) as PowerCard);
                 powerCards.forEach(card => this.#enableCard(card));
                 resolve(powerCards);
@@ -877,12 +876,7 @@ export default class CardBattleMemory implements CardBattle {
         return new Promise((resolve) => {
             setTimeout(async () => {
                 const powerCardId = powerAction.powerCard.id;
-                this.#powerActionUpdates.push({
-                    playerId,
-                    powerAction,
-                    playerSincronized: false,
-                    opponentSincronized: false,
-                });
+                this.#powerActions.push(powerAction);
                 if (this.#isPlayer(playerId)) {
                     await this.#removePowerCardInHandById(this.#playerId, powerCardId);
 
@@ -918,7 +912,7 @@ export default class CardBattleMemory implements CardBattle {
     isPowerfieldLimitReached(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#powerActionUpdates.length >= 3);
+                resolve(this.#powerActions.length >= 3);
             }, delayMock);
         });
     }
@@ -926,7 +920,7 @@ export default class CardBattleMemory implements CardBattle {
     hasPowerCardsInField(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                resolve(this.#powerActionUpdates.length > 0);
+                resolve(this.#powerActions.length > 0);
             }, delayMock);
         });
     }
@@ -1002,108 +996,117 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenNextPowerCard(playerId: string, callback: (powerAction: PowerActionData, belongToPlayer: boolean) => void): Promise<void> {
+    getPowerActions(playerId: string): Promise<PowerActionData[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const powerUpdates = this.#powerActionUpdates.filter(update => !update.playerSincronized);
-                    if (powerUpdates.length > 0) {
-                        const lastPowerUpdates = powerUpdates.pop();
-                        if (lastPowerUpdates) {
-                            callback(lastPowerUpdates.powerAction, this.#isPlayer(lastPowerUpdates.playerId));
-                        }
-                    }
-                };
-                if (this.#isOpponent(playerId)) {
-                    const powerUpdates = this.#powerActionUpdates.filter(update => !update.opponentSincronized);
-                    if (powerUpdates.length > 0) {
-                        const lastPowerUpdates = powerUpdates.pop();
-                        if (lastPowerUpdates) {
-                            callback(lastPowerUpdates.powerAction, this.#isOpponent(lastPowerUpdates.playerId));
-                        }
-                    }
-                };
-                resolve();
+                const powerActions = this.#powerActions;
+                resolve(powerActions);
             }, delayMock);
         });
     }
 
-    setPowerActionCompleted(playerId: string, powerCardId: string): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.id === powerCardId);
-                    if (update) update.playerSincronized = true;
-                    // mock
-                    if (update) update.opponentSincronized = true;
-                };
-                if (this.#isOpponent(playerId)) {
-                    const update = this.#powerActionUpdates.find(update => update.powerAction.powerCard.id === powerCardId);
-                    if (update) update.opponentSincronized = true;
-                };
-                this.#removePowerCardSincronized();
-                resolve();
-            }, delayMock);
-        });
-    }
+    // listenNextPowerCard(playerId: string, callback: (powerAction: PowerActionData, belongToPlayer: boolean) => void): Promise<void> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 const powerUpdates = this.#powerActions.filter(update => !update.playerSincronized);
+    //                 if (powerUpdates.length > 0) {
+    //                     const lastPowerUpdates = powerUpdates.pop();
+    //                     if (lastPowerUpdates) {
+    //                         callback(lastPowerUpdates.powerAction, this.#isPlayer(lastPowerUpdates.playerId));
+    //                     }
+    //                 }
+    //             };
+    //             if (this.#isOpponent(playerId)) {
+    //                 const powerUpdates = this.#powerActions.filter(update => !update.opponentSincronized);
+    //                 if (powerUpdates.length > 0) {
+    //                     const lastPowerUpdates = powerUpdates.pop();
+    //                     if (lastPowerUpdates) {
+    //                         callback(lastPowerUpdates.powerAction, this.#isOpponent(lastPowerUpdates.playerId));
+    //                     }
+    //                 }
+    //             };
+    //             resolve();
+    //         }, delayMock);
+    //     });
+    // }
 
-    #removePowerCardSincronized(): void {
-        this.#powerActionUpdates = this.#powerActionUpdates.filter(update => {
-            if (update.playerSincronized && update.opponentSincronized) {
-                if (this.#isPlayer(update.playerId)) {
-                    // this.#playerTrash.push(update.powerAction.powerCard);
-                    this.#playerBoard[TRASH] = this.#playerTrash.length;
-                    return;
-                };
-                if (this.#isOpponent(update.playerId)) {
-                    // this.#opponentTrash.push(update.powerAction.powerCard);
-                    this.#opponentBoard[TRASH] = this.#opponentTrash.length;
-                    return;
-                };
-            }
-            return !update.playerSincronized || !update.opponentSincronized;
-        });
-    }
+    // setPowerActionCompleted(playerId: string, powerCardId: string): Promise<void> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 const update = this.#powerActions.find(update => update.powerAction.powerCard.id === powerCardId);
+    //                 if (update) update.playerSincronized = true;
+    //                 // mock
+    //                 if (update) update.opponentSincronized = true;
+    //             };
+    //             if (this.#isOpponent(playerId)) {
+    //                 const update = this.#powerActions.find(update => update.powerAction.powerCard.id === powerCardId);
+    //                 if (update) update.opponentSincronized = true;
+    //             };
+    //             this.#removePowerCardSincronized();
+    //             resolve();
+    //         }, delayMock);
+    //     });
+    // }
 
-    hasPowerCardUpdates(playerId: string): Promise<boolean> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const hasUpdates = this.#powerActionUpdates.some(update => update.playerSincronized === false);
-                    if (!hasUpdates) {
-                        this.#setPlayerStep(WAITING_TO_PLAY);
-                        // mock
-                        this.#setOpponentStep(WAITING_TO_PLAY);
-                        // mock
-                    }
-                    resolve(hasUpdates);
-                };
-                if (this.#isOpponent(playerId)) {
-                    const hasUpdates = this.#powerActionUpdates.some(update => update.opponentSincronized === false);
-                    if (!hasUpdates) {
-                        this.#setOpponentStep(WAITING_TO_PLAY);
-                    }
-                    resolve(hasUpdates);
-                };
-            }, delayMock);
-        });
-    }
+    // #removePowerCardSincronized(): void {
+    //     this.#powerActions = this.#powerActions.filter(update => {
+    //         if (update.playerSincronized && update.opponentSincronized) {
+    //             if (this.#isPlayer(update.playerId)) {
+    //                 // this.#playerTrash.push(update.powerAction.powerCard);
+    //                 this.#playerBoard[TRASH] = this.#playerTrash.length;
+    //                 return;
+    //             };
+    //             if (this.#isOpponent(update.playerId)) {
+    //                 // this.#opponentTrash.push(update.powerAction.powerCard);
+    //                 this.#opponentBoard[TRASH] = this.#opponentTrash.length;
+    //                 return;
+    //             };
+    //         }
+    //         return !update.playerSincronized || !update.opponentSincronized;
+    //     });
+    // }
 
-    listenOpponentPowerActionUpdates(playerId: string, callback: (isEnd: boolean) => void): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                if (this.#isPlayer(playerId)) {
-                    const powerCards = this.#powerActionUpdates.filter(update => update.opponentSincronized === false);
-                    callback(powerCards.length === 0);
-                };
-                if (this.#isOpponent(playerId)) {
-                    const powerCards = this.#powerActionUpdates.filter(update => update.playerSincronized === false);
-                    callback(powerCards.length === 0);
-                };
-                resolve();
-            }, delayMock);
-        });
-    }
+    // hasPowerCardUpdates(playerId: string): Promise<boolean> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 const hasUpdates = this.#powerActions.some(update => update.playerSincronized === false);
+    //                 if (!hasUpdates) {
+    //                     this.#setPlayerStep(WAITING_TO_PLAY);
+    //                     // mock
+    //                     this.#setOpponentStep(WAITING_TO_PLAY);
+    //                     // mock
+    //                 }
+    //                 resolve(hasUpdates);
+    //             };
+    //             if (this.#isOpponent(playerId)) {
+    //                 const hasUpdates = this.#powerActions.some(update => update.opponentSincronized === false);
+    //                 if (!hasUpdates) {
+    //                     this.#setOpponentStep(WAITING_TO_PLAY);
+    //                 }
+    //                 resolve(hasUpdates);
+    //             };
+    //         }, delayMock);
+    //     });
+    // }
+
+    // listenOpponentPowerActionUpdates(playerId: string, callback: (isEnd: boolean) => void): Promise<void> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(() => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 const powerCards = this.#powerActions.filter(update => update.opponentSincronized === false);
+    //                 callback(powerCards.length === 0);
+    //             };
+    //             if (this.#isOpponent(playerId)) {
+    //                 const powerCards = this.#powerActions.filter(update => update.playerSincronized === false);
+    //                 callback(powerCards.length === 0);
+    //             };
+    //             resolve();
+    //         }, delayMock);
+    //     });
+    // }
 
     #hasEnoughPointsByColorAndCost(cardColor: CardColorType, cardCost: number, boardWindowData: BoardWindowData): boolean {
         if (cardColor === ORANGE) return true;

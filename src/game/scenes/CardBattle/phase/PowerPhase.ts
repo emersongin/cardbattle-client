@@ -170,6 +170,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         await super.closeAllWindows();
         // make power card play and remove hand point
         const powerAction = {
+            playerId: this.scene.room.playerId,
             powerCard: powerCard.staticData,
             config: powerCardConfig 
         };
