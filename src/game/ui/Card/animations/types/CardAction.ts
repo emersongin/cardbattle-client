@@ -4,7 +4,7 @@ import { ScaleConfig } from "@ui/Card/animations/types/ScaleConfig";
 import { MoveConfig } from "@ui/Card/animations/types/MoveConfig";
 import { UpdateConfig } from "@ui/Card/animations/types/UpdateConfig";
 import { EXPAND_ANIMATION, FACE_UP_ANIMATION, FLASH_ANIMATION, 
-    POSITION_ANIMATION, SCALE_ANIMATION, SHRINK_ANIMATION, UPDATE_ANIMATION } from "@game/constants/keys";
+    MOVE_ANIMATION, SCALE_ANIMATION, SHRINK_ANIMATION, UPDATE_ANIMATION } from "@game/constants/keys";
 import { FlashAnimation } from "../FlashAnimation";
 import { ExpandAnimation } from "../ExpandAnimation";
 import { ShrinkAnimation } from "../ShrinkAnimation";
@@ -28,7 +28,7 @@ export type CardActionName =
     typeof UPDATE_ANIMATION | 
     typeof EXPAND_ANIMATION | 
     typeof SCALE_ANIMATION | 
-    typeof POSITION_ANIMATION | 
+    typeof MOVE_ANIMATION | 
     typeof SHRINK_ANIMATION |
     typeof FACE_UP_ANIMATION;
 

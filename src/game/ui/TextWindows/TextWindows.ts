@@ -1,6 +1,6 @@
 import { VueScene } from "@game/scenes/VueScene";
-import { TextWindow } from "./TextWindow";
-import { TextWindowConfig } from "./TextWindowConfig";
+import { TextWindow } from "@ui/TextWindows/TextWindow";
+import { TextWindowConfig } from "@ui/TextWindows/TextWindowConfig";
 import { TweenConfig } from "@game/types/TweenConfig";
 
 export class TextWindows {

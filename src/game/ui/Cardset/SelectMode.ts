@@ -1,7 +1,7 @@
 import { Card } from "@ui/Card/Card";
 import { Cardset } from "@ui/Cardset/Cardset";
 import { CardsetEvents } from "@ui/Cardset/CardsetEvents";
-import { BattleCard } from "../Card/BattleCard";
+import { BattleCard } from "@ui/Card/BattleCard";
 
 export class SelectMode {
     #events: CardsetEvents;

@@ -2,7 +2,7 @@ import { Label, Sizer } from "phaser3-rex-plugins/templates/ui/ui-components";
 import { BLACK, BLUE, GREEN, RED, WHITE } from "@constants/colors";
 import { AP, DECK, HAND, HP, PASS, REVERSE, TRASH, WINS } from "@constants/keys";
 import { BoardWindowData } from "@objects/BoardWindowData";
-import { DisplayUtil } from "../../utils/DisplayUtil";
+import { DisplayUtil } from "@utils/DisplayUtil";
 import { BoardZonesType } from "@game/types/BoardZonesType";
 import { CardColorType } from "@game/types/CardColorType";
 import { TweenConfig } from "@game/types/TweenConfig";
