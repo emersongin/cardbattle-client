@@ -10,8 +10,10 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     async create(goToPlays: boolean = false): Promise<void> {
         if (goToPlays) {
+            // await super.createGameBoard();
             super.removeBoardPass();
             super.removeOpponentBoardPass();
+            // await super.openGameBoard();
             this.resumePhase();
             return;
         }
@@ -217,18 +219,6 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #nextPlay(): Promise<void> {
-        // if (await this.cardBattle.isPowerfieldLimitReached()) {
-        //     this.changeToTriggerPhase();
-        //     return;
-        // }
-        // if (await this.cardBattle.allPass()) {
-        //     if (await this.cardBattle.hasPowerCardsInField()) {
-        //         this.changeToTriggerPhase();
-        //         return;
-        //     }
-        //     super.closeGameBoard({ onComplete: () => this.changeTo() });
-        //     return;
-        // }
         if (await this.cardBattle.hasPowerCardsInField()) {
             this.changeToTriggerPhase();
             return;

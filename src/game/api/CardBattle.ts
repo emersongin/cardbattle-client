@@ -34,7 +34,6 @@ export interface CardBattle {
     setPlaying: (playerId: string) => Promise<void>;
     pass(playerId: string): Promise<void>;
     getPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
-    // getOpponentPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
     getFieldPowerCards: () => Promise<PowerCard[]>;
     makePowerCardPlay: (playerId: string, powerAction: PowerActionData) => Promise<void>;
     isPowerfieldLimitReached: () => Promise<boolean>;
@@ -45,11 +44,6 @@ export interface CardBattle {
     hasPowerCardInHand: (playerId: string) => Promise<boolean>;
     
     getPowerActions: () => Promise<PowerAction[]>;
-
-    // setPowerActionCompleted: (playerId: string, powerCardId: string) => Promise<void>;
-    // listenNextPowerCard: (playerId: string, callback: (powerAction: PowerActionData, belongToPlayer: boolean) => void) => Promise<void>;
-    // hasPowerCardUpdates: (playerId: string) => Promise<boolean>;
-    // listenOpponentPowerActionUpdates: (playerId: string, callback: (isEnd: boolean) => void) => Promise<void>;
     
     setBattleCards: (playerId: string, cardIds: string[]) => Promise<void>;
     isOpponentBattleCardsSet: (playerId: string) => Promise<boolean>;
