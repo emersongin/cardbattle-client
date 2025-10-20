@@ -1,6 +1,6 @@
 import { OpponentData } from "@objects/OpponentData";
 import { PowerActionData } from "@objects/PowerActionData";
-import { PowerCardPlayData } from "@objects/PowerCardPlayData";
+import { PowerCardPlay } from "@/game/objects/PowerCardPlay";
 import { RoomData } from "@objects/RoomData";
 import { BattlePoints } from "@objects/BattlePoints";
 import { Card } from "../ui/Card/Card";
@@ -8,6 +8,7 @@ import { PowerCard } from "../ui/Card/PowerCard";
 import { BattleCard } from "../ui/Card/BattleCard";
 import { CommandOption } from "../ui/CommandWindow/CommandOption";
 import { BoardWindow } from "../ui/BoardWindow/BoardWindow";
+import { PowerAction } from "../objects/PowerAction";
 
 export interface CardBattle {
     createRoom: () => Promise<RoomData>;
@@ -33,17 +34,17 @@ export interface CardBattle {
     setPlaying: (playerId: string) => Promise<void>;
     pass(playerId: string): Promise<void>;
     getPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
-    getOpponentPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
+    // getOpponentPowerCardById: (playerId: string, cardId: string) => Promise<PowerCard>;
     getFieldPowerCards: () => Promise<PowerCard[]>;
     makePowerCardPlay: (playerId: string, powerAction: PowerActionData) => Promise<void>;
     isPowerfieldLimitReached: () => Promise<boolean>;
     hasPowerCardsInField: () => Promise<boolean>;
     allPass: () => Promise<boolean>;
     isOpponentPassed: (playerId: string) => Promise<boolean>;
-    listenOpponentPlay: (playerId: string, callback: (play: PowerCardPlayData) => void) => Promise<void>;
+    listenOpponentPlay: (playerId: string, callback: (play: PowerCardPlay) => void) => Promise<void>;
     hasPowerCardInHand: (playerId: string) => Promise<boolean>;
     
-    getPowerActions: () => Promise<PowerActionData[]>;
+    getPowerActions: () => Promise<PowerAction[]>;
     removePowerActions: () => Promise<void>;
 
     // setPowerActionCompleted: (playerId: string, powerCardId: string) => Promise<void>;

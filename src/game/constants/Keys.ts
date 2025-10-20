@@ -22,6 +22,7 @@ export const WAITING_TO_PLAY = 'WAITING_TO_PLAY';
 export const PASS = 'PASS';
 export const REVERSE = 'REVERSE';
 export const IN_PLAY = 'IN_PLAY';
+export const PROCESS_POWER_CARDS = 'PROCESS_POWER_CARDS';
 export const BATTLE_CARDS_SET = 'BATTLE_CARDS_SET';
 export const ADD_COLOR_POINTS = 'ADD_COLOR_POINTS';
 export const REMOVE_COLOR_POINTS = 'REMOVE_COLOR_POINTS';

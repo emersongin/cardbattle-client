@@ -1,7 +1,7 @@
 import { ADD_COLOR_POINTS, HAND, REMOVE_COLOR_POINTS } from "@constants/keys";
 import { CARD_WIDTH } from "@constants/default";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
-import { PowerCardPlayData } from "@game/objects/PowerCardPlayData";
+import { PowerCardPlay } from "@/game/objects/PowerCardPlay";
 import { Card } from "@game/ui/Card/Card";
 import { TriggerPhase } from "./TriggerPhase";
 import { PowerCard } from "@game/ui/Card/PowerCard";
@@ -177,7 +177,6 @@ export abstract class PowerPhase extends CardBattlePhase {
         await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
         super.removeBoardZonePoints(HAND, 1);
         // set board pass
-        await this.cardBattle.pass(this.scene.room.playerId);
         super.setBoardPass();
         // reset opponent board pass if limit not reached
         if (!await this.cardBattle.isPowerfieldLimitReached()) super.removeOpponentBoardPass();
@@ -230,13 +229,12 @@ export abstract class PowerPhase extends CardBattlePhase {
         //     super.closeGameBoard({ onComplete: () => this.changeTo() });
         //     return;
         // }
-        console.log(await this.cardBattle.allPass(), await this.cardBattle.hasPowerCardsInField());
-        if (await this.cardBattle.allPass() && await this.cardBattle.hasPowerCardsInField()) {
+        console.log(await this.cardBattle.hasPowerCardsInField());
+        if (await this.cardBattle.hasPowerCardsInField()) {
             this.changeToTriggerPhase();
             return;
-        } else {
-            await this.cardBattle.removePowerActions();
         }
+        console.log(await this.cardBattle.allPass());
         if (await this.cardBattle.allPass()) {
             super.closeGameBoard({ onComplete: () => this.changeTo() });
             return;
@@ -260,7 +258,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             onComplete: () => {
                 this.cardBattle.listenOpponentPlay(
                     this.scene.room.playerId, 
-                    async (opponentPlay: PowerCardPlayData) => {
+                    async (opponentPlay: PowerCardPlay) => {
                         await super.closeAllWindows();
                         this.#onOpponentPlay(opponentPlay);
                     }
@@ -269,7 +267,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         });
     }
 
-    async #onOpponentPlay(opponentPlay: PowerCardPlayData): Promise<void> {
+    async #onOpponentPlay(opponentPlay: PowerCardPlay): Promise<void> {
         const { pass, powerAction } = opponentPlay;
         super.addOpponentBoardPass();
         if (pass) {
@@ -279,13 +277,14 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (await this.cardBattle.isPowerfieldLimitReached() === false) {
             await this.#resetPlay();
         }
-        if (powerAction?.powerCard?.id) {
+        if (powerAction?.powerCard?.getId()) {
             const opponentPlayFunction = async () => {
                 await super.closeAllWindows();
                 super.removeOpponentBoardZonePoints(HAND, 1);
                 this.#loadPlayAndMovePowerCardToField();
             };
-            const powerCard = await this.cardBattle.getOpponentPowerCardById(this.scene.room.playerId, powerAction.powerCard.id);
+            // const powerCard = await this.cardBattle.getOpponentPowerCardById(this.scene.room.playerId, powerAction.powerCard.id);
+            const powerCard = powerAction.powerCard;
             this.#playPowerCard(powerCard, opponentPlayFunction);
         }
     }

@@ -1,14 +1,14 @@
 import { v4 as uuidv4 } from 'uuid';
 import { CardBattle } from '@api/CardBattle';
 import { ADD_COLOR_POINTS, AP, BATTLE, BATTLE_CARDS_SET, DECK, DRAW_CARDS, END_MINI_GAME, 
-    HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
+    HAND, HP, IN_LOBBY, IN_PLAY, PASS, POWER, PROCESS_POWER_CARDS, SET_DECK, TRASH, WAITING_TO_PLAY, WINS } from '@constants/keys';
 import { BLACK, BLUE, GREEN, ORANGE, RED, WHITE } from '@constants/colors';
 import { BoardWindowData } from "@objects/BoardWindowData";
 import { CardData } from "@objects/CardData";
 import { CardsFolderData } from "@objects/CardsFolderData";
 import { OpponentData } from "@objects/OpponentData";
 import { PowerActionData } from "@objects/PowerActionData";
-import { PowerCardPlayData } from "@objects/PowerCardPlayData";
+import { PowerCardPlay } from "@/game/objects/PowerCardPlay";
 import { RoomData } from "@objects/RoomData";
 import { CardType } from '@game/types/CardType';
 import { ArrayUtil } from '@utils/ArrayUtil';
@@ -22,6 +22,7 @@ import { CommandOption } from '../ui/CommandWindow/CommandOption';
 import { BoardWindow } from '../ui/BoardWindow/BoardWindow';
 import { BattlePoints } from '../objects/BattlePoints';
 import { CardFactory } from '../ui/Card/CardFactory';
+import { PowerAction } from '../objects/PowerAction';
 
 const delayMock = 100;
 
@@ -801,13 +802,16 @@ export default class CardBattleMemory implements CardBattle {
     pass(playerId: string): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
+                if (this.#isPlayerStep(IN_PLAY) && this.#isOpponentStep(PROCESS_POWER_CARDS)) {
+                    this.#powerActionsProcessed = [];
+                }
                 if (this.#isPlayer(playerId)) {
                     this.#setPlayerStep(PASS);
                 };
                 if (this.#isOpponent(playerId)) {
                     this.#setOpponentStep(PASS);
                 };
-                if (await this.allPass()) {
+                if (await this.allPass() && this.#powerActions.length > 0) {
                     this.#processPowerCardPlays();
                 }
                 resolve();
@@ -830,48 +834,52 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getOpponentPowerCardById(playerId: string, cardId: string): Promise<PowerCard> {
-        return new Promise((resolve) => {
-            setTimeout(async () => {
-                if (this.#isPlayer(playerId)) {
-                    const powerAction = this.#powerActions.find(powerAction => {
-                        const { powerCard } = powerAction;
-                        if (
-                            this.#opponentId !== playerId
-                            && powerCard.id === cardId 
-                            && powerCard.type === POWER
-                        ) {
-                            return true;
-                        }
-                        return false;
-                    }) as PowerActionData;
-                    const { powerCard } = powerAction;
-                    resolve(this.#createCardByType(powerCard) as PowerCard);
-                };
-                if (this.#isOpponent(playerId)) {
-                    const powerAction = this.#powerActions.find(powerAction => {
-                        const { powerCard } = powerAction;
-                        if (
-                            this.#playerId !== playerId
-                            && powerCard.id === cardId 
-                            && powerCard.type === POWER
-                        ) {
-                            return true;
-                        }
-                        return false;
-                    }) as PowerActionData;
-                    const { powerCard } = powerAction;
-                    resolve(this.#createCardByType(powerCard) as PowerCard);
-                };
-            }, delayMock);
-        });
-    }
+    // getOpponentPowerCardById(playerId: string, cardId: string): Promise<PowerCard> {
+    //     return new Promise((resolve) => {
+    //         setTimeout(async () => {
+    //             if (this.#isPlayer(playerId)) {
+    //                 console.log(playerId, cardId, this.#powerActions);
+
+    //                 const powerAction = this.#powerActions.find(pa => {
+    //                     if (
+    //                         this.#opponentId !== playerId
+    //                         && pa.powerCard.id === cardId 
+    //                         && pa.powerCard.type === POWER
+    //                     ) {
+    //                         return true;
+    //                     }
+    //                     return false;
+    //                 }) as PowerActionData;
+    //                 const { powerCard } = powerAction;
+    //                 resolve(this.#createCardByType(powerCard) as PowerCard);
+    //             };
+    //             if (this.#isOpponent(playerId)) {
+    //                 const powerAction = this.#powerActions.find(powerAction => {
+    //                     const { powerCard } = powerAction;
+    //                     if (
+    //                         this.#playerId !== playerId
+    //                         && powerCard.id === cardId 
+    //                         && powerCard.type === POWER
+    //                     ) {
+    //                         return true;
+    //                     }
+    //                     return false;
+    //                 }) as PowerActionData;
+    //                 const { powerCard } = powerAction;
+    //                 resolve(this.#createCardByType(powerCard) as PowerCard);
+    //             };
+    //         }, delayMock);
+    //     });
+    // }
 
     getFieldPowerCards(): Promise<PowerCard[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const powerCardsData = this.#powerActions.map(pa => pa.powerCard);
-                const powerCards = powerCardsData.map(card => this.#createCardByType(card) as PowerCard);
+                const powerCards = this.#powerActions.map(action => {
+                    const powerCardData = action.powerCard;
+                    const powerCard = this.#createCardByType(powerCardData) as PowerCard;
+                    return powerCard;
+                });
                 powerCards.forEach(card => this.#enableCard(card));
                 resolve(powerCards);
             }, delayMock);
@@ -881,23 +889,22 @@ export default class CardBattleMemory implements CardBattle {
     makePowerCardPlay(playerId: string, powerAction: PowerActionData): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
+                if (this.#isPlayerStep(IN_PLAY) && this.#isOpponentStep(PROCESS_POWER_CARDS)) {
+                    this.#powerActionsProcessed = [];
+                }
                 const powerCardId = powerAction.powerCard.id;
                 this.#powerActions.push(powerAction);
                 if (this.#isPlayer(playerId)) {
                     await this.#removePowerCardInHandById(this.#playerId, powerCardId);
                     this.#setPlayerStep(PASS);
-                    if (!await this.isPowerfieldLimitReached()) {
-                        this.#setOpponentStep(IN_PLAY);
-                    }
+                    this.#setOpponentStep(IN_PLAY);
                 };
                 if (this.#isOpponent(playerId)) {
                     await this.#removePowerCardInHandById(this.#opponentId, powerCardId);
                     this.#setOpponentStep(PASS);
-                    if (!await this.isPowerfieldLimitReached()) {
-                        this.#setPlayerStep(IN_PLAY);
-                    }
+                    this.#setPlayerStep(IN_PLAY);
                 };
-                if (await this.allPass()) {
+                if (await this.isPowerfieldLimitReached()) {
                     this.#processPowerCardPlays();
                 }
                 resolve();
@@ -918,7 +925,10 @@ export default class CardBattleMemory implements CardBattle {
             };
         });
         this.#powerActionsProcessed = ArrayUtil.clone(this.#powerActions);
+        console.log('Processed power actions:', this.#powerActionsProcessed);
         this.#powerActions = [];
+        this.#setPlayerStep(PROCESS_POWER_CARDS);
+        this.#setOpponentStep(PROCESS_POWER_CARDS);
     }
 
     #removePowerCardInHandById(playerId: string, powerCardId: string): Promise<void> {
@@ -970,22 +980,34 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    listenOpponentPlay(playerId: string, callback: (play: PowerCardPlayData) => void): Promise<void> {
+    listenOpponentPlay(playerId: string, callback: (play: PowerCardPlay) => void): Promise<void> {
         return new Promise((resolve) => {
-            setTimeout(() => {
+            setTimeout(async () => {
+                if (this.#isOpponentStep(IN_PLAY) && this.#isPlayerStep(PROCESS_POWER_CARDS)) {
+                    this.#powerActionsProcessed = [];
+                }
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    const powerCard = this.#opponentHand.find(card => card.type === POWER) as CardData;
-                    if (counter === 0 && powerCard) {
+                    const powerCardData = this.#opponentHand.find(card => card.type === POWER) as CardData;
+                    const powerCard = this.#createCardByType(powerCardData) as PowerCard;
+                    if (counter <= 1 && powerCard) {
                         counter++;
-                        const powerAction = { powerCard } as PowerActionData;
-                        this.makePowerCardPlay(this.#opponentId, powerAction);
+                        const powerAction = { 
+                            playerId: this.#opponentId,
+                            powerCard: powerCard.staticData,
+                            config: true
+                        } as PowerActionData;
+                        await this.makePowerCardPlay(this.#opponentId, powerAction);
                         callback({
                             pass: false,
-                            powerAction
+                            powerAction: {
+                                playerId: this.#opponentId,
+                                powerCard,
+                                config: true
+                            }
                         });
                     } else {
-                        this.#setOpponentStep(PASS);
+                        await this.pass(this.#opponentId);
                         callback({
                             pass: true,
                             powerAction: null
@@ -995,7 +1017,7 @@ export default class CardBattleMemory implements CardBattle {
                 };
                 if (this.#isOpponent(playerId)) {
                     // mock
-                    this.#setPlayerStep(PASS);
+                    await this.pass(this.#playerId);
                     callback({
                         pass: true,
                         powerAction: null
@@ -1020,9 +1042,18 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    getPowerActions(): Promise<PowerActionData[]> {
+    getPowerActions(): Promise<PowerAction[]> {
         return new Promise((resolve) => {
-            setTimeout(() => resolve(this.#powerActionsProcessed), delayMock);
+            const powerActions = this.#powerActionsProcessed.map(action => {
+                const powerCardData = action.powerCard;
+                const powerCard = this.#createCardByType(powerCardData) as PowerCard;
+                return {
+                    playerId: action.playerId,
+                    powerCard,
+                    config: action.config
+                }
+            });
+            setTimeout(() => resolve(powerActions), delayMock);
         });
     }
 
