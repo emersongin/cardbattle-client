@@ -119,7 +119,6 @@ describe("Cardset.test", () => {
         ] as CardData[];
         const cards = cardData.map(card => CardFactory.createByType(scene, card)) as Card[];
         const cardset = Cardset.create(scene, cards);
-        console.log(cardset);
         expect(cardset.getCards().length).toBe(cards.length);
     });
 
