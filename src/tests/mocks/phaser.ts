@@ -185,6 +185,8 @@ const PhaserMock = {
         Shape: class {},
         Zone: class {
             setOrigin = vi.fn();
+            setName = vi.fn();
+            emit = vi.fn();
         },
         DOMElement: class {},
         BitmapText: class {},
@@ -208,6 +210,7 @@ const PhaserMock = {
         },
         Array: {
             Remove: vi.fn(),
+            Add: vi.fn(),
         },
         String: {
             UUID: vi.fn(),
