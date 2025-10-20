@@ -206,7 +206,7 @@ const folders = [
     }
 ] as { id: string; deck: CardData[] }[];
 
-let counter = 0;
+let counter = 1;
 
 export default class CardBattleMemory implements CardBattle {
     #roomId: string = '';
@@ -875,11 +875,16 @@ export default class CardBattleMemory implements CardBattle {
     getFieldPowerCards(): Promise<PowerCard[]> {
         return new Promise((resolve) => {
             setTimeout(() => {
-                const powerCards = this.#powerActions.map(action => {
-                    const powerCardData = action.powerCard;
-                    const powerCard = this.#createCardByType(powerCardData) as PowerCard;
-                    return powerCard;
-                });
+                const powerCards = [] as PowerCard[];
+                if (this.#powerActions.length > 0) {
+                    this.#powerActions.forEach(action => {
+                        powerCards.push(this.#createCardByType(action.powerCard) as PowerCard);
+                    });
+                } else {
+                    this.#powerActionsProcessed.forEach(action => {
+                        powerCards.push(this.#createCardByType(action.powerCard) as PowerCard);
+                    });
+                }
                 powerCards.forEach(card => this.#enableCard(card));
                 resolve(powerCards);
             }, delayMock);
@@ -925,7 +930,6 @@ export default class CardBattleMemory implements CardBattle {
             };
         });
         this.#powerActionsProcessed = ArrayUtil.clone(this.#powerActions);
-        console.log('Processed power actions:', this.#powerActionsProcessed);
         this.#powerActions = [];
         this.#setPlayerStep(PROCESS_POWER_CARDS);
         this.#setOpponentStep(PROCESS_POWER_CARDS);

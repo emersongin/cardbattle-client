@@ -229,12 +229,10 @@ export abstract class PowerPhase extends CardBattlePhase {
         //     super.closeGameBoard({ onComplete: () => this.changeTo() });
         //     return;
         // }
-        console.log(await this.cardBattle.hasPowerCardsInField());
         if (await this.cardBattle.hasPowerCardsInField()) {
             this.changeToTriggerPhase();
             return;
         }
-        console.log(await this.cardBattle.allPass());
         if (await this.cardBattle.allPass()) {
             super.closeGameBoard({ onComplete: () => this.changeTo() });
             return;
