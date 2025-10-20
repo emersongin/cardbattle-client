@@ -206,7 +206,7 @@ const folders = [
     }
 ] as { id: string; deck: CardData[] }[];
 
-let counter = 1;
+let counter = 0;
 
 export default class CardBattleMemory implements CardBattle {
     #roomId: string = '';
