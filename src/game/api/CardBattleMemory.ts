@@ -802,7 +802,9 @@ export default class CardBattleMemory implements CardBattle {
     pass(playerId: string): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
+                console.log(this.#playerStep, this.#opponentStep);
                 if (this.#isPlayerStep(IN_PLAY) && this.#isOpponentStep(PROCESS_POWER_CARDS)) {
+                    console.log('Clearing processed power actions');
                     this.#powerActionsProcessed = [];
                 }
                 if (this.#isPlayer(playerId)) {
@@ -894,7 +896,9 @@ export default class CardBattleMemory implements CardBattle {
     makePowerCardPlay(playerId: string, powerAction: PowerActionData): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
+                console.log(this.#playerStep, this.#opponentStep);
                 if (this.#isPlayerStep(IN_PLAY) && this.#isOpponentStep(PROCESS_POWER_CARDS)) {
+                    console.log('Clearing processed power actions');
                     this.#powerActionsProcessed = [];
                 }
                 const powerCardId = powerAction.powerCard.id;
@@ -987,7 +991,9 @@ export default class CardBattleMemory implements CardBattle {
     listenOpponentPlay(playerId: string, callback: (play: PowerCardPlay) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(async () => {
+                console.log(this.#playerStep, this.#opponentStep);
                 if (this.#isOpponentStep(IN_PLAY) && this.#isPlayerStep(PROCESS_POWER_CARDS)) {
+                    console.log('Clearing processed power actions');
                     this.#powerActionsProcessed = [];
                 }
                 if (this.#isPlayer(playerId)) {
@@ -1058,15 +1064,6 @@ export default class CardBattleMemory implements CardBattle {
                 }
             });
             setTimeout(() => resolve(powerActions), delayMock);
-        });
-    }
-
-    removePowerActions(): Promise<void> {
-        return new Promise((resolve) => {
-            setTimeout(() => {
-                this.#powerActionsProcessed = [];
-                resolve();
-            }, delayMock);
         });
     }
 

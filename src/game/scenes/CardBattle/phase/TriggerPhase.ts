@@ -15,13 +15,12 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     }
 
     async create(): Promise<void> {
-        const powerActions = await this.cardBattle.getPowerActions();
-        console.log(powerActions);
-        const actions: Promise<boolean>[] = [];
-        powerActions.forEach((powerAction) => {
+        const powerActions = (await this.cardBattle.getPowerActions()).reverse();
+        for (let index = 0; index < powerActions.length; index++) {
+            const powerAction = powerActions[index];
             const powerCardId = powerAction.powerCard.getId();
             const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
-            const action = new Promise<boolean>(res => {
+            const action = () => new Promise<boolean>(res => {
                 CardActionsBuilder.create(powerCard)
                 .expand()
                 .flash()
@@ -45,9 +44,9 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
                     }
                 });
             });
-            actions.push(action);
-        });
-        Promise.all(actions).then(() => this.#finish());
+            await action();
+        }
+        this.#finish();
     }
 
     // async #loadPowerCardUpdates(): Promise<void> {
