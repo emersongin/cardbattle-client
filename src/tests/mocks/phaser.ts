@@ -31,6 +31,7 @@ class MockGameObject {
     removeFromDisplayList = vi.fn();
     addedToScene = vi.fn();
     setTexture = vi.fn();
+    setName = vi.fn();
 }
 
 class RectangleMock extends MockGameObject {
@@ -91,19 +92,147 @@ export type KeyboardPluginMock = {
 };
 
 const PhaserMock = {
+    VERSION: '3.90.0',
+    Class: {
+        mixin: vi.fn(),
+    },
+    Display: {
+        Color: class {},
+        Canvas: {
+            CanvasPool: {
+                create: () => ({
+                    getContext: () => ({
+                        measureText: () => ({ 
+                            width: 0
+                        }),
+                        fillRect: vi.fn(),
+                        fillText: vi.fn(),
+                        getImageData: vi.fn(),
+                    }),
+                }),
+                remove: vi.fn(),
+            }
+        },
+        Align: {
+
+        }
+    },
+    Sound: {
+        BaseSound: class {},
+    },
+    Math: {
+        Angle: {
+            Between: vi.fn(),
+        },
+        Snap: {
+            To: vi.fn(),
+        },
+        Easing: {
+            Expo: {
+                In: vi.fn(),
+            }
+        },
+        DegToRad: vi.fn(),
+        RadToDeg: vi.fn(),
+        Clamp: vi.fn(),
+        Between: vi.fn(),
+        Distance: {
+            BetweenPointsSquared: vi.fn(),
+        },
+        Interpolation: {
+            Linear: vi.fn(),
+        },
+        Vector3: class {},
+        Matrix4: class {},
+    },
+    Events: {
+        EventEmitter: class {},
+    },
+    Geom: {
+        Polygon: {
+            Earcut: (..._args: any[]) => [],
+        },
+        Rectangle: class {},
+        Intersects: {
+            RectangleToRectangle: vi.fn(),
+        },
+        Mesh: {
+            GenerateGridVerts: vi.fn(),
+        }
+    },
+    Textures: {
+        TextureManager: class {},
+    },
+    Animations: {
+        AnimationManager: class {},
+    },
+    Cameras: {
+        Scene2D: {
+            BaseCamera: class {},
+        }
+    },
     GameObjects: {
         Container: MockContainer,
         Graphics: MockGraphics,
         Image: MockGameObject,
         Rectangle: RectangleMock,
         Text: MockText,
+        RenderTexture: class {},
+        GameObject: MockGameObject,
+        Components: {
+            TransformMatrix: class {}
+        },
+        Shape: class {},
+        Zone: class {
+            setOrigin = vi.fn();
+        },
+        DOMElement: class {},
+        BitmapText: class {},
+        NineSlice: class {},
+        Mesh: class {},
+    },
+    Renderer: {
+        Canvas: {},
+        WebGL: {
+            Utils: {},
+            Pipelines: {
+                PostFXPipeline: class {},
+            }
+        },
+    },
+    Utils: {
+        Objects: {
+            IsPlainObject: vi.fn(),
+            GetValue: vi.fn(),
+            GetAdvancedValue: vi.fn(),
+        },
+        Array: {
+            Remove: vi.fn(),
+        },
+        String: {
+            UUID: vi.fn(),
+        },
+    },
+    Structs: {
+        List: class {},
     },
     Tweens: {
+        Builders: {
+            GetEaseFunction: vi.fn(),
+        },
         Tween: MockTween,
         TweenManager: class {
             add = vi.fn(() => new MockTween());
             addCounter = vi.fn(() => new MockTween());
             chain = vi.fn();
+        },
+    },
+    DOM: {
+        AddToDOM: vi.fn(),
+    },
+    Input: {
+        Keyboard: {
+            KeyCodes: {},
         },
     },
     Scene: class {
@@ -165,6 +294,17 @@ const PhaserMock = {
                 },
             },
         };
+        cameras = {
+            main: {
+                centerX: 400,
+                centerY: 300,
+            },
+        };
+        rexUI = {
+            add: {
+                roundRectangle: vi.fn((...args: any[]) => new RectangleMock(...args)),
+            }
+        };
         constructor () {
             this.cardBattle = new CardBattleMock(this as unknown as VueScene);
         }
@@ -203,7 +343,8 @@ HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {
         fillRect: () => {},
         clearRect: () => {},
         getImageData: (_x: number, _y: number, w: number, h: number) => ({
-            data: new Array(w * h * 4),
+            data: [w * h * 4],
+            remove: () => {},
         }),
         putImageData: () => {},
         createImageData: () => [],

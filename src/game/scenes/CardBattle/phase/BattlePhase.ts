@@ -1,9 +1,9 @@
 import { Phase } from "@scenes/CardBattle/phase/Phase";
-import { CardBattlePhase } from './CardBattlePhase';
-import { CardActionsBuilder } from "@/game/ui/Card/CardActionsBuilder";
-import { CARD_HEIGHT, CARD_WIDTH } from "@/game/constants/default";
-import { TimelineEvent } from "../../VueScene";
-import { CardUi } from "@/game/ui/Card/CardUi";
+import { CardBattlePhase } from '@scenes/CardBattle/phase/CardBattlePhase';
+import { CardActionsBuilder } from "@game/ui/Card/CardActionsBuilder";
+import { CARD_HEIGHT, CARD_WIDTH } from "@game/constants/default";
+import { TimelineEvent } from "@scenes/VueScene";
+import { CardUi } from "@game/ui/Card/CardUi";
 
 export class BattlePhase extends CardBattlePhase implements Phase {
     

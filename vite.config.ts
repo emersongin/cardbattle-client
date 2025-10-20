@@ -8,7 +8,7 @@ export default defineConfig({
         include: [
             'src/tests/**/*.test.ts'
         ],
-        setupFiles: "./src/tests/mocks/phaser.ts",
+        setupFiles: "./src/tests/setup.ts",
     },
     resolve: {
         alias: {
@@ -19,7 +19,7 @@ export default defineConfig({
             '@objects': resolve(__dirname, 'src/game/objects'),
             '@scenes': resolve(__dirname, 'src/game/scenes'),
             '@ui': resolve(__dirname, 'src/game/ui'),
-            '@utils': resolve(__dirname, 'src/utils'),
+            '@utils': resolve(__dirname, 'src/game/utils'),
             '@mocks': resolve(__dirname, 'src/tests/mocks'),
             '@tests': resolve(__dirname, 'src/tests'),
         },

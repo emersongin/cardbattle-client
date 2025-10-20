@@ -37,7 +37,6 @@ export class TextWindow extends TextBox {
         this.#setYPositionByHeight(config.height);
         this.#setOnClose(config.onClose);
         scene.add.existing(this);
-        
     }
 
     setStartClose(onStartClose?: () => void): void {
