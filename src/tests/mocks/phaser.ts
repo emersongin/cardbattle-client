@@ -1,6 +1,8 @@
-import { vi } from "vitest";
 import Phaser from "phaser";
-import { VueScene } from "@/game/scenes/VueScene";
+import { vi } from "vitest";
+import { VueScene } from "@game/scenes/VueScene";
+import { Phase } from "@game/scenes/CardBattle/phase/Phase";
+import { CardBattleMock } from "./cardbattle";
 
 class MockGameObject {
     x: number;
@@ -105,6 +107,8 @@ const PhaserMock = {
         },
     },
     Scene: class {
+        private phase: Phase;
+        private cardBattle: CardBattleMock;
         tweens = {
             add: vi.fn(() => new MockTween()),
             chain: vi.fn(),
@@ -161,6 +165,12 @@ const PhaserMock = {
                 },
             },
         };
+        constructor () {
+            this.cardBattle = new CardBattleMock(this as unknown as VueScene);
+        }
+        getCardBattle(): CardBattleMock {
+            return this.cardBattle;
+        }
         addKeyEnterListening = (config: { onTrigger: () => void }) => {
             this.input.keyboard.on('keydown-ENTER', config.onTrigger);
         }
@@ -181,6 +191,10 @@ const PhaserMock = {
             this.input.keyboard.once('keydown-SHIFT', config.onTrigger);
         };
         timeline = vi.fn();
+        changePhase(phase: Phase, ...params: any[]): void {
+            this.phase = phase;
+            this.phase.create(...(params || []));
+        }
     } as unknown as typeof VueScene,
 };
 

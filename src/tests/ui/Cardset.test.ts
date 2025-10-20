@@ -190,13 +190,8 @@ describe("Cardset.test", () => {
     });
 
     it("should restore select mode at the last index position.", () => {
-        let card1Id: string = '';
-        let card2Id: string = '';
         const eventsMock = {
-            onComplete: (cardIds: string[]) => {
-                card1Id = cardIds[0];
-                card2Id = cardIds[1];
-            }
+            onComplete: (_cardIds: string[]) => {}
         };
         cardsetMock.selectModeMany(eventsMock);
         expect(cardsetMock.isSelectModeEnabled()).toBe(true);

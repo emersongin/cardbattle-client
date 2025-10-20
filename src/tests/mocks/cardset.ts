@@ -1,12 +1,7 @@
-import { Cardset } from "@game/ui/Cardset/Cardset";
 import { vi } from "vitest";
-
-const CardBattleMock = {
-    Cardset: class {
-        add = vi.fn();
-    }
+import { Cardset } from "@game/ui/Cardset/Cardset";
+class CardsetMock {
+    add = vi.fn();
 }
 
-export default CardBattleMock as unknown as {
-    Cardset: typeof Cardset;
-}
+export default CardsetMock as unknown as Cardset;
