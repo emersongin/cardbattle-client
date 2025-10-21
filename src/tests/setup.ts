@@ -8,7 +8,12 @@ vi.stubGlobal('Phaser', PhaserMock);
 vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
     return {
         TextBox: vi.fn().mockImplementation(() => {
-            return {};
+            return {
+                layout: vi.fn(),
+                setScale: vi.fn(),
+                setStartClose: vi.fn(),
+                open: vi.fn(),
+            };
         }),
         Label: vi.fn().mockImplementation(() => {
             return {};

@@ -194,6 +194,12 @@ const PhaserMock = {
             this.#phase = phase;
             this.#phase.create(...(params || []));
         }
+        cameras = {
+            main: {
+                centerX: 400,
+                centerY: 300,
+            }
+        };
         rexUI = {
             add: {
                 roundRectangle: () => RectangleMock,
