@@ -1,5 +1,5 @@
 import PhaserMock, { cardBattleMock } from "@mocks/phaser";
-import { describe, it, beforeAll, beforeEach } from "vitest";
+import { describe, it, beforeAll, beforeEach, expect } from "vitest";
 import { LoadPhase } from "@game/scenes/CardBattle/phase/LoadPhase";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
 import { RoomData } from "@game/objects/RoomData";
@@ -36,6 +36,7 @@ describe("LoadPhase.test", () => {
 
     it("should throw error: invalid card type.", () => {
         sceneMock.changePhase(new LoadPhase(sceneMock));
+        expect(sceneMock.isPhase('SummonPhase')).toBe(true);
     });
 
 });

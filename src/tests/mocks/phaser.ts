@@ -194,6 +194,9 @@ const PhaserMock = {
             this.#phase = phase;
             this.#phase.create(...(params || []));
         }
+        isPhase = (phaseName: string) => {
+            return this.#phase.constructor.name === phaseName;
+        }
         cameras = {
             main: {
                 centerX: 400,
