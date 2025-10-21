@@ -59,9 +59,9 @@ export class BoardWindow extends Sizer {
         this.addBackground(background);
     }
 
-    #createContentLabel(config: BoardWindowData) {
+    #createContentLabel(config: BoardWindowData) { console.log(this.#createContent);
         const contentLabel = this.scene.rexUI.add.label({
-            text: this.scene.add.text(0, 0, this.createContent(config), {
+            text: this.scene.add.text(0, 0, this.#createContent(config), {
                 fontSize: '24px',
                 color: '#ffffff'
             }),
@@ -73,10 +73,9 @@ export class BoardWindow extends Sizer {
 
     setText(text: string) {        
         this.#contentLabel.text = text;
-        // this.#contentLabel.layout();
     }
 
-    createContent(data: BoardWindowData): string {
+    #createContent(data: BoardWindowData): string {
         const battlePoints = this.#createBattlePoints(data[AP], data[HP], data[PASS]);
         const boardPoints = this.#createBoardPoints(
             data[RED],
@@ -236,7 +235,7 @@ export class BoardWindow extends Sizer {
         this.data.set(AP, attackPoints);
         this.data.set(HP, healthPoints);
         const fromTarget = this.getAllData();
-        const content = this.createContent(fromTarget);
+        const content = this.#createContent(fromTarget);
         this.setText(content);
     }
 

@@ -1,5 +1,5 @@
 import { vi } from "vitest";
-import Phaser from "phaser";
+import Phaser, { Game } from "phaser";
 import { VueScene } from "@/game/scenes/VueScene";
 
 class MockGameObject {
@@ -105,6 +105,16 @@ const PhaserMock = {
         },
     },
     Scene: class {
+        rexUI = {
+            add: {
+                roundRectangle: () => RectangleMock,
+                label: () => MockGameObject,
+            },
+        };
+        scale = {
+            width: 800,
+            height: 600,
+        };
         tweens = {
             add: vi.fn(() => new MockTween()),
             chain: vi.fn(),
