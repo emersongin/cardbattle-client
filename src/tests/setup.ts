@@ -7,6 +7,9 @@ vi.stubGlobal('Phaser', PhaserMock);
 
 vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
     return {
+        TextBox: vi.fn().mockImplementation(() => {
+            return {};
+        }),
         Label: vi.fn().mockImplementation(() => {
             return {};
         }),

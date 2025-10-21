@@ -105,6 +105,7 @@ const PhaserMock = {
         },
     },
     Scene: class {
+        getCardBattle = vi.fn();
         rexUI = {
             add: {
                 roundRectangle: () => RectangleMock,

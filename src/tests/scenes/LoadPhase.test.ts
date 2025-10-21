@@ -1,20 +1,21 @@
 import PhaserMock from "@mocks/phaser";
 import { describe, it, beforeAll } from "vitest";
-import { VueScene } from "@scenes/VueScene";
+import { LoadPhase } from "@game/scenes/CardBattle/phase/LoadPhase";
+import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
 
 describe("LoadPhase.test", () => {
-    let sceneMock: VueScene;
+    let sceneMock: CardBattleScene;
 
     beforeAll(() => {
         sceneMock = new PhaserMock.Scene({
             key: "MockScene",
             active: true,
             visible: true,
-        }) as VueScene;
+        }) as CardBattleScene;
     });
 
     it("should throw error: invalid card type.", () => {
-
+        const phase = new LoadPhase(sceneMock);
     });
 
 });
