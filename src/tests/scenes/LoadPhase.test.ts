@@ -1,9 +1,17 @@
 import PhaserMock, { cardBattleMock } from "@mocks/phaser";
-import { describe, it, beforeAll, beforeEach, expect } from "vitest";
+import { describe, it, beforeAll, beforeEach, expect, vi } from "vitest";
 import { LoadPhase } from "@game/scenes/CardBattle/phase/LoadPhase";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
 import { RoomData } from "@game/objects/RoomData";
 import { WHITE } from "@game/constants/colors";
+
+function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
+    const keyboard = scene.input.keyboard;
+    if (!keyboard) {
+        throw new Error("Keyboard input is not available in the scene.");
+    }
+    return keyboard;
+}
 
 describe("LoadPhase.test", () => {
     let sceneMock: CardBattleScene;
@@ -36,6 +44,12 @@ describe("LoadPhase.test", () => {
 
     it("should throw error: invalid card type.", () => {
         sceneMock.changePhase(new LoadPhase(sceneMock));
+        const keyboard = getKeyboard(sceneMock);
+        keyboard.emit('keydown-ENTER');
+        keyboard.emit('keydown-ENTER');
+        keyboard.emit('keydown-DOWN');
+        keyboard.emit('keydown-ENTER');
+        vi.mocked(cardBattle.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
         expect(sceneMock.isPhase('SummonPhase')).toBe(true);
     });
 
