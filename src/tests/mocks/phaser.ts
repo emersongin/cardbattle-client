@@ -214,7 +214,10 @@ const PhaserMock = {
             height: 600,
         };
         tweens = {
-            add: vi.fn(() => new MockTween()),
+            add: vi.fn((config) => { 
+                if (config.onComplete) config.onComplete();
+                return new MockTween();
+            }),
             chain: vi.fn(),
         };
         add = {
@@ -253,6 +256,7 @@ const PhaserMock = {
                     this.input.keyboard.list.push({ keyCode, fn, once: true });
                 },
                 emit: (eventName: string, times: number = 1) => {
+                    console.log(this.input.keyboard.list);
                     this.input.keyboard.list.forEach((key: any) => {
                         if (key.keyCode === eventName) {
                             for (let i = 0; i < times; i++) {
