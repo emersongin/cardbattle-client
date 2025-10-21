@@ -42,9 +42,7 @@ export interface CardBattle {
     isOpponentPassed: (playerId: string) => Promise<boolean>;
     listenOpponentPlay: (playerId: string, callback: (play: PowerCardPlay) => void) => Promise<void>;
     hasPowerCardInHand: (playerId: string) => Promise<boolean>;
-    
     getPowerActions: () => Promise<PowerAction[]>;
-    
     setBattleCards: (playerId: string, cardIds: string[]) => Promise<void>;
     isOpponentBattleCardsSet: (playerId: string) => Promise<boolean>;
     listenOpponentBattleCardsSet: (playerId: string, callback: (isSet: boolean) => void) => Promise<void>;
