@@ -97,7 +97,7 @@ export class TextWindows {
 
     openAllWindows(config?: TweenConfig): void {
         if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
+            this.#textWindows.forEach((window: TextWindow, index: number) => {
                 if (!index) return window.open(config);
                 window.open();
             });
