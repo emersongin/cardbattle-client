@@ -1,5 +1,5 @@
+import Phaser from "phaser";
 import { vi } from "vitest";
-import Phaser, { Game } from "phaser";
 import { VueScene } from "@/game/scenes/VueScene";
 
 class MockGameObject {
