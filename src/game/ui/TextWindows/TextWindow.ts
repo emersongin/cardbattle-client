@@ -79,7 +79,6 @@ export class TextWindow extends TextBox {
     }
 
     open(config?: TweenConfig) {
-        console.log('open TextWindow');
         if (!this.scene?.tweens) return;
         this.scene.tweens.add({
             targets: this,

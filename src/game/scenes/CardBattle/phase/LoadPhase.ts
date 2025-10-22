@@ -8,9 +8,7 @@ import { PowerCard } from "@game/ui/Card/PowerCard";
 export class LoadPhase extends PowerPhase implements Phase {
 
     createPhaseWindows(): void {
-        console.log('create createPhaseWindows');
         const onClose = async () => {
-            console.log('closed Load Phase!');
             await super.createGameBoard();
             await super.createTextWindowCentered('Begin Load Phase', { 
                 textAlign: 'center', 

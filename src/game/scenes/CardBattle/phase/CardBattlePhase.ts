@@ -82,7 +82,6 @@ export class CardBattlePhase implements Phase {
     }
 
     openAllWindows(config?: TweenConfig): void {
-        console.log('openAllWindows', config);
         this.#textWindows.openAllWindows(config);
     }
 
@@ -516,7 +515,6 @@ export class CardBattlePhase implements Phase {
         isOpponentBattleCardsFaceDown?: boolean,
     }): Promise<void> {
         return new Promise(async resolve => {
-            console.log('createGameBoard CardBattlePhase');
             const board = await this.cardBattle.getBoard(this.scene.getPlayerId());
             const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.getPlayerId());
             const powerCards: PowerCard[] = await this.cardBattle.getFieldPowerCards();

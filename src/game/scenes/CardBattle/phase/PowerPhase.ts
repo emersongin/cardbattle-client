@@ -9,7 +9,6 @@ import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 export abstract class PowerPhase extends CardBattlePhase {
 
     async create(goToPlays: boolean = false): Promise<void> {
-        console.log('create PowerPhase');
         if (goToPlays) {
             super.removeBoardPass();
             super.removeOpponentBoardPass();
