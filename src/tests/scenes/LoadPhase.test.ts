@@ -8,8 +8,6 @@ import { BLACK, BLUE, GREEN, RED, WHITE } from "@game/constants/colors";
 import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 import { PowerCard } from "@game/ui/Card/PowerCard";
 import { BattleCard } from "@game/ui/Card/BattleCard";
-import { TextWindow } from "@game/ui/TextWindows/TextWindow";
-import { TweenConfig } from "@game/types/TweenConfig";
 
 function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
     const keyboard = scene.input.keyboard;
@@ -72,18 +70,8 @@ describe("LoadPhase.test", () => {
     it("should throw error: invalid card type.", () => {
         const keyboard = getKeyboard(sceneMock);
         const phase = new LoadPhase(sceneMock);
-
-        const open = TextWindow.prototype.open;
-        vi.spyOn(TextWindow.prototype, 'open').mockImplementation(function (this: TextWindow, ...args) {
-            open.apply(this, [args]);
-            console.log('TextWindow keydown-ENTER', args);
-            // if (args?.onComplete) {
-            //     keyboard.emit('keydown-ENTER');
-            // }
-        });
-
         sceneMock.changePhase(phase);
-
+        keyboard.emit('keydown-ENTER');
         // keyboard.emit('keydown-DOWN');
         // keyboard.emit('keydown-ENTER');
         // vi.mocked(cardBattleMock.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
