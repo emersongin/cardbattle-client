@@ -2,7 +2,6 @@ import { vi } from 'vitest';
 import PhaserMock from './mocks/phaser';
 import { TextWindow } from '@game/ui/TextWindows/TextWindow';
 import { BoardWindow } from '@game/ui/BoardWindow/BoardWindow';
-import { TweenConfig } from '@/game/types/TweenConfig';
 
 (globalThis as any).Phaser = PhaserMock;
 
@@ -16,7 +15,9 @@ vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
                 setScale: vi.fn(),
                 setStartClose: vi.fn(),
                 open: vi.fn(TextWindow.prototype.open),
+                isOpen: vi.fn(TextWindow.prototype.isOpen),
                 close: vi.fn(TextWindow.prototype.close),
+                hasOnCloseFunction: vi.fn(TextWindow.prototype.hasOnCloseFunction),
                 destroy: vi.fn(),
             };
         }),

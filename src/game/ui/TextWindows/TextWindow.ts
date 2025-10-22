@@ -87,7 +87,7 @@ export class TextWindow extends TextBox {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: async () => {
-                if (this.#onClose) this.#addOnCompletedListener();
+                if (this.#onClose) this.#addListenerOnCompleted();
                 if (config?.onComplete) config.onComplete();
             }
         });
@@ -111,7 +111,7 @@ export class TextWindow extends TextBox {
         return this.scaleY === 1;
     }
 
-    #addOnCompletedListener() {
+    #addListenerOnCompleted() {
         this.scene.addKeyEnterListeningOnce({
             onTrigger: () => {
                 if (this.#onStartClose) this.#onStartClose();
@@ -120,5 +120,9 @@ export class TextWindow extends TextBox {
                 });
             }
         });
+    }
+
+    hasOnCloseFunction() {
+        return this.#onClose;
     }
 }

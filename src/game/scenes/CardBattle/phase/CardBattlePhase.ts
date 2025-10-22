@@ -82,7 +82,7 @@ export class CardBattlePhase implements Phase {
     }
 
     openAllWindows(config?: TweenConfig): void {
-        console.log('openAllWindows');
+        console.log('openAllWindows', config);
         this.#textWindows.openAllWindows(config);
     }
 
