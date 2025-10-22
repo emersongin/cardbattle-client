@@ -758,8 +758,8 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isPlayer(playerId)) {
                     // mock
                     const powerCardData = this.#opponentHand.find(card => card.type === POWER) as CardData;
-                    const powerCard = this.#createCardByType(powerCardData) as PowerCard;
-                    if (counter <= 1 && powerCard) {
+                    if (counter <= 1 && powerCardData) {
+                        const powerCard = this.#createCardByType(powerCardData) as PowerCard;
                         counter++;
                         const powerAction = { 
                             playerId: this.#opponentId,
