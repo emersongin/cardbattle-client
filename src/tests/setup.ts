@@ -1,6 +1,7 @@
 import { vi } from 'vitest';
 import PhaserMock from './mocks/phaser';
 import { TextWindow } from '@game/ui/TextWindows/TextWindow';
+import { BoardWindow } from '@game/ui/BoardWindow/BoardWindow';
 
 (globalThis as any).Phaser = PhaserMock;
 
@@ -37,6 +38,9 @@ vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
                 add: vi.fn(),
                 layout: vi.fn(),
                 setScale: vi.fn(),
+                createContent: vi.fn(BoardWindow.prototype.createContent),
+                setPass: vi.fn(BoardWindow.prototype.setPass),
+                open: vi.fn(BoardWindow.prototype.open),
             };
         })
     };

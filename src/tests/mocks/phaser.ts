@@ -128,8 +128,8 @@ const PhaserMock = {
         };
         rexUI = {
             add: {
-                roundRectangle: () => RectangleMock,
-                label: () => MockGameObject,
+                roundRectangle: () => new RectangleMock,
+                label: () => new MockGameObject,
             },
         };
         scale = {
@@ -137,11 +137,12 @@ const PhaserMock = {
             height: 600,
         };
         tweens = {
-            add: vi.fn((config) => { 
+            add: vi.fn((config) => {
                 if (config.onComplete) config.onComplete();
                 return new MockTween();
             }),
             chain: vi.fn(),
+            addCounter: vi.fn(),
         };
         add = {
             container: vi.fn((...args) => new MockContainer(this, ...args)),
@@ -214,9 +215,11 @@ const PhaserMock = {
         addKeyShiftListeningOnce = (config: { onTrigger: () => void }) => {
             this.input.keyboard.once('keydown-SHIFT', config.onTrigger);
         };
-        timeline = vi.fn();
+        timeline = vi.fn(async (config) => {
+            if (config.onAllComplete) config.onAllComplete();
+        });
     } as unknown as typeof VueScene,
-};
+} as unknown as typeof Phaser;
 
 HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {
     return {
@@ -248,4 +251,4 @@ HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {
     };
 } as any;
 
-export default PhaserMock as unknown as typeof Phaser;
+export default PhaserMock;

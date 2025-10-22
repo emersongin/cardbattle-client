@@ -87,7 +87,7 @@ export class TextWindow extends TextBox {
             ease: 'Back.easeOut',
             onComplete: async () => {
                 if (config?.onComplete) {
-                    await config.onComplete();
+                    config.onComplete();
                     if (this.#onClose) this.#addOnCompletedListener();
                     return;
                 }
@@ -118,7 +118,9 @@ export class TextWindow extends TextBox {
         this.scene.addKeyEnterListeningOnce({
             onTrigger: () => {
                 if (this.#onStartClose) this.#onStartClose();
-                this.close({ onComplete: this.#onClose });
+                this.close({ 
+                    onComplete: this.#onClose 
+                });
             }
         });
     }

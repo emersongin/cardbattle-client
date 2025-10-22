@@ -12,7 +12,8 @@ export class LoadPhase extends PowerPhase implements Phase {
             await super.createGameBoard();
             await super.createTextWindowCentered('Begin Load Phase', { 
                 textAlign: 'center', 
-                onClose: () => super.resumePhase()
+                onClose: () => {
+                    super.resumePhase()}
             });
             await super.openGameBoard();
             super.openAllWindows();

@@ -701,7 +701,6 @@ export default class CardBattleMemory implements CardBattle {
         this.#powerActionsProcessed = ArrayUtil.clone(this.#powerActions);
         this.#setPlayerStep(PROCESS_POWER_CARDS);
         this.#setOpponentStep(PROCESS_POWER_CARDS);
-        console.log('Processed power actions!');
     }
 
     #removePowerCardInHandById(playerId: string, powerCardId: string): Promise<void> {
