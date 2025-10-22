@@ -84,6 +84,10 @@ export class CardBattleScene extends VueScene {
         this.phase.create(...(params || []));
     }
 
+    getPlayerId(): string {
+        return this.room.playerId;
+    }
+
     isPhase(phaseName: string): boolean {
         return this.phase && this.phase.constructor.name === phaseName;
     }

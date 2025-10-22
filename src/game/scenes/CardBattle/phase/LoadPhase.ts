@@ -22,7 +22,7 @@ export class LoadPhase extends PowerPhase implements Phase {
     }
 
     async createHandZone(): Promise<void> {
-        const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
+        const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.getPlayerId());
         const battleCards = cards.filter(card => card instanceof BattleCard) as BattleCard[];
         battleCards.forEach(card => {
             card.faceUp();

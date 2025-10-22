@@ -515,11 +515,11 @@ export class CardBattlePhase implements Phase {
         isOpponentBattleCardsFaceDown?: boolean,
     }): Promise<void> {
         return new Promise(async resolve => {
-            const board = await this.cardBattle.getBoard(this.scene.room.playerId);
-            const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
+            const board = await this.cardBattle.getBoard(this.scene.getPlayerId());
+            const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.getPlayerId());
             const powerCards: PowerCard[] = await this.cardBattle.getFieldPowerCards();
-            const battleCards: BattleCard[] = await this.cardBattle.getBattleCards(this.scene.room.playerId);
-            let opponentBattleCards: BattleCard[] = await this.cardBattle.getOpponentBattleCards(this.scene.room.playerId);
+            const battleCards: BattleCard[] = await this.cardBattle.getBattleCards(this.scene.getPlayerId());
+            let opponentBattleCards: BattleCard[] = await this.cardBattle.getOpponentBattleCards(this.scene.getPlayerId());
             if (config?.isOpponentBattleCardsFaceDown) {
                 opponentBattleCards.forEach(card => card.faceDown());
             }            

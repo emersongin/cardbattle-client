@@ -7,14 +7,14 @@ import { CommandOption } from "@game/ui/CommandWindow/CommandOption";
 export class ChallengePhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        if (await this.cardBattle.isOpponentJoined(this.scene.room.playerId)) {
+        if (await this.cardBattle.isOpponentJoined(this.scene.getPlayerId())) {
             this.#loadChallengePhase();
             return;
         }
         super.createWaitingWindow('Waiting for opponent to join the room...');
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenOpponentJoined(this.scene.room.playerId, () => 
+                await this.cardBattle.listenOpponentJoined(this.scene.getPlayerId(), () => 
                     super.closeAllWindows({ onComplete: () => this.#loadChallengePhase() })
                 );
             }
@@ -23,14 +23,14 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
 
     async #loadChallengePhase(): Promise<void> {
         await this.cardBattle.getOpponentData(
-            this.scene.room.playerId, 
+            this.scene.getPlayerId(), 
             (opponent: OpponentData) => {
                 const { name, description } = opponent;
                 super.createTextWindowCentered('Challenge Phase', { 
                     textAlign: 'center', 
                     textColor: '#fff',
                     onClose: async () => {
-                        this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions(this.scene.room.playerId));
+                        this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions(this.scene.getPlayerId()));
                         super.openCommandWindow();
                     }  
                 });

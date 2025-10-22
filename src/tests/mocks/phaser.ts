@@ -1,14 +1,8 @@
 import Phaser from "phaser";
 import { vi } from "vitest";
 import { VueScene } from "@game/scenes/VueScene";
-import { PowerActionData } from "@game/objects/PowerActionData";
-import { BATTLE, NONE, POWER } from "@game/constants/keys";
 import { CardBattle } from "@game/api/CardBattle";
-import { folders, redDeck } from "@game/data/decks";
-import { ArrayUtil } from "@game/utils/ArrayUtil";
-import { CardData } from "@game/objects/CardData";
 import { Phase } from "@game/scenes/CardBattle/phase/Phase";
-
 class MockGameObject {
     x: number;
     y: number;
@@ -95,78 +89,6 @@ export type KeyboardPluginMock = {
     removeAllListeners: () => void;
 };
 
-class cardBattleMock implements CardBattle {
-    roomId: string = 'ROOM';
-    firstPlayer: string = 'P1';
-    powerActions = [] as PowerActionData[];
-    powerActionsProcessed = [] as PowerActionData[];
-    // player is the room creator
-    playerId: string = 'P1';
-    playerStep = NONE;
-    playerDeck: CardData[] = ArrayUtil.clone(folders[2].deck || []);
-    playerHand: CardData[] = [];
-    // opponent is the one who joins the room
-    opponentId: string = 'CPU';
-    opponentStep = NONE;
-    opponentDeck: CardData[] = redDeck;
-    opponentHand: CardData[] = [];
-    createRoom = vi.fn().mockReturnValue({ roomId: this.roomId, playerId: this.playerId });
-    isOpponentJoined = vi.fn();
-    listenOpponentJoined = vi.fn();
-    joinRoom = vi.fn().mockReturnValue({ roomId: this.roomId, playerId: this.opponentId });
-    getOpponentData = vi.fn();
-    getFoldersOptions = vi.fn();
-    setFolder = vi.fn();
-    isOpponentDeckSet = vi.fn();
-    listenOpponentDeckSet = vi.fn();
-    isPlayMiniGame = vi.fn();
-    setMiniGameChoice = vi.fn();
-    listenOpponentEndMiniGame = vi.fn();
-    isOpponentReadyDrawCards = vi.fn();
-    setReadyDrawCards = vi.fn((playerId: string) => {
-        if (this.playerId === playerId) {
-            const powerCards = this.playerDeck.filter(card => card.type === POWER).slice(0, 4);
-            const battleCards = this.playerDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
-            const drawnCards = [...powerCards, ...battleCards];
-            this.playerDeck = this.playerDeck.filter(card => !drawnCards.includes(card));
-            this.playerHand = drawnCards;
-        }
-        if (this.opponentId === playerId) {
-            const powerCards = this.opponentDeck.filter(card => card.type === POWER).slice(0, 4);
-            const battleCards = this.opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
-            const drawnCards = [...powerCards, ...battleCards];
-            this.opponentDeck = this.opponentDeck.filter(card => !drawnCards.includes(card));
-            this.opponentHand = drawnCards;
-        }
-        return Promise.resolve();
-    });
-    listenOpponentDrawCards = vi.fn();
-    getBoard = vi.fn();
-    getOpponentBoard = vi.fn();
-    getCardsFromHand = vi.fn();
-    getOpponentCardsFromHand = vi.fn();
-    isStartPlaying = vi.fn();
-    setPlaying = vi.fn();
-    pass = vi.fn();
-    getPowerCardById = vi.fn();
-    getFieldPowerCards = vi.fn();
-    makePowerCardPlay = vi.fn();
-    isPowerfieldLimitReached = vi.fn();
-    hasPowerCardsInField = vi.fn();
-    allPass = vi.fn();
-    isOpponentPassed = vi.fn();
-    listenOpponentPlay = vi.fn();
-    hasPowerCardInHand = vi.fn();
-    getPowerActions = vi.fn();
-    setBattleCards = vi.fn();
-    isOpponentBattleCardsSet = vi.fn();
-    listenOpponentBattleCardsSet = vi.fn();
-    getBattleCards = vi.fn();
-    getOpponentBattleCards = vi.fn();
-    getBattlePointsFromBoard = vi.fn();
-    getOpponentBattlePointsFromBoard = vi.fn();
-}
-
 const PhaserMock = {
     GameObjects: {
         Container: MockContainer,
@@ -184,12 +106,13 @@ const PhaserMock = {
         },
     },
     Scene: class {
-        #cardBattleMock: cardBattleMock;
+        #cardBattle: CardBattle;
         #phase: Phase;
+        getPlayerId = () => 'P1';
         setCardBattle = (cardBattle: CardBattle) => {
-            this.#cardBattleMock = cardBattle as cardBattleMock;
+            this.#cardBattle = cardBattle as CardBattle;
         }
-        getCardBattle = () => this.#cardBattleMock;
+        getCardBattle = () => this.#cardBattle;
         changePhase = (phase: Phase, ...params: any[]) => {
             this.#phase = phase;
             this.#phase.create(...(params || []));
@@ -256,7 +179,6 @@ const PhaserMock = {
                     this.input.keyboard.list.push({ keyCode, fn, once: true });
                 },
                 emit: (eventName: string, times: number = 1) => {
-                    console.log(this.input.keyboard.list);
                     this.input.keyboard.list.forEach((key: any) => {
                         if (key.keyCode === eventName) {
                             for (let i = 0; i < times; i++) {
@@ -327,4 +249,3 @@ HTMLCanvasElement.prototype.getContext = function(_type: string | undefined) {
 } as any;
 
 export default PhaserMock as unknown as typeof Phaser;
-export { cardBattleMock };

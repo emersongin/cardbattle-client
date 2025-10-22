@@ -22,7 +22,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     abstract createPhaseWindows(): void;
 
     async resumePhase(): Promise<void> {
-        if (await this.cardBattle.isStartPlaying(this.scene.room.playerId)) {
+        if (await this.cardBattle.isStartPlaying(this.scene.getPlayerId())) {
             this.#goPlay();
             return;
         }
@@ -39,7 +39,7 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     #resetPlay(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            await this.cardBattle.setPlaying(this.scene.room.playerId);
+            await this.cardBattle.setPlaying(this.scene.getPlayerId());
             super.removeBoardPass();
             resolve();
         });
@@ -50,13 +50,13 @@ export abstract class PowerPhase extends CardBattlePhase {
             super.createCommandWindowBottom('Use a Power Card?', [
                 {
                     description: 'Yes',
-                    disabled: !await this.cardBattle.hasPowerCardInHand(this.scene.room.playerId),
+                    disabled: !await this.cardBattle.hasPowerCardInHand(this.scene.getPlayerId()),
                     onSelect: () => this.#changeBattleZoneToHandZone()
                 },
                 {
                     description: 'No',
                     onSelect: async () => {
-                        await this.cardBattle.pass(this.scene.room.playerId);
+                        await this.cardBattle.pass(this.scene.getPlayerId());
                         super.setBoardPass();
                         this.#nextPlay();
                     },
@@ -70,7 +70,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     async #changeBattleZoneToHandZone(): Promise<void> {
         await super.closeGameBoard();
         // create hand zone
-        const board = await this.cardBattle.getBoard(this.scene.room.playerId) as BoardWindow;
+        const board = await this.cardBattle.getBoard(this.scene.getPlayerId()) as BoardWindow;
         super.addBoard(board);
         await this.createHandZone();
         super.createHandDisplayWindows();
@@ -130,7 +130,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #startPowerCardPlay(cardId: string): Promise<void> {
-        const powerCard = await this.cardBattle.getPowerCardById(this.scene.room.playerId, cardId);
+        const powerCard = await this.cardBattle.getPowerCardById(this.scene.getPlayerId(), cardId);
         const playerPlay = () => this.#createPowerCardConfig(powerCard);
         //mock
         // const playerPlay = () => this.#finishPowerCardPlay(powerCard, true);
@@ -170,11 +170,11 @@ export abstract class PowerPhase extends CardBattlePhase {
         await super.closeAllWindows();
         // make power card play and remove hand point
         const powerAction = {
-            playerId: this.scene.room.playerId,
+            playerId: this.scene.getPlayerId(),
             powerCard: powerCard.staticData,
             config: powerCardConfig 
         };
-        await this.cardBattle.makePowerCardPlay(this.scene.room.playerId, powerAction);
+        await this.cardBattle.makePowerCardPlay(this.scene.getPlayerId(), powerAction);
         super.removeBoardZonePoints(HAND, 1);
         // set board pass
         super.setBoardPass();
@@ -225,7 +225,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             super.closeGameBoard({ onComplete: () => this.changeTo() });
             return;
         }
-        if (await this.cardBattle.isOpponentPassed(this.scene.room.playerId)) {
+        if (await this.cardBattle.isOpponentPassed(this.scene.getPlayerId())) {
             this.#goPlay();
             return;
         }
@@ -243,7 +243,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openAllWindows({
             onComplete: () => {
                 this.cardBattle.listenOpponentPlay(
-                    this.scene.room.playerId, 
+                    this.scene.getPlayerId(), 
                     async (opponentPlay: PowerCardPlay) => {
                         await super.closeAllWindows();
                         this.#onOpponentPlay(opponentPlay);
@@ -269,7 +269,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                 super.removeOpponentBoardZonePoints(HAND, 1);
                 this.#loadPlayAndMovePowerCardToField();
             };
-            // const powerCard = await this.cardBattle.getOpponentPowerCardById(this.scene.room.playerId, powerAction.powerCard.id);
+            // const powerCard = await this.cardBattle.getOpponentPowerCardById(this.scene.getPlayerId(), powerAction.powerCard.id);
             const powerCard = powerAction.powerCard;
             this.#playPowerCard(powerCard, opponentPlayFunction);
         }

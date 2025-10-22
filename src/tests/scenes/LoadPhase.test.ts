@@ -1,9 +1,8 @@
-import PhaserMock, { cardBattleMock } from "@mocks/phaser";
 import { describe, it, beforeAll, beforeEach, expect, vi } from "vitest";
+import PhaserMock from "@mocks/phaser";
+import CardBattleMock from "@mocks/cardbattle";
 import { LoadPhase } from "@game/scenes/CardBattle/phase/LoadPhase";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
-import { RoomData } from "@game/objects/RoomData";
-import { WHITE } from "@game/constants/colors";
 
 function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
     const keyboard = scene.input.keyboard;
@@ -15,7 +14,7 @@ function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin 
 
 describe("LoadPhase.test", () => {
     let sceneMock: CardBattleScene;
-    let cardBattle: cardBattleMock;
+    let cardBattleMock: CardBattleMock;
 
     beforeAll(() => {
         sceneMock = new PhaserMock.Scene({
@@ -23,23 +22,12 @@ describe("LoadPhase.test", () => {
             active: true,
             visible: true,
         }) as CardBattleScene;
-        cardBattle = new cardBattleMock();
-        sceneMock.setCardBattle(cardBattle);
+        cardBattleMock = new CardBattleMock();
+        sceneMock.setCardBattle(cardBattleMock);
     });
 
     beforeEach(() => {
-        // CREATE ROOM
-        const room = cardBattle.createRoom();
-        const { roomId, playerId } = room;
-        // CHALLENGE PHASE
-        const { playerId: opponentId }: RoomData = cardBattle.joinRoom(roomId);
-        // START PHASE
-        cardBattle.setFolder(playerId, 'f3');
-        // DRAW PHASE
-        cardBattle.setMiniGameChoice(playerId, WHITE);
-        // LOAD PHASE
-        cardBattle.setReadyDrawCards(opponentId);
-        cardBattle.setReadyDrawCards(playerId);
+
     });
 
     it("should throw error: invalid card type.", () => {
@@ -49,7 +37,7 @@ describe("LoadPhase.test", () => {
         keyboard.emit('keydown-ENTER');
         keyboard.emit('keydown-DOWN');
         keyboard.emit('keydown-ENTER');
-        vi.mocked(cardBattle.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
+        vi.mocked(cardBattleMock.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
         expect(sceneMock.isPhase('SummonPhase')).toBe(true);
     });
 

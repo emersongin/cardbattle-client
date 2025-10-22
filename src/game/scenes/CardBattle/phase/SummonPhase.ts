@@ -23,9 +23,9 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #createHandZone(): Promise<void> {
-        const board: BoardWindow = await this.cardBattle.getBoard(this.scene.room.playerId);
+        const board: BoardWindow = await this.cardBattle.getBoard(this.scene.getPlayerId());
         super.addBoard(board);
-        const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
+        const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.getPlayerId());
         const battleCards = cards.filter(card => card instanceof BattleCard);
         battleCards.forEach(card => {
             card.faceUp();
@@ -121,8 +121,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                 (config?: TweenConfig) => super.closeCardset(config),
             ],
             onAllComplete: async () => {
-                await this.cardBattle.setBattleCards(this.scene.room.playerId, cardIds);
-                if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.room.playerId)) {
+                await this.cardBattle.setBattleCards(this.scene.getPlayerId(), cardIds);
+                if (await this.cardBattle.isOpponentBattleCardsSet(this.scene.getPlayerId())) {
                     this.#createGameBoard();
                     return;
                 }
@@ -132,7 +132,7 @@ export class SummonPhase extends CardBattlePhase implements Phase {
                         const ON = async () => {
                             super.closeAllWindows({ onComplete: () => this.#createGameBoard() });
                         };
-                        await this.cardBattle.listenOpponentBattleCardsSet(this.scene.room.playerId, ON);
+                        await this.cardBattle.listenOpponentBattleCardsSet(this.scene.getPlayerId(), ON);
                     }
                 });
             },
@@ -148,8 +148,8 @@ export class SummonPhase extends CardBattlePhase implements Phase {
     }
 
     async #loadBattlePoints(): Promise<void> {
-        const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.room.playerId);
-        const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.room.playerId);
+        const battlePoints = await this.cardBattle.getBattlePointsFromBoard(this.scene.getPlayerId());
+        const opponentBattlePoints = await this.cardBattle.getOpponentBattlePointsFromBoard(this.scene.getPlayerId());
         this.scene.timeline({
             targets: [
                 (t?: TweenConfig) => super.setBattlePointsWithDuration({ ...t, ...battlePoints }),

@@ -32,7 +32,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
                             .shrink({ 
                                 onComplete: async () => {
                                     this.originPhase.removeCardFromPowerCardsetById(powerCardId);
-                                    if (powerAction.playerId === this.scene.room.playerId) {
+                                    if (powerAction.playerId === this.scene.getPlayerId()) {
                                         this.originPhase.addBoardZonePoints(TRASH, 1);
                                     } else {
                                         this.originPhase.addOpponentBoardZonePoints(TRASH, 1);
@@ -51,7 +51,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
 
     // async #loadPowerCardUpdates(): Promise<void> {
     //     await this.cardBattle.listenNextPowerCard(
-    //         this.scene.room.playerId,
+    //         this.scene.getPlayerId(),
     //         (powerAction: PowerActionData, belongToPlayer: boolean) => {
     //             const powerCardId = powerAction.powerCard.id;
     //             const powerCard = this.originPhase.getCardFromPowerCardsetById(powerCardId);
@@ -64,7 +64,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     //                         CardActionsBuilder
     //                             .create(powerCard)
     //                             .shrink({ onComplete: async () => {
-    //                                 await this.cardBattle.setPowerActionCompleted(this.scene.room.playerId, powerCardId);
+    //                                 await this.cardBattle.setPowerActionCompleted(this.scene.getPlayerId(), powerCardId);
     //                                 this.originPhase.removeCardFromPowerCardsetById(powerCardId);
     //                                 if (belongToPlayer) {
     //                                     this.originPhase.addBoardZonePoints(TRASH, 1);
@@ -81,7 +81,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
     // }
 
     // async #next(): Promise<void> {
-        // if (await this.cardBattle.hasPowerCardUpdates(this.scene.room.playerId)) {
+        // if (await this.cardBattle.hasPowerCardUpdates(this.scene.getPlayerId())) {
         //     this.#loadPowerCardUpdates();
         //     return;
         // }
@@ -90,7 +90,7 @@ export class TriggerPhase extends CardBattlePhase implements Phase {
         //     this.originPhase.openAllWindows({
         //         onComplete: async () => {
         //             await this.cardBattle.listenOpponentPowerActionUpdates(
-        //                 this.scene.room.playerId,
+        //                 this.scene.getPlayerId(),
         //                 (isEnd: boolean) => {
         //                     if (isEnd) {
         //                         this.originPhase.closeAllWindows({ 

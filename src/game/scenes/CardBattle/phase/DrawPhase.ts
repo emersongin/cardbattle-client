@@ -8,17 +8,17 @@ import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 export class DrawPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.room.playerId);
-        const playerBoard = await this.cardBattle.getBoard(this.scene.room.playerId);
-        await this.cardBattle.setReadyDrawCards(this.scene.room.playerId);
-        if (await this.cardBattle.isOpponentReadyDrawCards(this.scene.room.playerId)) {
+        const opponentBoard = await this.cardBattle.getOpponentBoard(this.scene.getPlayerId());
+        const playerBoard = await this.cardBattle.getBoard(this.scene.getPlayerId());
+        await this.cardBattle.setReadyDrawCards(this.scene.getPlayerId());
+        if (await this.cardBattle.isOpponentReadyDrawCards(this.scene.getPlayerId())) {
             this.#loadDrawPhase(playerBoard, opponentBoard);
             return;
         }
         this.#createOpponentDrawCardsWaitingWindow();
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenOpponentDrawCards(this.scene.room.playerId, async () => {
+                await this.cardBattle.listenOpponentDrawCards(this.scene.getPlayerId(), async () => {
                     super.closeAllWindows({ onComplete: () => this.#loadDrawPhase(playerBoard, opponentBoard) });
                 });
             }
@@ -51,7 +51,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #createPlayerDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            const playerCards = await this.cardBattle.getCardsFromHand(this.scene.room.playerId);
+            const playerCards = await this.cardBattle.getCardsFromHand(this.scene.getPlayerId());
             await super.createCardset(playerCards);
             const widthEdge = this.scene.scale.width;
             const cardset = super.getCardset();
@@ -64,7 +64,7 @@ export class DrawPhase extends CardBattlePhase implements Phase {
 
     #createOpponentDrawCardset(): Promise<void> {
         return new Promise<void>(async (resolve) => {
-            const opponentCards = await this.cardBattle.getOpponentCardsFromHand(this.scene.room.playerId);
+            const opponentCards = await this.cardBattle.getOpponentCardsFromHand(this.scene.getPlayerId());
             await super.createOpponentCardset(opponentCards);
             const widthEdge = this.scene.scale.width;
             const cardset = super.getOpponentCardset();

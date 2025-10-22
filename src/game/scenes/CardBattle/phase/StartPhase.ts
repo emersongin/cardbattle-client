@@ -7,14 +7,14 @@ import { ArrayUtil } from "@utils/ArrayUtil";
 export class StartPhase extends CardBattlePhase implements Phase {
 
     async create(): Promise<void> {
-        if (await this.cardBattle.isOpponentDeckSet(this.scene.room.playerId)) {
+        if (await this.cardBattle.isOpponentDeckSet(this.scene.getPlayerId())) {
             this.#loadStartPhase();
             return;
         }
         super.createWaitingWindow('Waiting for opponent to set their deck...');
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenOpponentDeckSet(this.scene.room.playerId, () => {
+                await this.cardBattle.listenOpponentDeckSet(this.scene.getPlayerId(), () => {
                     super.closeAllWindows({ onComplete: () => this.#loadStartPhase() });
                 });
             }
@@ -22,7 +22,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
     }
 
     async #loadStartPhase(): Promise<void> {
-        if (await this.cardBattle.isPlayMiniGame(this.scene.room.playerId)) {
+        if (await this.cardBattle.isPlayMiniGame(this.scene.getPlayerId())) {
             super.createTextWindowCentered('Start Phase', { 
                 textAlign: 'center', 
                 onClose: () => {
@@ -40,7 +40,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
                 super.openAllWindows({
                     onComplete: async () => {
                         await this.cardBattle.listenOpponentEndMiniGame(
-                            this.scene.room.playerId,
+                            this.scene.getPlayerId(),
                             (choice: string) => 
                                 super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice)})
                         );                           
@@ -57,7 +57,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
             {
                 description: 'option: Draw white card',
                 onSelect: async () => {
-                    await this.cardBattle.setMiniGameChoice(this.scene.room.playerId, WHITE);
+                    await this.cardBattle.setMiniGameChoice(this.scene.getPlayerId(), WHITE);
                     this.#createResultWindow(WHITE);
                 },
                 disabled: false,
@@ -65,7 +65,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
             {
                 description: 'option: Draw black card',
                 onSelect: async () => {
-                    await this.cardBattle.setMiniGameChoice(this.scene.room.playerId, BLACK);
+                    await this.cardBattle.setMiniGameChoice(this.scene.getPlayerId(), BLACK);
                     this.#createResultWindow(BLACK);
                 },
                 disabled: false,
