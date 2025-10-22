@@ -79,6 +79,7 @@ export class TextWindow extends TextBox {
     }
 
     open(config?: TweenConfig) {
+        console.log('open TextWindow');
         if (!this.scene?.tweens) return;
         this.scene.tweens.add({
             targets: this,
@@ -86,12 +87,8 @@ export class TextWindow extends TextBox {
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: async () => {
-                if (config?.onComplete) {
-                    config.onComplete();
-                    if (this.#onClose) this.#addOnCompletedListener();
-                    return;
-                }
                 if (this.#onClose) this.#addOnCompletedListener();
+                if (config?.onComplete) config.onComplete();
             }
         });
     }

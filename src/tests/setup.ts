@@ -2,6 +2,7 @@ import { vi } from 'vitest';
 import PhaserMock from './mocks/phaser';
 import { TextWindow } from '@game/ui/TextWindows/TextWindow';
 import { BoardWindow } from '@game/ui/BoardWindow/BoardWindow';
+import { TweenConfig } from '@/game/types/TweenConfig';
 
 (globalThis as any).Phaser = PhaserMock;
 

@@ -9,7 +9,7 @@ import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 import { PowerCard } from "@game/ui/Card/PowerCard";
 import { BattleCard } from "@game/ui/Card/BattleCard";
 import { TextWindow } from "@game/ui/TextWindows/TextWindow";
-import { TweenConfig } from "@/game/types/TweenConfig";
+import { TweenConfig } from "@game/types/TweenConfig";
 
 function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
     const keyboard = scene.input.keyboard;
@@ -34,14 +34,6 @@ describe("LoadPhase.test", () => {
     });
 
     beforeEach(() => {
-        const keyboard = getKeyboard(sceneMock);
-        const open = TextWindow.prototype.open;
-        vi.spyOn(TextWindow.prototype, 'open').mockImplementation(async function(this: TextWindow, config?: TweenConfig) {
-            open.call(this, config);
-            keyboard.emit('keydown-ENTER');
-        });
-
-
         vi.mocked(cardBattleMock.getBoard).mockReturnValue(BoardWindow.createBottom(sceneMock, {
             [AP]: 0,
             [HP]: 0,
@@ -78,9 +70,20 @@ describe("LoadPhase.test", () => {
     });
 
     it("should throw error: invalid card type.", () => {
-        sceneMock.changePhase(new LoadPhase(sceneMock));
-        
-        // keyboard.emit('keydown-ENTER');
+        const keyboard = getKeyboard(sceneMock);
+        const phase = new LoadPhase(sceneMock);
+
+        const open = TextWindow.prototype.open;
+        vi.spyOn(TextWindow.prototype, 'open').mockImplementation(function (this: TextWindow, ...args) {
+            open.apply(this, [args]);
+            console.log('TextWindow keydown-ENTER', args);
+            // if (args?.onComplete) {
+            //     keyboard.emit('keydown-ENTER');
+            // }
+        });
+
+        sceneMock.changePhase(phase);
+
         // keyboard.emit('keydown-DOWN');
         // keyboard.emit('keydown-ENTER');
         // vi.mocked(cardBattleMock.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
