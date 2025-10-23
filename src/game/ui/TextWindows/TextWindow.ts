@@ -96,7 +96,7 @@ export class TextWindow {
             onComplete: () => {
                 this.#textBox.scaleY = 0;
                 if (config?.onComplete) config.onComplete();
-                this.destroy();
+                this.#textBox.destroy();
             }
         });
     }
@@ -123,9 +123,5 @@ export class TextWindow {
 
     getScaleY(): number {
         return this.#textBox.scaleY;
-    }
-
-    destroy(): void {
-        this.#textBox.destroy();
     }
 }

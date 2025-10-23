@@ -1,5 +1,5 @@
 import { vi } from 'vitest';
-import PhaserMock from './mocks/phaser';
+import PhaserMock, { ShapeMock } from './mocks/phaser';
 import { BoardWindow } from '@game/ui/BoardWindow/BoardWindow';
 
 (globalThis as any).Phaser = PhaserMock;
@@ -21,7 +21,11 @@ vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
             };
         }),
         Label: vi.fn().mockImplementation(() => {
-            return {};
+            return {
+                getElement: vi.fn(() => {
+                    return new ShapeMock();
+                })
+            };
         }),
         Sizer: vi.fn().mockImplementation(() => {
             return {

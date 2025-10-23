@@ -32,6 +32,10 @@ class MockGameObject {
     setTexture = vi.fn();
 }
 
+class ShapeMock extends MockGameObject {}
+class LabelMock extends MockGameObject {
+    getElement = vi.fn();
+}
 class RectangleMock extends MockGameObject {
     fillColor: number;
     alpha: number;
@@ -62,7 +66,11 @@ class MockGraphics extends MockGameObject {
 class MockContainer extends MockGameObject {
     visible: boolean = false;
     list: any[] = [] as Phaser.GameObjects.Graphics[];
-    constructor(readonly scene: any, readonly x: number = 0, readonly y: number = 0) {
+    constructor(
+        readonly scene: any, 
+        readonly x: number = 0, 
+        readonly y: number = 0
+    ) {
         super(x, y);
     };
     add = vi.fn((obj: any) => { this.list.push(obj); return obj; });
@@ -96,6 +104,7 @@ const PhaserMock = {
         Image: MockGameObject,
         Rectangle: RectangleMock,
         Text: MockText,
+        Shape: ShapeMock,
     },
     Tweens: {
         Tween: MockTween,
@@ -129,7 +138,7 @@ const PhaserMock = {
         rexUI = {
             add: {
                 roundRectangle: () => new RectangleMock,
-                label: () => new MockGameObject,
+                label: () => new LabelMock(),
             },
         };
         scale = {

@@ -3,9 +3,10 @@ import { DisplayUtil } from '@utils/DisplayUtil';
 import { VueScene } from '@game/scenes/VueScene';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { TweenConfig } from '@/game/types/TweenConfig';
-export class CommandWindow extends Sizer {
-    private selectedIndex: number = 0;
-    private options: Label[];
+export class CommandWindow {
+    #sizer: Sizer;
+    #options: Label[];
+    #selectedIndex: number = 0;
 
     private constructor(
         readonly scene: VueScene,
@@ -17,7 +18,7 @@ export class CommandWindow extends Sizer {
         readonly commands: CommandOption[]
     ) {
         const vertical = 1;
-        super(scene, {
+        this.#sizer = new Sizer(scene, {
             x,
             y,
             width,
@@ -29,9 +30,9 @@ export class CommandWindow extends Sizer {
         this.#createBackground(scene);
         this.#createTitle(scene, title);
         this.#createOptions(scene, width, commands);
-        this.layout();
-        this.setScale(1, 0);
-        scene.add.existing(this);
+        this.#sizer.layout();
+        this.#sizer.setScale(1, 0);
+        scene.add.existing(this.#sizer);
     }
 
     static createBottom(scene: VueScene, title: string, commands: CommandOption[]) {
@@ -58,8 +59,6 @@ export class CommandWindow extends Sizer {
             ease: 'Back.easeOut',
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
-                // this.#setupKeyboardControls();
-                // this.#select(0);
             }
         });
     }
@@ -67,7 +66,7 @@ export class CommandWindow extends Sizer {
     #createBackground(scene: Phaser.Scene) {
         const background = scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, 0x000000);
         background.setAlpha(0.8);
-        this.addBackground(background);
+        this.#sizer.addBackground(background);
     }
 
     #createTitle(scene: Phaser.Scene, title: string) {
@@ -78,13 +77,13 @@ export class CommandWindow extends Sizer {
             }),
             align: 'center'
         });
-        this.add(titleLabel, { align: 'left', expand: false, padding: { top: 20, bottom: 20 } });
+        this.#sizer.add(titleLabel, { align: 'left', expand: false, padding: { top: 20, bottom: 20 } });
     }
     
     #createOptions(scene: Phaser.Scene, width: number, commands: CommandOption[]) {
-        this.options = commands.map(cmd => {
+        this.#options = commands.map(cmd => {
             const option = CommandWindow.#createOption(scene, cmd.description, width - 20, cmd.disabled);
-            this.add(option, { align: 'center', expand: true });
+            this.#sizer.add(option, { align: 'center', expand: true });
             return option;
         });
     }
@@ -106,11 +105,11 @@ export class CommandWindow extends Sizer {
     }
 
     cursorUp(): void {
-        this.selectByIndex(this.selectedIndex - 1);
+        this.selectByIndex(this.#selectedIndex - 1);
     }
 
     cursorDown(): void {
-        this.selectByIndex(this.selectedIndex + 1);
+        this.selectByIndex(this.#selectedIndex + 1);
     }
 
     selectByIndex(newIndex: number): void {
@@ -119,23 +118,23 @@ export class CommandWindow extends Sizer {
     }
 
     select(): void {
-        if (this.commands[this.selectedIndex].disabled) {
+        if (this.commands[this.#selectedIndex].disabled) {
             console.log('Sound disabled command');
             return;
         }
-        this.#close(this.commands[this.selectedIndex].onSelect);
+        this.#close(this.commands[this.#selectedIndex].onSelect);
     }
 
     // #setupKeyboardControls() {
-        // this.scene.addKeyUpListening({ onTrigger: () => this.#select(this.selectedIndex - 1) });
-        // this.scene.addKeyDownListening({ onTrigger: () => this.#select(this.selectedIndex + 1) });
+        // this.scene.addKeyUpListening({ onTrigger: () => this.#select(this.#selectedIndex - 1) });
+        // this.scene.addKeyDownListening({ onTrigger: () => this.#select(this.#selectedIndex + 1) });
         // this.scene.addKeyEnterListeningOnce({ 
         //     onTrigger: () => {
-        //         if (this.commands[this.selectedIndex].disabled) {
+        //         if (this.commands[this.#selectedIndex].disabled) {
         //             console.log('Sound disabled command');
         //             return;
         //         }
-        //         this.#close(this.commands[this.selectedIndex].onSelect);
+        //         this.#close(this.commands[this.#selectedIndex].onSelect);
         //     }
         // });
     // }
@@ -148,7 +147,7 @@ export class CommandWindow extends Sizer {
             ease: 'Back.easeIn',
             onComplete: async () => {
                 await onSelect()
-                this.destroy();
+                this.#sizer.destroy();
             }
         });
     }
@@ -157,13 +156,14 @@ export class CommandWindow extends Sizer {
         const limit = this.commands.length - 1;
         if (newIndex < 0) newIndex = 0;
         if (newIndex > limit) newIndex = limit;
-        this.selectedIndex = newIndex;
+        this.#selectedIndex = newIndex;
     }
 
     #updateOptions() {
-        this.options.forEach((opt: Label, index: number) => {
+        this.#options.forEach((opt: Label, index: number) => {
+            console.log(opt.constructor.name);
             const bg = opt.getElement('background') as Phaser.GameObjects.Shape;
-            if (bg) bg.setFillStyle(index === this.selectedIndex ? 0x8888ff : 0x444444);
+            if (bg) bg.setFillStyle(index === this.#selectedIndex ? 0x8888ff : 0x444444);
         });
     }
 }
