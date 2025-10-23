@@ -206,10 +206,10 @@ const PhaserMock = {
             },
         };
         addKeyUpListening = (config: { onTrigger: () => void }) => {
-            this.input.keyboard.on('keyup', config.onTrigger);
+            this.input.keyboard.on('keydown-UP', config.onTrigger);
         };
         addKeyDownListening = (config: { onTrigger: () => void }) => {
-            this.input.keyboard.on('keydown', config.onTrigger);
+            this.input.keyboard.on('keydown-DOWN', config.onTrigger);
         }
         addKeyEnterListening = (config: { onTrigger: () => void }) => {
             this.input.keyboard.on('keydown-ENTER', config.onTrigger);

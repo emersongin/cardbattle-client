@@ -122,31 +122,22 @@ export class CommandWindow {
             console.log('Sound disabled command');
             return;
         }
-        this.#close(this.commands[this.#selectedIndex].onSelect);
+        this.#close({
+            onComplete: async () => {
+                await this.commands[this.#selectedIndex].onSelect();
+            }
+        });
     }
 
-    // #setupKeyboardControls() {
-        // this.scene.addKeyUpListening({ onTrigger: () => this.#select(this.#selectedIndex - 1) });
-        // this.scene.addKeyDownListening({ onTrigger: () => this.#select(this.#selectedIndex + 1) });
-        // this.scene.addKeyEnterListeningOnce({ 
-        //     onTrigger: () => {
-        //         if (this.commands[this.#selectedIndex].disabled) {
-        //             console.log('Sound disabled command');
-        //             return;
-        //         }
-        //         this.#close(this.commands[this.#selectedIndex].onSelect);
-        //     }
-        // });
-    // }
-
-    #close(onSelect: () => Promise<void> | void) {
+    #close(config?: TweenConfig) {
         this.scene.tweens.add({
             targets: this,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',
             onComplete: async () => {
-                await onSelect()
+                this.#sizer.scaleY = 0;
+                if (config?.onComplete) config.onComplete();
                 this.#sizer.destroy();
             }
         });
@@ -161,7 +152,6 @@ export class CommandWindow {
 
     #updateOptions() {
         this.#options.forEach((opt: Label, index: number) => {
-            console.log(opt.constructor.name);
             const bg = opt.getElement('background') as Phaser.GameObjects.Shape;
             if (bg) bg.setFillStyle(index === this.#selectedIndex ? 0x8888ff : 0x444444);
         });
