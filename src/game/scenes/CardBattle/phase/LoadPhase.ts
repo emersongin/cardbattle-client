@@ -9,6 +9,7 @@ export class LoadPhase extends PowerPhase implements Phase {
     createPhaseWindows(): void {
         super.createTextWindowCentered('Load Phase', { textAlign: 'center' });
         super.addTextWindow('Select and use a Power Card');
+        console.log('LoadPhase: createPhaseWindows called');
     }
 
     createBeginPhaseWindows(): void {

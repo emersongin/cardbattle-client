@@ -38,6 +38,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.createPhaseWindows();
         super.openAllWindows({
             onComplete: () => {
+                console.log('openAllWindows complete');
                 this.scene.addKeyEnterListeningOnce({
                     onTrigger: () => 
                         super.closeAllWindows({

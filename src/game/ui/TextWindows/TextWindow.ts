@@ -4,13 +4,14 @@ import { DisplayUtil } from '@utils/DisplayUtil';
 import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
 import { VueScene } from '@game/scenes/VueScene';
 
-export class TextWindow extends TextBox {
+export class TextWindow {
+    #textBox: TextBox;
 
     private constructor(
         readonly scene: VueScene, 
         config: TextWindowConfig
     ) {
-        super(scene, {
+        this.#textBox = new TextBox(scene, {
             x: config.x,
             y: config.y,
             width: config.width,
@@ -29,14 +30,14 @@ export class TextWindow extends TextBox {
                 left: 10, right: 10, top: 10, bottom: 10
             }
         });
-        this.layout();
-        this.setScale(1, 0);
+        this.#textBox.layout();
+        this.#textBox.setScale(1, 0);
         this.#setYPositionByHeight(config.height);
-        scene.add.existing(this);
+        scene.add.existing(this.#textBox);
     }
 
     #setYPositionByHeight(height: number): void {
-        this.y = this.y + ((this.height - (height ?? 0)) / 2);
+        this.#textBox.y = this.#textBox.y + ((this.#textBox.height - (height ?? 0)) / 2);
     }
 
     static createTop(scene: VueScene, config: Partial<TextWindowConfig>) {
@@ -44,7 +45,7 @@ export class TextWindow extends TextBox {
         const x = scene.cameras.main.centerX;
         let y = DisplayUtil.column1of12(scene.scale.height);
         if (relativeParent) {
-            y = relativeParent.y - relativeParent.height - 2 + (config.marginTop || 0);
+            y = relativeParent.getY() - relativeParent.getHeight() - 2 + (config.marginTop || 0);
         }
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);
@@ -57,7 +58,7 @@ export class TextWindow extends TextBox {
         const x = scene.cameras.main.centerX;
         let y = scene.cameras.main.centerY;
         if (relativeParent) {
-            y = (relativeParent.y + relativeParent.height) + 2 + (config.marginTop || 0);
+            y = (relativeParent.getY() + relativeParent.getHeight()) + 2 + (config.marginTop || 0);
         }
         const width = (scene.cameras.main.width / 12) * 11;
         const height = (scene.cameras.main.height / 12);
@@ -68,7 +69,7 @@ export class TextWindow extends TextBox {
     open(config?: TweenConfig) {
         if (!this.scene?.tweens) return;
         this.scene.tweens.add({
-            targets: this,
+            targets: this.#textBox,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
@@ -84,7 +85,7 @@ export class TextWindow extends TextBox {
     close(config?: TweenConfig) {
         if (!this.scene?.tweens) return;
         this.scene.tweens.add({
-            targets: this,
+            targets: this.#textBox,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeOut',
@@ -99,11 +100,30 @@ export class TextWindow extends TextBox {
     }
 
     isOpened(): boolean {
-        return this.scaleY === 1;
+        return this.getScaleY() === 1;
     }
 
     isClosed(): boolean {
-        return this.scaleY === 0;
+        return this.getScaleY() === 0;
     }
 
+    setText(text: string): void {
+        this.#textBox.setText(text);
+    }
+
+    getY(): number {
+        return this.#textBox.y;
+    }
+
+    getHeight(): number {
+        return this.#textBox.height;
+    }
+
+    getScaleY(): number {
+        return this.#textBox.scaleY;
+    }
+
+    destroy(): void {
+        this.#textBox.destroy();
+    }
 }

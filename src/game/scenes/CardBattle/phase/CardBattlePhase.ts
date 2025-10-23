@@ -16,7 +16,7 @@ import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
 import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
 import { BattlePoints } from "@game/objects/BattlePoints";
 import { ORANGE } from "@game/constants/colors";
-import { Phase } from "./Phase";
+import { Phase, PhaseEvents } from "./Phase";
 import { CardsetEvents } from "@game/ui/Cardset/CardsetEvents";
 import { TextWindows } from "@game/ui/TextWindows/TextWindows";
 import { PowerCard } from "@game/ui/Card/PowerCard";
@@ -26,10 +26,9 @@ export type AlignType =
     | typeof LEFT 
     | typeof CENTER 
     | typeof RIGHT;
-
 export class CardBattlePhase implements Phase {
     protected cardBattle: CardBattle;
-    protected events: { eventName: string, listeners: ((params?: any) => void)[] }[] = [];
+    protected events: PhaseEvents = [];
 
     #textWindows: TextWindows;
     #commandWindow: CommandWindow;

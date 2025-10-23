@@ -1,3 +1,4 @@
+export type PhaseEvents = { eventName: string, listeners: ((params?: any) => void)[] }[];
 export interface Phase {
     create(params?: any): void;
     addListener(event: string, listener: (params?: any) => void): void;

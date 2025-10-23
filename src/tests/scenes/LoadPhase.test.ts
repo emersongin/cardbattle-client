@@ -71,10 +71,12 @@ describe("LoadPhase.test", () => {
         const phase = new LoadPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenCommandWindow: () => {
+                keyboard.emit('keydown-DOWN');
+                keyboard.emit('keydown-ENTER');
+            },
         });
         sceneMock.changePhase(phase);
-        // keyboard.emit('keydown-DOWN');
-        // keyboard.emit('keydown-ENTER');
         // vi.mocked(cardBattleMock.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
         expect(sceneMock.isPhase('SummonPhase')).toBe(true);
     });
