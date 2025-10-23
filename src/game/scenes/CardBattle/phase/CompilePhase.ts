@@ -8,17 +8,12 @@ import { BattleCard } from "@game/ui/Card/BattleCard";
 export class CompilePhase extends PowerPhase implements Phase {
 
     createPhaseWindows(): void {
-        const onClose = async () => {
-            await super.createGameBoard();
-            await super.openGameBoard();
-            await super.createTextWindowCentered('Begin Compile Phase', { 
-                textAlign: 'center', 
-                onClose: () => super.resumePhase()
-            });
-            super.openAllWindows();
-        }
-        super.createTextWindowCentered('Compile Phase', { textAlign: 'center', onClose });
+        super.createTextWindowCentered('Compile Phase', { textAlign: 'center' });
         super.addTextWindow('Select and use a Power Card');
+    }
+
+    createBeginPhaseWindows(): void {
+        super.createTextWindowCentered('Begin Compile Phase', { textAlign: 'center' });
     }
 
     async createHandZone(): Promise<void> {

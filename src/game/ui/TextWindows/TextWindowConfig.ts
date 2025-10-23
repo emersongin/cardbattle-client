@@ -11,7 +11,7 @@ export type TextWindowConfig = {
     textColor?: string,
     textAlign?: typeof LEFT | typeof CENTER | typeof RIGHT,
     onStartClose?: () => void,
-    onClose?: () => Promise<void> | void,
+    // onClose?: () => Promise<void> | void,
     relativeParent?: TextWindow,
     marginTop?: number
 };

@@ -5,8 +5,6 @@ import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
 import { VueScene } from '@game/scenes/VueScene';
 
 export class TextWindow extends TextBox {
-    #onStartClose?: () => void;
-    #onClose?: () => void;
 
     private constructor(
         readonly scene: VueScene, 
@@ -33,23 +31,12 @@ export class TextWindow extends TextBox {
         });
         this.layout();
         this.setScale(1, 0);
-        this.setStartClose(config.onStartClose);
         this.#setYPositionByHeight(config.height);
-        this.#setOnClose(config.onClose);
         scene.add.existing(this);
-    }
-
-    setStartClose(onStartClose?: () => void): void {
-        if (typeof onStartClose !== 'function') return;
-        this.#onStartClose = onStartClose;
     }
 
     #setYPositionByHeight(height: number): void {
         this.y = this.y + ((this.height - (height ?? 0)) / 2);
-    }
-
-    #setOnClose(onClose?: () => void): void {
-        if (onClose) this.#onClose = onClose;
     }
 
     static createTop(scene: VueScene, config: Partial<TextWindowConfig>) {
@@ -85,8 +72,10 @@ export class TextWindow extends TextBox {
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
+            onStart: () => {
+                if (config?.onStart) config.onStart();
+            },
             onComplete: async () => {
-                if (this.#onClose) this.#addListenerOnCompleted();
                 if (config?.onComplete) config.onComplete();
             }
         });
@@ -99,6 +88,9 @@ export class TextWindow extends TextBox {
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeOut',
+            onStart: () => {
+                if (config?.onStart) config.onStart();
+            },
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
                 this.destroy();
@@ -106,22 +98,12 @@ export class TextWindow extends TextBox {
         });
     }
 
-    isOpen(): boolean {
+    isOpened(): boolean {
         return this.scaleY === 1;
     }
 
-    #addListenerOnCompleted() {
-        this.scene.addKeyEnterListeningOnce({
-            onTrigger: () => {
-                if (this.#onStartClose) this.#onStartClose();
-                this.close({ 
-                    onComplete: this.#onClose 
-                });
-            }
-        });
+    isClosed(): boolean {
+        return this.scaleY === 0;
     }
 
-    hasOnCloseFunction() {
-        return this.#onClose;
-    }
 }

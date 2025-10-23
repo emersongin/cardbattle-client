@@ -15,9 +15,9 @@ vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
                 setScale: vi.fn(),
                 setStartClose: vi.fn(),
                 open: vi.fn(TextWindow.prototype.open),
-                isOpen: vi.fn(TextWindow.prototype.isOpen),
+                isOpened: vi.fn(TextWindow.prototype.isOpened),
+                isClosed: vi.fn(TextWindow.prototype.isClosed),
                 close: vi.fn(TextWindow.prototype.close),
-                hasOnCloseFunction: vi.fn(TextWindow.prototype.hasOnCloseFunction),
                 destroy: vi.fn(),
             };
         }),

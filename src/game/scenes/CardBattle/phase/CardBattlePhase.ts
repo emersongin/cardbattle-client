@@ -29,6 +29,7 @@ export type AlignType =
 
 export class CardBattlePhase implements Phase {
     protected cardBattle: CardBattle;
+    protected events: { eventName: string, listeners: ((params?: any) => void)[] }[] = [];
 
     #textWindows: TextWindows;
     #commandWindow: CommandWindow;
@@ -45,6 +46,23 @@ export class CardBattlePhase implements Phase {
 
     create(_p?: any): void {
         throw new Error("Method not implemented.");
+    }
+
+    addListener(event: string, listener: (params?: any) => void): void {
+        const eventIndex = this.events.findIndex(e => e.eventName === event);
+        if (eventIndex !== -1) {
+            this.events[eventIndex].listeners.push(listener);
+        } else {
+            this.events.push({ eventName: event, listeners: [listener] });
+        }
+    }
+
+    publish(event: string, params?: any): void {
+        console.log('Publishing event:', event, params);
+        const eventIndex = this.events.findIndex(e => e.eventName === event);
+        if (eventIndex !== -1) {
+            this.events[eventIndex].listeners.forEach(listener => listener(params));
+        }
     }
 
     // TEXT WINDOWS

@@ -18,18 +18,8 @@ export class TextWindows {
             textAlign: config.textAlign || 'left',
             textColor: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
-            onStartClose: () => this.#onStartCloseAllChildrenWindows(),
-            onClose: config.onClose
         };
         this.#textWindows[0] = TextWindow.createTop(this.scene, { ...windowConfig, text });
-    }
-
-    #onStartCloseAllChildrenWindows(): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window, index) => {
-                if (index > 0) window.close({ onComplete: () => window.destroy()})
-            });
-        }
     }
 
     createTextWindowCentered(text: string, config: Partial<TextWindowConfig>): void {
@@ -43,8 +33,8 @@ export class TextWindows {
             textColor: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
             marginTop: config.marginTop || 0,
-            onStartClose: () => this.#onStartCloseAllChildrenWindows(),
-            onClose: config.onClose
+            // onStartClose: () => this.#onStartCloseAllChildrenWindows(),
+            // onClose: config.onClose
         };
         return TextWindow.createCentered(this.scene, { ...windowConfig, text });
     }
@@ -55,7 +45,6 @@ export class TextWindows {
         }
         if (!config) config = {};
         config.relativeParent = this.#getLastTextWindow();
-        config.onStartClose = () => {}; // null
         const textFormatted = this.#breakTextWithoutCuttingWords(text, 60);
         this.#textWindows.push(this.#createTextWindowCentered(textFormatted, config));
     }
@@ -96,26 +85,28 @@ export class TextWindows {
     }
 
     openAllWindows(config?: TweenConfig): void {
-        if (this.#textWindows.length) {
-            this.#textWindows.forEach((window: TextWindow, index: number) => {
-                if (!index) return window.open(config);
-                window.open();
-            });
+        if (!this.#textWindows.length) {
+            if (config?.onComplete) config.onComplete();
+            return;
         }
+        this.#textWindows.forEach((window: TextWindow, index: number) => {
+            if (!index && window.isClosed()) return window.open(config);
+            window.open();
+        });
     }
 
     closeAllWindows(config?: TweenConfig): void {
+        if (!this.#textWindows.length) {
+            if (config?.onComplete) config.onComplete();
+            return;
+        }
         this.#textWindows.forEach((window, index) => {
-            if (!index && window.isOpen()) {
-                return window.close({ 
-                    ...config, 
-                    onComplete: () => {
-                        if (config?.onComplete) config.onComplete();
-                    }
-                });
-            } else {
-                if (config?.onComplete) config.onComplete();
-            }
+            if (!index && window.isOpened()) return window.close({ ...config, 
+                onComplete: () => {
+                    if (config?.onComplete) config.onComplete();
+                    this.#empty();
+                } 
+            });
             window.close();
         });
     }

@@ -6,7 +6,23 @@ import { PowerCardPlay } from "@game/objects/PowerCardPlay";
 import { Card } from "@game/ui/Card/Card";
 import { PowerCard } from "@game/ui/Card/PowerCard";
 import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
+import { CardBattleScene } from "../CardBattleScene";
+
+export type PowerPhaseEvents = {
+    onOpenPhaseWindows?: () => void;
+    onOpenBeginPhaseWindow?: () => void;
+}
 export abstract class PowerPhase extends CardBattlePhase {
+
+    constructor(scene: CardBattleScene, events?: PowerPhaseEvents) {
+        super(scene);
+        if (events?.onOpenPhaseWindows) {
+            super.addListener('onOpenPhaseWindows', events.onOpenPhaseWindows);
+        }
+        if (events?.onOpenBeginPhaseWindow) {
+            super.addListener('onOpenBeginPhaseWindow', events.onOpenBeginPhaseWindow);
+        }
+    }
 
     async create(goToPlays: boolean = false): Promise<void> {
         if (goToPlays) {
@@ -16,10 +32,36 @@ export abstract class PowerPhase extends CardBattlePhase {
             return;
         }
         this.createPhaseWindows();
-        super.openAllWindows();
+        super.openAllWindows({
+            onComplete: () => {
+                this.scene.addKeyEnterListeningOnce({
+                    onTrigger: () => 
+                        super.closeAllWindows({
+                            onComplete: async () => {
+                                await super.createGameBoard();
+                                this.createBeginPhaseWindows();
+                                await super.openGameBoard();
+                                super.openAllWindows({
+                                    onComplete: () => {
+                                        this.scene.addKeyEnterListeningOnce({
+                                            onTrigger: () => 
+                                                super.closeAllWindows({
+                                                    onComplete: () => this.resumePhase()
+                                                })
+                                        });
+                                        super.publish('onOpenBeginPhaseWindow');
+                                    }
+                                });
+                            }
+                        })
+                });
+                super.publish('onOpenPhaseWindows');
+            }
+        });
     }
 
     abstract createPhaseWindows(): void;
+    abstract createBeginPhaseWindows(): void;
 
     async resumePhase(): Promise<void> {
         if (await this.cardBattle.isStartPlaying(this.scene.getPlayerId())) {
