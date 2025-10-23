@@ -2,6 +2,7 @@ import { Sizer, Label } from 'phaser3-rex-plugins/templates/ui/ui-components';
 import { DisplayUtil } from '@utils/DisplayUtil';
 import { VueScene } from '@game/scenes/VueScene';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
+import { TweenConfig } from '@/game/types/TweenConfig';
 export class CommandWindow extends Sizer {
     private selectedIndex: number = 0;
     private options: Label[];
@@ -28,7 +29,6 @@ export class CommandWindow extends Sizer {
         this.#createBackground(scene);
         this.#createTitle(scene, title);
         this.#createOptions(scene, width, commands);
-
         this.layout();
         this.setScale(1, 0);
         scene.add.existing(this);
@@ -50,15 +50,16 @@ export class CommandWindow extends Sizer {
         return new CommandWindow(scene, x, y, width, height, title, commands);
     }
 
-    open() {
+    open(config?: TweenConfig) {
         this.scene.tweens.add({
             targets: this,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
             onComplete: () => {
-                this.#setupKeyboardControls();
-                this.#select(0);
+                if (config?.onComplete) config.onComplete();
+                // this.#setupKeyboardControls();
+                // this.#select(0);
             }
         });
     }
@@ -104,19 +105,40 @@ export class CommandWindow extends Sizer {
         });
     }
 
-    #setupKeyboardControls() {
-        this.scene.addKeyUpListening({ onTrigger: () => this.#select(this.selectedIndex - 1) });
-        this.scene.addKeyDownListening({ onTrigger: () => this.#select(this.selectedIndex + 1) });
-        this.scene.addKeyEnterListeningOnce({ 
-            onTrigger: () => {
-                if (this.commands[this.selectedIndex].disabled) {
-                    console.log('Sound disabled command');
-                    return;
-                }
-                this.#close(this.commands[this.selectedIndex].onSelect);
-            }
-        });
+    cursorUp(): void {
+        this.selectByIndex(this.selectedIndex - 1);
     }
+
+    cursorDown(): void {
+        this.selectByIndex(this.selectedIndex + 1);
+    }
+
+    selectByIndex(newIndex: number): void {
+        this.#setSelectIndex(newIndex);
+        this.#updateOptions();
+    }
+
+    select(): void {
+        if (this.commands[this.selectedIndex].disabled) {
+            console.log('Sound disabled command');
+            return;
+        }
+        this.#close(this.commands[this.selectedIndex].onSelect);
+    }
+
+    // #setupKeyboardControls() {
+        // this.scene.addKeyUpListening({ onTrigger: () => this.#select(this.selectedIndex - 1) });
+        // this.scene.addKeyDownListening({ onTrigger: () => this.#select(this.selectedIndex + 1) });
+        // this.scene.addKeyEnterListeningOnce({ 
+        //     onTrigger: () => {
+        //         if (this.commands[this.selectedIndex].disabled) {
+        //             console.log('Sound disabled command');
+        //             return;
+        //         }
+        //         this.#close(this.commands[this.selectedIndex].onSelect);
+        //     }
+        // });
+    // }
 
     #close(onSelect: () => Promise<void> | void) {
         this.scene.tweens.add({
@@ -129,11 +151,6 @@ export class CommandWindow extends Sizer {
                 this.destroy();
             }
         });
-    }
-
-    #select(newIndex: number) {
-        this.#setSelectIndex(newIndex);
-        this.#updateOptions();
     }
 
     #setSelectIndex(newIndex: number) {

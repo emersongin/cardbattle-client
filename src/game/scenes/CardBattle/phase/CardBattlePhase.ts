@@ -123,8 +123,12 @@ export class CardBattlePhase implements Phase {
         this.#commandWindow = CommandWindow.createBottom(this.scene, text, options);
     }
 
-    openCommandWindow(): void {
-        this.#commandWindow.open();
+    getCommandWindow(): CommandWindow {
+        return this.#commandWindow;
+    }
+
+    openCommandWindow(config?: TweenConfig): void {
+        this.#commandWindow.open(config);
     }
 
     // PLAYER BOARD

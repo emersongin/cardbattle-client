@@ -11,6 +11,7 @@ import { CardBattleScene } from "../CardBattleScene";
 export type PowerPhaseEvents = {
     onOpenPhaseWindows?: () => void;
     onOpenBeginPhaseWindow?: () => void;
+    onOpenCommandWindow?: () => void;
 }
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -21,6 +22,9 @@ export abstract class PowerPhase extends CardBattlePhase {
         }
         if (events?.onOpenBeginPhaseWindow) {
             super.addListener('onOpenBeginPhaseWindow', events.onOpenBeginPhaseWindow);
+        }
+        if (events?.onOpenCommandWindow) {
+            super.addListener('onOpenCommandWindow', events.onOpenCommandWindow);
         }
     }
 
@@ -76,7 +80,16 @@ export abstract class PowerPhase extends CardBattlePhase {
             this.#resetPlay(),
             this.#createCommandWindow()
         ]);
-        super.openCommandWindow()
+        super.openCommandWindow({
+            onComplete: () => {
+                const commandWindow = super.getCommandWindow();
+                this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
+                this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
+                this.scene.addKeyEnterListeningOnce({ onTrigger: () => commandWindow.select() });
+                commandWindow.selectByIndex(0);
+                super.publish('onOpenCommandWindow');
+            }
+        })
     }
 
     #resetPlay(): Promise<void> {
