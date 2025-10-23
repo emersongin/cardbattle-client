@@ -8,6 +8,7 @@ import { BLACK, BLUE, GREEN, RED, WHITE } from "@game/constants/colors";
 import { BoardWindow } from "@game/ui/BoardWindow/BoardWindow";
 import { PowerCard } from "@game/ui/Card/PowerCard";
 import { BattleCard } from "@game/ui/Card/BattleCard";
+import { PowerCardPlay } from "@/game/objects/PowerCardPlay";
 
 function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
     const keyboard = scene.input.keyboard;
@@ -65,22 +66,38 @@ describe("LoadPhase.test", () => {
         vi.mocked(cardBattleMock.getOpponentBattleCards).mockReturnValue([] as BattleCard[]);
         vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
         vi.mocked(cardBattleMock.hasPowerCardsInField).mockReturnValue(false);
-        vi.mocked(cardBattleMock.allPass).mockReturnValue(true);
+        vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
+            (_playerId: string, callback: (play: PowerCardPlay) => void) => {
+                cardBattleMock.opponentStep = PASS;
+                callback({
+                    pass: true,
+                    powerAction: null,
+                });
+                return Promise.resolve(); // garante que retorna Promise<void>
+            }
+        );
+        
     });
 
-    it("should throw error: invalid card type.", () => {
-        const keyboard = getKeyboard(sceneMock);
-        const phase = new LoadPhase(sceneMock, {
+    it("should throw error: invalid card type.", async () => {
+        const asyncFunction = new Promise<void>((resolve) => {
+            const keyboard = getKeyboard(sceneMock);
+            const phase = new LoadPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => {
-                keyboard.emit('keydown-DOWN');
-                keyboard.emit('keydown-ENTER');
-            },
+                    keyboard.emit('keydown-DOWN');
+                    keyboard.emit('keydown-ENTER');
+                },
+            });
+            const changeToOriginal = phase.changeTo.bind(phase);
+            phase.changeTo = () => {
+                changeToOriginal();
+                resolve();
+            };
+            sceneMock.changePhase(phase);
         });
-        sceneMock.changePhase(phase);
-        // vi.mocked(cardBattleMock.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
-        console.log(sceneMock.isPhase('SummonPhase'));
+        await asyncFunction;
         expect(sceneMock.isPhase('SummonPhase')).toBe(true);
     });
 

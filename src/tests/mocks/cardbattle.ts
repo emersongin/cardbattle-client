@@ -1,7 +1,7 @@
 import { vi } from "vitest";
 import { CardBattle } from "@game/api/CardBattle";
 import { PowerActionData } from "@game/objects/PowerActionData";
-import { NONE } from "@game/constants/keys";
+import { NONE, PASS } from "@game/constants/keys";
 import { CardData } from "@game/objects/CardData";
 class CardBattleMock implements CardBattle {
     roomId: string = '';
@@ -39,13 +39,18 @@ class CardBattleMock implements CardBattle {
     getOpponentCardsFromHand = vi.fn();
     isStartPlaying = vi.fn();
     setPlaying = vi.fn();
-    pass = vi.fn();
+    pass = () => {
+        this.playerStep = PASS;
+        return Promise.resolve();
+    };
     getPowerCardById = vi.fn();
     getFieldPowerCards = vi.fn();
     makePowerCardPlay = vi.fn();
     isPowerfieldLimitReached = vi.fn();
     hasPowerCardsInField = vi.fn();
-    allPass = vi.fn();
+    allPass = () => {
+        return Promise.resolve(this.playerStep === PASS && this.opponentStep === PASS);
+    };
     isOpponentPassed = vi.fn();
     listenOpponentPlay = vi.fn();
     hasPowerCardInHand = vi.fn();

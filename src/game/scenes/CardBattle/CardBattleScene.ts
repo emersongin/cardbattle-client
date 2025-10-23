@@ -80,7 +80,6 @@ export class CardBattleScene extends VueScene {
     }
 
     changePhase(phase: Phase, ...params: any[]): void {
-        console.log(`Changing phase to: ${phase.constructor.name}`);
         this.phase = phase;
         this.phase.create(...(params || []));
     }

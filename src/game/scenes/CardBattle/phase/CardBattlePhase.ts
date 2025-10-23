@@ -57,7 +57,6 @@ export class CardBattlePhase implements Phase {
     }
 
     publish(event: string, params?: any): void {
-        console.log('Publishing event:', event, params || {});
         const eventIndex = this.events.findIndex(e => e.eventName === event);
         if (eventIndex !== -1) {
             this.events[eventIndex].listeners.forEach(listener => listener(params));
@@ -579,7 +578,6 @@ export class CardBattlePhase implements Phase {
     }
 
     closeGameBoard(generalConfig?: TweenConfig): Promise<void> {
-        console.log('CardBattlePhase: closeGameBoard called');
         return new Promise(resolve => {
             this.scene.timeline({
                 targets: [
@@ -591,7 +589,6 @@ export class CardBattlePhase implements Phase {
                     (config?: TweenConfig) => this.closeAllWindows(config),
                 ],
                 onAllComplete: () => {
-                    console.log('CardBattlePhase: closeGameBoard complete', generalConfig?.onComplete?.toString());
                     if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },
