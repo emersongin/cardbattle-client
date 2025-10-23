@@ -579,6 +579,7 @@ export class CardBattlePhase implements Phase {
     }
 
     closeGameBoard(generalConfig?: TweenConfig): Promise<void> {
+        console.log('CardBattlePhase: closeGameBoard called');
         return new Promise(resolve => {
             this.scene.timeline({
                 targets: [
@@ -590,6 +591,7 @@ export class CardBattlePhase implements Phase {
                     (config?: TweenConfig) => this.closeAllWindows(config),
                 ],
                 onAllComplete: () => {
+                    console.log('CardBattlePhase: closeGameBoard complete', generalConfig?.onComplete?.toString());
                     if (generalConfig?.onComplete) generalConfig.onComplete();
                     resolve();
                 },

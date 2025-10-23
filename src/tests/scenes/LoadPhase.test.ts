@@ -64,6 +64,8 @@ describe("LoadPhase.test", () => {
         vi.mocked(cardBattleMock.getBattleCards).mockReturnValue([] as BattleCard[]);
         vi.mocked(cardBattleMock.getOpponentBattleCards).mockReturnValue([] as BattleCard[]);
         vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
+        vi.mocked(cardBattleMock.hasPowerCardsInField).mockReturnValue(false);
+        vi.mocked(cardBattleMock.allPass).mockReturnValue(true);
     });
 
     it("should throw error: invalid card type.", () => {
@@ -78,6 +80,7 @@ describe("LoadPhase.test", () => {
         });
         sceneMock.changePhase(phase);
         // vi.mocked(cardBattleMock.listenOpponentPlay).mockReturnValue({ pass: true, powerAction: null });
+        console.log(sceneMock.isPhase('SummonPhase'));
         expect(sceneMock.isPhase('SummonPhase')).toBe(true);
     });
 
