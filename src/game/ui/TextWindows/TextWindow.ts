@@ -77,6 +77,7 @@ export class TextWindow {
                 if (config?.onStart) config.onStart();
             },
             onComplete: async () => {
+                this.#textBox.scaleY = 1;
                 if (config?.onComplete) config.onComplete();
             }
         });
@@ -93,6 +94,7 @@ export class TextWindow {
                 if (config?.onStart) config.onStart();
             },
             onComplete: () => {
+                this.#textBox.scaleY = 0;
                 if (config?.onComplete) config.onComplete();
                 this.destroy();
             }

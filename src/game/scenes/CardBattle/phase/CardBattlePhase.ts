@@ -57,7 +57,7 @@ export class CardBattlePhase implements Phase {
     }
 
     publish(event: string, params?: any): void {
-        console.log('Publishing event:', event, params);
+        console.log('Publishing event:', event, params || {});
         const eventIndex = this.events.findIndex(e => e.eventName === event);
         if (eventIndex !== -1) {
             this.events[eventIndex].listeners.forEach(listener => listener(params));

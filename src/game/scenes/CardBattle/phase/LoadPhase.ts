@@ -14,6 +14,7 @@ export class LoadPhase extends PowerPhase implements Phase {
 
     createBeginPhaseWindows(): void {
         super.createTextWindowCentered('Begin Load Phase', { textAlign: 'center' });
+        console.log('LoadPhase: createBeginPhaseWindows called');
     }
 
     async createHandZone(): Promise<void> {
