@@ -31,7 +31,20 @@ export class SelectMode {
     #enable() {
         this.cardset.data.set('selectModeEnabled', true);
         this.#updateCursor();
-        this.#addKeyboardListeners();
+        // this.#addKeyboardListeners();
+    }
+
+    cursorRight(): void {
+        this.#updateCursor(this.#index + 1);
+    }
+
+    cursorLeft(): void {
+        this.#updateCursor(this.#index - 1);
+    }
+
+    leave(): void {
+        if (this.#events.onLeave) this.#events.onLeave();
+        this.#disable();
     }
 
     #updateCursor(newIndex: number = this.#getCurrentIndex()): void {
@@ -111,34 +124,30 @@ export class SelectMode {
     }
 
     #addKeyboardListeners() {
-        this.#onKeydownRight();
-        this.#onKeydownLeft();       
-        this.#onKeydownEsc();
-        this.#onKeydownEnter();
         this.#onKeydownShift();
     }
 
-    #onKeydownRight(): void {
-        this.cardset.scene.addKeyRightListening({ 
-            onTrigger: () => this.#updateCursor(this.#index + 1) 
-        });
-    }
+    // #onKeydownRight(): void {
+    //     this.cardset.scene.addKeyRightListening({ 
+    //         onTrigger: () => this.#updateCursor(this.#index + 1) 
+    //     });
+    // }
 
-    #onKeydownLeft(): void {
-        this.cardset.scene.addKeyLeftListening({ 
-            onTrigger: () => this.#updateCursor(this.#index - 1) 
-        });
-    }
+    // #onKeydownLeft(): void {
+    //     this.cardset.scene.addKeyLeftListening({ 
+    //         onTrigger: () => this.#updateCursor(this.#index - 1) 
+    //     });
+    // }
 
-    #onKeydownEsc(): void {
-        if (!this.#events.onLeave) return;
-        this.cardset.scene.addKeyEscListeningOnce({
-            onTrigger: () => {
-                this.#disable();
-                if (this.#events.onLeave) this.#events.onLeave();
-            } 
-        });
-    }
+    // #onKeydownEsc(): void {
+    //     if (!this.#events.onLeave) return;
+    //     this.cardset.scene.addKeyEscListeningOnce({
+    //         onTrigger: () => {
+    //             this.#disable();
+    //             if (this.#events.onLeave) this.#events.onLeave();
+    //         } 
+    //     });
+    // }
 
     #disable() {
         this.cardset.data.set('selectModeEnabled', false);
@@ -146,43 +155,36 @@ export class SelectMode {
         this.cardset.scene.removeAllKeyListening();
     }
 
-    #onKeydownEnter(): void {
+    select(): void {
         if (this.#isOneSelectMode()) {
-            const onKeydownEnterOnce = () => {
-                const currentId = this.#getCurrentId();
-                if (this.#isCardDisabledById(currentId)) return;
-                this.#selectId(currentId);
-                this.#disable();
-                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
-                return;
-            };
-            this.cardset.scene.addKeyEnterListeningOnce({ onTrigger: onKeydownEnterOnce });
-            return;
-        }
-        const onKeydownEnter = () => {
             const currentId = this.#getCurrentId();
             if (this.#isCardDisabledById(currentId)) return;
-            if (!this.#isIdSelected(currentId) && this.#notHaveEnoughPoints(currentId)) return;
-            if (this.#isIdSelected(currentId)) {
-                this.#removeId(currentId);
-                this.#creditPointsById(currentId);
-                this.cardset.enableCardById(currentId);
-                this.#unmarkCardById(currentId);
-                this.#disableCardsWithoutEnoughPoints();
-                return;
-            }
             this.#selectId(currentId);
-            this.#debitPointsById(currentId);
-            this.cardset.disableCardById(currentId);
-            this.#markCardById(currentId);
-            if (this.#events.onMarked) this.#events.onMarked(this.#getCardById(currentId));
+            this.#disable();
+            if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
+            return;
+        }
+        const currentId = this.#getCurrentId();
+        if (this.#isCardDisabledById(currentId)) return;
+        if (!this.#isIdSelected(currentId) && this.#notHaveEnoughPoints(currentId)) return;
+        if (this.#isIdSelected(currentId)) {
+            this.#removeId(currentId);
+            this.#creditPointsById(currentId);
+            this.cardset.enableCardById(currentId);
+            this.#unmarkCardById(currentId);
             this.#disableCardsWithoutEnoughPoints();
-            if (this.#noCardsAvaliable()) {
-                this.#disable();
-                if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
-            }
-        };
-        this.cardset.scene.addKeyEnterListening({ onTrigger: onKeydownEnter });
+            return;
+        }
+        this.#selectId(currentId);
+        this.#debitPointsById(currentId);
+        this.cardset.disableCardById(currentId);
+        this.#markCardById(currentId);
+        if (this.#events.onMarked) this.#events.onMarked(this.#getCardById(currentId));
+        this.#disableCardsWithoutEnoughPoints();
+        if (this.#noCardsAvaliable()) {
+            this.#disable();
+            if (this.#events.onComplete) this.#events.onComplete(this.getIdsSelected());
+        }
     }
 
     #onKeydownShift(): void {

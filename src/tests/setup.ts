@@ -18,6 +18,7 @@ vi.mock('phaser3-rex-plugins/templates/ui/ui-components', () => {
                     this.scaleY = y;
                 }),
                 setStartClose: vi.fn(),
+                setText: vi.fn(),
             };
         }),
         Label: vi.fn().mockImplementation(() => {

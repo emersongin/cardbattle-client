@@ -12,6 +12,10 @@ export type PowerPhaseEvents = {
     onOpenPhaseWindows?: () => void;
     onOpenBeginPhaseWindow?: () => void;
     onOpenCommandWindow?: () => void;
+    onOpenHandZone?: () => void;
+    onOpenPowerCardChoiceCommandWindow?: () => void;
+    onOpenPowerCardCommandWindow?: () => void;
+    onChangeToTriggerPhase?: () => void;
 }
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -26,6 +30,19 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (events?.onOpenCommandWindow) {
             super.addListener('onOpenCommandWindow', events.onOpenCommandWindow);
         }
+        if (events?.onOpenHandZone) {
+            super.addListener('onOpenHandZone', events.onOpenHandZone);
+        }
+        if (events?.onOpenPowerCardChoiceCommandWindow) {
+            super.addListener('onOpenPowerCardChoiceCommandWindow', events.onOpenPowerCardChoiceCommandWindow);
+        }
+        if (events?.onOpenPowerCardCommandWindow) {
+            super.addListener('onOpenPowerCardCommandWindow', events.onOpenPowerCardCommandWindow);
+        }
+        if (events?.onChangeToTriggerPhase) {
+            super.addListener('onChangeToTriggerPhase', events.onChangeToTriggerPhase);
+        }
+
     }
 
     async create(goToPlays: boolean = false): Promise<void> {
@@ -136,8 +153,16 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.setSelectModeOnceCardset({
             onChangeIndex: (card: Card) => this.#updateTextWindows(card),
             onComplete: (cardIds: string[]) => this.#completeChoice(cardIds),
-            onLeave: () => this.#changeHandZoneToBattleZone({ onComplete: () => this.#goPlay() }),
+            onLeave: () => this.#changeHandZoneToBattleZone({ 
+                onComplete: () => this.#goPlay() 
+            }),
         });
+        const cardset = super.getCardset();
+        this.scene.addKeyRightListening({ onTrigger: () => cardset.cursorRight() });
+        this.scene.addKeyLeftListening({ onTrigger: () => cardset.cursorLeft() });
+        this.scene.addKeyEnterListeningOnce({ onTrigger: () => cardset.select() });
+        this.scene.addKeyEscListeningOnce({ onTrigger: () => cardset.leave() });
+        super.publish('onOpenHandZone');
     }
 
     async #changeHandZoneToBattleZone(config: { onComplete: () => void }): Promise<void> {
@@ -166,6 +191,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             {
                 description: 'Yes',
                 onSelect: () => {
+                    console.log('cardId');
                     const cardId = cardIds.shift();
                     this.#changeHandZoneToBattleZone({ 
                         onComplete: () => {
@@ -181,7 +207,16 @@ export abstract class PowerPhase extends CardBattlePhase {
                 disabled: false
             },
         ]);
-        super.openCommandWindow();
+        super.openCommandWindow({
+            onComplete: () => {
+                const commandWindow = super.getCommandWindow();
+                this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
+                this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
+                this.scene.addKeyEnterListeningOnce({ onTrigger: () => commandWindow.select() });
+                commandWindow.selectByIndex(0);
+                super.publish('onOpenPowerCardChoiceCommandWindow');
+            }
+        });
     }
 
     async #startPowerCardPlay(cardId: string): Promise<void> {
@@ -218,7 +253,16 @@ export abstract class PowerPhase extends CardBattlePhase {
             }
         ]);
         super.openAllWindows();
-        super.openCommandWindow();
+        super.openCommandWindow({
+            onComplete: () => {
+                const commandWindow = super.getCommandWindow();
+                this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
+                this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
+                this.scene.addKeyEnterListeningOnce({ onTrigger: () => commandWindow.select() });
+                commandWindow.selectByIndex(0);
+                super.publish('onOpenPowerCardCommandWindow');
+            }
+        });
     }
 
     async #finishPowerCardPlay(powerCard: PowerCard, powerCardConfig: any): Promise<void> {
@@ -291,6 +335,7 @@ export abstract class PowerPhase extends CardBattlePhase {
     
     changeToTriggerPhase(): void {
         this.scene.changePhase(new TriggerPhase(this.scene, this));
+        super.publish('onChangeToTriggerPhase');
     }
 
     #listanOpponentPlay() {

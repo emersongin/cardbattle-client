@@ -172,6 +172,7 @@ const PhaserMock = {
             },
             updateList: {
                 add: vi.fn(),
+                remove: vi.fn(),
             },
             queueDepthSort: vi.fn(),
         };

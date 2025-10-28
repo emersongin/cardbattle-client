@@ -118,6 +118,7 @@ export class CommandWindow {
     }
 
     select(): void {
+        console.log(`Selected command index: ${this.#selectedIndex}`);
         if (this.commands[this.#selectedIndex].disabled) {
             console.log('Sound disabled command');
             return;

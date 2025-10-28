@@ -8,7 +8,8 @@ import { CardColorType } from "@game/types/CardColorType";
 import { TweenConfig } from "@game/types/TweenConfig";
 import { UpdateAnimation } from "@ui/BoardWindow/animations/UpdateAnimation";
 
-export class BoardWindow extends Sizer {
+export class BoardWindow {
+    #sizer: Sizer;
     #contentLabel: Label;
 
     private constructor(
@@ -22,7 +23,7 @@ export class BoardWindow extends Sizer {
         reverse: boolean = false
     ) {
         const vertical = 1;
-        super(scene, {
+        this.#sizer = new Sizer(scene, {
             x,
             y,
             width,
@@ -32,31 +33,31 @@ export class BoardWindow extends Sizer {
         this.#setStartData(data, reverse);
         this.#createBackground(color);
         this.#createContentLabel(data);
-        this.layout();
-        this.setScale(1, 0);
-        scene.add.existing(this);
+        this.#sizer.layout();
+        this.#sizer.setScale(1, 0);
+        scene.add.existing(this.#sizer);
     }
 
     #setStartData(data: BoardWindowData, reverse: boolean = false) {
-        this.setDataEnabled();
-        this.data.set(AP, data[AP] ?? 0);
-        this.data.set(HP, data[HP] ?? 0);
-        this.data.set(RED, data[RED] ?? 0);
-        this.data.set(GREEN, data[GREEN] ?? 0);
-        this.data.set(BLUE, data[BLUE] ?? 0);
-        this.data.set(BLACK, data[BLACK] ?? 0);
-        this.data.set(WHITE, data[WHITE] ?? 0);
-        this.data.set(HAND, data[HAND] ?? 0);
-        this.data.set(DECK, data[DECK] ?? 0);
-        this.data.set(TRASH, data[TRASH] ?? 0);
-        this.data.set(WINS, data[WINS] ?? 0);
-        this.data.set(REVERSE, reverse ?? false);
-        this.data.set(PASS, data[PASS] ?? false);
+        this.#sizer.setDataEnabled();
+        this.#sizer.data.set(AP, data[AP] ?? 0);
+        this.#sizer.data.set(HP, data[HP] ?? 0);
+        this.#sizer.data.set(RED, data[RED] ?? 0);
+        this.#sizer.data.set(GREEN, data[GREEN] ?? 0);
+        this.#sizer.data.set(BLUE, data[BLUE] ?? 0);
+        this.#sizer.data.set(BLACK, data[BLACK] ?? 0);
+        this.#sizer.data.set(WHITE, data[WHITE] ?? 0);
+        this.#sizer.data.set(HAND, data[HAND] ?? 0);
+        this.#sizer.data.set(DECK, data[DECK] ?? 0);
+        this.#sizer.data.set(TRASH, data[TRASH] ?? 0);
+        this.#sizer.data.set(WINS, data[WINS] ?? 0);
+        this.#sizer.data.set(REVERSE, reverse ?? false);
+        this.#sizer.data.set(PASS, data[PASS] ?? false);
     }
 
     #createBackground(color: number) {
         const background = this.scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, color);
-        this.addBackground(background);
+        this.#sizer.addBackground(background);
     }
 
     #createContentLabel(config: BoardWindowData) {
@@ -67,7 +68,7 @@ export class BoardWindow extends Sizer {
             }),
             align: 'center'
         });
-        this.add(contentLabel, { align: 'center', expand: false, padding: { top: 20, bottom: 20 } });
+        this.#sizer.add(contentLabel, { align: 'center', expand: false, padding: { top: 20, bottom: 20 } });
         this.#contentLabel = contentLabel;
     }
 
@@ -92,7 +93,7 @@ export class BoardWindow extends Sizer {
     }
 
     #getData(prop: string): any {
-        return this.data.get(prop);
+        return this.#sizer.data.get(prop);
     }
 
     #createBattlePoints(ap: number, hp: number, pass: boolean): string {
@@ -183,7 +184,7 @@ export class BoardWindow extends Sizer {
             ease: 'Back.easeIn',
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
-                this.destroy();
+                this.#sizer.destroy();
             }
         });
     }
@@ -232,8 +233,8 @@ export class BoardWindow extends Sizer {
     }
 
     setBattlePoints(attackPoints: number, healthPoints: number): void {
-        this.data.set(AP, attackPoints);
-        this.data.set(HP, healthPoints);
+        this.#sizer.data.set(AP, attackPoints);
+        this.#sizer.data.set(HP, healthPoints);
         const fromTarget = this.getAllData();
         const content = this.createContent(fromTarget);
         this.setText(content);
@@ -249,8 +250,8 @@ export class BoardWindow extends Sizer {
             [HP]: healthPoints,
         } as Partial<BoardWindowData>;
         this.#updating(fromTarget, toTarget, 1000, onComplete);
-        this.data.set(AP, attackPoints);
-        this.data.set(HP, healthPoints);
+        this.#sizer.data.set(AP, attackPoints);
+        this.#sizer.data.set(HP, healthPoints);
     }
 
     addZonePoints(boardZone: BoardZonesType, value: number): void {
@@ -283,10 +284,10 @@ export class BoardWindow extends Sizer {
             toTarget[WINS] = value
         }
         this.#updating(fromTarget, toTarget);
-        if (boardZone === HAND) this.data.set(HAND, value);
-        if (boardZone === DECK) this.data.set(DECK, value);
-        if (boardZone === TRASH) this.data.set(TRASH, value);
-        if (boardZone === WINS) this.data.set(WINS, value);
+        if (boardZone === HAND) this.#sizer.data.set(HAND, value);
+        if (boardZone === DECK) this.#sizer.data.set(DECK, value);
+        if (boardZone === TRASH) this.#sizer.data.set(TRASH, value);
+        if (boardZone === WINS) this.#sizer.data.set(WINS, value);
     }
 
     addColorPoints(cardColor: CardColorType, value: number): void {
@@ -323,11 +324,11 @@ export class BoardWindow extends Sizer {
             toTarget[WHITE] = value;
         }
         this.#updating(fromTarget, toTarget);
-        if (cardColor === RED) this.data.set(RED, value);
-        if (cardColor === GREEN) this.data.set(GREEN, value);
-        if (cardColor === BLUE) this.data.set(BLUE, value);
-        if (cardColor === BLACK) this.data.set(BLACK, value);
-        if (cardColor === WHITE) this.data.set(WHITE, value);
+        if (cardColor === RED) this.#sizer.data.set(RED, value);
+        if (cardColor === GREEN) this.#sizer.data.set(GREEN, value);
+        if (cardColor === BLUE) this.#sizer.data.set(BLUE, value);
+        if (cardColor === BLACK) this.#sizer.data.set(BLACK, value);
+        if (cardColor === WHITE) this.#sizer.data.set(WHITE, value);
     }
 
     setPass(pass: boolean): void {
@@ -336,7 +337,7 @@ export class BoardWindow extends Sizer {
         fromTarget[PASS] = this.#getData(PASS);
         toTarget[PASS] = pass;
         this.#updating(fromTarget, toTarget);
-        this.data.set(PASS, pass);
+        this.#sizer.data.set(PASS, pass);
     }
 
     #updating(
@@ -379,5 +380,21 @@ export class BoardWindow extends Sizer {
             duration,
             onComplete
         });
+    }
+
+    getY(): number {
+        return this.#sizer.y;
+    }
+
+    getX(): number {
+        return this.#sizer.x;
+    }
+
+    getHeight(): number {
+        return this.#sizer.height;
+    }
+
+    getWidth(): number {
+        return this.#sizer.width;
     }
 }

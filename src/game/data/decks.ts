@@ -156,6 +156,8 @@ const cardsMock = [
 const redDeck = createDeck(cardsMock, 40);
 const greenDeck = createDeck(cardsMock, 40);
 const blueDeck = createDeck(cardsMock, 40);
+const battleDeck = createDeck(battleCardsMock as CardData[], 40);
+const powerDeck = createDeck(powerCardsMock as CardData[], 40);
 
 function createDeck(cards: CardData[], number: number) {
     const deck: CardData[] = [];
@@ -185,4 +187,4 @@ const folders = [
     }
 ] as { id: string; deck: CardData[] }[];
 
-export { folders, redDeck, greenDeck, blueDeck };
+export { folders, redDeck, greenDeck, blueDeck, battleDeck, powerDeck };

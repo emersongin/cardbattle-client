@@ -290,4 +290,20 @@ export class Cardset extends Phaser.GameObjects.Container {
         return this.getCards().findIndex((card: Card) => card.getId() === cardId);
     }
 
+    cursorRight(): void {
+        this.#selectMode.cursorRight();
+    }
+
+    cursorLeft(): void {
+        this.#selectMode.cursorLeft();
+    }
+
+    select(): void {
+        this.#selectMode.select();
+    }
+
+    leave(): void {
+        this.#selectMode.leave();
+    }
+
 }

@@ -219,7 +219,7 @@ export class CardBattlePhase implements Phase {
     createCardset(cards: Card[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3)); 
-            const y = (this.#board.y - (this.#board.height / 2)) - CARD_HEIGHT - 10; 
+            const y = (this.#board.getY() - (this.#board.getHeight() / 2)) - CARD_HEIGHT - 10; 
             const cardset = Cardset.create(this.scene, cards, x, y);
             cardset.setCardsInLinePosition();
             cardset.setCardsClosed();
@@ -291,7 +291,7 @@ export class CardBattlePhase implements Phase {
     createOpponentCardset(cards: Card[]): Promise<void> {
         return new Promise(resolve => {
             const x = (this.scene.cameras.main.centerX - (CARD_WIDTH * 3));
-            const y = (this.#opponentBoard.y + (this.#opponentBoard.height / 2)) + 10;
+            const y = (this.#opponentBoard.getY() + (this.#opponentBoard.getHeight() / 2)) + 10;
             const cardset = Cardset.create(this.scene, cards, x, y);
             cardset.setCardsInLinePosition();
             cardset.setCardsClosed();
