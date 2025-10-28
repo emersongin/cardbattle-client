@@ -18,6 +18,12 @@ function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin 
     return keyboard;
 }
 
+async function expectAsync<T>(
+    fn: (resolve: (value: T) => void, reject: (reason?: any) => void) => void,
+): Promise<T> {
+    return await new Promise<T>((res, rej) => fn(res, rej));
+}
+
 describe("LoadPhase.test", () => {
     let sceneMock: CardBattleScene;
     let cardBattleMock: CardBattleMock;
@@ -64,23 +70,22 @@ describe("LoadPhase.test", () => {
         vi.mocked(cardBattleMock.getFieldPowerCards).mockReturnValue([] as PowerCard[]);
         vi.mocked(cardBattleMock.getBattleCards).mockReturnValue([] as BattleCard[]);
         vi.mocked(cardBattleMock.getOpponentBattleCards).mockReturnValue([] as BattleCard[]);
-        vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
-        vi.mocked(cardBattleMock.hasPowerCardsInField).mockReturnValue(false);
-        vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
-            (_playerId: string, callback: (play: PowerCardPlay) => void) => {
-                cardBattleMock.opponentStep = PASS;
-                callback({
-                    pass: true,
-                    powerAction: null,
-                });
-                return Promise.resolve(); // garante que retorna Promise<void>
-            }
-        );
-        
+        vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);  
     });
 
-    it("should throw error: invalid card type.", async () => {
-        const asyncFunction = new Promise<void>((resolve) => {
+    it("should change the Summon Phase when players passed.", async () => {
+        await expectAsync<void>(res => {
+            vi.mocked(cardBattleMock.hasPowerCardsInField).mockReturnValue(false);
+            vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
+                (_playerId: string, callback: (play: PowerCardPlay) => void) => {
+                    cardBattleMock.opponentStep = PASS;
+                    callback({
+                        pass: true,
+                        powerAction: null,
+                    });
+                    return Promise.resolve();
+                }
+            );
             const keyboard = getKeyboard(sceneMock);
             const phase = new LoadPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
@@ -93,12 +98,12 @@ describe("LoadPhase.test", () => {
             const changeToOriginal = phase.changeTo.bind(phase);
             phase.changeTo = () => {
                 changeToOriginal();
-                resolve();
+                res();
             };
+
             sceneMock.changePhase(phase);
         });
-        await asyncFunction;
-        expect(sceneMock.isPhase('SummonPhase')).toBe(true);
+        expect(sceneMock.isPhase("SummonPhase")).toBe(true);
     });
 
 });
