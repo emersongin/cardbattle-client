@@ -53,7 +53,7 @@ export class CommandWindow {
 
     open(config?: TweenConfig) {
         this.scene.tweens.add({
-            targets: this,
+            targets: this.#sizer,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
@@ -131,7 +131,7 @@ export class CommandWindow {
 
     #close(config?: TweenConfig) {
         this.scene.tweens.add({
-            targets: this,
+            targets: this.#sizer,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',

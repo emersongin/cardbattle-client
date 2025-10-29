@@ -166,7 +166,7 @@ export class BoardWindow {
 
     open(config?: TweenConfig) {
         this.scene.tweens.add({
-            targets: this,
+            targets: this.#sizer,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
@@ -178,7 +178,7 @@ export class BoardWindow {
 
     close(config?: TweenConfig) {
         this.scene.tweens.add({
-            targets: this,
+            targets: this.#sizer,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',
