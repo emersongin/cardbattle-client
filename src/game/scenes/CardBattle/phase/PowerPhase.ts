@@ -191,7 +191,6 @@ export abstract class PowerPhase extends CardBattlePhase {
             {
                 description: 'Yes',
                 onSelect: () => {
-                    console.log('cardId');
                     const cardId = cardIds.shift();
                     this.#changeHandZoneToBattleZone({ 
                         onComplete: () => {

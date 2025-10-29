@@ -139,14 +139,12 @@ describe("LoadPhase.test", () => {
                 onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
                 onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
                 onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
-                onChangeToTriggerPhase: () => {
-                    console.log('onChangeToTriggerPhase triggered');
-                    res();
-                },
+                onChangeToTriggerPhase: () => res(),
             });
             
             sceneMock.changePhase(phase);
         });
+        console.log('Asserting TriggerPhase');
         expect(sceneMock.isPhase("TriggerPhase")).toBe(true);
     });
 
