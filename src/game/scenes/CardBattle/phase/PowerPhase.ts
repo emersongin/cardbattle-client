@@ -15,7 +15,6 @@ export type PowerPhaseEvents = {
     onOpenHandZone?: () => void;
     onOpenPowerCardChoiceCommandWindow?: () => void;
     onOpenPowerCardCommandWindow?: () => void;
-    onChangeToTriggerPhase?: () => void;
 }
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -38,9 +37,6 @@ export abstract class PowerPhase extends CardBattlePhase {
         }
         if (events?.onOpenPowerCardCommandWindow) {
             super.addListener('onOpenPowerCardCommandWindow', events.onOpenPowerCardCommandWindow);
-        }
-        if (events?.onChangeToTriggerPhase) {
-            super.addListener('onChangeToTriggerPhase', events.onChangeToTriggerPhase);
         }
 
     }
@@ -294,7 +290,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         cardset.setCardsInLinePosition();
         cardset.showCards();
         // set last card position
-        const widthEdge = (this.scene.scale.width - cardset.x) - ((CARD_WIDTH * 1.5) - 20);
+        const widthEdge = (this.scene.scale.width - cardset.getX()) - ((CARD_WIDTH * 1.5) - 20);
         const lastIndex = cardset.getCardsLastIndex();
         cardset.setCardAtThePosition(lastIndex, widthEdge);
         cardset.setCardClosedByIndex(lastIndex);
@@ -334,7 +330,6 @@ export abstract class PowerPhase extends CardBattlePhase {
     
     changeToTriggerPhase(): void {
         this.scene.changePhase(new TriggerPhase(this.scene, this));
-        super.publish('onChangeToTriggerPhase');
     }
 
     #listanOpponentPlay() {

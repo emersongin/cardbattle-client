@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Phaser, { GameObjects } from "phaser";
 import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { Card } from "@ui/Card/Card";
 import { CardUi } from "@ui/Card/CardUi";
@@ -8,7 +8,8 @@ import { SelectMode } from "@ui/Cardset/SelectMode";
 import { MoveConfig } from "@ui/Card/animations/types/MoveConfig";
 import { VueScene } from "@game/scenes/VueScene";
 
-export class Cardset extends Phaser.GameObjects.Container {
+export class Cardset {
+    #container: GameObjects.Container;
     #cards: Card[] = [];
     #selectedTweens: Phaser.Tweens.Tween[];
     #selectMode: SelectMode;
@@ -19,14 +20,14 @@ export class Cardset extends Phaser.GameObjects.Container {
         x: number = 0,
         y: number = 0
     ) {
-        super(scene, x, y);
-        this.setDataEnabled();
-        this.data.set('selectModeEnabled', false);
-        this.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
+        this.#container = new GameObjects.Container(scene, x, y);
+        this.#container.setDataEnabled();
+        this.#container.data.set('selectModeEnabled', false);
+        this.#container.setSize(cards.length * CARD_WIDTH, CARD_HEIGHT);
         this.#selectMode = new SelectMode(this);
         this.#setCards(cards);
         this.#addCards();
-        this.scene.add.existing(this);
+        this.scene.add.existing(this.#container);
     }
 
     static create(
@@ -41,7 +42,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     setCardsInLinePosition(x: number = 0, y: number = 0): void {
         const cards = this.getCards();
         const numCards = cards.length;
-        let padding = Math.max(0, Math.abs(this.width / numCards));
+        let padding = Math.max(0, Math.abs(this.#container.width / numCards));
         if (padding > CARD_WIDTH) padding = CARD_WIDTH;
         cards.forEach((card: Card, index: number) => {
             card.setPosition(x + (padding * index), y);
@@ -120,7 +121,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     selectCardById(cardId: string): void {
         this.removeAllSelectCardById(cardId);
         const card = this.getCardById(cardId);
-        this.bringToTop(card.getUi());
+        this.#container.bringToTop(card.getUi());
         if (card.isMarked()) return this.markCardById(cardId);
         if (card.isHighlighted()) return;
         if (card.isDisabled()) return this.banCardById(cardId);
@@ -208,7 +209,7 @@ export class Cardset extends Phaser.GameObjects.Container {
     }
 
     #addCards(): void {
-        this.getCards().forEach((card: Card) => this.add(card.getUi()));
+        this.getCards().forEach((card: Card) => this.#container.add(card.getUi()));
     }
 
     preUpdate(): void {
@@ -260,16 +261,16 @@ export class Cardset extends Phaser.GameObjects.Container {
         if (cardIndex === -1) {
             throw new Error(`Cardset: card with id ${cardId} not found.`);
         }
-        this.remove(this.getCards()[cardIndex].getUi(), true);
+        this.#container.remove(this.getCards()[cardIndex].getUi(), true);
         this.getCards().splice(cardIndex, 1);
     }
 
     isSelectModeEnabled(): boolean {
-        return this.data.get('selectModeEnabled') === true;
+        return this.#container.data.get('selectModeEnabled') === true;
     }
 
     isSelectModeDisabled(): boolean {
-        return this.data.get('selectModeEnabled') === false;
+        return this.#container.data.get('selectModeEnabled') === false;
     }
 
     moveCardById(cardId: string, config: Partial<MoveConfig>): void {
@@ -304,6 +305,26 @@ export class Cardset extends Phaser.GameObjects.Container {
 
     leave(): void {
         this.#selectMode.leave();
+    }
+
+    setData(key: string, value: any): void {
+        this.#container.data.set(key, value);
+    }
+
+    sendToBack(card: CardUi): void {
+        this.#container.sendToBack(card);
+    }
+
+    bringToTop(card: CardUi): void {
+        this.#container.bringToTop(card);
+    }
+
+    destroy(): void {
+        this.#container.destroy();
+    }
+
+    getX(): number {
+        return this.#container.x;
     }
 
 }

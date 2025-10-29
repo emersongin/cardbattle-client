@@ -26,6 +26,7 @@ class MockGameObject {
     setInteractive = vi.fn();
     destroy = vi.fn();
     on = vi.fn();
+    off = vi.fn();
     once = vi.fn();
     removeFromDisplayList = vi.fn();
     addedToScene = vi.fn();
@@ -169,6 +170,10 @@ const PhaserMock = {
             displayList: {
                 add: vi.fn(),
                 exists: vi.fn(),
+                queueDepthSort: vi.fn(),
+                events: {
+                    emit: vi.fn(),
+                },
             },
             updateList: {
                 add: vi.fn(),

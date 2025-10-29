@@ -29,7 +29,7 @@ export class SelectMode {
     }
 
     #enable() {
-        this.cardset.data.set('selectModeEnabled', true);
+        this.cardset.setData('selectModeEnabled', true);
         this.#updateCursor();
         // this.#addKeyboardListeners();
     }
@@ -150,7 +150,7 @@ export class SelectMode {
     // }
 
     #disable() {
-        this.cardset.data.set('selectModeEnabled', false);
+        this.cardset.setData('selectModeEnabled', false);
         this.#deselectCardByIndex(this.#getCurrentIndex());
         this.cardset.scene.removeAllKeyListening();
     }
