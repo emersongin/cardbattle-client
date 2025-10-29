@@ -36,11 +36,11 @@ describe("LoadPhase.test", () => {
             active: true,
             visible: true,
         }) as CardBattleScene;
-        cardBattleMock = new CardBattleMock();
-        sceneMock.setCardBattle(cardBattleMock);
     });
 
     beforeEach(() => {
+        cardBattleMock = new CardBattleMock();
+        sceneMock.setCardBattle(cardBattleMock);
         vi.mocked(cardBattleMock.getBoard).mockReturnValue(BoardWindow.createBottom(sceneMock, {
             [AP]: 0,
             [HP]: 0,
@@ -114,11 +114,8 @@ describe("LoadPhase.test", () => {
         const spy = vi.spyOn(phase, 'changeToTriggerPhase');
 
         // when
-        await expectAsync<void>(resolve => {
-            spy.mockImplementation(() => {
-                console.log("changeToTriggerPhase ✅");
-                resolve();
-            });
+        await expectAsync<void>(res => {
+            spy.mockImplementation(() => res());
             sceneMock.changePhase(phase);
         });
 
@@ -126,40 +123,40 @@ describe("LoadPhase.test", () => {
         expect(spy).toHaveBeenCalled();
     });
 
-    // it("should change the Summon Phase when players passed.", async () => {
-    //     // given
-    //     vi.mocked(cardBattleMock.hasPowerCardsInField).mockReturnValue(false);
-    //     vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
-    //         (_playerId: string, callback: (play: PowerCardPlay) => void) => {
-    //             cardBattleMock.opponentStep = PASS;
-    //             callback({
-    //                 pass: true,
-    //                 powerAction: null,
-    //             });
-    //             return Promise.resolve();
-    //         }
-    //     );
-    //     const keyboard = getKeyboard(sceneMock);
-    //     const phase = new LoadPhase(sceneMock, {
-    //     onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
-    //     onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
-    //     onOpenCommandWindow: () => {
-    //             keyboard.emit('keydown-DOWN');
-    //             keyboard.emit('keydown-ENTER');
-    //         },
-    //     });
-    //     const changeToOriginal = phase.changeTo.bind(phase);
+    it("should change the Summon Phase when players passed.", async () => {
+        // given
+        vi.mocked(cardBattleMock.hasPowerCardsInField).mockReturnValue(false);
+        vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
+            (_playerId: string, callback: (play: PowerCardPlay) => void) => {
+                cardBattleMock.opponentStep = PASS;
+                callback({
+                    pass: true,
+                    powerAction: null,
+                });
+                return Promise.resolve();
+            }
+        );
+        const keyboard = getKeyboard(sceneMock);
+        const phase = new LoadPhase(sceneMock, {
+        onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
+        onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
+        onOpenCommandWindow: () => {
+                keyboard.emit('keydown-DOWN');
+                keyboard.emit('keydown-ENTER');
+            },
+        });
+        const changeToOriginal = phase.changeTo.bind(phase);
 
-    //     // when
-    //     await expectAsync<void>(res => {
-    //         vi.spyOn(phase, 'changeTo').mockImplementation(() => {
-    //             changeToOriginal();
-    //             res();
-    //         });
-    //         sceneMock.changePhase(phase);
-    //     });
+        // when
+        await expectAsync<void>(res => {
+            vi.spyOn(phase, 'changeTo').mockImplementation(() => {
+                changeToOriginal();
+                res();
+            });
+            sceneMock.changePhase(phase);
+        });
 
-    //     // then
-    //     expect(sceneMock.isPhase("SummonPhase")).toBe(true);
-    // });
+        // then
+        expect(sceneMock.isPhase("SummonPhase")).toBe(true);
+    });
 });
