@@ -1,5 +1,5 @@
 import { EventBus } from '@game/EventBus';
-import { ORANGE, WHITE } from '@game/constants/colors';
+import { BLACK, ORANGE, WHITE } from '@game/constants/colors';
 import { RoomData } from '@objects/RoomData';
 import { VueScene } from '@scenes/VueScene';
 import { Phase } from '@scenes/CardBattle/phase/Phase';

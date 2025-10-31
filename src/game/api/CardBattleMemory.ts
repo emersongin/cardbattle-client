@@ -424,7 +424,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #drawOpponentCards(): void {
-        const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 0);
+        const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 1);
         const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
         this.#opponentDeck = this.#opponentDeck.filter(card => !drawnCards.includes(card));
@@ -723,7 +723,7 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
-    hasPowerCardsInField(): Promise<boolean> {
+    hasPowerCardsProcessed(): Promise<boolean> {
         return new Promise((resolve) => {
             setTimeout(() => {
                 resolve(this.#powerActionsProcessed.length > 0);
@@ -757,6 +757,7 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
                     // mock
+                    await this.pass(this.#opponentId);
                     const powerCardData = this.#opponentHand.find(card => card.type === POWER) as CardData;
                     if (counter <= 1 && powerCardData) {
                         const powerCard = this.#createCardByType(powerCardData) as PowerCard;
@@ -776,7 +777,6 @@ export default class CardBattleMemory implements CardBattle {
                             }
                         });
                     } else {
-                        await this.pass(this.#opponentId);
                         callback({
                             pass: true,
                             powerAction: null

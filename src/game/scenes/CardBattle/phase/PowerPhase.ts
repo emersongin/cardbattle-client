@@ -298,8 +298,8 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openCardFromPowerCardsetByIndex(lastIndex, {
             faceUp: true,
             onComplete: () => {
-                const card = cardset.getCardByIndex(lastIndex);
-                cardset.selectCardById(card.getId());
+                const cardId = cardset.getCardByIndex(lastIndex).getId();
+                cardset.selectCardById(cardId);
                 loadPowerActionConfig();
             }
         });
@@ -311,7 +311,8 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #nextPlay(): Promise<void> {
-        if (await this.cardBattle.hasPowerCardsInField()) {
+        console.log(await this.cardBattle.hasPowerCardsProcessed());
+        if (await this.cardBattle.hasPowerCardsProcessed()) {
             this.changeToTriggerPhase();
             return;
         }
