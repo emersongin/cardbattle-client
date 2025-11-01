@@ -510,4 +510,5 @@ describe("LoadPhase.test", () => {
         expect(numOfOpponentPlays).toBe(1);
         expect(numOfPowerCards).toBe(3);
     });
+    
 });
