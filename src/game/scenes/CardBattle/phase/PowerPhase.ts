@@ -52,7 +52,8 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openAllWindows({
             onComplete: () => {
                 this.scene.addKeyEnterListeningOnce({
-                    onTrigger: () => 
+                    onTrigger: () => {
+                        this.scene.removeAllKeyListening();
                         super.closeAllWindows({
                             onComplete: async () => {
                                 await super.createGameBoard();
@@ -61,16 +62,19 @@ export abstract class PowerPhase extends CardBattlePhase {
                                 super.openAllWindows({
                                     onComplete: () => {
                                         this.scene.addKeyEnterListeningOnce({
-                                            onTrigger: () => 
+                                            onTrigger: () => {
+                                                this.scene.removeAllKeyListening();
                                                 super.closeAllWindows({
                                                     onComplete: () => this.resumePhase()
                                                 })
+                                            }
                                         });
                                         super.publish('onOpenBeginPhaseWindow');
                                     }
                                 });
                             }
                         })
+                    }
                 });
                 super.publish('onOpenPhaseWindows');
             }
@@ -98,7 +102,10 @@ export abstract class PowerPhase extends CardBattlePhase {
                 const commandWindow = super.getCommandWindow();
                 this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
                 this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
-                this.scene.addKeyEnterListeningOnce({ onTrigger: () => commandWindow.select() });
+                this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
+                    this.scene.removeAllKeyListening();
+                    commandWindow.select();
+                } });
                 commandWindow.selectByIndex(0);
                 super.publish('onOpenCommandWindow');
             }
@@ -156,8 +163,14 @@ export abstract class PowerPhase extends CardBattlePhase {
         const cardset = super.getCardset();
         this.scene.addKeyRightListening({ onTrigger: () => cardset.cursorRight() });
         this.scene.addKeyLeftListening({ onTrigger: () => cardset.cursorLeft() });
-        this.scene.addKeyEnterListeningOnce({ onTrigger: () => cardset.select() });
-        this.scene.addKeyEscListeningOnce({ onTrigger: () => cardset.leave() });
+        this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
+            this.scene.removeAllKeyListening();
+            cardset.select();
+        } });
+        this.scene.addKeyEscListeningOnce({ onTrigger: () => {
+            this.scene.removeAllKeyListening();
+            cardset.leave();
+        } });
         super.publish('onOpenHandZone');
     }
 
@@ -207,7 +220,10 @@ export abstract class PowerPhase extends CardBattlePhase {
                 const commandWindow = super.getCommandWindow();
                 this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
                 this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
-                this.scene.addKeyEnterListeningOnce({ onTrigger: () => commandWindow.select() });
+                this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
+                    this.scene.removeAllKeyListening();
+                    commandWindow.select();
+                } });
                 commandWindow.selectByIndex(0);
                 super.publish('onOpenPowerCardChoiceCommandWindow');
             }
@@ -253,7 +269,10 @@ export abstract class PowerPhase extends CardBattlePhase {
                 const commandWindow = super.getCommandWindow();
                 this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
                 this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
-                this.scene.addKeyEnterListeningOnce({ onTrigger: () => commandWindow.select() });
+                this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
+                    this.scene.removeAllKeyListening();
+                    commandWindow.select();
+                } });
                 commandWindow.selectByIndex(0);
                 super.publish('onOpenPowerCardCommandWindow');
             }

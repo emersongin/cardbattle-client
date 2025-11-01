@@ -169,7 +169,7 @@ describe("LoadPhase.test", () => {
         expect(numOfOpponentPlays).toBe(1);
     });
 
-    test("P:pass, O:play, P:pass, => Load.", async () => {
+    test("P:pass, O:play, P:pass => Load.", async () => {
         // given
         const powerCards = powerDeck.slice(0, 1);
         vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
@@ -216,7 +216,7 @@ describe("LoadPhase.test", () => {
         expect(numOfPowerCards).toBe(1);
     });
 
-    test("P:pass, O:play, P:play, O:pass, => Load.", async () => {
+    test("P:pass, O:play, P:play, O:pass => Load.", async () => {
         // given
         const powerCards = powerDeck.slice(0, 1);
         vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
@@ -249,8 +249,8 @@ describe("LoadPhase.test", () => {
             config: true
         }]);
         vi.mocked(cardBattleMock.hasPowerCardInHand).mockReturnValue(true);
-        vi.mocked(cardBattleMock.getCardsFromHand).mockReturnValue([CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
-        vi.mocked(cardBattleMock.getPowerCardById).mockReturnValue(CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
+        vi.mocked(cardBattleMock.getCardsFromHand).mockImplementation(() => [CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
+        vi.mocked(cardBattleMock.getPowerCardById).mockImplementation(() => CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
         vi.mocked(cardBattleMock.makePowerCardPlay).mockImplementation(() => setPlayerPassed(true));
         const phase = new LoadPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
@@ -278,37 +278,20 @@ describe("LoadPhase.test", () => {
         expect(numOfPowerCards).toBe(2);
     });
 
-    test("P:pass, O:play, P:play, O:play, => Load.", async () => {
+    test("P:pass, O:play, P:play, O:play => Load.", async () => {
         // given
         const powerCards = powerDeck.slice(0, 1);
         vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
         vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
             async (_playerId: string, callback: (play: PowerCardPlay) => void) => {
-                if (numOfOpponentPlays <= 1) {
-                    await setOppenentPassed(true);
-                    console.log('listenOpponentPlay', {
-                        numOfOpponentPlays,
-                        numOfPlayerPlays,
-                        playerPassed,
-                        opponentPassed,
-                        allPass: cardBattleMock.allPass(),
-                        numOfPowerCards,
-                        arePowercardsReadyForProcessing,
-                    });
-                    callback({
-                        pass: false,
-                        powerAction: {
-                            playerId: 'P1',
-                            powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
-                            config: true
-                        }
-                    });
-                    return Promise.resolve();
-                }
-                await setOppenentPassed();
+                await setOppenentPassed(true);
                 callback({
-                    pass: true,
-                    powerAction: null,
+                    pass: false,
+                    powerAction: {
+                        playerId: 'P1',
+                        powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
+                        config: true
+                    }
                 });
                 return Promise.resolve();
             }
@@ -320,24 +303,15 @@ describe("LoadPhase.test", () => {
             config: true
         }]);
         vi.mocked(cardBattleMock.hasPowerCardInHand).mockReturnValue(true);
-        vi.mocked(cardBattleMock.getCardsFromHand).mockReturnValue([CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
-        vi.mocked(cardBattleMock.getPowerCardById).mockReturnValue(CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
-        vi.mocked(cardBattleMock.makePowerCardPlay).mockImplementation(async () => await setPlayerPassed(true));
+        vi.mocked(cardBattleMock.getCardsFromHand).mockImplementation(() => [CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
+        vi.mocked(cardBattleMock.getPowerCardById).mockImplementation(() => CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
+        vi.mocked(cardBattleMock.makePowerCardPlay).mockImplementation(() => setPlayerPassed(true));
         const phase = new LoadPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => {
                 if (numOfPlayerPlays === 0) keyboard.emit('keydown-DOWN');
                 keyboard.emit('keydown-ENTER');
-                console.log('onOpenCommandWindow', {
-                    numOfOpponentPlays,
-                    numOfPlayerPlays,
-                    playerPassed,
-                    opponentPassed,
-                    allPass: cardBattleMock.allPass(),
-                    numOfPowerCards,
-                    arePowercardsReadyForProcessing,
-                });
             },
             onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
             onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
@@ -358,4 +332,182 @@ describe("LoadPhase.test", () => {
         expect(numOfPowerCards).toBe(3);
     });
 
+    test("P:play, O:pass => Load.", async () => {
+        // given
+        const powerCards = powerDeck.slice(0, 1);
+        vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
+        vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
+            async (_playerId: string, callback: (play: PowerCardPlay) => void) => {
+                await setOppenentPassed();
+                callback({
+                    pass: true,
+                    powerAction: null,
+                });
+                return Promise.resolve();
+            }
+        );
+        vi.mocked(cardBattleMock.getPowerActions).mockReturnValueOnce([{
+            playerId: 'P1',
+            powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
+            config: true
+        }]);
+        vi.mocked(cardBattleMock.hasPowerCardInHand).mockReturnValue(true);
+        vi.mocked(cardBattleMock.getCardsFromHand).mockImplementation(() => [CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
+        vi.mocked(cardBattleMock.getPowerCardById).mockImplementation(() => CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
+        vi.mocked(cardBattleMock.makePowerCardPlay).mockImplementation(() => setPlayerPassed(true));
+        const phase = new LoadPhase(sceneMock, {
+            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
+            onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+        });
+        const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
+
+        // when
+        await expectAsync<void>(res => {
+            changeToTriggerPhaseSpy.mockImplementation(() => res());
+            sceneMock.changePhase(phase);
+        });
+
+        // then
+        expect(changeToTriggerPhaseSpy).toHaveBeenCalled();
+        expect(numOfPlayerPlays).toBe(1);
+        expect(numOfOpponentPlays).toBe(1);
+        expect(numOfPowerCards).toBe(1);
+    });
+
+    test("P:play, O:play, P:pass => Load.", async () => {
+        // given
+        const powerCards = powerDeck.slice(0, 1);
+        vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
+        vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
+            async (_playerId: string, callback: (play: PowerCardPlay) => void) => {
+                if (numOfOpponentPlays === 0) {
+                    await setOppenentPassed(true);
+                    callback({
+                        pass: false,
+                        powerAction: {
+                            playerId: 'P1',
+                            powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
+                            config: true
+                        }
+                    });
+                    return Promise.resolve();
+                }
+                await setOppenentPassed();
+                callback({
+                    pass: true,
+                    powerAction: null,
+                });
+                return Promise.resolve();
+            }
+        );
+        vi.mocked(cardBattleMock.getPowerActions).mockReturnValueOnce([{
+            playerId: 'P1',
+            powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
+            config: true
+        }]);
+        vi.mocked(cardBattleMock.hasPowerCardInHand).mockReturnValue(true);
+        vi.mocked(cardBattleMock.getCardsFromHand).mockImplementation(() => [CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
+        vi.mocked(cardBattleMock.getPowerCardById).mockImplementation(() => CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
+        vi.mocked(cardBattleMock.makePowerCardPlay).mockImplementation(() => setPlayerPassed(true));
+        const phase = new LoadPhase(sceneMock, {
+            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
+            onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenCommandWindow: () => {
+                if (numOfPlayerPlays === 1) keyboard.emit('keydown-DOWN');
+                keyboard.emit('keydown-ENTER');
+            },
+            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+        });
+        const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
+
+        // when
+        await expectAsync<void>(res => {
+            changeToTriggerPhaseSpy.mockImplementation(() => res());
+            sceneMock.changePhase(phase);
+        });
+
+        // then
+        expect(changeToTriggerPhaseSpy).toHaveBeenCalled();
+        expect(numOfPlayerPlays).toBe(2);
+        expect(numOfOpponentPlays).toBe(1);
+        expect(numOfPowerCards).toBe(2);
+    });
+
+    test("P:play, O:play, P:play => Load.", async () => {
+        // given
+        const powerCards = powerDeck.slice(0, 1);
+        vi.mocked(cardBattleMock.isStartPlaying).mockReturnValue(true);
+        vi.mocked(cardBattleMock.listenOpponentPlay).mockImplementation(
+            async (_playerId: string, callback: (play: PowerCardPlay) => void) => {
+                await setOppenentPassed(true);
+                console.log('listenOpponentPlay', {
+                    playerPassed,
+                    opponentPassed,
+                    numOfPowerCards,
+                    numOfOpponentPlays,
+                    numOfPlayerPlays,
+                    arePowercardsReadyForProcessing
+                });
+                callback({
+                    pass: false,
+                    powerAction: {
+                        playerId: 'P1',
+                        powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
+                        config: true
+                    }
+                });
+                return Promise.resolve();
+            }
+        );
+
+        vi.mocked(cardBattleMock.getPowerActions).mockReturnValueOnce([{
+            playerId: 'P1',
+            powerCard: CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard,
+            config: true
+        }]);
+        vi.mocked(cardBattleMock.hasPowerCardInHand).mockReturnValue(true);
+        vi.mocked(cardBattleMock.getCardsFromHand).mockImplementation(() => [CardFactory.createByType(sceneMock, powerCards[0])] as PowerCard[]);
+        vi.mocked(cardBattleMock.getPowerCardById).mockImplementation(() => CardFactory.createByType(sceneMock, powerCards[0]) as PowerCard);
+        vi.mocked(cardBattleMock.makePowerCardPlay).mockImplementation(async () => {
+            await setPlayerPassed(true);
+            console.log('makePowerCardPlay', {
+                playerPassed,
+                opponentPassed,
+                numOfPowerCards,
+                numOfOpponentPlays,
+                numOfPlayerPlays,
+                arePowercardsReadyForProcessing
+            });
+        });
+        const phase = new LoadPhase(sceneMock, {
+            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
+            onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenCommandWindow: () => {
+                console.log('onOpenCommandWindow');
+                keyboard.emit('keydown-ENTER');
+            },
+            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+        });
+        const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
+
+        // when
+        await expectAsync<void>(res => {
+            changeToTriggerPhaseSpy.mockImplementation(() => res());
+            sceneMock.changePhase(phase);
+        });
+
+        // then
+        expect(changeToTriggerPhaseSpy).toHaveBeenCalled();
+        expect(numOfPlayerPlays).toBe(2);
+        expect(numOfOpponentPlays).toBe(1);
+        expect(numOfPowerCards).toBe(3);
+    });
 });
