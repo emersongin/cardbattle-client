@@ -46,11 +46,8 @@ describe("LoadPhase.test", () => {
             };
             playerPassed = true;
             numOfPlayerPlays++;
-            if (numOfPowerCards >= 3) {
+            if (numOfPowerCards >= 3 || await cardBattleMock.allPass() && numOfPowerCards > 0) {
                 vi.mocked(cardBattleMock.isPowerfieldLimitReached).mockReturnValue(true);
-                arePowercardsReadyForProcessing = true;
-            }
-            if (await cardBattleMock.allPass() && numOfPowerCards > 0) {
                 arePowercardsReadyForProcessing = true;
             }
             res();
@@ -66,11 +63,8 @@ describe("LoadPhase.test", () => {
             };
             opponentPassed = true;
             numOfOpponentPlays++;
-            if (numOfPowerCards >= 3) {
+            if (numOfPowerCards >= 3 || await cardBattleMock.allPass() && numOfPowerCards > 0) {
                 vi.mocked(cardBattleMock.isPowerfieldLimitReached).mockReturnValue(true);
-                arePowercardsReadyForProcessing = true;
-            }
-            if (await cardBattleMock.allPass() && numOfPowerCards > 0) {
                 arePowercardsReadyForProcessing = true;
             }
             res();

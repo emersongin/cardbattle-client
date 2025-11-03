@@ -424,7 +424,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #drawOpponentCards(): void {
-        const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 1);
+        const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 4);
         const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
         this.#opponentDeck = this.#opponentDeck.filter(card => !drawnCards.includes(card));
@@ -627,7 +627,8 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isOpponent(playerId)) {
                     this.#setOpponentStep(PASS);
                 };
-                if (await this.allPass() && this.#powerActions.length > 0) {
+                console.log(await this.isPowerfieldLimitReached(), await this.allPass() && this.#powerActions.length > 0);
+                if (await this.isPowerfieldLimitReached() || await this.allPass() && this.#powerActions.length > 0) {
                     this.#processPowerCardPlays();
                 }
                 resolve();
@@ -669,18 +670,16 @@ export default class CardBattleMemory implements CardBattle {
                 const powerCardId = powerAction.powerCard.id;
                 this.#powerActions.push(powerAction);
                 if (this.#isPlayer(playerId)) {
+                    console.log('player', this.#playerStep, this.#opponentStep);
                     await this.#removePowerCardInHandById(this.#playerId, powerCardId);
-                    this.#setPlayerStep(PASS);
                     this.#setOpponentStep(IN_PLAY);
                 };
                 if (this.#isOpponent(playerId)) {
+                    console.log('opponent', this.#playerStep, this.#opponentStep);
                     await this.#removePowerCardInHandById(this.#opponentId, powerCardId);
-                    this.#setOpponentStep(PASS);
                     this.#setPlayerStep(IN_PLAY);
                 };
-                if (await this.isPowerfieldLimitReached()) {
-                    this.#processPowerCardPlays();
-                }
+                this.pass(playerId);
                 resolve();
             }, delayMock);
         });
@@ -757,9 +756,8 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(async () => {
                 if (this.#isPlayer(playerId)) {
                     // mock
-                    await this.pass(this.#opponentId);
                     const powerCardData = this.#opponentHand.find(card => card.type === POWER) as CardData;
-                    if (counter <= 1 && powerCardData) {
+                    if (counter <= 3 && powerCardData) {
                         const powerCard = this.#createCardByType(powerCardData) as PowerCard;
                         counter++;
                         const powerAction = { 
@@ -777,6 +775,7 @@ export default class CardBattleMemory implements CardBattle {
                             }
                         });
                     } else {
+                        await this.pass(this.#opponentId);
                         callback({
                             pass: true,
                             powerAction: null
