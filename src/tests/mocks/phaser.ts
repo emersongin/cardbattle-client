@@ -197,7 +197,6 @@ const PhaserMock = {
                     this.input.keyboard.list.push({ keyCode, fn, once: true });
                 },
                 emit: (eventName: string, times: number = 1) => {
-                    console.log(this.input.keyboard.list);
                     this.input.keyboard.list.forEach((key: any) => {
                         if (key.keyCode === eventName) {
                             for (let i = 0; i < times; i++) {
