@@ -12,9 +12,9 @@ export type PowerPhaseEvents = {
     onOpenPhaseWindows?: () => void;
     onOpenBeginPhaseWindow?: () => void;
     onOpenCommandWindow?: () => void;
-    onOpenHandZone?: () => void;
-    onOpenPowerCardChoiceCommandWindow?: () => void;
-    onOpenPowerCardCommandWindow?: () => void;
+    onSelectModeHandZoneCardset?: () => void;
+    onOpenPowerCardSelectionCommandWindow?: () => void;
+    onOpenPowerCardActivationCommandWindow?: () => void;
 }
 export abstract class PowerPhase extends CardBattlePhase {
 
@@ -29,14 +29,14 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (events?.onOpenCommandWindow) {
             super.addListener('onOpenCommandWindow', events.onOpenCommandWindow);
         }
-        if (events?.onOpenHandZone) {
-            super.addListener('onOpenHandZone', events.onOpenHandZone);
+        if (events?.onSelectModeHandZoneCardset) {
+            super.addListener('onSelectModeHandZoneCardset', events.onSelectModeHandZoneCardset);
         }
-        if (events?.onOpenPowerCardChoiceCommandWindow) {
-            super.addListener('onOpenPowerCardChoiceCommandWindow', events.onOpenPowerCardChoiceCommandWindow);
+        if (events?.onOpenPowerCardSelectionCommandWindow) {
+            super.addListener('onOpenPowerCardSelectionCommandWindow', events.onOpenPowerCardSelectionCommandWindow);
         }
-        if (events?.onOpenPowerCardCommandWindow) {
-            super.addListener('onOpenPowerCardCommandWindow', events.onOpenPowerCardCommandWindow);
+        if (events?.onOpenPowerCardActivationCommandWindow) {
+            super.addListener('onOpenPowerCardActivationCommandWindow', events.onOpenPowerCardActivationCommandWindow);
         }
 
     }
@@ -144,15 +144,16 @@ export abstract class PowerPhase extends CardBattlePhase {
 
     async #changeBattleZoneToHandZone(): Promise<void> {
         await super.closeGameBoard();
-        // create hand zone
-        const board = await this.cardBattle.getBoard(this.scene.getPlayerId()) as BoardWindow;
-        super.addBoard(board);
         await this.createHandZone();
+        super.openHandZone({ onComplete: () => this.#selectModeHandZoneCardset() });
+    }
+
+    async createHandZone(): Promise<void> {
+        super.addBoard(await this.cardBattle.getBoard(this.scene.getPlayerId()) as BoardWindow);
         super.createHandDisplayWindows();
-        // open
-        await super.openHandZone();
-        super.openAllWindows();
-        // start select mode
+    }
+
+    #selectModeHandZoneCardset (): void {
         super.setSelectModeOnceCardset({
             onChangeIndex: (card: Card) => this.#updateTextWindows(card),
             onComplete: (cardIds: string[]) => this.#completeChoice(cardIds),
@@ -171,7 +172,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             this.scene.removeAllKeyListening();
             cardset.leave();
         } });
-        super.publish('onOpenHandZone');
+        super.publish('onSelectModeHandZoneCardset');
     }
 
     async #changeHandZoneToBattleZone(config: { onComplete: () => void }): Promise<void> {
@@ -180,8 +181,6 @@ export abstract class PowerPhase extends CardBattlePhase {
         await super.openGameBoard();
         if (config?.onComplete) config.onComplete();
     }
-
-    abstract createHandZone(): Promise<void>;
 
     #updateTextWindows(card: Card): void {
         super.setTextWindowText(card.getName() + ' ' + card.getId(), 1);
@@ -225,7 +224,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                     commandWindow.select();
                 } });
                 commandWindow.selectByIndex(0);
-                super.publish('onOpenPowerCardChoiceCommandWindow');
+                super.publish('onOpenPowerCardSelectionCommandWindow');
             }
         });
     }
@@ -274,7 +273,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                     commandWindow.select();
                 } });
                 commandWindow.selectByIndex(0);
-                super.publish('onOpenPowerCardCommandWindow');
+                super.publish('onOpenPowerCardActivationCommandWindow');
             }
         });
     }

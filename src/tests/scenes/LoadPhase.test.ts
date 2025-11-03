@@ -251,9 +251,9 @@ describe("LoadPhase.test", () => {
                 if (numOfPlayerPlays === 0) keyboard.emit('keydown-DOWN');
                 keyboard.emit('keydown-ENTER');
             },
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -285,9 +285,9 @@ describe("LoadPhase.test", () => {
                 if (numOfPlayerPlays === 0) keyboard.emit('keydown-DOWN');
                 keyboard.emit('keydown-ENTER');
             },
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -317,9 +317,9 @@ describe("LoadPhase.test", () => {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -354,9 +354,9 @@ describe("LoadPhase.test", () => {
                 if (numOfPlayerPlays === 1) keyboard.emit('keydown-DOWN');
                 keyboard.emit('keydown-ENTER');
             },
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -387,9 +387,9 @@ describe("LoadPhase.test", () => {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -456,9 +456,9 @@ describe("LoadPhase.test", () => {
                 keyboard.emit('keydown-ENTER');
                 
             },
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -494,9 +494,9 @@ describe("LoadPhase.test", () => {
                 if (numOfPlayerPlays !== 0) keyboard.emit('keydown-DOWN');
                 keyboard.emit('keydown-ENTER');
             },
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -528,9 +528,9 @@ describe("LoadPhase.test", () => {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -593,9 +593,9 @@ describe("LoadPhase.test", () => {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 
@@ -626,9 +626,9 @@ describe("LoadPhase.test", () => {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenBeginPhaseWindow: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenHandZone: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardChoiceCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenPowerCardCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onSelectModeHandZoneCardset: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardSelectionCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenPowerCardActivationCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToTriggerPhaseSpy = vi.spyOn(phase, 'changeToTriggerPhase');
 

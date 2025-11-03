@@ -17,6 +17,7 @@ export class CompilePhase extends PowerPhase implements Phase {
     }
 
     async createHandZone(): Promise<void> {
+        super.createHandZone();
         const cards: Card[] = await this.cardBattle.getCardsFromHand(this.scene.getPlayerId());
         const battleCards = cards.filter(card => card instanceof BattleCard);
         battleCards.forEach(card => {
