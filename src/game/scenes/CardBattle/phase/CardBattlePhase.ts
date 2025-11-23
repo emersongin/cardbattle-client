@@ -391,11 +391,11 @@ export class CardBattlePhase implements Phase {
     }
 
     // SHARED
-    #openCardset(cardset: Cardset, config?: TweenConfig, index?: number): void {
+    #openCardset(cardset: Cardset, config?: TweenConfig, cardIndex?: number): void {
         const cardsUis = cardset.getCardsUi();
         let cardsLayers = cardsUis.map(ui => ui.getMainLayer());
-        if (index !== undefined) {
-            const card = cardset.getCardByIndex(index);
+        if (cardIndex !== undefined) {
+            const card = cardset.getCardByIndex(cardIndex);
             if (!card) return (config?.onComplete) ? config.onComplete() : undefined;
             cardsLayers = [card.getUi().getMainLayer()];
         }
@@ -405,7 +405,7 @@ export class CardBattlePhase implements Phase {
             onStart: ({ index, pause, resume  }: TimelineEvent<GameObjects.Container>) => {
                 pause();
                 const builder = CardActionsBuilder
-                    .create(cardsUis[index].card);
+                    .create(cardsUis[cardIndex || index].card);
                 builder
                     .open({
                         delay: (index * 100),
