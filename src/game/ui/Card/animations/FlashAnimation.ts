@@ -28,7 +28,7 @@ export class FlashAnimation {
         flashLayer.setOrigin(0, 0);
         flashLayer.setVisible(false);
         this.#flashLayer = flashLayer;
-        this.card.getUi().add(this.#flashLayer);
+        this.card.getUi().getMainLayer().add(this.#flashLayer);
         return this.#flashLayer;
     }
 }

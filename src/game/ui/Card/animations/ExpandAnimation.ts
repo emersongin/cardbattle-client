@@ -8,7 +8,7 @@ export class ExpandAnimation {
         const toX = card.getOriginX() - (card.getWidth() * 0.25);
         const toY = card.getOriginY() - (card.getHeight() * 0.25);
         this.card.scene.tweens.add({
-            targets: this.card.getUi(),
+            targets: this.card.getUi().getMainLayer(),
             x: toX,
             y: toY,
             scaleX: 1.5,

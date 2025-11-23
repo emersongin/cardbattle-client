@@ -7,14 +7,14 @@ export class MoveAnimation {
     constructor(readonly card: Card, config: MoveConfig) {
         const tweens = [
             { 
-                targets: this.card.getUi(),
+                targets: this.card.getUi().getMainLayer(),
                 x: (config?.fromX || this.card.getX() || 0), 
                 y: (config?.fromY || this.card.getY() || 0),
                 delay: 0,
                 duration: 0 
             },
             {
-                targets: this.card.getUi(),
+                targets: this.card.getUi().getMainLayer(),
                 x: config.toX, 
                 y: config.toY,
                 scaleX: 1,

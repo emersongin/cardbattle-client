@@ -7,7 +7,7 @@ export class ScaleAnimation {
     constructor(readonly card: Card, config: ScaleConfig) {
         if (config.open) {
             this.card.scene.tweens.add({ 
-                targets: this.card.getUi(), 
+                targets: this.card.getUi().getMainLayer(), 
                 x: this.card.getOriginX(),
                 scaleX: 1,
                 ease: 'Linear',
@@ -21,13 +21,13 @@ export class ScaleAnimation {
             return;
         }
         this.card.scene.tweens.add({ 
-            targets: this.card.getUi(), 
+            targets: this.card.getUi().getMainLayer(), 
             x: this.card.getX() + (this.card.getWidth() / 2),
             scaleX: 0,
             ease: 'Linear',
             onComplete: () => {
                 this.card.setClosed();
-                if (config?.destroy) this.card.getUi().destroy();
+                if (config?.destroy) this.card.destroy();
                 if (config?.onComplete) config.onComplete();
             },
             delay: config?.delay || 0,

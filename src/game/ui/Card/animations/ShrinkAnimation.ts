@@ -7,7 +7,7 @@ export class ShrinkAnimation {
         const toX = card.getOriginX() + (card.getWidth() / 2);
         const toY = card.getOriginY() + (card.getHeight() / 2);
         this.card.scene.tweens.add({
-            targets: this.card.getUi(), 
+            targets: this.card.getUi().getMainLayer(), 
             x: toX,
             y: toY,
             scaleX: 0,
