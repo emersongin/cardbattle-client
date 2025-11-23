@@ -3,6 +3,7 @@ import { vi } from "vitest";
 import { VueScene } from "@game/scenes/VueScene";
 import { CardBattle } from "@game/api/CardBattle";
 import { Phase } from "@game/scenes/CardBattle/phase/Phase";
+import { RoomData } from "@/game/objects/RoomData";
 class MockGameObject {
     x: number;
     y: number;
@@ -118,7 +119,8 @@ const PhaserMock = {
     Scene: class {
         #cardBattle: CardBattle;
         #phase: Phase;
-        getPlayerId = () => 'P1';
+        room: RoomData;
+        getPlayerId = () => this.room.playerId;
         setCardBattle = (cardBattle: CardBattle) => {
             this.#cardBattle = cardBattle as CardBattle;
         }

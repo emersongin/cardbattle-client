@@ -329,7 +329,6 @@ export abstract class PowerPhase extends CardBattlePhase {
     }
 
     async #nextPlay(): Promise<void> {
-        console.log(await this.cardBattle.hasPowerCardsProcessed());
         if (await this.cardBattle.hasPowerCardsProcessed()) {
             this.changeToTriggerPhase();
             return;

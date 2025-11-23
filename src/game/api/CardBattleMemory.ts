@@ -627,7 +627,6 @@ export default class CardBattleMemory implements CardBattle {
                 if (this.#isOpponent(playerId)) {
                     this.#setOpponentStep(PASS);
                 };
-                console.log(await this.isPowerfieldLimitReached(), await this.allPass() && this.#powerActions.length > 0);
                 if (await this.isPowerfieldLimitReached() || await this.allPass() && this.#powerActions.length > 0) {
                     this.#processPowerCardPlays();
                 }
@@ -669,17 +668,21 @@ export default class CardBattleMemory implements CardBattle {
             setTimeout(async () => {
                 const powerCardId = powerAction.powerCard.id;
                 this.#powerActions.push(powerAction);
+                this.pass(playerId);
+                if (await this.hasPowerCardsProcessed() === false) {
+                    if (this.#isPlayer(playerId)) {
+                        this.#setOpponentStep(IN_PLAY);
+                    };
+                    if (this.#isOpponent(playerId)) {
+                        this.#setPlayerStep(IN_PLAY);
+                    };
+                }
                 if (this.#isPlayer(playerId)) {
-                    console.log('player', this.#playerStep, this.#opponentStep);
                     await this.#removePowerCardInHandById(this.#playerId, powerCardId);
-                    this.#setOpponentStep(IN_PLAY);
                 };
                 if (this.#isOpponent(playerId)) {
-                    console.log('opponent', this.#playerStep, this.#opponentStep);
                     await this.#removePowerCardInHandById(this.#opponentId, powerCardId);
-                    this.#setPlayerStep(IN_PLAY);
                 };
-                this.pass(playerId);
                 resolve();
             }, delayMock);
         });

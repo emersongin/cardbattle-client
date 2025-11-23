@@ -1,4 +1,3 @@
-- class abstrata de CArdBattlePhase para compartilhas ações entre load e compile fases:
-- msg descrição de ação para Powercard e janela de confirmação para tipos de ações de configuração de card PowerCard
-- movimentos de cartão ao acionar afeito
-- executar PowerCards sem efeito mas deixando momento para executar ações dinamicas...
+- renomear obj de composição de class que extende a lib REXUI.
+- testar com CardBattleMemory
+- refatorar testes de LOADPHASE
