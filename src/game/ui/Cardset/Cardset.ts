@@ -121,7 +121,7 @@ export class Cardset {
     selectCardById(cardId: string): void {
         this.removeAllSelectCardById(cardId);
         const card = this.getCardById(cardId);
-        this.#container.bringToTop(card.getUi());
+        this.#container.bringToTop(card.getUi().getMainLayer());
         if (card.isMarked()) return this.markCardById(cardId);
         if (card.isHighlighted()) return;
         if (card.isDisabled()) return this.banCardById(cardId);
@@ -209,7 +209,7 @@ export class Cardset {
     }
 
     #addCards(): void {
-        this.getCards().forEach((card: Card) => this.#container.add(card.getUi()));
+        this.getCards().forEach((card: Card) => this.#container.add(card.getUi().getMainLayer()));
     }
 
     preUpdate(): void {
@@ -261,7 +261,7 @@ export class Cardset {
         if (cardIndex === -1) {
             throw new Error(`Cardset: card with id ${cardId} not found.`);
         }
-        this.#container.remove(this.getCards()[cardIndex].getUi(), true);
+        this.#container.remove(this.getCards()[cardIndex].getUi().getMainLayer(), true);
         this.getCards().splice(cardIndex, 1);
     }
 
@@ -311,12 +311,12 @@ export class Cardset {
         this.#container.data.set(key, value);
     }
 
-    sendToBack(card: CardUi): void {
-        this.#container.sendToBack(card);
+    sendToBack(cardUi: CardUi): void {
+        this.#container.sendToBack(cardUi.getMainLayer());
     }
 
-    bringToTop(card: CardUi): void {
-        this.#container.bringToTop(card);
+    bringToTop(cardUi: CardUi): void {
+        this.#container.bringToTop(cardUi.getMainLayer());
     }
 
     destroy(): void {

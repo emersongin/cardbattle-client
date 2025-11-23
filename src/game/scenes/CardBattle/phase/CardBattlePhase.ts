@@ -10,7 +10,6 @@ import { CommandWindow } from '@ui/CommandWindow/CommandWindow';
 import { BoardWindow } from '@ui/BoardWindow/BoardWindow';
 import { Cardset } from '@ui/Cardset/Cardset';
 import { Card } from '@ui/Card/Card';
-import { CardUi } from '@ui/Card/CardUi';
 import { CommandOption } from '@ui/CommandWindow/CommandOption';
 import { CardActionsBuilder } from '@ui/Card/CardActionsBuilder';
 import { TextWindowConfig } from '@ui/TextWindows/TextWindowConfig';
@@ -21,6 +20,7 @@ import { CardsetEvents } from "@game/ui/Cardset/CardsetEvents";
 import { TextWindows } from "@game/ui/TextWindows/TextWindows";
 import { PowerCard } from "@game/ui/Card/PowerCard";
 import { BattleCard } from "@game/ui/Card/BattleCard";
+import { GameObjects } from "phaser";
 
 export type AlignType = 
     | typeof LEFT 
@@ -392,19 +392,20 @@ export class CardBattlePhase implements Phase {
 
     // SHARED
     #openCardset(cardset: Cardset, config?: TweenConfig, index?: number): void {
-        let cardsUis = cardset.getCardsUi();
+        const cardsUis = cardset.getCardsUi();
+        let cardsLayers = cardsUis.map(ui => ui.getMainLayer());
         if (index !== undefined) {
             const card = cardset.getCardByIndex(index);
             if (!card) return (config?.onComplete) ? config.onComplete() : undefined;
-            cardsUis = [card.getUi()];
+            cardsLayers = [card.getUi().getMainLayer()];
         }
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
-        const openConfig: TimelineConfig<CardUi> = {
-            targets: cardsUis,
-            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+        const openConfig: TimelineConfig<GameObjects.Container> = {
+            targets: cardsLayers,
+            onStart: ({ index, pause, resume  }: TimelineEvent<GameObjects.Container>) => {
                 pause();
                 const builder = CardActionsBuilder
-                    .create(card);
+                    .create(cardsUis[index].card);
                 builder
                     .open({
                         delay: (index * 100),
@@ -421,13 +422,14 @@ export class CardBattlePhase implements Phase {
 
     #closeCardset(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
+        let cardsLayers = cardsUis.map(ui => ui.getMainLayer());
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
-        const closeConfig: TimelineConfig<CardUi> = {
-            targets: cardsUis,
-            onStart: ({ target: { card }, index, pause, resume  }: TimelineEvent<CardUi>) => {
+        const closeConfig: TimelineConfig<GameObjects.Container> = {
+            targets: cardsLayers,
+            onStart: ({ index, pause, resume  }: TimelineEvent<GameObjects.Container>) => {
                 pause();
                 CardActionsBuilder
-                    .create(card)
+                    .create(cardsUis[index].card)
                     .close({
                         delay: (index * 100),
                         destroy: true,
@@ -445,13 +447,14 @@ export class CardBattlePhase implements Phase {
 
     #flipCardset(cardset: Cardset, config?: TweenConfig) {
         const cardsUis = cardset.getCardsUi();
+        let cardsLayers = cardsUis.map(ui => ui.getMainLayer());
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
-        const flipConfig: TimelineConfig<CardUi> = {
-            targets: cardsUis,
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+        const flipConfig: TimelineConfig<GameObjects.Container> = {
+            targets: cardsLayers,
+            onStart: ({ index, pause, resume }: TimelineEvent<GameObjects.Container>) => {
                 pause();
                 CardActionsBuilder
-                    .create(card)
+                    .create(cardsUis[index].card)
                     .close({ delay: (index * 200) })
                     .faceUp()
                     .open({ onComplete: () => resume() })
@@ -466,20 +469,21 @@ export class CardBattlePhase implements Phase {
 
     #flashCardset(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
+        let cardsLayers = cardsUis.map(ui => ui.getMainLayer());
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
-        const flashConfig: TimelineConfig<CardUi> = {
-            targets: cardsUis,
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
-                const cardColor = card.getColor();
+        const flashConfig: TimelineConfig<GameObjects.Container> = {
+            targets: cardsLayers,
+            onStart: ({ index, pause, resume }: TimelineEvent<GameObjects.Container>) => {
+                const cardColor = cardsUis[index].card.getColor();
                 if (cardColor === ORANGE) return resume();
                 pause();
                 CardActionsBuilder
-                    .create(card)
+                    .create(cardsUis[index].card)
                     .flash({
                         color: 0xffffff,
                         delay: (index * 200),
                         onStart: () => {
-                            if (config?.onStartEach) config.onStartEach(card);
+                            if (config?.onStartEach) config.onStartEach(cardsUis[index].card);
                         },
                         onComplete: () => resume()
                     })
@@ -494,13 +498,14 @@ export class CardBattlePhase implements Phase {
 
     #moveCardsetToBoard(cardset: Cardset, config?: TweenConfig): void {
         const cardsUis = cardset.getCardsUi();
+        let cardsLayers = cardsUis.map(ui => ui.getMainLayer());
         if (cardsUis.length === 0) return (config?.onComplete) ? config.onComplete() : undefined;
         const moveConfig = {
-            targets: cardsUis,
-            onStart: ({ target: { card }, index, pause, resume }: TimelineEvent<CardUi>) => {
+            targets: cardsLayers,
+            onStart: ({ index, pause, resume }: TimelineEvent<GameObjects.Container>) => {
                 pause();
                 CardActionsBuilder
-                    .create(card)
+                    .create(cardsUis[index].card)
                     .open({ delay: 0, duration: 0 })
                     .move({
                         toX: (index * CARD_WIDTH),

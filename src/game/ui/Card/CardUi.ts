@@ -13,8 +13,13 @@ export class CardUi {
     #selectedLayer: Phaser.GameObjects.Container;
 
     constructor(readonly scene: VueScene, readonly card: Card) {
+        this.#mainlayer = new Phaser.GameObjects.Container(this.#getScene(), 0, 0);
         this.#mainlayer.setSize(CARD_WIDTH, CARD_HEIGHT);
         this.#createLayers();
+    }
+
+    getMainLayer(): Phaser.GameObjects.Container {
+        return this.#mainlayer;
     }
 
     #createLayers(): void {
@@ -191,5 +196,9 @@ export class CardUi {
 
     setDisabledLayerVisible(visible: boolean): void {
         this.#disabledLayer.setVisible(visible);
+    }
+
+    destroy(): void {
+        this.#mainlayer.destroy();
     }
 }

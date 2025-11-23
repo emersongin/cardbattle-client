@@ -14,7 +14,7 @@ export class Card {
         isStartFaceUp: boolean = false,
         isStartDisabled: boolean = false
     ) {
-        this.setStartData();
+        this.#setStartData();
         this.#ui = new CardUi(this.scene, this);
         this.setData(FACE_UP, isStartFaceUp || false);
         this.setData(DISABLED, isStartDisabled || false);
@@ -30,8 +30,9 @@ export class Card {
         this.#data.set(key, data);
     }
 
-    setStartData(): void {
-        // this.setDataEnabled();
+    #setStartData(): void {
+        this.#data = new Phaser.Data.DataManager({ sys: this.scene }, new Phaser.Events.EventEmitter());
+        // this.#data.setDataEnabled();
         this.setData(CLOSED, false);
         this.setData(SELECTED, false);
         this.setData(MARKED, false);
@@ -295,5 +296,10 @@ export class Card {
 
     setScaleY(scaleY: number): void {
         this.#ui.setScaleY(scaleY);
+    }
+
+    destroy(): void {
+        this.#ui.destroy();
+        this.#data.destroy();
     }
 }

@@ -322,7 +322,7 @@ describe("LoadPhase.test", () => {
         expect(await cardBattleMock.getPowerActions()).toHaveLength(2);
     }, 6000);
 
-    test.only("P:play, O:play, P:play => Load.", async () => {
+    test("P:play, O:play, P:play => Load.", async () => {
         // given
         const passSpy = vi.spyOn(cardBattleMock, 'pass');
         vi.spyOn(cardBattleMock, "isStartPlaying").mockResolvedValue(true);
