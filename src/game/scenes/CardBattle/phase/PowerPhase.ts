@@ -51,34 +51,41 @@ export abstract class PowerPhase extends CardBattlePhase {
         this.createPhaseWindows();
         super.openAllWindows({
             onComplete: () => {
-                this.scene.addKeyEnterListeningOnce({
-                    onTrigger: () => {
-                        this.scene.removeAllKeyListening();
-                        super.closeAllWindows({
-                            onComplete: async () => {
-                                await super.createGameBoard();
-                                this.createBeginPhaseWindows();
-                                await super.openGameBoard();
-                                super.openAllWindows({
-                                    onComplete: () => {
-                                        this.scene.addKeyEnterListeningOnce({
-                                            onTrigger: () => {
-                                                this.scene.removeAllKeyListening();
-                                                super.closeAllWindows({
-                                                    onComplete: () => this.resumePhase()
-                                                })
-                                            }
-                                        });
-                                        super.publish('onOpenBeginPhaseWindow');
-                                    }
-                                });
-                            }
-                        })
-                    }
-                });
+                this.#addKeyEnterOnOpenPhaseWindows();
                 super.publish('onOpenPhaseWindows');
             }
         });
+    }
+
+    #addKeyEnterOnOpenPhaseWindows(): void {
+        this.scene.addKeyEnterListeningOnce({ 
+            onTrigger: () => 
+                super.closeAllWindows({ 
+                    onComplete: () => this.createGameBoardOnBeginPhase() 
+                })
+        });
+    }
+
+    async createGameBoardOnBeginPhase(): Promise<void> {
+        await super.createGameBoard();
+        this.createBeginPhaseWindows();
+        await super.openGameBoard();
+        super.openAllWindows({
+            onComplete: () => {
+                this.#addKeyEnterOnOpenBeginPhaseWindows();
+                super.publish('onOpenBeginPhaseWindow');
+            }
+        });
+    }
+
+    #addKeyEnterOnOpenBeginPhaseWindows(): void {
+        this.scene.addKeyEnterListeningOnce({
+            onTrigger: () => 
+                super.closeAllWindows({ 
+                    onComplete: () => this.resumePhase() 
+                })
+            }
+        );
     }
 
     abstract createPhaseWindows(): void;
