@@ -26,17 +26,17 @@ export class BattleCard extends Card {
 
     getAllData(): BattlePoints {
         return { 
-            [AP]: this.data.get(AP), 
-            [HP]: this.data.get(HP),
+            [AP]: this.getData(AP), 
+            [HP]: this.getData(HP),
         };
     }
 
     getAp(): number {
-        return this.data.get(AP);
+        return this.getData(AP);
     }
 
     getHp(): number {
-        return this.data.get(HP);
+        return this.getData(HP);
     }
 
     getCost(): number {
@@ -54,11 +54,11 @@ export class BattleCard extends Card {
     }
 
     setAp(ap: number): void {
-        this.data.set(AP, ap);
+        this.setData(AP, ap);
     }
 
     setHp(hp: number): void {
-        this.data.set(HP, hp);
+        this.setData(HP, hp);
     }
 
 }

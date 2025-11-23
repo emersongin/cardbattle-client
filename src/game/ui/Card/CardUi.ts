@@ -4,7 +4,8 @@ import { CARD_HEIGHT, CARD_WIDTH } from "@constants/default";
 import { Card } from "@ui/Card/Card";
 import { VueScene } from "@game/scenes/VueScene";
 
-export class CardUi extends Phaser.GameObjects.Container {
+export class CardUi {
+    #mainlayer: Phaser.GameObjects.Container;
     #background: Phaser.GameObjects.Rectangle;
     #image: Phaser.GameObjects.Image;
     #display: Phaser.GameObjects.Text;
@@ -12,8 +13,7 @@ export class CardUi extends Phaser.GameObjects.Container {
     #selectedLayer: Phaser.GameObjects.Container;
 
     constructor(readonly scene: VueScene, readonly card: Card) {
-        super(scene);
-        this.setSize(CARD_WIDTH, CARD_HEIGHT);
+        this.#mainlayer.setSize(CARD_WIDTH, CARD_HEIGHT);
         this.#createLayers();
     }
 
@@ -27,10 +27,50 @@ export class CardUi extends Phaser.GameObjects.Container {
 
     #createBackground(): void {
         const backgroundColor = this.getBackgroundColor();
-        const backgroundRect = this.#getScene().add.rectangle(0, 0, this.width, this.height, backgroundColor);
+        const backgroundRect = this.#getScene().add.rectangle(0, 0, this.getWidth(), this.getHeight(), backgroundColor);
         backgroundRect.setOrigin(0, 0);
         this.#background = backgroundRect;
-        this.add(this.#background);
+        this.#mainlayer.add(this.#background);
+    }
+
+    getWidth(): number {
+        return this.#mainlayer.width;
+    }
+
+    getHeight(): number {
+        return this.#mainlayer.height;
+    }
+
+    getX(): number {
+        return this.#mainlayer.x;
+    }
+
+    getY(): number {
+        return this.#mainlayer.y;
+    }
+
+    getScaleX(): number {
+        return this.#mainlayer.scaleX;
+    }
+
+    getScaleY(): number {
+        return this.#mainlayer.scaleY;
+    }
+
+    setX(x: number): void {
+        this.#mainlayer.x = x;
+    }
+
+    setY(y: number): void {
+        this.#mainlayer.y = y;
+    }
+
+    setScaleX(scaleX: number): void {
+        this.#mainlayer.scaleX = scaleX;
+    }
+
+    setScaleY(scaleY: number): void {
+        this.#mainlayer.scaleY = scaleY;
     }
 
     getBackgroundColor(): number {
@@ -56,7 +96,7 @@ export class CardUi extends Phaser.GameObjects.Container {
         const image = this.#getScene().add.image(0, 0, 'empty');
         this.#image = image;
         this.#adjustImagePosition();
-        this.add(this.#image);
+        this.#mainlayer.add(this.#image);
     }
 
     #getScene(): VueScene {
@@ -76,17 +116,17 @@ export class CardUi extends Phaser.GameObjects.Container {
         const escalaProporcional = Math.min(escalaX, escalaY);
         this.#image.setOrigin(0, 0);
         this.#image.setScale(escalaProporcional);
-        this.#image.setPosition((this.width - this.#image.displayWidth) / 2, (this.height - this.#image.displayHeight) / 2);
+        this.#image.setPosition((this.getWidth() - this.#image.displayWidth) / 2, (this.getHeight() - this.#image.displayHeight) / 2);
     }
 
     #createDisplay(): void {
-        const display = this.#getScene().add.text(this.width - 80, this.height - 32, '', {
+        const display = this.#getScene().add.text(this.getWidth() - 80, this.getHeight() - 32, '', {
             fontSize: '24px',
             color: (this.card.staticData.color === WHITE) ? '#000' : '#fff',
             fontStyle: 'bold',
         });
         this.#display = display;
-        this.add(this.#display);
+        this.#mainlayer.add(this.#display);
     }
 
     setDisplayText(text: string): void {
@@ -95,18 +135,18 @@ export class CardUi extends Phaser.GameObjects.Container {
     }
 
     #createDisabledLayer(): void {
-        const disabledLayer = this.#getScene().add.rectangle(0, 0, this.width, this.height, 0x000000, 0.6);
+        const disabledLayer = this.#getScene().add.rectangle(0, 0, this.getWidth(), this.getHeight(), 0x000000, 0.6);
         disabledLayer.setOrigin(0, 0);
         disabledLayer.setVisible(this.card.isDisabled() || false);
         this.#disabledLayer = disabledLayer;
-        this.add(this.#disabledLayer);
+        this.#mainlayer.add(this.#disabledLayer);
     }
 
     #createSelectedLayer(): void {
         const selectedLayer = this.#getScene().add.container(0, 0);
         selectedLayer.setVisible(false);
         this.#selectedLayer = selectedLayer;
-        this.add(this.#selectedLayer);
+        this.#mainlayer.add(this.#selectedLayer);
     }
 
     setSelectedLayerVisible(visible: boolean): void {
@@ -121,8 +161,8 @@ export class CardUi extends Phaser.GameObjects.Container {
             throw new Error('Selected layer is not initialized.');
         }
         this.#selectedLayer.removeAll(true);
-        this.#selectedLayer.add(this.#createOutlinedRect(0, 0, this.width, this.height, 0x000000, 6));
-        this.#selectedLayer.add(this.#createOutlinedRect(0, 0, this.width, this.height, color || 0xffff00, 6));
+        this.#selectedLayer.add(this.#createOutlinedRect(0, 0, this.getWidth(), this.getHeight(), 0x000000, 6));
+        this.#selectedLayer.add(this.#createOutlinedRect(0, 0, this.getWidth(), this.getHeight(), color || 0xffff00, 6));
     }
 
     #createOutlinedRect(x: number, y: number, w: number, h: number, color = 0xffffff, thickness = 2) {

@@ -9,8 +9,8 @@ import { TweenConfig } from "@game/types/TweenConfig";
 import { UpdateAnimation } from "@ui/BoardWindow/animations/UpdateAnimation";
 
 export class BoardWindow {
-    #sizer: Sizer;
-    #contentLabel: Label;
+    #rect: Sizer;
+    #label: Label;
 
     private constructor(
         readonly scene: Phaser.Scene,
@@ -23,7 +23,7 @@ export class BoardWindow {
         reverse: boolean = false
     ) {
         const vertical = 1;
-        this.#sizer = new Sizer(scene, {
+        this.#rect = new Sizer(scene, {
             x,
             y,
             width,
@@ -33,31 +33,31 @@ export class BoardWindow {
         this.#setStartData(data, reverse);
         this.#createBackground(color);
         this.#createContentLabel(data);
-        this.#sizer.layout();
-        this.#sizer.setScale(1, 0);
-        scene.add.existing(this.#sizer);
+        this.#rect.layout();
+        this.#rect.setScale(1, 0);
+        scene.add.existing(this.#rect);
     }
 
     #setStartData(data: BoardWindowData, reverse: boolean = false) {
-        this.#sizer.setDataEnabled();
-        this.#sizer.data.set(AP, data[AP] ?? 0);
-        this.#sizer.data.set(HP, data[HP] ?? 0);
-        this.#sizer.data.set(RED, data[RED] ?? 0);
-        this.#sizer.data.set(GREEN, data[GREEN] ?? 0);
-        this.#sizer.data.set(BLUE, data[BLUE] ?? 0);
-        this.#sizer.data.set(BLACK, data[BLACK] ?? 0);
-        this.#sizer.data.set(WHITE, data[WHITE] ?? 0);
-        this.#sizer.data.set(HAND, data[HAND] ?? 0);
-        this.#sizer.data.set(DECK, data[DECK] ?? 0);
-        this.#sizer.data.set(TRASH, data[TRASH] ?? 0);
-        this.#sizer.data.set(WINS, data[WINS] ?? 0);
-        this.#sizer.data.set(REVERSE, reverse ?? false);
-        this.#sizer.data.set(PASS, data[PASS] ?? false);
+        this.#rect.setDataEnabled();
+        this.#rect.data.set(AP, data[AP] ?? 0);
+        this.#rect.data.set(HP, data[HP] ?? 0);
+        this.#rect.data.set(RED, data[RED] ?? 0);
+        this.#rect.data.set(GREEN, data[GREEN] ?? 0);
+        this.#rect.data.set(BLUE, data[BLUE] ?? 0);
+        this.#rect.data.set(BLACK, data[BLACK] ?? 0);
+        this.#rect.data.set(WHITE, data[WHITE] ?? 0);
+        this.#rect.data.set(HAND, data[HAND] ?? 0);
+        this.#rect.data.set(DECK, data[DECK] ?? 0);
+        this.#rect.data.set(TRASH, data[TRASH] ?? 0);
+        this.#rect.data.set(WINS, data[WINS] ?? 0);
+        this.#rect.data.set(REVERSE, reverse ?? false);
+        this.#rect.data.set(PASS, data[PASS] ?? false);
     }
 
     #createBackground(color: number) {
         const background = this.scene.rexUI.add.roundRectangle(0, 0, 0, 0, 10, color);
-        this.#sizer.addBackground(background);
+        this.#rect.addBackground(background);
     }
 
     #createContentLabel(config: BoardWindowData) {
@@ -68,12 +68,12 @@ export class BoardWindow {
             }),
             align: 'center'
         });
-        this.#sizer.add(contentLabel, { align: 'center', expand: false, padding: { top: 20, bottom: 20 } });
-        this.#contentLabel = contentLabel;
+        this.#rect.add(contentLabel, { align: 'center', expand: false, padding: { top: 20, bottom: 20 } });
+        this.#label = contentLabel;
     }
 
     setText(text: string) {        
-        this.#contentLabel.text = text;
+        this.#label.text = text;
     }
 
     createContent(data: BoardWindowData): string {
@@ -93,7 +93,7 @@ export class BoardWindow {
     }
 
     #getData(prop: string): any {
-        return this.#sizer.data.get(prop);
+        return this.#rect.data.get(prop);
     }
 
     #createBattlePoints(ap: number, hp: number, pass: boolean): string {
@@ -166,7 +166,7 @@ export class BoardWindow {
 
     open(config?: TweenConfig) {
         this.scene.tweens.add({
-            targets: this.#sizer,
+            targets: this.#rect,
             scaleY: 1,
             duration: 300,
             ease: 'Back.easeOut',
@@ -178,13 +178,13 @@ export class BoardWindow {
 
     close(config?: TweenConfig) {
         this.scene.tweens.add({
-            targets: this.#sizer,
+            targets: this.#rect,
             scaleY: 0,
             duration: 300,
             ease: 'Back.easeIn',
             onComplete: () => {
                 if (config?.onComplete) config.onComplete();
-                this.#sizer.destroy();
+                this.#rect.destroy();
             }
         });
     }
@@ -233,8 +233,8 @@ export class BoardWindow {
     }
 
     setBattlePoints(attackPoints: number, healthPoints: number): void {
-        this.#sizer.data.set(AP, attackPoints);
-        this.#sizer.data.set(HP, healthPoints);
+        this.#rect.data.set(AP, attackPoints);
+        this.#rect.data.set(HP, healthPoints);
         const fromTarget = this.getAllData();
         const content = this.createContent(fromTarget);
         this.setText(content);
@@ -250,8 +250,8 @@ export class BoardWindow {
             [HP]: healthPoints,
         } as Partial<BoardWindowData>;
         this.#updating(fromTarget, toTarget, 1000, onComplete);
-        this.#sizer.data.set(AP, attackPoints);
-        this.#sizer.data.set(HP, healthPoints);
+        this.#rect.data.set(AP, attackPoints);
+        this.#rect.data.set(HP, healthPoints);
     }
 
     addZonePoints(boardZone: BoardZonesType, value: number): void {
@@ -284,10 +284,10 @@ export class BoardWindow {
             toTarget[WINS] = value
         }
         this.#updating(fromTarget, toTarget);
-        if (boardZone === HAND) this.#sizer.data.set(HAND, value);
-        if (boardZone === DECK) this.#sizer.data.set(DECK, value);
-        if (boardZone === TRASH) this.#sizer.data.set(TRASH, value);
-        if (boardZone === WINS) this.#sizer.data.set(WINS, value);
+        if (boardZone === HAND) this.#rect.data.set(HAND, value);
+        if (boardZone === DECK) this.#rect.data.set(DECK, value);
+        if (boardZone === TRASH) this.#rect.data.set(TRASH, value);
+        if (boardZone === WINS) this.#rect.data.set(WINS, value);
     }
 
     addColorPoints(cardColor: CardColorType, value: number): void {
@@ -324,11 +324,11 @@ export class BoardWindow {
             toTarget[WHITE] = value;
         }
         this.#updating(fromTarget, toTarget);
-        if (cardColor === RED) this.#sizer.data.set(RED, value);
-        if (cardColor === GREEN) this.#sizer.data.set(GREEN, value);
-        if (cardColor === BLUE) this.#sizer.data.set(BLUE, value);
-        if (cardColor === BLACK) this.#sizer.data.set(BLACK, value);
-        if (cardColor === WHITE) this.#sizer.data.set(WHITE, value);
+        if (cardColor === RED) this.#rect.data.set(RED, value);
+        if (cardColor === GREEN) this.#rect.data.set(GREEN, value);
+        if (cardColor === BLUE) this.#rect.data.set(BLUE, value);
+        if (cardColor === BLACK) this.#rect.data.set(BLACK, value);
+        if (cardColor === WHITE) this.#rect.data.set(WHITE, value);
     }
 
     setPass(pass: boolean): void {
@@ -337,7 +337,7 @@ export class BoardWindow {
         fromTarget[PASS] = this.#getData(PASS);
         toTarget[PASS] = pass;
         this.#updating(fromTarget, toTarget);
-        this.#sizer.data.set(PASS, pass);
+        this.#rect.data.set(PASS, pass);
     }
 
     #updating(
@@ -383,18 +383,18 @@ export class BoardWindow {
     }
 
     getY(): number {
-        return this.#sizer.y;
+        return this.#rect.y;
     }
 
     getX(): number {
-        return this.#sizer.x;
+        return this.#rect.x;
     }
 
     getHeight(): number {
-        return this.#sizer.height;
+        return this.#rect.height;
     }
 
     getWidth(): number {
-        return this.#sizer.width;
+        return this.#rect.width;
     }
 }
