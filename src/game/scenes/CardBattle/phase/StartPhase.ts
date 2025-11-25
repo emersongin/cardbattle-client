@@ -46,31 +46,47 @@ export class StartPhase extends CardBattlePhase implements Phase {
 
     async #loadStartPhase(): Promise<void> {
         if (await this.cardBattle.isPlayMiniGame(this.scene.getPlayerId())) {
-            super.createTextWindowCentered('Start Phase', { textAlign: 'center' });
+            this.#createPhaseWindows();
             super.openAllWindows({
                 onComplete: () => {
-                    this.#createMiniGameCommandWindow();
-                    super.openCommandWindow({
-                        onComplete: () => {
-                            super.startCommandWindowSelection();
-                            super.publishEvent('onOpenCommandWindow');
-                        }
-                    });
+                    this.#addKeyEnterOnOpenPhaseWindowsToMiniGame();
+                    super.publishEvent('onOpenPhaseWindows');
                 }
             });
             return;
         }
-        super.createTextWindowCentered('Start Phase', { textAlign: 'center' });
-        super.addTextWindow('Draw white card to go first.');
+        this.#createPhaseWindows();
         super.openAllWindows({
             onComplete: () => {
-                this.#addKeyEnterOnOpenPhaseWindows();
+                this.#addKeyEnterOnOpenPhaseWindowsToWaitingOppoenent();
                 super.publishEvent('onOpenPhaseWindows');
             }
         });
     }
 
-    #addKeyEnterOnOpenPhaseWindows(): void {
+    #createPhaseWindows(): void {
+        super.createTextWindowCentered('Start Phase', { textAlign: 'center' });
+        super.addTextWindow('Draw white card to go first.');
+    }
+
+    #addKeyEnterOnOpenPhaseWindowsToMiniGame(): void {
+        this.scene.addKeyEnterListeningOnce({
+            onTrigger: () => 
+                super.closeAllWindows({ 
+                    onComplete: () => {
+                        this.#createMiniGameCommandWindow();
+                        super.openCommandWindow({
+                            onComplete: () => {
+                                super.startCommandWindowSelection();
+                                super.publishEvent('onOpenCommandWindow');
+                            }
+                        });
+                    }
+                })
+        });
+    }
+
+    #addKeyEnterOnOpenPhaseWindowsToWaitingOppoenent(): void {
         this.scene.addKeyEnterListeningOnce({ 
             onTrigger:  () => {
                 super.closeAllWindows({ 
@@ -84,11 +100,20 @@ export class StartPhase extends CardBattlePhase implements Phase {
         super.createWaitingWindow('Waiting for opponent to finish the mini-game...');
         super.openAllWindows({
             onComplete: async () => {
-                await this.cardBattle.listenOpponentEndMiniGame(
-                    this.scene.getPlayerId(),
-                    (choice: string) => 
-                        super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice)})
-                );                           
+                setTimeout(async () => {
+                    super.closeAllWindows({ 
+                        onComplete: () => console.log('Opponent finished mini-game.')
+                    });
+                }, 1000);
+                // await this.cardBattle.listenOpponentEndMiniGame(
+                //     this.scene.getPlayerId(),
+                //     (choice: string) => {
+                //         super.closeAllWindows({ 
+                //             onComplete: () => this.#createResultWindow(choice)
+                //         });
+                        
+                //     }
+                // );                           
             }
         });
     }

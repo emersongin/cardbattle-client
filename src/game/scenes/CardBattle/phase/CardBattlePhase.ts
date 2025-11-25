@@ -105,6 +105,7 @@ export class CardBattlePhase implements Phase {
     }
 
     closeAllWindows(config?: TweenConfig): Promise<void> {
+        console.log(this.#textWindows);
         return new Promise(resolve => {
             this.#textWindows.closeAllWindows({ ...config, 
                 onComplete: () => {

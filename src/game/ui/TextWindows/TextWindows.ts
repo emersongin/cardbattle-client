@@ -33,8 +33,6 @@ export class TextWindows {
             textColor: config.textColor || '#ffffff',
             relativeParent: config.relativeParent,
             marginTop: config.marginTop || 0,
-            // onStartClose: () => this.#onStartCloseAllChildrenWindows(),
-            // onClose: config.onClose
         };
         return TextWindow.createCentered(this.scene, { ...windowConfig, text });
     }
