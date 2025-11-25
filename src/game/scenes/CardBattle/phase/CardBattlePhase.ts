@@ -28,7 +28,7 @@ export type AlignType =
     | typeof RIGHT;
 export class CardBattlePhase implements Phase {
     protected cardBattle: CardBattle;
-    protected events: PhaseEvents = [];
+    protected events: PhaseEvents[] = [];
 
     #textWindows: TextWindows;
     #commandWindow: CommandWindow;
@@ -47,17 +47,20 @@ export class CardBattlePhase implements Phase {
         throw new Error("Method not implemented.");
     }
 
-    addListener(event: string, listener: (params?: any) => void): void {
-        const eventIndex = this.events.findIndex(e => e.eventName === event);
+    addListener(eventName: string, listener: (params?: any) => void): void {
+        const eventIndex = this.events.findIndex(e => e.eventName === eventName);
         if (eventIndex !== -1) {
             this.events[eventIndex].listeners.push(listener);
         } else {
-            this.events.push({ eventName: event, listeners: [listener] });
+            this.events.push({ 
+                eventName: eventName, 
+                listeners: [ listener ] 
+            });
         }
     }
 
-    publish(event: string, params?: any): void {
-        const eventIndex = this.events.findIndex(e => e.eventName === event);
+    publishEvent(eventName: string, params?: any): void {
+        const eventIndex = this.events.findIndex(e => e.eventName === eventName);
         if (eventIndex !== -1) {
             this.events[eventIndex].listeners.forEach(listener => listener(params));
         }
@@ -127,6 +130,17 @@ export class CardBattlePhase implements Phase {
 
     openCommandWindow(config?: TweenConfig): void {
         this.#commandWindow.open(config);
+    }
+
+    startCommandWindowSelection(): void {
+        const commandWindow = this.getCommandWindow();
+        this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
+        this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
+        this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
+            this.scene.removeAllKeyListening();
+            commandWindow.select();
+        } });
+        commandWindow.selectByIndex(0);
     }
 
     // PLAYER BOARD

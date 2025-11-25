@@ -38,7 +38,6 @@ export abstract class PowerPhase extends CardBattlePhase {
         if (events?.onOpenPowerCardActivationCommandWindow) {
             super.addListener('onOpenPowerCardActivationCommandWindow', events.onOpenPowerCardActivationCommandWindow);
         }
-
     }
 
     async create(goToPlays: boolean = false): Promise<void> {
@@ -52,7 +51,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openAllWindows({
             onComplete: () => {
                 this.#addKeyEnterOnOpenPhaseWindows();
-                super.publish('onOpenPhaseWindows');
+                super.publishEvent('onOpenPhaseWindows');
             }
         });
     }
@@ -73,7 +72,7 @@ export abstract class PowerPhase extends CardBattlePhase {
         super.openAllWindows({
             onComplete: () => {
                 this.#addKeyEnterOnOpenBeginPhaseWindows();
-                super.publish('onOpenBeginPhaseWindow');
+                super.publishEvent('onOpenBeginPhaseWindow');
             }
         });
     }
@@ -106,15 +105,8 @@ export abstract class PowerPhase extends CardBattlePhase {
         ]);
         super.openCommandWindow({
             onComplete: () => {
-                const commandWindow = super.getCommandWindow();
-                this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
-                this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
-                this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
-                    this.scene.removeAllKeyListening();
-                    commandWindow.select();
-                } });
-                commandWindow.selectByIndex(0);
-                super.publish('onOpenCommandWindow');
+                super.startCommandWindowSelection();
+                super.publishEvent('onOpenCommandWindow');
             }
         })
     }
@@ -179,7 +171,7 @@ export abstract class PowerPhase extends CardBattlePhase {
             this.scene.removeAllKeyListening();
             cardset.leave();
         } });
-        super.publish('onSelectModeHandZoneCardset');
+        super.publishEvent('onSelectModeHandZoneCardset');
     }
 
     async #changeHandZoneToBattleZone(config: { onComplete: () => void }): Promise<void> {
@@ -231,7 +223,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                     commandWindow.select();
                 } });
                 commandWindow.selectByIndex(0);
-                super.publish('onOpenPowerCardSelectionCommandWindow');
+                super.publishEvent('onOpenPowerCardSelectionCommandWindow');
             }
         });
     }
@@ -280,7 +272,7 @@ export abstract class PowerPhase extends CardBattlePhase {
                     commandWindow.select();
                 } });
                 commandWindow.selectByIndex(0);
-                super.publish('onOpenPowerCardActivationCommandWindow');
+                super.publishEvent('onOpenPowerCardActivationCommandWindow');
             }
         });
     }

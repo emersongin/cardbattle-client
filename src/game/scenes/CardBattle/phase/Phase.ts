@@ -1,8 +1,8 @@
-export type PhaseEvents = { eventName: string, listeners: ((params?: any) => void)[] }[];
+export type PhaseEvents = { eventName: string, listeners: ((params?: any) => void)[] };
 export interface Phase {
     create(params?: any): void;
-    addListener(event: string, listener: (params?: any) => void): void;
-    publish(event: string, params?: any): void;
+    addListener(eventName: string, listener: (params?: any) => void): void;
+    publishEvent(eventName: string, params?: any): void;
     changeToChallengePhase(): void;
     changeToStartPhase(): void;
     changeToDrawPhase(): void;
