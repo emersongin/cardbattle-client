@@ -60,17 +60,21 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     #addKeyEnterOnOpenPhaseWindows(): void {
         this.scene.addKeyEnterListeningOnce({ 
             onTrigger:  () => 
-                super.closeAllWindows({ onComplete: async () => this.#createAndOpenCommandWindow() })
+                super.closeAllWindows({ 
+                    onComplete: async () => this.#createAndOpenCommandWindow() 
+                })
             }
         );
     }
 
     async #createAndOpenCommandWindow(): Promise<void> {
         this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions(this.scene.getPlayerId()));
-        super.openCommandWindow({ onComplete: () => {
-            super.startCommandWindowSelection();
-            super.publishEvent('onOpenCommandWindow');
-        } });
+        super.openCommandWindow({ 
+            onComplete: () => {
+                super.startCommandWindowSelection();
+                super.publishEvent('onOpenCommandWindow');
+            } 
+        });
     }
 
     #createFoldersCommandWindow(options: CommandOption[]): void {

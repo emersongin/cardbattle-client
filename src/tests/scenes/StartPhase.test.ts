@@ -3,7 +3,7 @@ import PhaserMock from "@mocks/phaser";
 import CardBattleMemory from "@game/api/CardBattleMemory";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
 import { CardBattle } from "@game/api/CardBattle";
-import { ChallengePhase } from "@game/scenes/CardBattle/phase/ChallengePhase";
+import { StartPhase } from "@game/scenes/CardBattle/phase/StartPhase";
 
 function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
     const keyboard = scene.input.keyboard;
@@ -19,7 +19,7 @@ async function expectAsync<T>(
     return await new Promise<T>((res, rej) => fn(res, rej));
 }
 
-describe("ChallengePhase.test", () => {
+describe("StartPhase.test", () => {
     let sceneMock: CardBattleScene;
     let keyboard: Phaser.Input.Keyboard.KeyboardPlugin;
     let cardBattleMock: CardBattle;
@@ -50,21 +50,25 @@ describe("ChallengePhase.test", () => {
         sceneMock.room = playerRoom;
         // CHALLENGE PHASE
         await cardBattleMock.joinRoom(roomId);
+        // START PHASE
+        await cardBattleMock.setFolder(playerId, 'f3');
     });
 
     //PLAYER
 
     it("Should go through the phase.", async () => {
         // given
-        const phase = new ChallengePhase(sceneMock, {
+        vi.spyOn(cardBattleMock, 'isPlayMiniGame').mockResolvedValue(true);
+        const phase = new StartPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenResultWindows: () => keyboard.emit('keydown-ENTER'),
         });
-        const changeToOriginal = phase.changeToStartPhase.bind(phase);
+        const changeToOriginal = phase.changeToDrawPhase.bind(phase);
 
         // when
         await expectAsync<void>(res => {
-            vi.spyOn(phase, 'changeToStartPhase').mockImplementation(() => {
+            vi.spyOn(phase, 'changeToDrawPhase').mockImplementation(() => {
                 changeToOriginal();
                 res();
             });
@@ -72,7 +76,7 @@ describe("ChallengePhase.test", () => {
         });
 
         // then
-        expect(sceneMock.isPhase("StartPhase")).toBe(true);
+        expect(sceneMock.isPhase("DrawPhase")).toBe(true);
     });
     
 });
