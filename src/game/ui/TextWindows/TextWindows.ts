@@ -99,12 +99,7 @@ export class TextWindows {
             return;
         }
         this.#textWindows.forEach((window, index) => {
-            if (!index && window.isOpened()) return window.close({ ...config, 
-                onComplete: () => {
-                    if (config?.onComplete) config.onComplete();
-                    this.#empty();
-                } 
-            });
+            if (!index && window.isOpened()) return window.close(config);
             window.close();
         });
     }

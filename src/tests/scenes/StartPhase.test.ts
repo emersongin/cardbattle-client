@@ -1,4 +1,4 @@
-import { describe, beforeAll, beforeEach, expect, vi, it } from "vitest";
+import { describe, beforeAll, beforeEach, expect, vi, test } from "vitest";
 import PhaserMock from "@mocks/phaser";
 import CardBattleMemory from "@game/api/CardBattleMemory";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
@@ -56,12 +56,34 @@ describe("StartPhase.test", () => {
 
     //PLAYER
 
-    it("Should go through the phase.", async () => {
+    test("Player should play the mini game.", async () => {
         // given
         vi.spyOn(cardBattleMock, 'isPlayMiniGame').mockResolvedValue(true);
         const phase = new StartPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
+            onOpenResultWindows: () => keyboard.emit('keydown-ENTER'),
+        });
+        const changeToOriginal = phase.changeToDrawPhase.bind(phase);
+
+        // when
+        await expectAsync<void>(res => {
+            vi.spyOn(phase, 'changeToDrawPhase').mockImplementation(() => {
+                changeToOriginal();
+                res();
+            });
+            sceneMock.changePhase(phase);
+        });
+
+        // then
+        expect(sceneMock.isPhase("DrawPhase")).toBe(true);
+    });
+
+    test("Opponent should play the mini game.", async () => {
+        // given
+        vi.spyOn(cardBattleMock, 'isPlayMiniGame').mockResolvedValue(false);
+        const phase = new StartPhase(sceneMock, {
+            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenResultWindows: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToOriginal = phase.changeToDrawPhase.bind(phase);
