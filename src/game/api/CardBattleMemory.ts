@@ -21,7 +21,7 @@ import { BoardWindow } from '../ui/BoardWindow/BoardWindow';
 import { BattlePoints } from '../objects/BattlePoints';
 import { CardFactory } from '../ui/Card/CardFactory';
 import { PowerAction } from '../objects/PowerAction';
-import { folders, redDeck } from '../data/decks';
+import { Folder, folders, redDeck } from '../data/decks';
 
 const delayMock = 100;
 let counter = 0;
@@ -48,7 +48,7 @@ export default class CardBattleMemory implements CardBattle {
         [WINS]: 0,
         [PASS]: false,
     };
-    #playerDeck: CardData[] = [];
+    #playerDeck: Folder = { id: '', deck: [] };
     #playerHand: CardData[] = [];
     #playerTrash: CardData[] = [];
     #playerBattleCardset: CardData[] = [];
@@ -69,16 +69,12 @@ export default class CardBattleMemory implements CardBattle {
         [WINS]: 0,
         [PASS]: false,
     };
-    #opponentDeck: CardData[] = [];
+    #opponentDeck: Folder = { id: '', deck: [] };
     #opponentHand: CardData[] = [];
     #opponentTrash: CardData[] = [];
     #opponentBattleCardset: CardData[] = [];
 
     constructor(readonly scene: VueScene) {}
-
-    getTotalCardsInDeck(): number {
-        return this.#playerDeck.length;
-    }
 
     createRoom(): Promise<RoomData> {
         return new Promise((resolve) => {
@@ -104,7 +100,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #setPlayerDeck(deck: CardData[]): void {
-        this.#playerDeck = deck;
+        this.#playerDeck.deck = deck;
     }
 
     #setPlayerHand(hand: CardData[]): void {
@@ -120,7 +116,7 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #setOpponentDeck(deck: CardData[]): void {
-        this.#opponentDeck = deck;
+        this.#opponentDeck.deck = deck;
     }
 
     #setOpponentHand(hand: CardData[]): void {
@@ -207,6 +203,22 @@ export default class CardBattleMemory implements CardBattle {
         });
     }
 
+    #getDeck(): CardData[] {
+        return this.#playerDeck.deck;
+    }
+
+    #getOpponentDeck(): CardData[] {
+        return this.#opponentDeck.deck;
+    }
+
+    #getTotalCardsInDeck(): number {
+        return this.#getDeck().length;
+    }
+
+    #getOpponentTotalCardsInDeck(): number {
+        return this.#getOpponentDeck().length;
+    }
+
     getOpponentData(playerId: string, callback: (opponent: OpponentData) => void): Promise<void> {
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -270,11 +282,11 @@ export default class CardBattleMemory implements CardBattle {
             if (this.#isPlayer(playerId)) {
                 this.#setPlayerDeck(deck);
                 this.#setPlayerStep(SET_DECK);
-                this.#playerBoard[DECK] = this.#playerDeck.length;
+                this.#playerBoard[DECK] = this.#getTotalCardsInDeck();
                 //mock
                 this.#setOpponentDeck(ArrayUtil.clone(redDeck));
                 this.#setOpponentStep(SET_DECK);
-                this.#opponentBoard[DECK] = this.#opponentDeck.length;
+                this.#opponentBoard[DECK] = this.#getOpponentTotalCardsInDeck();
                 // mock
             };
             if (this.#isOpponent(playerId)) {
@@ -408,26 +420,26 @@ export default class CardBattleMemory implements CardBattle {
     }
 
     #shufflePlayerDeck(): void {
-        this.#playerDeck = ArrayUtil.shuffle<CardData>(this.#playerDeck);
+        this.#setPlayerDeck(ArrayUtil.shuffle<CardData>(this.#playerDeck.deck));
     }
 
     #drawPlayerCards(): void {
-        const powerCards = this.#playerDeck.filter(card => card.type === POWER).slice(0, 4);
-        const battleCards = this.#playerDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
+        const powerCards = this.#getDeck().filter(card => card.type === POWER).slice(0, 4);
+        const battleCards = this.#getDeck().filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
-        this.#playerDeck = this.#playerDeck.filter(card => !drawnCards.includes(card));
+        this.#setPlayerDeck(this.#getDeck().filter(card => !drawnCards.includes(card)));
         this.#setPlayerHand(drawnCards);
     }
 
     #shuffleOpponentDeck(): void {
-        this.#opponentDeck = ArrayUtil.shuffle<CardData>(this.#opponentDeck);
+        this.#setOpponentDeck(ArrayUtil.shuffle<CardData>(this.#getOpponentDeck()));
     }
 
     #drawOpponentCards(): void {
-        const powerCards = this.#opponentDeck.filter(card => card.type === POWER).slice(0, 4);
-        const battleCards = this.#opponentDeck.filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
+        const powerCards = this.#getOpponentDeck().filter(card => card.type === POWER).slice(0, 4);
+        const battleCards = this.#getOpponentDeck().filter(card => card.type === BATTLE).slice(0, (6 - powerCards.length));
         const drawnCards = [...powerCards, ...battleCards];
-        this.#opponentDeck = this.#opponentDeck.filter(card => !drawnCards.includes(card));
+        this.#setOpponentDeck(this.#getOpponentDeck().filter(card => !drawnCards.includes(card)));
         this.#setOpponentHand(drawnCards);
     }
 
@@ -455,7 +467,7 @@ export default class CardBattleMemory implements CardBattle {
             this.#playerBoard[BLUE] += this.#playerHand.filter(card => card.color === BLUE).length;
             this.#playerBoard[BLACK] += this.#playerHand.filter(card => card.color === BLACK).length;
             this.#playerBoard[WHITE] += this.#playerHand.filter(card => card.color === WHITE).length;
-            this.#playerBoard[DECK] = this.#playerDeck.length;
+            this.#playerBoard[DECK] = this.#getDeck().length;
             this.#playerBoard[HAND] = this.#playerHand.length;
             this.#playerBoard[TRASH] = this.#playerTrash.length;
             this.#setPlayerStep(WAITING_TO_PLAY);
@@ -466,7 +478,7 @@ export default class CardBattleMemory implements CardBattle {
             this.#opponentBoard[BLUE] += this.#opponentHand.filter(card => card.color === BLUE).length;
             this.#opponentBoard[BLACK] += this.#opponentHand.filter(card => card.color === BLACK).length;
             this.#opponentBoard[WHITE] += this.#opponentHand.filter(card => card.color === WHITE).length;
-            this.#opponentBoard[DECK] = this.#opponentDeck.length;
+            this.#opponentBoard[DECK] = this.#getOpponentTotalCardsInDeck();
             this.#opponentBoard[HAND] = this.#opponentHand.length;
             this.#opponentBoard[TRASH] = this.#opponentTrash.length;
             this.#setOpponentStep(WAITING_TO_PLAY);

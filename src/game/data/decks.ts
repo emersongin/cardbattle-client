@@ -172,6 +172,11 @@ function createDeck(cards: CardData[], number: number) {
     return deck;
 }
 
+export type Folder = {
+    id: string;
+    deck: CardData[];
+};
+
 const folders = [
     {
         id: 'f1',
@@ -185,6 +190,6 @@ const folders = [
         id: 'f3',
         deck: blueDeck
     }
-] as { id: string; deck: CardData[] }[];
+] as Folder[];
 
 export { folders, redDeck, greenDeck, blueDeck, battleDeck, powerDeck };

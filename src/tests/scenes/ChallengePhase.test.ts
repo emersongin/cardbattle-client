@@ -24,9 +24,6 @@ describe("ChallengePhase.test", () => {
     let keyboard: Phaser.Input.Keyboard.KeyboardPlugin;
     let cardBattleMock: CardBattle;
     let roomId: string;
-    let playerId: string;
-    let numOfPlayerPlays: number;
-    let numOfOpponentPlays: number;
 
     beforeAll(() => {
         sceneMock = new PhaserMock.Scene({
@@ -38,15 +35,12 @@ describe("ChallengePhase.test", () => {
     });
 
     beforeEach(async () => {
-        numOfPlayerPlays = 0;
-        numOfOpponentPlays = 0;
         cardBattleMock = new CardBattleMemory(sceneMock);
         sceneMock.setCardBattle(cardBattleMock);
 
         // CREATE ROOM
         const playerRoom = await cardBattleMock.createRoom();
         roomId = playerRoom.roomId;
-        playerId = playerRoom.playerId;
         sceneMock.room = playerRoom;
         // CHALLENGE PHASE
         await cardBattleMock.joinRoom(roomId);
@@ -73,6 +67,32 @@ describe("ChallengePhase.test", () => {
 
         // then
         expect(sceneMock.isPhase("StartPhase")).toBe(true);
+    });
+
+    it("Should select the third deck.", async () => {
+        // given
+        const phase = new ChallengePhase(sceneMock, {
+            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
+            onOpenCommandWindow: () => {
+                keyboard.emit('keydown-DOWN');
+                keyboard.emit('keydown-DOWN');
+                keyboard.emit('keydown-ENTER');
+            },
+        });
+        let folderIdMock = '';
+
+        // when
+        await expectAsync<void>(res => {
+            vi.spyOn(cardBattleMock, 'setFolder').mockImplementation(async (_playerId: string, folderId: string) => {
+                folderIdMock = folderId;
+                res();
+                return true;
+            });
+            sceneMock.changePhase(phase);
+        });
+
+        // then
+        expect(folderIdMock).toBe('f3');
     });
     
 });
