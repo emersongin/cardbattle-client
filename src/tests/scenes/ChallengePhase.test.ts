@@ -48,13 +48,19 @@ describe("ChallengePhase.test", () => {
 
     //PLAYER
 
-    it("Should go through the phase.", async () => {
+    it("Should go through the phase and select first deck.", async () => {
         // given
         const phase = new ChallengePhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
         });
         const changeToOriginal = phase.changeToStartPhase.bind(phase);
+        let folderIdMock = '';
+        const setFolderOriginal = cardBattleMock.setFolder;
+        vi.spyOn(cardBattleMock, 'setFolder').mockImplementation(async (_playerId: string, folderId: string) => {
+            folderIdMock = folderId;
+            return setFolderOriginal.apply(cardBattleMock, [_playerId, folderId]);
+        });
 
         // when
         await expectAsync<void>(res => {
@@ -66,7 +72,33 @@ describe("ChallengePhase.test", () => {
         });
 
         // then
+        expect(folderIdMock).toBe('f1');
         expect(sceneMock.isPhase("StartPhase")).toBe(true);
+    });
+
+    it("Should select the second deck.", async () => {
+        // given
+        const phase = new ChallengePhase(sceneMock, {
+            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
+            onOpenCommandWindow: () => {
+                keyboard.emit('keydown-DOWN');
+                keyboard.emit('keydown-ENTER');
+            },
+        });
+        let folderIdMock = '';
+
+        // when
+        await expectAsync<void>(res => {
+            vi.spyOn(cardBattleMock, 'setFolder').mockImplementation(async (_playerId: string, folderId: string) => {
+                folderIdMock = folderId;
+                res();
+                return true;
+            });
+            sceneMock.changePhase(phase);
+        });
+
+        // then
+        expect(folderIdMock).toBe('f2');
     });
 
     it("Should select the third deck.", async () => {
