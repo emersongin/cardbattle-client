@@ -1,4 +1,4 @@
-import { describe, beforeAll, beforeEach, expect, vi, it } from "vitest";
+import { describe, beforeAll, beforeEach, expect, vi, test } from "vitest";
 import PhaserMock from "@mocks/phaser";
 import CardBattleMemory from "@game/api/CardBattleMemory";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
@@ -48,7 +48,7 @@ describe("ChallengePhase.test", () => {
 
     //PLAYER
 
-    it("Should go through the phase and select first deck.", async () => {
+    test("Select first deck and complete phase.", async () => {
         // given
         const phase = new ChallengePhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
@@ -76,7 +76,7 @@ describe("ChallengePhase.test", () => {
         expect(sceneMock.isPhase("StartPhase")).toBe(true);
     });
 
-    it("Should select the second deck.", async () => {
+    test("Select the second deck.", async () => {
         // given
         const phase = new ChallengePhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
@@ -101,7 +101,7 @@ describe("ChallengePhase.test", () => {
         expect(folderIdMock).toBe('f2');
     });
 
-    it("Should select the third deck.", async () => {
+    test("Select the third deck.", async () => {
         // given
         const phase = new ChallengePhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),

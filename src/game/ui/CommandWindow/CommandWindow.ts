@@ -117,14 +117,16 @@ export class CommandWindow {
         this.#updateOptions();
     }
 
-    select(): void {
+    select(onComplete?: (value: string) => void): void {
         if (this.commands[this.#selectedIndex].disabled) {
             console.log('Sound disabled command');
             return;
         }
         this.#close({
             onComplete: async () => {
-                await this.commands[this.#selectedIndex].onSelect();
+                const command = this.commands[this.#selectedIndex];
+                await command.onSelect();
+                if (onComplete) onComplete(command.value);
             }
         });
     }

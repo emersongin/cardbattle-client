@@ -21,6 +21,7 @@ export interface CardBattle {
     isOpponentDeckSet: (playerId: string) => Promise<boolean>;
     listenOpponentDeckSet: (playerId: string, callback: (isDeckSet?: boolean) => void) => Promise<void>;
     isPlayMiniGame: (playerId: string) => Promise<boolean>;
+    getMiniGameOptions: (playerId: string) => Promise<CommandOption[]>;
     setMiniGameChoice: (playerId: string, choice: string) => Promise<void>;
     listenOpponentEndMiniGame: (playerId: string, callback: (choice: string) => void) => Promise<void>;
     isOpponentReadyDrawCards: (playerId: string) => Promise<boolean>;

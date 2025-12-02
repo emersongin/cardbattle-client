@@ -76,7 +76,7 @@ export class CardBattleScene extends VueScene {
 
         // BATTLE PHASE
 
-        this.changePhase(new ChallengePhase(this));
+        this.changePhase(new StartPhase(this));
     }
 
     changePhase(phase: Phase, ...params: any[]): void {

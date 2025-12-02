@@ -132,13 +132,13 @@ export class CardBattlePhase implements Phase {
         this.#commandWindow.open(config);
     }
 
-    startCommandWindowSelection(): void {
+    startCommandWindowSelection(onComplete?: (value: string) => void): void {
         const commandWindow = this.getCommandWindow();
         this.scene.addKeyUpListening({ onTrigger: () => commandWindow.cursorUp() });
         this.scene.addKeyDownListening({ onTrigger: () => commandWindow.cursorDown() });
         this.scene.addKeyEnterListeningOnce({ onTrigger: () => {
             this.scene.removeAllKeyListening();
-            commandWindow.select();
+            commandWindow.select(onComplete);
         } });
         commandWindow.selectByIndex(0);
     }

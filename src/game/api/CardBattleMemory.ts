@@ -265,6 +265,7 @@ export default class CardBattleMemory implements CardBattle {
                 });
                 const options = folderDescriptions.map(folder => ({
                     description: `${folder.name} ${folder.description}`,
+                    value: folder.id,
                     onSelect: async () => { 
                         await this.setFolder(playerId, folder.id); 
                     },
@@ -342,6 +343,29 @@ export default class CardBattleMemory implements CardBattle {
                 };
             }, delayMock);
         });
+    }
+
+    getMiniGameOptions(playerId: string): Promise<CommandOption[]> {
+        const options = [
+            {
+                description: 'option: Draw white card',
+                value: WHITE,
+                onSelect: async () => {
+                    await this.setMiniGameChoice(playerId, WHITE);
+                },
+                disabled: false,
+            },
+            {
+                description: 'option: Draw black card',
+                value: BLACK,
+                onSelect: async () => {
+                    await this.setMiniGameChoice(playerId, BLACK);
+                },
+                disabled: false,
+            },
+        ];
+        ArrayUtil.shuffle(options);        
+        return Promise.resolve(options);
     }
 
     setMiniGameChoice(playerId: string, choice: string): Promise<void> {

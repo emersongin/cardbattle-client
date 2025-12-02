@@ -68,24 +68,17 @@ export class ChallengePhase extends CardBattlePhase implements Phase {
     }
 
     async #createAndOpenCommandWindow(): Promise<void> {
-        this.#createFoldersCommandWindow(await this.cardBattle.getFoldersOptions(this.scene.getPlayerId()));
+        const options = await this.cardBattle.getFoldersOptions(this.scene.getPlayerId());
+        this.#createFoldersCommandWindow(options);
         super.openCommandWindow({ 
             onComplete: () => {
-                super.startCommandWindowSelection();
+                super.startCommandWindowSelection(() => this.changeToStartPhase());
                 super.publishEvent('onOpenCommandWindow');
             } 
         });
     }
 
     #createFoldersCommandWindow(options: CommandOption[]): void {
-        options = options.map(option => {
-            const setFolder = option.onSelect;
-            option.onSelect = async () => {
-                await setFolder();
-                this.changeToStartPhase();
-            }
-            return option;
-        });
         super.createCommandWindowCentered('Choose your folder', options);
     }
 
