@@ -1,9 +1,9 @@
-import { describe, beforeAll, beforeEach, expect, vi, test } from "vitest";
+import { describe, beforeAll, beforeEach, expect, vi, it } from "vitest";
 import PhaserMock from "@mocks/phaser";
 import CardBattleMemory from "@game/api/CardBattleMemory";
 import { CardBattleScene } from "@game/scenes/CardBattle/CardBattleScene";
 import { CardBattle } from "@game/api/CardBattle";
-import { StartPhase } from "@game/scenes/CardBattle/phase/StartPhase";
+import { DrawPhase } from "@/game/scenes/CardBattle/phase/DrawPhase";
 
 function getKeyboard(scene: Phaser.Scene): Phaser.Input.Keyboard.KeyboardPlugin {
     const keyboard = scene.input.keyboard;
@@ -19,12 +19,14 @@ async function expectAsync<T>(
     return await new Promise<T>((res, rej) => fn(res, rej));
 }
 
-describe("StartPhase.test", () => {
+describe("DrawPhase.test", () => {
     let sceneMock: CardBattleScene;
     let keyboard: Phaser.Input.Keyboard.KeyboardPlugin;
     let cardBattleMock: CardBattle;
     let roomId: string;
     let playerId: string;
+    let numOfPlayerPlays: number;
+    let numOfOpponentPlays: number;
 
     beforeAll(() => {
         sceneMock = new PhaserMock.Scene({
@@ -36,6 +38,8 @@ describe("StartPhase.test", () => {
     });
 
     beforeEach(async () => {
+        numOfPlayerPlays = 0;
+        numOfOpponentPlays = 0;
         cardBattleMock = new CardBattleMemory(sceneMock);
         sceneMock.setCardBattle(cardBattleMock);
 
@@ -46,25 +50,21 @@ describe("StartPhase.test", () => {
         sceneMock.room = playerRoom;
         // CHALLENGE PHASE
         await cardBattleMock.joinRoom(roomId);
-        // START PHASE
-        await cardBattleMock.setFolder(playerId, 'f3');
     });
 
     //PLAYER
 
-    test.only("play the mini game and win.", async () => {
+    it("Should go through the phase.", async () => {
         // given
-        vi.spyOn(cardBattleMock, 'isPlayMiniGame').mockResolvedValue(true);
-        const phase = new StartPhase(sceneMock, {
+        const phase = new DrawPhase(sceneMock, {
             onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
             onOpenCommandWindow: () => keyboard.emit('keydown-ENTER'),
-            onOpenResultWindows: () => keyboard.emit('keydown-ENTER'),
         });
-        const changeToOriginal = phase.changeToDrawPhase.bind(phase);
+        const changeToOriginal = phase.changeToStartPhase.bind(phase);
 
         // when
         await expectAsync<void>(res => {
-            vi.spyOn(phase, 'changeToDrawPhase').mockImplementation(() => {
+            vi.spyOn(phase, 'changeToStartPhase').mockImplementation(() => {
                 changeToOriginal();
                 res();
             });
@@ -72,35 +72,7 @@ describe("StartPhase.test", () => {
         });
 
         // then
-        expect(sceneMock.isPhase("DrawPhase")).toBe(true);
-    });
-
-    // play the mini game and lose
-    // opponent plays the mini game and wins
-    // opponent plays the mini game and loses
-
-
-
-    test("Opponent should play the mini game.", async () => {
-        // given
-        vi.spyOn(cardBattleMock, 'isPlayMiniGame').mockResolvedValue(false);
-        const phase = new StartPhase(sceneMock, {
-            onOpenPhaseWindows: () => keyboard.emit('keydown-ENTER'),
-            onOpenResultWindows: () => keyboard.emit('keydown-ENTER'),
-        });
-        const changeToOriginal = phase.changeToDrawPhase.bind(phase);
-
-        // when
-        await expectAsync<void>(res => {
-            vi.spyOn(phase, 'changeToDrawPhase').mockImplementation(() => {
-                changeToOriginal();
-                res();
-            });
-            sceneMock.changePhase(phase);
-        });
-
-        // then
-        expect(sceneMock.isPhase("DrawPhase")).toBe(true);
+        expect(sceneMock.isPhase("StartPhase")).toBe(true);
     });
     
 });

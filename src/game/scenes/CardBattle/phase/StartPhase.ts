@@ -1,10 +1,11 @@
-import { WHITE, BLACK } from "@constants/colors";
+
 import { Phase } from "@scenes/CardBattle/phase/Phase";
 import { CardBattlePhase } from "@scenes/CardBattle/phase/CardBattlePhase";
 import { DrawPhase } from "@scenes/CardBattle/phase/DrawPhase";
-import { ArrayUtil } from "@utils/ArrayUtil";
 import { CardBattleScene } from "../CardBattleScene";
-import { TweenConfig } from "@/game/types/TweenConfig";
+import { TweenConfig } from "@game/types/TweenConfig";
+import { WHITE } from "@game/constants/colors";
+import { CommandOption } from "@game/ui/CommandWindow/CommandOption";
 
 export type StartPhaseEvents = {
     onOpenPhaseWindows?: () => void;
@@ -77,41 +78,23 @@ export class StartPhase extends CardBattlePhase implements Phase {
         });
     }
 
-    #createAndOpenMiniGameCommandWindow(): void {
-        this.#createMiniGameCommandWindow();
+    async #createAndOpenMiniGameCommandWindow(): Promise<void> {
+        const options = await this.cardBattle.getMiniGameOptions(this.scene.getPlayerId());
+        this.#createMiniGameCommandWindow(options);
         super.openCommandWindow({
             onComplete: () => {
-                super.startCommandWindowSelection();
+                super.startCommandWindowSelection((choice) => this.#createResultWindow(choice === WHITE));
                 super.publishEvent('onOpenCommandWindow');
             }
         });
     }
 
-    #createMiniGameCommandWindow(): void {
-        const options = [
-            {
-                description: 'option: Draw white card',
-                onSelect: async () => {
-                    await this.cardBattle.setMiniGameChoice(this.scene.getPlayerId(), WHITE);
-                    this.#createResultWindow(WHITE);
-                },
-                disabled: false,
-            },
-            {
-                description: 'option: Draw black card',
-                onSelect: async () => {
-                    await this.cardBattle.setMiniGameChoice(this.scene.getPlayerId(), BLACK);
-                    this.#createResultWindow(BLACK);
-                },
-                disabled: false,
-            },
-        ];
-        ArrayUtil.shuffle(options);
+    #createMiniGameCommandWindow(options: CommandOption[]): void {
         super.createCommandWindowCentered('Select a card', options);
     }
 
-    #createResultWindow(choice: string): void {
-        const resultMessage = choice === WHITE ? 'You go first!' : 'Opponent goes first!';
+    #createResultWindow(wins: boolean): void {
+        const resultMessage = wins ? 'You go first!' : 'Opponent goes first!';
         super.createTextWindowCentered(resultMessage, { textAlign: 'center' });
         super.openAllWindows({
             onComplete: () => {
@@ -137,7 +120,7 @@ export class StartPhase extends CardBattlePhase implements Phase {
                 await this.cardBattle.listenOpponentEndMiniGame(
                     this.scene.getPlayerId(),
                     (choice: string) => {
-                        super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice) });
+                        super.closeAllWindows({ onComplete: () => this.#createResultWindow(choice === WHITE) });
                     }
                 );                           
             }
